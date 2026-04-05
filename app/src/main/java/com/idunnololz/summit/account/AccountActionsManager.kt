@@ -24,7 +24,6 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils
@@ -41,8 +40,10 @@ import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.models.GetPostResponse
 import com.idunnololz.summit.models.GetPostsResponse
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
+import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -220,9 +221,11 @@ class AccountActionsManager @Inject constructor(
     override val downvoteColor: Int
       get() = preferences.downvoteColor
 
-    override fun neutralColor(context: Context): Int = colorManager.textColor
+    override fun neutralColor(context: Context): ColorStateList =
+      context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor)!!
 
-    override fun controlColor(context: Context): ColorStateList = colorManager.controlColor
+    override fun controlColor(context: Context): ColorStateList =
+      context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor)!!
   }
 
   private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {

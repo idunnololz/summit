@@ -178,7 +178,6 @@ class SimpleDiskCache(
     }
   }
 
-
   @Synchronized
   @Throws(IOException::class)
   fun put(key: String, value: ByteArray, annotations: Map<String, Serializable>) {

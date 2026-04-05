@@ -13,7 +13,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -38,7 +37,6 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
@@ -74,6 +72,7 @@ import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostFabQuickActions
@@ -333,7 +332,7 @@ class PostFragment :
 
     if (!args.isSinglePage) {
       // DO NOT add back press dispatchers in Fragment.onCreate(). For some reason it doesn't work
-      // when the activity is killed and recreated. 
+      // when the activity is killed and recreated.
       requireSummitActivity().onBackPressedDispatcher
         .addCallback(
           this,
@@ -367,7 +366,7 @@ class PostFragment :
                   {
                     unlockNavBar()
                   },
-                  200
+                  200,
                 )
               }
               slidingPaneFragment = null
@@ -824,7 +823,6 @@ class PostFragment :
       }
       viewModel.screenshotMode.observe(viewLifecycleOwner) { showScreenshotMode ->
         updateScreenshotMode(showScreenshotMode)
-        screenshotModeBackPressHandler.isEnabled = showScreenshotMode
       }
 
       nextResult.setOnClickListener {
@@ -904,12 +902,6 @@ class PostFragment :
             this.gravity = Gravity.BOTTOM
           }
           binding.root.addView(root)
-          root.updatePadding(
-            left = 0,
-            top = 0,
-            right = 0,
-            bottom = getMainActivity()?.insets?.value?.bottomInset ?: 0,
-          )
 
           screenshotModeAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -925,10 +917,18 @@ class PostFragment :
           }
         }
       binding.fab.hide()
+      if (args.isSinglePage) {
+        getSummitActivity()?.hideNavBar()
+      }
     } else {
       binding.root.removeView(binding.root.findViewById(R.id.screenshot_mode_container))
       binding.fab.show()
+      if (args.isSinglePage) {
+        getSummitActivity()?.showNavBar()
+      }
     }
+
+    screenshotModeBackPressHandler.isEnabled = screenshotMode
   }
 
   private fun highlightMatch(match: QueryMatchHelper.QueryResult, scrolled: Boolean = false) {
@@ -1215,6 +1215,8 @@ class PostFragment :
                 }
               }
             }
+          } else if (!hasConsumedJumpToComments && args.jumpToComments) {
+            jumpToComments()
           }
         }
       }
@@ -1253,13 +1255,6 @@ class PostFragment :
     binding.recyclerView.setupForPostAndComments(preferences)
     binding.fastScroller.setRecyclerView(binding.recyclerView)
 
-    if (!hasConsumedJumpToComments && args.jumpToComments) {
-      Log.d("TEST", "jumping to comments")
-      hasConsumedJumpToComments = true
-      (binding.recyclerView.layoutManager as LinearLayoutManager)
-        .scrollToPositionWithOffset(1, scrollOffsetTop)
-    }
-
     viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
       updateTitle(viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: "")
     }
@@ -1269,6 +1264,27 @@ class PostFragment :
         binding.recyclerView.width,
         binding.recyclerView.height,
       )
+    }
+  }
+
+  private fun jumpToComments() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      repeat(5) out@{
+        delay(10)
+
+        if (!isBindingAvailable()) {
+          return@launch
+        }
+
+        val postIndex = adapter?.getPostItemIndex()
+        if (postIndex == -1 || postIndex == null) {
+          return@out
+        }
+
+        hasConsumedJumpToComments = true
+        (binding.recyclerView.layoutManager as LinearLayoutManager)
+          .scrollToPositionWithOffset(postIndex + 1, scrollOffsetTop)
+      }
     }
   }
 
@@ -1535,7 +1551,6 @@ class PostFragment :
     }
   }
 
-  private fun getSlidingPaneProvider(): SlidingPaneControllerProvider? {
-    return parentFragment as? SlidingPaneControllerProvider
-  }
+  private fun getSlidingPaneProvider(): SlidingPaneControllerProvider? =
+    parentFragment as? SlidingPaneControllerProvider
 }

@@ -92,23 +92,16 @@ class LemmySwipeActionCallback(
     }
     recyclerView.requestApplyInsets()
     recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
-      override fun onInterceptTouchEvent(
-        rv: RecyclerView,
-        e: MotionEvent,
-      ): Boolean {
+      override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         startX = e.x
         return false
       }
 
-      override fun onTouchEvent(
-        rv: RecyclerView,
-        e: MotionEvent,
-      ) {
+      override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
       }
 
       override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
       }
-
     })
   }
 

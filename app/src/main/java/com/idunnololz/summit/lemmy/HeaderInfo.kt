@@ -3,8 +3,8 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.Person
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.tsToConcise
 

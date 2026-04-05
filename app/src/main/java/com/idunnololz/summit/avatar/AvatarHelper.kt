@@ -157,7 +157,6 @@ class AvatarHelper @Inject constructor(
     (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
 
     if (iconUrl.isNullOrBlank()) {
-
       val cached = accountImageGenerator.getCachedDrawableForGeneric(communityRef.getKey())
       if (cached != null) {
         imageView.dispose()

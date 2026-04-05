@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.GetSiteInstanceChooserSearchResponseItem
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param result 
+ *
+ * @param result
  */
 
+data class GetSiteInstanceChooserSearchResponse(
 
-data class GetSiteInstanceChooserSearchResponse (
+  @SerializedName("result")
+  val result: kotlin.collections.List<GetSiteInstanceChooserSearchResponseItem>,
 
-    @SerializedName("result")
-    val result: kotlin.collections.List<GetSiteInstanceChooserSearchResponseItem>
-
-) {
-
-
-}
-
+)

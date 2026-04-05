@@ -7,62 +7,63 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.PollChoice
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param choices 
- * @param endPoll 
+ *
+ * @param choices
+ * @param endPoll
  * @param mode single or multiple - determines whether people can vote for one or multiple options
- * @param localOnly 
- * @param latestVote 
- * @param myVotes 
+ * @param localOnly
+ * @param latestVote
+ * @param myVotes
  */
 
+data class PostPoll(
 
-data class PostPoll (
+  @SerializedName("choices")
+  val choices: kotlin.collections.List<PollChoice>,
 
-    @SerializedName("choices")
-    val choices: kotlin.collections.List<PollChoice>,
+  @SerializedName("end_poll")
+  val endPoll: kotlin.String? = null,
 
-    @SerializedName("end_poll")
-    val endPoll: kotlin.String? = null,
+  /* single or multiple - determines whether people can vote for one or multiple options */
+  @SerializedName("mode")
+  val mode: PostPoll.Mode? = null,
 
-    /* single or multiple - determines whether people can vote for one or multiple options */
-    @SerializedName("mode")
-    val mode: PostPoll.Mode? = null,
+  @SerializedName("local_only")
+  val localOnly: kotlin.Boolean? = false,
 
-    @SerializedName("local_only")
-    val localOnly: kotlin.Boolean? = false,
+  @SerializedName("latest_vote")
+  val latestVote: kotlin.String? = null,
 
-    @SerializedName("latest_vote")
-    val latestVote: kotlin.String? = null,
-
-    @SerializedName("my_votes")
-    val myVotes: kotlin.collections.List<kotlin.Int>? = null
+  @SerializedName("my_votes")
+  val myVotes: kotlin.collections.List<kotlin.Int>? = null,
 
 ) {
 
-    /**
-     * single or multiple - determines whether people can vote for one or multiple options
-     *
-     * Values: single,multiple
-     */
-    enum class Mode(val value: kotlin.String) {
-        @SerializedName(value = "single") single("single"),
-        @SerializedName(value = "multiple") multiple("multiple");
-    }
+  /**
+   * single or multiple - determines whether people can vote for one or multiple options
+   *
+   * Values: single,multiple
+   */
+  enum class Mode(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "single")
+    single("single"),
 
+    @SerializedName(value = "multiple")
+    multiple("multiple"),
+  }
 }
-

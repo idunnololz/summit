@@ -64,6 +64,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_FINISH_APP_ON_BACK
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GENERATE_MISSING_VIDEO_THUMBNAILS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT_COLOR
@@ -126,7 +127,6 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_QUICK_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_SHOW_UP_AND_DOWN_VOTES
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFERRED_LOCALE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_COMMUNITY_DISPLAY_NAME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_USER_DISPLAY_NAME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFETCH_POSTS
@@ -253,7 +253,7 @@ class Preferences(
         .getString(PreferenceKeys.KEY_COMMUNITY_LAYOUT, null) ?: "",
     )
   } catch (e: IllegalArgumentException) {
-    CommunityLayout.List
+    CommunityLayout.List2
   }
 
   fun setPostsLayout(layout: CommunityLayout) {
@@ -280,6 +280,8 @@ class Preferences(
       PreferenceKeys.KEY_POST_UI_CONFIG_COMPACT
     CommunityLayout.List ->
       PreferenceKeys.KEY_POST_UI_CONFIG_LIST
+    CommunityLayout.List2 ->
+      PreferenceKeys.KEY_POST_UI_CONFIG_LIST2
     CommunityLayout.LargeList ->
       PreferenceKeys.KEY_POST_UI_CONFIG_LARGE_LIST
     CommunityLayout.Card ->
@@ -659,9 +661,7 @@ class Preferences(
   var hideDuplicatePostsOnRead: Boolean
     by booleanPreference(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
   var usePostsFeedHeader: Boolean
-    by booleanPreference(KEY_USE_POSTS_FEED_HEADER, false)
-  var postsFeedHeaderVersion: Int
-    by intPreference(KEY_POSTS_FEED_HEADER_VERSION, PostsFeedHeaderVersions.V2)
+    by booleanPreference(KEY_USE_POSTS_FEED_HEADER, true)
   var inlineVideoDefaultVolume: Float
     by floatPreference(KEY_INLINE_VIDEO_DEFAULT_VOLUME, 0f)
   var swipeBetweenPosts: Boolean
@@ -753,6 +753,11 @@ class Preferences(
     by booleanPreference(KEY_PEEK_IMAGES_ON_LONG_PRESS, false)
   var parseTagsFromPostTitles
     by booleanPreference(KEY_PARSE_TAGS_FROM_POST_TITLES, true)
+  var generateMissingVideoThumbnails
+    by booleanPreference(KEY_GENERATE_MISSING_VIDEO_THUMBNAILS, true)
+
+  var postsFeedHeaderVersion: Int
+    by intPreference(KEY_POSTS_FEED_HEADER_VERSION, PostsFeedHeaderVersions.V2)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

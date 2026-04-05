@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
 import com.idunnololz.summit.util.dagger.json
@@ -17,7 +16,7 @@ import kotlinx.serialization.Serializable
 data class CommunityViewState(
   val communityState: CommunityState,
   val pageScrollStates: List<CommunityViewModel.PageScrollState>,
-): Parcelable {
+) : Parcelable {
   companion object {
 
     private const val SIS_KEY = "LemmyViewState_pp"
@@ -27,7 +26,6 @@ data class CommunityViewState(
   }
 
   fun writeToBundle(outState: Bundle) {
-    Log.d("HAHA", "writeToBundle() ${communityState.communityRef}")
     outState.putParcelable(SIS_KEY, this)
   }
 }
@@ -68,14 +66,14 @@ data class CommunityState(
   val communityRef: CommunityRef,
   val pages: List<PageInfo>,
   val currentPageIndex: Int,
-): Parcelable
+) : Parcelable
 
 @Serializable
 @Parcelize
 data class PageInfo(
   val pageIndex: Int,
   var flags: Int,
-): Parcelable
+) : Parcelable
 
 fun CommunityViewState.getShortDesc(context: Context): String = context.getString(
   R.string.community_state_format,

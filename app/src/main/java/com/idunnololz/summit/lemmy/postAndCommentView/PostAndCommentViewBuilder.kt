@@ -9,7 +9,6 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -52,7 +51,6 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.local.UserRegistrationApplication.Status
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -95,6 +93,7 @@ import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.supportsDownvotes
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
@@ -129,7 +128,6 @@ import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.AutoHorizontalScrollView
 import com.idunnololz.summit.view.LemmyHeaderView
-import com.idunnololz.summit.view.LemmyHeaderView.Companion.DEFAULT_ICON_SIZE_DP
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -337,7 +335,13 @@ class PostAndCommentViewBuilder @Inject constructor(
     postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
-    onImageClick: (Either<PostView, CommentView>, View?, url: String, altUrl: String?, peek: Boolean) -> Unit,
+    onImageClick: (
+      Either<PostView, CommentView>,
+      View?,
+      url: String,
+      altUrl: String?,
+      peek: Boolean,
+    ) -> Unit,
     onVideoClick: (
       Either<PostView, CommentView>,
       url: String,
@@ -439,7 +443,6 @@ class PostAndCommentViewBuilder @Inject constructor(
     )
 
     if (showCommunityIcon) {
-      headerContainer.iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
       val iconImageView = headerContainer.getIconImageView()
       avatarHelper.loadCommunityIcon(iconImageView, postView.community)
       iconImageView.setOnClickListener {
@@ -839,7 +842,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     val isActionsExpanded = isActionsExpanded || !preferences.hideCommentActions
     val isUserMod = currentAccountInfo?.isMod(commentView.post.community_id) == true
     val isCurrentUser = currentUser?.id == commentView.creator.id &&
-        currentUser?.instance == commentView.creator.instance
+      currentUser?.instance == commentView.creator.instance
 
     with(holder) {
       if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
@@ -965,7 +968,6 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
       }
     } else {
-      Log.d("HAHA", "q: ${highlightTextData?.query}")
       val spannable = lemmyTextHelper.bindText(
         textView = text,
         text = content,
@@ -2052,9 +2054,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       paddingHalf,
     )
     setBackgroundResource(selectableItemBackgroundBorderless)
-    imageTintList = context.getColorStateListFromAttribute(
-      androidx.appcompat.R.attr.colorControlNormal,
-    )
+    imageTintList = context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor)
   }
 
   fun ensureCommentsActionButtons(
@@ -2094,7 +2094,6 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     quickActionsBar?.let {
       if (it.parent != null && it.tag == actions && it.getTag(R.id.is_saved) == isSaved) {
-
         it.findViewById<View>(R.id.ca_edit_comment)?.apply {
           if (canEdit) {
             (getTag(R.id.divider) as? View)?.visibility = View.VISIBLE

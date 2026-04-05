@@ -8,9 +8,9 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PersonView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.api.toLemmyPageIndex
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.toCommentHeaderInfo
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import info.debatty.java.stringsimilarity.NGram
@@ -613,8 +614,6 @@ class QueryEngine(
     pages = listOf()
     activePageQueries.clear()
   }
-
-  private fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
   fun getItems() = _items
 }

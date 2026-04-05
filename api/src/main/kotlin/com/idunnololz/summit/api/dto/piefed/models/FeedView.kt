@@ -7,132 +7,126 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Community
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param actorId 
- * @param apDomain 
+ *
+ * @param actorId
+ * @param apDomain
  * @param children Always empty list for resolve_object endpoint
  * @param communities Always empty list for resolve_object endpoint
- * @param communitiesCount 
- * @param id 
- * @param isInstanceFeed 
- * @param local 
- * @param name 
- * @param nsfl 
- * @param nsfw 
+ * @param communitiesCount
+ * @param id
+ * @param isInstanceFeed
+ * @param local
+ * @param name
+ * @param nsfl
+ * @param nsfw
  * @param owner Is the authorized user the creator of the feed?
- * @param `public` 
- * @param published 
- * @param showPostsFromChildren 
- * @param subscribed 
- * @param subscriptionsCount 
- * @param title 
- * @param updated 
+ * @param `public`
+ * @param published
+ * @param showPostsFromChildren
+ * @param subscribed
+ * @param subscriptionsCount
+ * @param title
+ * @param updated
  * @param userId user_id of the feed creator/owner
- * @param banner 
- * @param description 
- * @param descriptionHtml 
- * @param icon 
- * @param parentFeedId 
+ * @param banner
+ * @param description
+ * @param descriptionHtml
+ * @param icon
+ * @param parentFeedId
  */
 
+data class FeedView(
 
-data class FeedView (
+  @SerializedName("actor_id")
+  val actorId: kotlin.String,
 
-    @SerializedName("actor_id")
-    val actorId: kotlin.String,
+  @SerializedName("ap_domain")
+  val apDomain: kotlin.String,
 
-    @SerializedName("ap_domain")
-    val apDomain: kotlin.String,
+  /* Always empty list for resolve_object endpoint */
+  @SerializedName("children")
+  val children: kotlin.collections.List<FeedView>,
 
-    /* Always empty list for resolve_object endpoint */
-    @SerializedName("children")
-    val children: kotlin.collections.List<FeedView>,
+  /* Always empty list for resolve_object endpoint */
+  @SerializedName("communities")
+  val communities: kotlin.collections.List<Community>,
 
-    /* Always empty list for resolve_object endpoint */
-    @SerializedName("communities")
-    val communities: kotlin.collections.List<Community>,
+  @SerializedName("communities_count")
+  val communitiesCount: kotlin.Int,
 
-    @SerializedName("communities_count")
-    val communitiesCount: kotlin.Int,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("is_instance_feed")
+  val isInstanceFeed: kotlin.Boolean,
 
-    @SerializedName("is_instance_feed")
-    val isInstanceFeed: kotlin.Boolean,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("nsfl")
+  val nsfl: kotlin.Boolean,
 
-    @SerializedName("nsfl")
-    val nsfl: kotlin.Boolean,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean,
+  /* Is the authorized user the creator of the feed? */
+  @SerializedName("owner")
+  val owner: kotlin.Boolean,
 
-    /* Is the authorized user the creator of the feed? */
-    @SerializedName("owner")
-    val owner: kotlin.Boolean,
+  @SerializedName("public")
+  val `public`: kotlin.Boolean,
 
-    @SerializedName("public")
-    val `public`: kotlin.Boolean,
+  @SerializedName("published")
+  val published: kotlin.String,
 
-    @SerializedName("published")
-    val published: kotlin.String,
+  @SerializedName("show_posts_from_children")
+  val showPostsFromChildren: kotlin.Boolean,
 
-    @SerializedName("show_posts_from_children")
-    val showPostsFromChildren: kotlin.Boolean,
+  @SerializedName("subscribed")
+  val subscribed: kotlin.Boolean,
 
-    @SerializedName("subscribed")
-    val subscribed: kotlin.Boolean,
+  @SerializedName("subscriptions_count")
+  val subscriptionsCount: kotlin.Int,
 
-    @SerializedName("subscriptions_count")
-    val subscriptionsCount: kotlin.Int,
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("updated")
+  val updated: kotlin.String,
 
-    @SerializedName("updated")
-    val updated: kotlin.String,
+  /* user_id of the feed creator/owner */
+  @SerializedName("user_id")
+  val userId: kotlin.Int,
 
-    /* user_id of the feed creator/owner */
-    @SerializedName("user_id")
-    val userId: kotlin.Int,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
-    @SerializedName("description")
-    val description: kotlin.String? = null,
+  @SerializedName("description_html")
+  val descriptionHtml: kotlin.String? = null,
 
-    @SerializedName("description_html")
-    val descriptionHtml: kotlin.String? = null,
+  @SerializedName("icon")
+  val icon: kotlin.String? = null,
 
-    @SerializedName("icon")
-    val icon: kotlin.String? = null,
+  @SerializedName("parent_feed_id")
+  val parentFeedId: kotlin.Int? = null,
 
-    @SerializedName("parent_feed_id")
-    val parentFeedId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

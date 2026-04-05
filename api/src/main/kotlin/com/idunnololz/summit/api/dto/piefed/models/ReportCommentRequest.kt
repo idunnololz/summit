@@ -7,44 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param commentId 
- * @param reason 
- * @param description 
+ *
+ * @param commentId
+ * @param reason
+ * @param description
  * @param reportRemote Also send report to originating instance
  */
 
+data class ReportCommentRequest(
 
-data class ReportCommentRequest (
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
-    @SerializedName("description")
-    val description: kotlin.String? = null,
+  /* Also send report to originating instance */
+  @SerializedName("report_remote")
+  val reportRemote: kotlin.Boolean? = true,
 
-    /* Also send report to originating instance */
-    @SerializedName("report_remote")
-    val reportRemote: kotlin.Boolean? = true
-
-) {
-
-
-}
-
+)

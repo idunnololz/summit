@@ -43,7 +43,6 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
@@ -53,10 +52,7 @@ import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
-import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
-import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
@@ -91,6 +87,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.main.CommunityAppBarController
 import com.idunnololz.summit.main.MainFragment
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
@@ -108,7 +105,6 @@ import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementTransition
-import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -119,6 +115,7 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
@@ -591,6 +588,7 @@ class CommunityFragment :
         communityInfoViewModel = communityInfoViewModel,
         viewLifecycleOwner = viewLifecycleOwner,
         avatarHelper = avatarHelper,
+        version = preferences.postsFeedHeaderVersion,
         useHeader = preferences.usePostsFeedHeader,
         moreActionsHelper = moreActionsHelper,
         userCommunitiesManager = userCommunitiesManager,
@@ -608,7 +606,10 @@ class CommunityFragment :
       // Prevent flickers by setting the app bar here first
       communityAppBarController.setCommunity(args.communityRef)
       // Prevent flickers by setting the header thing
-      communityAppBarController.setUseHeader(preferences.usePostsFeedHeader)
+      communityAppBarController.setUseHeader(
+        useHeader = preferences.usePostsFeedHeader,
+        version = preferences.postsFeedHeaderVersion,
+      )
 
       viewModel.defaultCommunity.observe(viewLifecycleOwner) {
         if (it != null) {
@@ -1064,31 +1065,40 @@ class CommunityFragment :
         scheduleStartPostponedTransition(rootView)
       }
 
+      fun showFatalErrorMessage(err: String) {
+        recyclerView.visibility = View.GONE
+        loadingView.showErrorText(err)
+        recyclerView.postDelayed(
+          {
+            communityAppBarController?.setExpanded(true)
+          },
+          300,
+        )
+      }
+
       viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
         when (it) {
           is StatefulData.Error -> {
             swipeRefreshLayout.isRefreshing = false
 
-            if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
-              recyclerView.visibility = View.GONE
-              loadingView.showErrorText(
-                R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden,
-              )
-            } else if (it.error is FilterTooAggressiveException) {
-              recyclerView.visibility = View.GONE
-              loadingView.showErrorText(R.string.error_filter_too_aggressive)
-            } else if (it.error is ContentTypeFilterTooAggressiveException) {
-              recyclerView.visibility = View.GONE
-              loadingView.showErrorText(
-                R.string.error_content_type_filter_too_aggressive,
-              )
-            } else if (viewModel.infinity) {
-              loadingView.hideAll()
-              adapter?.onItemsChanged()
-            } else {
-              recyclerView.visibility = View.GONE
-              loadingView.showDefaultErrorMessageFor(it.error)
-            }
+            loadingView.hideAll()
+            adapter?.setFatalError(it.error)
+
+//            if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
+//              showFatalErrorMessage(
+//                getString(R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden))
+//            } else if (it.error is FilterTooAggressiveException) {
+//              showFatalErrorMessage(getString(R.string.error_filter_too_aggressive))
+//            } else if (it.error is ContentTypeFilterTooAggressiveException) {
+//              showFatalErrorMessage(getString(R.string.error_content_type_filter_too_aggressive))
+//            } else if (viewModel.infinity) {
+//              loadingView.hideAll()
+//              adapter?.onItemsChanged()
+//            } else {
+//              adapter?.setFatalError(it.error)
+//              recyclerView.visibility = View.GONE
+//              loadingView.showDefaultErrorMessageFor(it.error)
+//            }
           }
 
           is StatefulData.Loading -> {
@@ -1102,8 +1112,6 @@ class CommunityFragment :
           is StatefulData.Success -> {
             loadingView.hideAll()
 
-            Log.d("HAHA", "loadedPostsData success!")
-
             val adapter = adapter ?: return@a
 
             if (it.data.hideReadCount != null) {
@@ -1115,6 +1123,8 @@ class CommunityFragment :
                 )
                 .show()
             }
+
+            adapter.clearFatalError()
 
             if (it.data.isReadPostUpdate) {
               adapter.onItemsChanged(animate = false)
@@ -1337,7 +1347,10 @@ class CommunityFragment :
       }
 
       customAppBarController.setIsInfinity(viewModel.infinity)
-      customAppBarController.setUseHeader(preferences.usePostsFeedHeader)
+      customAppBarController.setUseHeader(
+        useHeader = preferences.usePostsFeedHeader,
+        version = preferences.postsFeedHeaderVersion,
+      )
       if (viewModel.infinity) {
         onBackPressedHandler.isEnabled = false
       } else {
@@ -1489,6 +1502,9 @@ class CommunityFragment :
       CommunityLayout.List ->
         _layoutSelectorMenu.setChecked(R.id.layout_list)
 
+      CommunityLayout.List2 ->
+        _layoutSelectorMenu.setChecked(R.id.layout_list2)
+
       CommunityLayout.LargeList ->
         _layoutSelectorMenu.setChecked(R.id.layout_large_list)
 
@@ -1600,7 +1616,7 @@ class CommunityFragment :
         is CommunityRef.Local,
         is CommunityRef.All,
         null,
-          -> {
+        -> {
           addItemWithIcon(
             id = R.id.community_info,
             title = R.string.instance_info,
@@ -1661,11 +1677,11 @@ class CommunityFragment :
         addItemWithIcon(
           id = R.id.search,
           title =
-            if (currentCommunityRef is CommunityRef.CommunityRefByName) {
-              getString(R.string.search_in_format, currentCommunityRef.getName(context))
-            } else {
-              getString(R.string.search)
-            },
+          if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+            getString(R.string.search_in_format, currentCommunityRef.getName(context))
+          } else {
+            getString(R.string.search)
+          },
           icon = R.drawable.baseline_search_24,
         )
       }
@@ -1926,11 +1942,13 @@ class CommunityFragment :
       R.id.hide_read_on,
       R.id.hide_read_off,
       R.id.hide_read,
-        -> {
+      -> {
         val anchors = mutableSetOf<Int>()
         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-          it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size
-            ?: it.findLastVisibleItemPosition())
+          it.findFirstCompletelyVisibleItemPosition()..(
+            adapter?.items?.size
+              ?: it.findLastVisibleItemPosition()
+            )
         }
         range?.mapNotNullTo(anchors) {
           (adapter?.items?.getOrNull(it) as? PostListEngineItem.VisiblePostItem)
@@ -1975,7 +1993,7 @@ class CommunityFragment :
 
       R.id.feed_info,
       R.id.community_info,
-        -> {
+      -> {
         currentCommunityRef ?: return@a
         getMainActivity()?.showCommunityInfo(currentCommunityRef)
       }
@@ -1999,7 +2017,7 @@ class CommunityFragment :
             is CommunityRef.MultiCommunity,
             is CommunityRef.Subscribed,
             is CommunityRef.AllSubscribed,
-              -> null
+            -> null
           },
         )
       }
@@ -2077,7 +2095,7 @@ class CommunityFragment :
 
       R.id.subscribe,
       R.id.unsubscribe,
-        -> {
+      -> {
         if (currentCommunityRef is CommunityRef.CommunityRefByName) {
           moreActionsHelper.updateSubscription(
             currentCommunityRef,
@@ -2089,7 +2107,7 @@ class CommunityFragment :
       R.id.enable_nsfw_mode,
       R.id.disable_nsfw_mode,
       R.id.toggle_nsfw_mode,
-        -> {
+      -> {
         val newValue = if (actionId == R.id.enable_nsfw_mode) {
           true
         } else if (actionId == R.id.disable_nsfw_mode) {
@@ -2206,6 +2224,10 @@ class CommunityFragment :
   }
 
   private fun onSelectedLayoutChanged() {
+    if (!isBindingAvailable()) {
+      return
+    }
+
     val currentLayout = currentLayout
     val newPostUiConfig = preferences.getPostInListUiConfig(currentLayout)
     val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
@@ -2215,10 +2237,10 @@ class CommunityFragment :
     val didLayoutRelatedSettingChange =
       postListViewBuilder.showUpAndDownVotes != preferences.postShowUpAndDownVotes
 
+    Log.d(TAG, "onSelectedLayoutChanged() didUiConfigChange: $didUiConfigChange")
+
     if (didLayoutChange) {
-      if (isBindingAvailable()) {
-        updateDecoratorAndGestureHandler(binding.recyclerView)
-      }
+      updateDecoratorAndGestureHandler(binding.recyclerView)
     }
 
     if (didUiConfigChange) {
@@ -2228,8 +2250,11 @@ class CommunityFragment :
     if (didLayoutChange || didUiConfigChange || didActionsChange || didLayoutRelatedSettingChange) {
       adapter?.layout = currentLayout
 
-      // Need to manually call this in case the layout didn't change
-      adapter?.notifyDataSetChanged()
+      binding.recyclerView.recycledViewPool.clear()
+
+      adapter?.let { adapter ->
+        adapter.notifyItemRangeChanged(0, adapter.items.size)
+      }
     }
 
     postListViewBuilder.onPostUiConfigUpdated()
@@ -2249,7 +2274,7 @@ class CommunityFragment :
 
   private fun makeLayoutSelectorMenu(onLayoutSelected: (CommunityLayout) -> Unit): BottomMenu =
     BottomMenu(requireContext()).apply {
-      addItemWithIcon(R.id.layout_list, R.string.list, R.drawable.baseline_view_list_24)
+      addItemWithIcon(R.id.layout_list2, R.string.list, R.drawable.baseline_view_list_24)
       addItemWithIcon(
         R.id.layout_large_list,
         R.string.large_list,
@@ -2275,6 +2300,7 @@ class CommunityFragment :
         R.string.smart_list,
         R.drawable.baseline_view_list_24,
       )
+      addItemWithIcon(R.id.layout_list, R.string.list_old, R.drawable.baseline_view_list_24)
       setTitle(R.string.layout)
 
       setOnMenuItemClickListener { menuItem ->
@@ -2284,6 +2310,9 @@ class CommunityFragment :
 
           R.id.layout_list ->
             onLayoutSelected(CommunityLayout.List)
+
+          R.id.layout_list2 ->
+            onLayoutSelected(CommunityLayout.List2)
 
           R.id.layout_large_list ->
             onLayoutSelected(CommunityLayout.LargeList)

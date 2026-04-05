@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param commentId 
- * @param locked 
+ *
+ * @param commentId
+ * @param locked
  */
 
+data class LockCommentRequest(
 
-data class LockCommentRequest (
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("locked")
+  val locked: kotlin.Boolean,
 
-    @SerializedName("locked")
-    val locked: kotlin.Boolean
-
-) {
-
-
-}
-
+)

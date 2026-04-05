@@ -1,6 +1,5 @@
 package com.idunnololz.summit.models.processed
 
-import android.util.Log
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
@@ -37,51 +36,44 @@ class DtoConverter @Inject constructor(
       creator_blocked = postView.creator_blocked,
       my_vote = postView.my_vote,
       unread_comments = postView.unread_comments,
-      tags = parsedTagsResult?.tags
+      tags = parsedTagsResult?.tags,
     )
   }
 
   fun convertGetPostsResponse(
-    getPostsResponse: GetPostsResponse
-  ): com.idunnololz.summit.models.GetPostsResponse {
-    return com.idunnololz.summit.models.GetPostsResponse(
-      getPostsResponse.posts.map { convertPostView(it) },
-      getPostsResponse.next_page,
-    )
-  }
+    getPostsResponse: GetPostsResponse,
+  ): com.idunnololz.summit.models.GetPostsResponse = com.idunnololz.summit.models.GetPostsResponse(
+    getPostsResponse.posts.map { convertPostView(it) },
+    getPostsResponse.next_page,
+  )
 
   fun convertGetPostResponse(
-    getPostResponse: GetPostResponse
-  ): com.idunnololz.summit.models.GetPostResponse {
-    return com.idunnololz.summit.models.GetPostResponse(
-      convertPostView(getPostResponse.post_view),
-      getPostResponse.community_view,
-      getPostResponse.moderators,
-      getPostResponse.cross_posts.map { convertPostView(it) },
-      getPostResponse.online,
-    )
-  }
+    getPostResponse: GetPostResponse,
+  ): com.idunnololz.summit.models.GetPostResponse = com.idunnololz.summit.models.GetPostResponse(
+    convertPostView(getPostResponse.post_view),
+    getPostResponse.community_view,
+    getPostResponse.moderators,
+    getPostResponse.cross_posts.map { convertPostView(it) },
+    getPostResponse.online,
+  )
 
   fun convertGetPersonDetailsResponse(
-    getPersonDetailsResponse: GetPersonDetailsResponse
-  ): com.idunnololz.summit.models.GetPersonDetailsResponse {
-    return com.idunnololz.summit.models.GetPersonDetailsResponse(
+    getPersonDetailsResponse: GetPersonDetailsResponse,
+  ): com.idunnololz.summit.models.GetPersonDetailsResponse =
+    com.idunnololz.summit.models.GetPersonDetailsResponse(
       getPersonDetailsResponse.person_view,
       getPersonDetailsResponse.comments,
       getPersonDetailsResponse.posts.map { convertPostView(it) },
       getPersonDetailsResponse.moderates,
     )
-  }
 
   fun convertSearchResponse(
-    searchResponse: SearchResponse
-  ): com.idunnololz.summit.models.SearchResponse {
-    return com.idunnololz.summit.models.SearchResponse(
-      searchResponse.type_,
-      searchResponse.comments,
-      searchResponse.posts.map { convertPostView(it) },
-      searchResponse.communities,
-      searchResponse.users,
-    )
-  }
+    searchResponse: SearchResponse,
+  ): com.idunnololz.summit.models.SearchResponse = com.idunnololz.summit.models.SearchResponse(
+    searchResponse.type_,
+    searchResponse.comments,
+    searchResponse.posts.map { convertPostView(it) },
+    searchResponse.communities,
+    searchResponse.users,
+  )
 }

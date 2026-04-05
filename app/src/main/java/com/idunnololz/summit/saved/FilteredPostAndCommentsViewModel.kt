@@ -29,8 +29,8 @@ import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
 import com.idunnololz.summit.lemmy.utils.actions.SavePostResult
-import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

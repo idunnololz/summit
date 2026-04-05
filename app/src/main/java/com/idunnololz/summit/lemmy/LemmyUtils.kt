@@ -117,8 +117,6 @@ object LemmyUtils {
   }
 }
 
-fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
-
 fun SearchType.toLocalizedString(context: Context) = when (this) {
   SearchType.All -> context.getString(R.string.all)
   SearchType.Comments -> context.getString(R.string.comments)

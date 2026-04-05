@@ -7,115 +7,118 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.CommunityFlair
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.Post
 import com.idunnololz.summit.api.dto.piefed.models.PostAggregates
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param bannedFromCommunity 
- * @param community 
- * @param counts 
- * @param creator 
- * @param creatorBannedFromCommunity 
- * @param creatorIsAdmin 
- * @param creatorIsModerator 
- * @param hidden 
- * @param post 
- * @param read 
- * @param saved 
- * @param unreadComments 
- * @param subscribed 
- * @param activityAlert 
- * @param altText 
- * @param myVote 
+ *
+ * @param bannedFromCommunity
+ * @param community
+ * @param counts
+ * @param creator
+ * @param creatorBannedFromCommunity
+ * @param creatorIsAdmin
+ * @param creatorIsModerator
+ * @param hidden
+ * @param post
+ * @param read
+ * @param saved
+ * @param unreadComments
+ * @param subscribed
+ * @param activityAlert
+ * @param altText
+ * @param myVote
  * @param flairList See also the simpler 'flair' on post which can be used when editing
- * @param canAuthUserModerate 
+ * @param canAuthUserModerate
  */
 
+data class PostView(
 
-data class PostView (
+  @SerializedName("banned_from_community")
+  val bannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("banned_from_community")
-    val bannedFromCommunity: kotlin.Boolean,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("counts")
+  val counts: PostAggregates,
 
-    @SerializedName("counts")
-    val counts: PostAggregates,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("creator_is_moderator")
+  val creatorIsModerator: kotlin.Boolean,
 
-    @SerializedName("creator_is_moderator")
-    val creatorIsModerator: kotlin.Boolean,
+  @SerializedName("hidden")
+  val hidden: kotlin.Boolean,
 
-    @SerializedName("hidden")
-    val hidden: kotlin.Boolean,
+  @SerializedName("post")
+  val post: Post,
 
-    @SerializedName("post")
-    val post: Post,
+  @SerializedName("read")
+  val read: kotlin.Boolean,
 
-    @SerializedName("read")
-    val read: kotlin.Boolean,
+  @SerializedName("saved")
+  val saved: kotlin.Boolean,
 
-    @SerializedName("saved")
-    val saved: kotlin.Boolean,
+  @SerializedName("unread_comments")
+  val unreadComments: kotlin.Int,
 
-    @SerializedName("unread_comments")
-    val unreadComments: kotlin.Int,
+  @SerializedName("subscribed")
+  val subscribed: PostView.Subscribed? = null,
 
-    @SerializedName("subscribed")
-    val subscribed: PostView.Subscribed? = null,
+  @SerializedName("activity_alert")
+  val activityAlert: kotlin.Boolean? = null,
 
-    @SerializedName("activity_alert")
-    val activityAlert: kotlin.Boolean? = null,
+  @SerializedName("alt_text")
+  val altText: kotlin.String? = null,
 
-    @SerializedName("alt_text")
-    val altText: kotlin.String? = null,
+  @SerializedName("my_vote")
+  val myVote: kotlin.Int? = null,
 
-    @SerializedName("my_vote")
-    val myVote: kotlin.Int? = null,
+  /* See also the simpler 'flair' on post which can be used when editing */
+  @SerializedName("flair_list")
+  val flairList: kotlin.collections.List<CommunityFlair>? = null,
 
-    /* See also the simpler 'flair' on post which can be used when editing */
-    @SerializedName("flair_list")
-    val flairList: kotlin.collections.List<CommunityFlair>? = null,
-
-    @SerializedName("can_auth_user_moderate")
-    val canAuthUserModerate: kotlin.Boolean? = null
+  @SerializedName("can_auth_user_moderate")
+  val canAuthUserModerate: kotlin.Boolean? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: Subscribed,NotSubscribed,Pending
-     */
-    enum class Subscribed(val value: kotlin.String) {
-        @SerializedName(value = "Subscribed") Subscribed("Subscribed"),
-        @SerializedName(value = "NotSubscribed") NotSubscribed("NotSubscribed"),
-        @SerializedName(value = "Pending") Pending("Pending");
-    }
+  /**
+   *
+   *
+   * Values: Subscribed,NotSubscribed,Pending
+   */
+  enum class Subscribed(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "Subscribed")
+    Subscribed("Subscribed"),
 
+    @SerializedName(value = "NotSubscribed")
+    NotSubscribed("NotSubscribed"),
+
+    @SerializedName(value = "Pending")
+    Pending("Pending"),
+  }
 }
-

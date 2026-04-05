@@ -7,49 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param flairId 
- * @param flairTitle 
+ *
+ * @param flairId
+ * @param flairTitle
  * @param textColor Hex color code for the text of the flair.
  * @param backgroundColor Hex color code for the background of the flair.
- * @param blurImages 
+ * @param blurImages
  */
 
+data class CommunityFlairEditRequest(
 
-data class CommunityFlairEditRequest (
+  @SerializedName("flair_id")
+  val flairId: kotlin.Int,
 
-    @SerializedName("flair_id")
-    val flairId: kotlin.Int,
+  @SerializedName("flair_title")
+  val flairTitle: kotlin.String? = null,
 
-    @SerializedName("flair_title")
-    val flairTitle: kotlin.String? = null,
+  /* Hex color code for the text of the flair. */
+  @SerializedName("text_color")
+  val textColor: kotlin.String? = null,
 
-    /* Hex color code for the text of the flair. */
-    @SerializedName("text_color")
-    val textColor: kotlin.String? = null,
+  /* Hex color code for the background of the flair. */
+  @SerializedName("background_color")
+  val backgroundColor: kotlin.String? = null,
 
-    /* Hex color code for the background of the flair. */
-    @SerializedName("background_color")
-    val backgroundColor: kotlin.String? = null,
+  @SerializedName("blur_images")
+  val blurImages: kotlin.Boolean? = null,
 
-    @SerializedName("blur_images")
-    val blurImages: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

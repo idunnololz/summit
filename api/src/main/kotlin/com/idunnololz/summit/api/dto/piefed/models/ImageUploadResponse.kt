@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param url 
- * @param likedOnly 
- * @param savedOnly 
- * @param q 
+ *
+ * @param url
+ * @param likedOnly
+ * @param savedOnly
+ * @param q
  */
 
+data class ImageUploadResponse(
 
-data class ImageUploadResponse (
+  @SerializedName("url")
+  val url: kotlin.String,
 
-    @SerializedName("url")
-    val url: kotlin.String,
+  @SerializedName("liked_only")
+  val likedOnly: kotlin.Boolean? = null,
 
-    @SerializedName("liked_only")
-    val likedOnly: kotlin.Boolean? = null,
+  @SerializedName("saved_only")
+  val savedOnly: kotlin.Boolean? = null,
 
-    @SerializedName("saved_only")
-    val savedOnly: kotlin.Boolean? = null,
+  @SerializedName("q")
+  val q: kotlin.String? = null,
 
-    @SerializedName("q")
-    val q: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,6 +7,7 @@
 
     <attr name="textColorNormal" format="color"/>
     <attr name="summitTextButton" format="color"/>
+    <attr name="postOrCommentActionColor" format="color"/>
 
     <declare-styleable name="CropImageView">
         <attr name="cropGuidelines">

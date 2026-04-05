@@ -76,9 +76,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_quarter"
         android:layout_marginBottom="@dimen/padding_quarter"
+        android:minWidth="0dp"
+        android:textColor="?attr/postOrCommentActionColor"
+        app:iconTint="?attr/postOrCommentActionColor"
         app:iconPadding="@dimen/padding_half"
         app:iconSize="24dp"
-        app:icon="@drawable/outline_mode_comment_24"
+        app:icon="@drawable/ic_comment_24"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintTop_toBottomOf="@+id/bottom_barrier"
         app:layout_constraintBottom_toBottomOf="parent"/>

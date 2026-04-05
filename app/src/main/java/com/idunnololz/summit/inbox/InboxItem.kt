@@ -9,7 +9,6 @@ import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationView
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs

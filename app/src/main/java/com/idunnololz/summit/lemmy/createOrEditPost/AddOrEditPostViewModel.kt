@@ -15,7 +15,6 @@ import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.drafts.DraftEntry
@@ -25,6 +24,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel

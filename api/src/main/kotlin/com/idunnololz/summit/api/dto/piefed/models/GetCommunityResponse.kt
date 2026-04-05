@@ -7,46 +7,40 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommunityModeratorView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 import com.idunnololz.summit.api.dto.piefed.models.Site
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param communityView 
- * @param discussionLanguages 
- * @param moderators 
- * @param site 
+ *
+ * @param communityView
+ * @param discussionLanguages
+ * @param moderators
+ * @param site
  */
 
+data class GetCommunityResponse(
 
-data class GetCommunityResponse (
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView,
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Int>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Int>,
+  @SerializedName("moderators")
+  val moderators: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderators")
-    val moderators: kotlin.collections.List<CommunityModeratorView>,
+  @SerializedName("site")
+  val site: Site? = null,
 
-    @SerializedName("site")
-    val site: Site? = null
-
-) {
-
-
-}
-
+)

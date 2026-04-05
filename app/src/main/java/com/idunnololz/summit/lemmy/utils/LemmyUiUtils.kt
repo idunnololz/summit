@@ -25,7 +25,7 @@ fun RecyclerView.setupDecoratorsForPostList(preferences: Preferences) {
 fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
   clearItemDecorations()
 
-  if (communityLayout.usesDividers()) {
+  if (communityLayout.usesDividers) {
     this.addItemDecoration(
       CustomDividerItemDecoration(
         this.context,

@@ -7,63 +7,57 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param creatorId 
- * @param recipientId 
- * @param content 
- * @param deleted 
- * @param read 
- * @param published 
- * @param apId 
- * @param local 
+ *
+ * @param id
+ * @param creatorId
+ * @param recipientId
+ * @param content
+ * @param deleted
+ * @param read
+ * @param published
+ * @param apId
+ * @param local
  */
 
+data class PrivateMessage(
 
-data class PrivateMessage (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  @SerializedName("recipient_id")
+  val recipientId: kotlin.Int,
 
-    @SerializedName("recipient_id")
-    val recipientId: kotlin.Int,
+  @SerializedName("content")
+  val content: kotlin.String,
 
-    @SerializedName("content")
-    val content: kotlin.String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("read")
+  val read: kotlin.Boolean,
 
-    @SerializedName("read")
-    val read: kotlin.Boolean,
+  @SerializedName("published")
+  val published: kotlin.String,
 
-    @SerializedName("published")
-    val published: kotlin.String,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean
-
-) {
-
-
-}
-
+)

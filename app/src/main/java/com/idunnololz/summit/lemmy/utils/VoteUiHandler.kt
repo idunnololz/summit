@@ -13,9 +13,9 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.ext.imageTintListCompat
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
@@ -48,7 +48,7 @@ interface VoteUiHandler {
   val upvoteColor: Int
   val downvoteColor: Int
 
-  fun neutralColor(context: Context): Int
+  fun neutralColor(context: Context): ColorStateList
   fun controlColor(context: Context): ColorStateList
 }
 

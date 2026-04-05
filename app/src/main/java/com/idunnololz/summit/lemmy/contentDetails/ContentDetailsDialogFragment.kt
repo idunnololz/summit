@@ -23,11 +23,11 @@ import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.PostAggregates
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentCommentDetailsBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils

@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommunityBlockView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityFollowerView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityModeratorView
@@ -23,46 +24,39 @@ import com.idunnololz.summit.api.dto.piefed.models.LanguageView
 import com.idunnololz.summit.api.dto.piefed.models.LocalUserView
 import com.idunnololz.summit.api.dto.piefed.models.PersonBlockView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param communityBlocks 
- * @param discussionLanguages 
- * @param follows 
- * @param instanceBlocks 
- * @param localUserView 
- * @param moderates 
- * @param personBlocks 
+ *
+ * @param communityBlocks
+ * @param discussionLanguages
+ * @param follows
+ * @param instanceBlocks
+ * @param localUserView
+ * @param moderates
+ * @param personBlocks
  */
 
+data class UserMeResponse(
 
-data class UserMeResponse (
+  @SerializedName("community_blocks")
+  val communityBlocks: kotlin.collections.List<CommunityBlockView>,
 
-    @SerializedName("community_blocks")
-    val communityBlocks: kotlin.collections.List<CommunityBlockView>,
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<LanguageView>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<LanguageView>,
+  @SerializedName("follows")
+  val follows: kotlin.collections.List<CommunityFollowerView>,
 
-    @SerializedName("follows")
-    val follows: kotlin.collections.List<CommunityFollowerView>,
+  @SerializedName("instance_blocks")
+  val instanceBlocks: kotlin.collections.List<InstanceBlockView>,
 
-    @SerializedName("instance_blocks")
-    val instanceBlocks: kotlin.collections.List<InstanceBlockView>,
+  @SerializedName("local_user_view")
+  val localUserView: LocalUserView,
 
-    @SerializedName("local_user_view")
-    val localUserView: LocalUserView,
+  @SerializedName("moderates")
+  val moderates: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderates")
-    val moderates: kotlin.collections.List<CommunityModeratorView>,
+  @SerializedName("person_blocks")
+  val personBlocks: kotlin.collections.List<PersonBlockView>,
 
-    @SerializedName("person_blocks")
-    val personBlocks: kotlin.collections.List<PersonBlockView>
-
-) {
-
-
-}
-
+)

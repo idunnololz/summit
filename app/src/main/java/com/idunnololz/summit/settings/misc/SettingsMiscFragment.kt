@@ -312,6 +312,10 @@ class SettingsMiscFragment :
         { preferences.parseTagsFromPostTitles },
         { preferences.parseTagsFromPostTitles = it },
       ),
+      settings.generateMissingVideoThumbnails.asOnOffSwitch(
+        { preferences.generateMissingVideoThumbnails },
+        { preferences.generateMissingVideoThumbnails = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

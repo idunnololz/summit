@@ -7,85 +7,86 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param answer 
- * @param email 
- * @param ipAddress 
- * @param userId 
- * @param userName 
- * @param appliedAt 
- * @param countryCode 
- * @param throwawayEmail 
- * @param status 
- * @param approvedBy 
- * @param approvedAt 
- * @param referrer 
+ *
+ * @param answer
+ * @param email
+ * @param ipAddress
+ * @param userId
+ * @param userName
+ * @param appliedAt
+ * @param countryCode
+ * @param throwawayEmail
+ * @param status
+ * @param approvedBy
+ * @param approvedAt
+ * @param referrer
  */
 
+data class UserRegistration(
 
-data class UserRegistration (
+  @SerializedName("answer")
+  val answer: kotlin.String?,
 
-    @SerializedName("answer")
-    val answer: kotlin.String?,
+  @SerializedName("email")
+  val email: kotlin.String?,
 
-    @SerializedName("email")
-    val email: kotlin.String?,
+  @SerializedName("ip_address")
+  val ipAddress: kotlin.String?,
 
-    @SerializedName("ip_address")
-    val ipAddress: kotlin.String?,
+  @SerializedName("user_id")
+  val userId: kotlin.Int,
 
-    @SerializedName("user_id")
-    val userId: kotlin.Int,
+  @SerializedName("user_name")
+  val userName: kotlin.String,
 
-    @SerializedName("user_name")
-    val userName: kotlin.String,
+  @SerializedName("applied_at")
+  val appliedAt: kotlin.String? = null,
 
-    @SerializedName("applied_at")
-    val appliedAt: kotlin.String? = null,
+  @SerializedName("country_code")
+  val countryCode: kotlin.String? = null,
 
-    @SerializedName("country_code")
-    val countryCode: kotlin.String? = null,
+  @SerializedName("throwaway_email")
+  val throwawayEmail: kotlin.Boolean? = null,
 
-    @SerializedName("throwaway_email")
-    val throwawayEmail: kotlin.Boolean? = null,
+  @SerializedName("status")
+  val status: UserRegistration.Status? = null,
 
-    @SerializedName("status")
-    val status: UserRegistration.Status? = null,
+  @SerializedName("approved_by")
+  val approvedBy: Person? = null,
 
-    @SerializedName("approved_by")
-    val approvedBy: Person? = null,
+  @SerializedName("approved_at")
+  val approvedAt: kotlin.String? = null,
 
-    @SerializedName("approved_at")
-    val approvedAt: kotlin.String? = null,
-
-    @SerializedName("referrer")
-    val referrer: kotlin.String? = null
+  @SerializedName("referrer")
+  val referrer: kotlin.String? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: approved,awaiting_review
-     */
-    enum class Status(val value: kotlin.String) {
-        @SerializedName(value = "approved") approved("approved"),
-        @SerializedName(value = "awaiting review") awaiting_review("awaiting review");
-    }
+  /**
+   *
+   *
+   * Values: approved,awaiting_review
+   */
+  enum class Status(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "approved")
+    approved("approved"),
 
+    @SerializedName(value = "awaiting review")
+    awaiting_review("awaiting review"),
+  }
 }
-

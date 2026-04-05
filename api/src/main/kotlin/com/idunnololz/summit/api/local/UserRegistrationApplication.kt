@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api.local
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 

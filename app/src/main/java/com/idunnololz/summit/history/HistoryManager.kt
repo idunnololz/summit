@@ -2,11 +2,11 @@ package com.idunnololz.summit.history
 
 import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.TabCommunityState
 import javax.inject.Inject

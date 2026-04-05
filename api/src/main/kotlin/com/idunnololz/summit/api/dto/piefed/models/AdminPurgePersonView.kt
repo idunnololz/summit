@@ -7,37 +7,31 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.AdminPurgePerson
 import com.idunnololz.summit.api.dto.piefed.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param adminPurgePerson 
- * @param admin 
+ *
+ * @param adminPurgePerson
+ * @param admin
  */
 
+data class AdminPurgePersonView(
 
-data class AdminPurgePersonView (
+  @SerializedName("admin_purge_person")
+  val adminPurgePerson: AdminPurgePerson,
 
-    @SerializedName("admin_purge_person")
-    val adminPurgePerson: AdminPurgePerson,
+  @SerializedName("admin")
+  val admin: Person? = null,
 
-    @SerializedName("admin")
-    val admin: Person? = null
-
-) {
-
-
-}
-
+)

@@ -14,7 +14,6 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.dto.lemmy.CommentId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.emptyScreen.EmptyScreenFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -23,6 +22,7 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.post.PostTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostTabbedFragmentArgs
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.util.BaseFragment
@@ -35,19 +35,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SlidingPaneController(
-    private val fragment: BaseFragment<*>,
-    private val slidingPaneLayout: FixedSlidingPaneLayout,
-    private val childFragmentManager: FragmentManager,
-    private val viewModel: PostViewPagerViewModel,
-    private val globalLayoutMode: GlobalLayoutMode,
-    /**
+  private val fragment: BaseFragment<*>,
+  private val slidingPaneLayout: FixedSlidingPaneLayout,
+  private val childFragmentManager: FragmentManager,
+  private val viewModel: PostViewPagerViewModel,
+  private val globalLayoutMode: GlobalLayoutMode,
+  /**
    * Used for tablets. The message is shown on the side pane when nothing is selected.
    */
   private val emptyScreenText: String,
-    @IdRes private val fragmentContainerId: Int,
-    private val retainClosedPosts: Boolean = false,
-    private val useSwipeBetweenPosts: Boolean = false,
-    private val isPreview: Boolean = false,
+  @IdRes private val fragmentContainerId: Int,
+  private val retainClosedPosts: Boolean = false,
+  private val useSwipeBetweenPosts: Boolean = false,
+  private val isPreview: Boolean = false,
 ) {
 
   interface PostViewPagerViewModel {
@@ -190,14 +190,14 @@ class SlidingPaneController(
   }
 
   fun openPost(
-      instance: String,
-      id: Int,
-      currentCommunity: CommunityRef?,
-      accountId: Long?,
-      post: PostView? = null,
-      jumpToComments: Boolean = false,
-      reveal: Boolean = false,
-      videoState: VideoState? = null,
+    instance: String,
+    id: Int,
+    currentCommunity: CommunityRef?,
+    accountId: Long?,
+    post: PostView? = null,
+    jumpToComments: Boolean = false,
+    reveal: Boolean = false,
+    videoState: VideoState? = null,
   ) {
     try {
       // Best effort restore PostFragment
@@ -226,19 +226,19 @@ class SlidingPaneController(
 
     openPostInternal(
       args = PostFragmentArgs(
-          instance = instance,
-          id = id,
-          reveal = reveal,
-          isPreview = isPreview,
-          jumpToComments = jumpToComments,
-          currentCommunity = currentCommunity,
-          videoState = videoState,
-          accountId = accountId ?: 0L,
-          lastReadTs = if (postReadInfo?.read == true || post?.read == true) {
-              postReadInfo?.ts ?: (System.currentTimeMillis() - (15 * 60 * 1000))
-          } else {
-              0L
-          },
+        instance = instance,
+        id = id,
+        reveal = reveal,
+        isPreview = isPreview,
+        jumpToComments = jumpToComments,
+        currentCommunity = currentCommunity,
+        videoState = videoState,
+        accountId = accountId ?: 0L,
+        lastReadTs = if (postReadInfo?.read == true || post?.read == true) {
+          postReadInfo?.ts ?: (System.currentTimeMillis() - (15 * 60 * 1000))
+        } else {
+          0L
+        },
       ),
       removeLastPostFragment = true,
       itemRef = Either.Left(PostRef(instance, id)),
@@ -250,12 +250,12 @@ class SlidingPaneController(
   fun openComment(instance: String, commentId: CommentId) {
     openPostInternal(
       args = PostFragmentArgs(
-          instance = instance,
-          id = 0,
-          isPreview = isPreview,
-          commentId = commentId,
-          currentCommunity = null,
-          isSinglePage = false,
+        instance = instance,
+        id = 0,
+        isPreview = isPreview,
+        commentId = commentId,
+        currentCommunity = null,
+        isSinglePage = false,
       ),
       removeLastPostFragment = false,
       itemRef = Either.Right(CommentRef(instance, commentId)),
@@ -290,7 +290,7 @@ class SlidingPaneController(
           ?: if (useSwipeBetweenPosts) {
             PostTabbedFragment().apply {
               arguments = PostTabbedFragmentArgs(
-                  id = args?.id ?: 0,
+                id = args?.id ?: 0,
               ).toBundle()
             }
           } else {
@@ -308,19 +308,19 @@ class SlidingPaneController(
       }
 
       if (postFragmentOverride != null) {
-          withContext(Dispatchers.IO) {
-              // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
-              delay(100)
-          }
+        withContext(Dispatchers.IO) {
+          // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
+          delay(100)
+        }
       }
 
       viewModel.lastSelectedItem = itemRef
 
       openPane()
 
-        withContext(Dispatchers.IO) {
-            delay(250)
-        }
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
       activeOpenPostJob = null
     }
   }
@@ -334,9 +334,9 @@ class SlidingPaneController(
     activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
       closePane()
 
-        withContext(Dispatchers.IO) {
-            delay(250)
-        }
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
       activeClosePostJob = null
     }
   }

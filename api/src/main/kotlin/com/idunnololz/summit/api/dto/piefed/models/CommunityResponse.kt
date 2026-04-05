@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param communityView 
- * @param discussionLanguages 
+ *
+ * @param communityView
+ * @param discussionLanguages
  */
 
+data class CommunityResponse(
 
-data class CommunityResponse (
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView,
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Int>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Int>
-
-) {
-
-
-}
-
+)

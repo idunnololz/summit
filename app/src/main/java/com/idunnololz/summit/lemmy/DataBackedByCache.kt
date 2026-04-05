@@ -3,6 +3,8 @@ package com.idunnololz.summit.lemmy
 import android.util.Log
 import com.idunnololz.summit.cache.CborDiskCache
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @OptIn(FlowPreview::class)
 class DataBackedByCache<T>(
@@ -37,28 +37,27 @@ class DataBackedByCache<T>(
       primaryKey: String,
       initialValue: T,
       cborDiskCache: CborDiskCache,
-    ): DataBackedByCache<T> =
-      create(primaryKey, initialValue, T::class.java, cborDiskCache)
+    ): DataBackedByCache<T> = create(primaryKey, initialValue, T::class.java, cborDiskCache)
 
     fun <T> create(
       primaryKey: String,
       initialValue: T,
       clazz: Class<T>,
       cborDiskCache: CborDiskCache,
-    ): DataBackedByCache<T> =
-      DataBackedByCache(
-        primaryKey = primaryKey,
-        initialValue = initialValue,
-        clazz = clazz,
-        coroutineScopeFactory = coroutineScopeFactory,
-        cborDiskCache = cborDiskCache,
-      )
+    ): DataBackedByCache<T> = DataBackedByCache(
+      primaryKey = primaryKey,
+      initialValue = initialValue,
+      clazz = clazz,
+      coroutineScopeFactory = coroutineScopeFactory,
+      cborDiskCache = cborDiskCache,
+    )
   }
 
   private val coroutineScope = coroutineScopeFactory.create()
   private val mutex = Mutex()
 
   private val source = MutableStateFlow<T>(initialValue)
+
   @Volatile private var writeJobIndex = 0
   var restored = false
 
@@ -71,7 +70,6 @@ class DataBackedByCache<T>(
   var commitChanges: Boolean = true
 
   init {
-    Log.d("HAHA", "DataBackedByCache.init(): $primaryKey")
     coroutineScope.launch {
       source
         .drop(1)
@@ -98,14 +96,13 @@ class DataBackedByCache<T>(
       val restored = runInterruptible {
         cborDiskCache.getCachedObject<T>(
           primaryKey,
-          clazz
+          clazz,
         )
       } ?: return
 
       source.value = restored
 
-      Log.d(TAG, "[${primaryKey}] Successfully restored!")
-      Log.d("HAHA", "[${primaryKey}] Successfully restored!")
+      Log.d(TAG, "[$primaryKey] Successfully restored!")
     }
   }
 
@@ -119,10 +116,7 @@ class DataBackedByCache<T>(
         runInterruptible {
           cborDiskCache.cacheObject(primaryKey, value, clazz)
         }
-
-        Log.d("HAHA", "[${primaryKey}] Successfully committed!")
       }
     }
   }
-
 }

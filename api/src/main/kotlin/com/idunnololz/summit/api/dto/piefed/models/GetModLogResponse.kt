@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommentView
 import com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunityView
 import com.idunnololz.summit.api.dto.piefed.models.AdminPurgePersonView
@@ -31,78 +32,71 @@ import com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunityView
 import com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView
 import com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunityView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param removedPosts 
- * @param lockedPosts 
- * @param featuredPosts 
- * @param removedComments 
- * @param removedCommunities 
- * @param bannedFromCommunity 
- * @param banned 
- * @param addedToCommunity 
- * @param transferredToCommunity 
- * @param added 
- * @param adminPurgedPersons 
- * @param adminPurgedCommunities 
- * @param adminPurgedPosts 
- * @param adminPurgedComments 
- * @param hiddenCommunities 
+ *
+ * @param removedPosts
+ * @param lockedPosts
+ * @param featuredPosts
+ * @param removedComments
+ * @param removedCommunities
+ * @param bannedFromCommunity
+ * @param banned
+ * @param addedToCommunity
+ * @param transferredToCommunity
+ * @param added
+ * @param adminPurgedPersons
+ * @param adminPurgedCommunities
+ * @param adminPurgedPosts
+ * @param adminPurgedComments
+ * @param hiddenCommunities
  */
 
+data class GetModLogResponse(
 
-data class GetModLogResponse (
+  @SerializedName("removed_posts")
+  val removedPosts: kotlin.collections.List<ModRemovePostView>,
 
-    @SerializedName("removed_posts")
-    val removedPosts: kotlin.collections.List<ModRemovePostView>,
+  @SerializedName("locked_posts")
+  val lockedPosts: kotlin.collections.List<ModLockPostView>,
 
-    @SerializedName("locked_posts")
-    val lockedPosts: kotlin.collections.List<ModLockPostView>,
+  @SerializedName("featured_posts")
+  val featuredPosts: kotlin.collections.List<ModFeaturePostView>,
 
-    @SerializedName("featured_posts")
-    val featuredPosts: kotlin.collections.List<ModFeaturePostView>,
+  @SerializedName("removed_comments")
+  val removedComments: kotlin.collections.List<ModRemoveCommentView>,
 
-    @SerializedName("removed_comments")
-    val removedComments: kotlin.collections.List<ModRemoveCommentView>,
+  @SerializedName("removed_communities")
+  val removedCommunities: kotlin.collections.List<ModRemoveCommunityView>,
 
-    @SerializedName("removed_communities")
-    val removedCommunities: kotlin.collections.List<ModRemoveCommunityView>,
+  @SerializedName("banned_from_community")
+  val bannedFromCommunity: kotlin.collections.List<ModBanFromCommunityView>,
 
-    @SerializedName("banned_from_community")
-    val bannedFromCommunity: kotlin.collections.List<ModBanFromCommunityView>,
+  @SerializedName("banned")
+  val banned: kotlin.collections.List<ModBanView>,
 
-    @SerializedName("banned")
-    val banned: kotlin.collections.List<ModBanView>,
+  @SerializedName("added_to_community")
+  val addedToCommunity: kotlin.collections.List<ModAddCommunityView>,
 
-    @SerializedName("added_to_community")
-    val addedToCommunity: kotlin.collections.List<ModAddCommunityView>,
+  @SerializedName("transferred_to_community")
+  val transferredToCommunity: kotlin.collections.List<ModTransferCommunityView>,
 
-    @SerializedName("transferred_to_community")
-    val transferredToCommunity: kotlin.collections.List<ModTransferCommunityView>,
+  @SerializedName("added")
+  val added: kotlin.collections.List<ModAddView>,
 
-    @SerializedName("added")
-    val added: kotlin.collections.List<ModAddView>,
+  @SerializedName("admin_purged_persons")
+  val adminPurgedPersons: kotlin.collections.List<AdminPurgePersonView>,
 
-    @SerializedName("admin_purged_persons")
-    val adminPurgedPersons: kotlin.collections.List<AdminPurgePersonView>,
+  @SerializedName("admin_purged_communities")
+  val adminPurgedCommunities: kotlin.collections.List<AdminPurgeCommunityView>,
 
-    @SerializedName("admin_purged_communities")
-    val adminPurgedCommunities: kotlin.collections.List<AdminPurgeCommunityView>,
+  @SerializedName("admin_purged_posts")
+  val adminPurgedPosts: kotlin.collections.List<AdminPurgePostView>,
 
-    @SerializedName("admin_purged_posts")
-    val adminPurgedPosts: kotlin.collections.List<AdminPurgePostView>,
+  @SerializedName("admin_purged_comments")
+  val adminPurgedComments: kotlin.collections.List<AdminPurgeCommentView>,
 
-    @SerializedName("admin_purged_comments")
-    val adminPurgedComments: kotlin.collections.List<AdminPurgeCommentView>,
+  @SerializedName("hidden_communities")
+  val hiddenCommunities: kotlin.collections.List<ModHideCommunityView>,
 
-    @SerializedName("hidden_communities")
-    val hiddenCommunities: kotlin.collections.List<ModHideCommunityView>
-
-) {
-
-
-}
-
+)

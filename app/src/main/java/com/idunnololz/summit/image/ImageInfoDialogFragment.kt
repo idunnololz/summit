@@ -13,7 +13,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentImageInfoBinding
 import com.idunnololz.summit.databinding.ImageInfoInfoItemBinding

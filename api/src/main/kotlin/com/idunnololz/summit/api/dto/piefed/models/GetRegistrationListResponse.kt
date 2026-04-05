@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.UserRegistration
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param registrations 
+ *
+ * @param registrations
  */
 
+data class GetRegistrationListResponse(
 
-data class GetRegistrationListResponse (
+  @SerializedName("registrations")
+  val registrations: kotlin.collections.List<UserRegistration>,
 
-    @SerializedName("registrations")
-    val registrations: kotlin.collections.List<UserRegistration>
-
-) {
-
-
-}
-
+)

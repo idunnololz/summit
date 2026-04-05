@@ -262,11 +262,13 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               preferences.usePostsFeedHeader = it
             },
           ),
+          settings.postsFeedHeaderVersion.asSingleChoiceSelectorItem(
+            { preferences.postsFeedHeaderVersion },
+            { preferences.postsFeedHeaderVersion = it },
+          ),
           settings.hideHeaderBannerIfNoBanner.asOnOffSwitch(
             { preferences.hideHeaderBannerIfNoBanner },
-            {
-              preferences.hideHeaderBannerIfNoBanner = it
-            },
+            { preferences.hideHeaderBannerIfNoBanner = it },
           ),
         ),
       ),

@@ -18,10 +18,8 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemPostViewParentCommentsBinding
@@ -29,6 +27,7 @@ import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.databinding.PostLoadingItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostNoCommentsItemBinding
@@ -57,6 +56,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
@@ -89,7 +89,13 @@ class PostAdapter(
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-  private val onImageClick: (Either<PostView, CommentView>?, View?, url: String, altUrl: String?, peek: Boolean) -> Unit,
+  private val onImageClick: (
+    Either<PostView, CommentView>?,
+    View?,
+    url: String,
+    altUrl: String?,
+    peek: Boolean,
+  ) -> Unit,
   private val onVideoClick: (
     Either<PostView, CommentView>?,
     String,
@@ -360,7 +366,7 @@ class PostAdapter(
       } else {
         R.layout.post_pending_comment_collapsed_item
       }
-    is ProgressOrErrorItem -> R.layout.generic_loading_item
+    is ProgressOrErrorItem -> R.layout.post_loading_item
     is MoreCommentsItem -> R.layout.post_more_comments_item
     is FooterItem -> R.layout.generic_space_footer_item
     is Item.ViewAllComments -> R.layout.view_all_comments
@@ -412,8 +418,8 @@ class PostAdapter(
         ViewBindingViewHolder(PostPendingCommentCollapsedItemBinding.bind(v))
       R.layout.post_more_comments_item ->
         ViewBindingViewHolder(PostMoreCommentsItemBinding.bind(v))
-      R.layout.generic_loading_item ->
-        ViewBindingViewHolder(GenericLoadingItemBinding.bind(v))
+      R.layout.post_loading_item ->
+        ViewBindingViewHolder(PostLoadingItemBinding.bind(v))
       R.layout.generic_space_footer_item ->
         ViewBindingViewHolder(GenericSpaceFooterItemBinding.bind(v))
       R.layout.view_all_comments ->
@@ -850,7 +856,7 @@ class PostAdapter(
         holder.itemView.setTag(R.id.expanded, item.isExpanded)
       }
       is ProgressOrErrorItem -> {
-        val b = holder.getBinding<GenericLoadingItemBinding>()
+        val b = holder.getBinding<PostLoadingItemBinding>()
         if (item.error != null) {
           b.loadingView.showDefaultErrorMessageFor(item.error)
         } else {
@@ -1040,6 +1046,8 @@ class PostAdapter(
   fun deselectItemForScreenshot(id: String) {
     includedInScreenshot.remove(id)
   }
+
+  fun getPostItemIndex() = items.indexOfFirst { it is HeaderItem }
 
   /**
    * @param refreshHeader Pass false to not always refresh header. Useful for web view headers

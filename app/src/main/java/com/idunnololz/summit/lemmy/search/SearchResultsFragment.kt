@@ -28,7 +28,6 @@ import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -64,6 +63,7 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -641,6 +641,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
         postListViewBuilder.bind(
           holder = h,
+          currentCommunity = null,
           fetchedPost = item.fetchedPost,
           instance = item.instance,
           isRevealed = isRevealed,

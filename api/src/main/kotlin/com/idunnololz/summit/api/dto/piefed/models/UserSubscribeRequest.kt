@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param personId 
- * @param subscribe 
+ *
+ * @param personId
+ * @param subscribe
  */
 
+data class UserSubscribeRequest(
 
-data class UserSubscribeRequest (
+  @SerializedName("person_id")
+  val personId: kotlin.Int,
 
-    @SerializedName("person_id")
-    val personId: kotlin.Int,
+  @SerializedName("subscribe")
+  val subscribe: kotlin.Boolean,
 
-    @SerializedName("subscribe")
-    val subscribe: kotlin.Boolean
-
-) {
-
-
-}
-
+)

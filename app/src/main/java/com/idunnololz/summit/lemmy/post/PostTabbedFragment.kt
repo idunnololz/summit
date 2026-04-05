@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
 import com.idunnololz.summit.history.HistoryManager
@@ -25,6 +24,7 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -37,7 +37,9 @@ import io.sentry.Sentry
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>(), SlidingPaneControllerProvider {
+class PostTabbedFragment :
+  BaseFragment<TabbedFragmentPostBinding>(),
+  SlidingPaneControllerProvider {
 
   companion object {
     private const val TAG = "PostTabbedFragment"

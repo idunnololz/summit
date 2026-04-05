@@ -50,7 +50,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
         textView = binding.previewContent,
         text = args.content,
         instance = args.instance,
-        onImageClick = {_, _ -> },
+        onImageClick = { _, _ -> },
         onVideoClick = {},
         onPageClick = { _, _ -> },
         onLinkClick = { _, _, _ -> },

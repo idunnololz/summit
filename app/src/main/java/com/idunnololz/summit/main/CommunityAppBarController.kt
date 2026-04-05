@@ -33,8 +33,9 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.avatar.AvatarHelper
-import com.idunnololz.summit.databinding.CustomAppBarLargeBinding
-import com.idunnololz.summit.databinding.CustomAppBarSmallBinding
+import com.idunnololz.summit.databinding.CommunityAppBarLarge2Binding
+import com.idunnololz.summit.databinding.CommunityAppBarLargeBinding
+import com.idunnololz.summit.databinding.CommunityAppBarSmallBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -48,6 +49,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.PostsFeedHeaderVersions
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -78,6 +80,7 @@ class CommunityAppBarController(
   private val lemmyTextHelper: LemmyTextHelper,
   private val preferences: Preferences,
   useHeader: Boolean,
+  version: Int,
   state: State? = null,
   private val viewModel: CommunityViewModel,
   private val onSearchClick: () -> Unit,
@@ -122,6 +125,7 @@ class CommunityAppBarController(
   private var isInfinity: Boolean = true
 
   private sealed interface ViewHolder {
+    val version: Int
     val root: View
     val customActionBar: ViewGroup
     val communityTextView: TextView
@@ -137,6 +141,7 @@ class CommunityAppBarController(
     fun setToolbarTopPadding(padding: Int)
 
     class LargeAppBarViewHolder(
+      override val version: Int,
       override val root: View,
       override val customActionBar: ViewGroup,
       override val communityTextView: TextView,
@@ -148,7 +153,7 @@ class CommunityAppBarController(
       override val toolbar: MaterialToolbar,
       override val hideReadOn: TextView,
       val title: TextView,
-      val subtitle: TextView,
+      val subtitle: TextView?,
       val body: TextView,
       val banner: ImageView,
       val communitySortOrder2: TextView,
@@ -157,7 +162,7 @@ class CommunityAppBarController(
       val subscribe: TextView,
       val info: TextView,
       val titleHotspot: View,
-      val feedInfoText: TextView,
+      val feedInfoText: TextView?,
       val communities: TextView,
       val search: TextView,
       val scrollView: View,
@@ -178,6 +183,7 @@ class CommunityAppBarController(
     }
 
     class SmallAppBarViewHolder(
+      override val version: Int,
       override val root: View,
       override val customActionBar: ViewGroup,
       override val communityTextView: TextView,
@@ -200,7 +206,7 @@ class CommunityAppBarController(
   }
 
   init {
-    vh = ensureViewHolder(useHeader, force = true)
+    vh = ensureViewHolder(useHeader, version = version, force = true)
 
     summitActivity.apply {
       insets.observe(viewLifecycleOwner) {
@@ -411,36 +417,45 @@ class CommunityAppBarController(
 
     vh.title.text = communityName
     if (currentCommunity == null) {
-      vh.subtitle.visibility = View.GONE
+      vh.subtitle?.visibility = View.GONE
     } else {
       val communityInstance = currentCommunity.instance ?: communityInfoViewModel.instance
-      vh.subtitle.visibility = View.VISIBLE
-      @Suppress("SetTextI18n")
-      vh.subtitle.text = when (currentCommunity) {
-        is CommunityRef.All -> context.getString(R.string.all_feed_desc)
-        is CommunityRef.AllSubscribed -> context.getString(R.string.all_subscribed_feed_desc)
-        is CommunityRef.CommunityRefByName -> "$communityName@$communityInstance"
-        is CommunityRef.Local -> context.getString(R.string.local_feed_desc)
-        is CommunityRef.ModeratedCommunities -> context.getString(R.string.moderated_feed_desc)
-        is CommunityRef.MultiCommunity -> context.getString(R.string.multi_community_desc)
-        is CommunityRef.Subscribed -> context.getString(R.string.subscribed_feed_desc)
+
+      if (vh.subtitle == null) {
+        if (currentCommunity is CommunityRef.All) {
+          vh.title.text =
+            CommunityRef.All(communityInfoViewModel.instance).getLocalizedFullNameSpannable(context)
+        } else if (communityInstance == communityInfoViewModel.instance) {
+          vh.title.text = communityName
+        } else {
+          vh.title.text = currentCommunity.getLocalizedFullNameSpannable(context)
+        }
+      } else {
+        vh.subtitle.visibility = View.VISIBLE
+
+        @Suppress("SetTextI18n")
+        val subtitle = when (currentCommunity) {
+          is CommunityRef.All -> context.getString(R.string.all_feed_desc)
+          is CommunityRef.AllSubscribed -> context.getString(R.string.all_subscribed_feed_desc)
+          is CommunityRef.CommunityRefByName -> "$communityName@$communityInstance"
+          is CommunityRef.Local -> context.getString(R.string.local_feed_desc)
+          is CommunityRef.ModeratedCommunities -> context.getString(R.string.moderated_feed_desc)
+          is CommunityRef.MultiCommunity -> context.getString(R.string.multi_community_desc)
+          is CommunityRef.Subscribed -> context.getString(R.string.subscribed_feed_desc)
+        }
+        vh.subtitle.text = lemmyTextHelper.getSpannable(context, subtitle)
       }
     }
 
     when (val value = communityInfoViewModel.siteOrCommunity.value) {
       is StatefulData.Error -> {
-        vh.body.text = value.error.toErrorMessage(context)
-        vh.feedInfoText.text = "-"
+        vh.feedInfoText?.text = "-"
       }
       is StatefulData.Loading -> {
         vh.updateBanner("", isLoading = true)
         vh.icon.forCoil()
         vh.icon.load(newShimmerDrawableSquare(context))
-        vh.body.text = buildSpannedString {
-          appendLine(context.getString(R.string.loading))
-          appendLine(context.getString(R.string.loading))
-        }
-        vh.feedInfoText.text = context.getString(R.string.loading)
+        vh.feedInfoText?.text = context.getString(R.string.loading)
       }
 
       is StatefulData.NotStarted -> {}
@@ -466,8 +481,6 @@ class CommunityAppBarController(
               it.community_view.community.icon
             },
           )
-
-        updateDescription()
 
         vh.updateBanner(bannerUrl, isLoading = false)
         if (bannerUrl == null) {
@@ -520,97 +533,98 @@ class CommunityAppBarController(
           { it.community_view.counts.comments },
         )
 
-        if (mau == null && totalUsers == null && posts == null && comments == null) {
-          vh.feedInfoText.visibility = View.GONE
-        } else {
-          vh.feedInfoText.visibility = View.VISIBLE
-          vh.feedInfoText.text = buildSpannedString {
-            append(
-              context.resources.getQuantityString(
-                R.plurals.users_format,
-                totalUsers ?: 0,
-                if (totalUsers == null) {
-                  "-"
-                } else {
-                  LemmyUtils.abbrevNumber(totalUsers.toLong())
-                },
-              ),
-            )
-            appendSeparator()
-            append(
-              context.getString(
-                R.string.mau_format,
-                if (mau == null) {
-                  "-"
-                } else {
-                  LemmyUtils.abbrevNumber(mau.toLong())
-                },
-              ),
-            )
-            appendSeparator()
-            append(
-              context.resources.getQuantityString(
-                R.plurals.posts_format,
-                posts ?: 0,
-                if (posts == null) {
-                  "-"
-                } else {
-                  LemmyUtils.abbrevNumber(posts.toLong())
-                },
-              ),
-            )
-            appendSeparator()
-            append(
-              context.resources.getQuantityString(
-                R.plurals.comments_format,
-                comments ?: 0,
-                if (comments == null) {
-                  "-"
-                } else {
-                  LemmyUtils.abbrevNumber(comments.toLong())
-                },
-              ),
-            )
+        if (vh.feedInfoText != null) {
+          if (mau == null && totalUsers == null && posts == null && comments == null) {
+            vh.feedInfoText.visibility = View.GONE
+          } else {
+            vh.feedInfoText.visibility = View.VISIBLE
+            vh.feedInfoText.text = buildSpannedString {
+              append(
+                context.resources.getQuantityString(
+                  R.plurals.users_format,
+                  totalUsers ?: 0,
+                  if (totalUsers == null) {
+                    "-"
+                  } else {
+                    LemmyUtils.abbrevNumber(totalUsers.toLong())
+                  },
+                ),
+              )
+              appendSeparator()
+              append(
+                context.getString(
+                  R.string.mau_format,
+                  if (mau == null) {
+                    "-"
+                  } else {
+                    LemmyUtils.abbrevNumber(mau.toLong())
+                  },
+                ),
+              )
+              appendSeparator()
+              append(
+                context.resources.getQuantityString(
+                  R.plurals.posts_format,
+                  posts ?: 0,
+                  if (posts == null) {
+                    "-"
+                  } else {
+                    LemmyUtils.abbrevNumber(posts.toLong())
+                  },
+                ),
+              )
+              appendSeparator()
+              append(
+                context.resources.getQuantityString(
+                  R.plurals.comments_format,
+                  comments ?: 0,
+                  if (comments == null) {
+                    "-"
+                  } else {
+                    LemmyUtils.abbrevNumber(comments.toLong())
+                  },
+                ),
+              )
+            }
           }
         }
       }
     }
 
     updateSubscribeButton()
+    updateDescription()
 
     when (currentCommunity) {
       is CommunityRef.MultiCommunity -> {
         vh.updateBanner(url = null, isLoading = false)
         vh.icon.forCoil()
         vh.icon.load(currentCommunity.icon)
-        vh.body.visibility = View.VISIBLE
-        vh.body.text = currentCommunity.communities.joinToString {
-          it.getLocalizedFullName(context)
+
+        if (vh.subtitle != null) {
+          currentCommunity.communities.joinToString {
+            it.getLocalizedFullName(context)
+          }
         }
-        vh.body.maxLines = 2
-        vh.body.addEllipsizeToSpannedOnLayout()
-        vh.feedInfoText.visibility = View.GONE
+
+        vh.feedInfoText?.visibility = View.GONE
       }
       is CommunityRef.Subscribed -> {
         vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.baseline_subscriptions_24)
-        vh.body.visibility = View.GONE
-        vh.feedInfoText.visibility = View.GONE
+        vh.feedInfoText?.visibility = View.GONE
       }
       is CommunityRef.AllSubscribed -> {
         vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.outline_groups_24)
-        vh.body.visibility = View.GONE
-        vh.feedInfoText.visibility = View.GONE
+        vh.feedInfoText?.visibility = View.GONE
       }
       is CommunityRef.ModeratedCommunities -> {
         vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.outline_shield_24)
-        vh.body.visibility = View.GONE
-        vh.feedInfoText.visibility = View.GONE
+        vh.feedInfoText?.visibility = View.GONE
       }
       is CommunityRef.CommunityRefByName,
       is CommunityRef.All,
@@ -731,13 +745,48 @@ class CommunityAppBarController(
       return
     }
 
-    val siteOrCommunity = communityInfoViewModel.siteOrCommunity.valueOrNull
-      ?: return
-    val body = siteOrCommunity.response
-      .fold(
-        { it.site_view.site.description },
-        { it.community_view.community.description },
-      )
+    val currentCommunity = state.currentCommunity
+    val siteOrCommunity = communityInfoViewModel.siteOrCommunity.value
+
+    var body: String? = when (siteOrCommunity) {
+      is StatefulData.Error -> {
+        siteOrCommunity.error.toErrorMessage(context)
+      }
+      is StatefulData.Loading -> {
+        buildString {
+          append(context.getString(R.string.loading))
+          appendLine("  ")
+          appendLine(context.getString(R.string.loading))
+        }
+      }
+      is StatefulData.NotStarted -> {
+        null
+      }
+      is StatefulData.Success -> {
+        siteOrCommunity.data.response
+          .fold(
+            { it.site_view.site.description },
+            { it.community_view.community.description },
+          )
+      }
+    }
+
+    if (vh.subtitle == null) {
+      if (body == null) {
+        body = when (currentCommunity) {
+          is CommunityRef.All -> context.getString(R.string.all_feed_desc)
+          is CommunityRef.AllSubscribed -> context.getString(R.string.all_subscribed_feed_desc)
+          is CommunityRef.CommunityRefByName -> null
+          is CommunityRef.Local -> context.getString(R.string.local_feed_desc)
+          is CommunityRef.ModeratedCommunities -> context.getString(R.string.moderated_feed_desc)
+          is CommunityRef.MultiCommunity -> context.getString(R.string.multi_community_desc)
+          is CommunityRef.Subscribed -> context.getString(R.string.subscribed_feed_desc)
+          null -> null
+        }
+      } else if (currentCommunity is CommunityRef.All) {
+        body = context.getString(R.string.all_feed_desc)
+      }
+    }
 
     if (body.isNullOrBlank()) {
       vh.body.visibility = View.GONE
@@ -859,8 +908,8 @@ class CommunityAppBarController(
     updateToolbarVisibility(animate = false)
   }
 
-  fun setUseHeader(useHeader: Boolean) {
-    ensureViewHolder(useHeader)
+  fun setUseHeader(useHeader: Boolean, version: Int) {
+    ensureViewHolder(useHeader, version)
     if (useHeader) {
       updateToolbarVisibility(animate = false)
       isScrimListenerEnabled = true
@@ -1047,10 +1096,16 @@ class CommunityAppBarController(
     }
   }
 
-  private fun ensureViewHolder(useHeader: Boolean, force: Boolean = false): ViewHolder {
+  private fun ensureViewHolder(
+    useHeader: Boolean,
+    version: Int,
+    force: Boolean = false,
+  ): ViewHolder {
     if (!force) {
       if (useHeader && vh is ViewHolder.LargeAppBarViewHolder) {
-        return vh
+        if (vh.version == version) {
+          return vh
+        }
       }
       if (!useHeader && vh is ViewHolder.SmallAppBarViewHolder) {
         return vh
@@ -1060,7 +1115,7 @@ class CommunityAppBarController(
     if (!force) {
       parentContainer.removeView(vh.root)
     }
-    vh = createViewHolder(useHeader)
+    vh = createViewHolder(useHeader, version)
     parentContainer.addView(vh.root, 0)
     return vh
   }
@@ -1072,52 +1127,94 @@ class CommunityAppBarController(
     PanelsChildGestureRegionObserver.Provider.get().register(vh.scrollView)
   }
 
-  private fun createViewHolder(useHeader: Boolean): ViewHolder {
+  private fun createViewHolder(useHeader: Boolean, version: Int): ViewHolder {
     val inflater = LayoutInflater.from(summitActivity)
-    return if (useHeader) {
-      val b = CustomAppBarLargeBinding.inflate(inflater, parentContainer, false)
-      ViewHolder.LargeAppBarViewHolder(
-        root = b.root,
-        customActionBar = b.customActionBar,
-        communityTextView = b.communityTextView,
-        pageTextView = b.pageTextView,
-        customAppBar = b.customAppBar,
-        accountImageView = b.accountImageView,
-        communitySortOrder = b.communitySortOrder,
-        collapsingToolbarLayout = b.collapsingToolbarLayout,
-        toolbar = b.toolbar,
-        hideReadOn = b.hideReadOn,
-        title = b.title,
-        subtitle = b.subtitle,
-        body = b.body,
-        banner = b.banner,
-        communitySortOrder2 = b.communitySortOrder2,
-        toolbarPlaceholder = b.toolbarPlaceholder,
-        icon = b.icon,
-        subscribe = b.subscribe,
-        info = b.info,
-        titleHotspot = b.titleHotspot,
-        feedInfoText = b.feedInfoText,
-        communities = b.communities,
-        search = b.search,
-        scrollView = b.scrollView,
-        headerBg = b.headerBg,
-        hideReadOn2 = b.hideReadOn2,
-      )
-    } else {
-      val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)
-      ViewHolder.SmallAppBarViewHolder(
-        root = b.root,
-        customActionBar = b.customActionBar,
-        communityTextView = b.communityTextView,
-        pageTextView = b.pageTextView,
-        customAppBar = b.customAppBar,
-        accountImageView = b.accountImageView,
-        communitySortOrder = b.communitySortOrder,
-        collapsingToolbarLayout = b.collapsingToolbarLayout,
-        toolbar = b.toolbar,
-        hideReadOn = b.hideReadOn,
-      )
+    return when {
+      useHeader -> {
+        when (version) {
+          PostsFeedHeaderVersions.V1 -> {
+            val b = CommunityAppBarLargeBinding.inflate(inflater, parentContainer, false)
+            ViewHolder.LargeAppBarViewHolder(
+              version = version,
+              root = b.root,
+              customActionBar = b.customActionBar,
+              communityTextView = b.communityTextView,
+              pageTextView = b.pageTextView,
+              customAppBar = b.customAppBar,
+              accountImageView = b.accountImageView,
+              communitySortOrder = b.communitySortOrder,
+              collapsingToolbarLayout = b.collapsingToolbarLayout,
+              toolbar = b.toolbar,
+              hideReadOn = b.hideReadOn,
+              title = b.title,
+              subtitle = b.subtitle,
+              body = b.body,
+              banner = b.banner,
+              communitySortOrder2 = b.communitySortOrder2,
+              toolbarPlaceholder = b.toolbarPlaceholder,
+              icon = b.icon,
+              subscribe = b.subscribe,
+              info = b.info,
+              titleHotspot = b.titleHotspot,
+              feedInfoText = b.feedInfoText,
+              communities = b.communities,
+              search = b.search,
+              scrollView = b.scrollView,
+              headerBg = b.headerBg,
+              hideReadOn2 = b.hideReadOn2,
+            )
+          }
+          // PostsFeedHeaderVersions.V2
+          else -> {
+            val b = CommunityAppBarLarge2Binding.inflate(inflater, parentContainer, false)
+            ViewHolder.LargeAppBarViewHolder(
+              version = version,
+              root = b.root,
+              customActionBar = b.customActionBar,
+              communityTextView = b.communityTextView,
+              pageTextView = b.pageTextView,
+              customAppBar = b.customAppBar,
+              accountImageView = b.accountImageView,
+              communitySortOrder = b.communitySortOrder,
+              collapsingToolbarLayout = b.collapsingToolbarLayout,
+              toolbar = b.toolbar,
+              hideReadOn = b.hideReadOn,
+              title = b.title,
+              subtitle = null,
+              body = b.body,
+              banner = b.banner,
+              communitySortOrder2 = b.communitySortOrder2,
+              toolbarPlaceholder = b.toolbarPlaceholder,
+              icon = b.icon,
+              subscribe = b.subscribe,
+              info = b.info,
+              titleHotspot = b.titleHotspot,
+              feedInfoText = null,
+              communities = b.communities,
+              search = b.search,
+              scrollView = b.scrollView,
+              headerBg = b.headerBg,
+              hideReadOn2 = b.hideReadOn2,
+            )
+          }
+        }
+      }
+      else -> {
+        val b = CommunityAppBarSmallBinding.inflate(inflater, parentContainer, false)
+        ViewHolder.SmallAppBarViewHolder(
+          version = version,
+          root = b.root,
+          customActionBar = b.customActionBar,
+          communityTextView = b.communityTextView,
+          pageTextView = b.pageTextView,
+          customAppBar = b.customAppBar,
+          accountImageView = b.accountImageView,
+          communitySortOrder = b.communitySortOrder,
+          collapsingToolbarLayout = b.collapsingToolbarLayout,
+          toolbar = b.toolbar,
+          hideReadOn = b.hideReadOn,
+        )
+      }
     }
   }
 }

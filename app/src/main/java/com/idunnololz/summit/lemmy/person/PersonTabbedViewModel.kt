@@ -17,7 +17,6 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentListEngine
@@ -29,8 +28,9 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
-import com.idunnololz.summit.util.slidingPane.SlidingPaneController
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -117,7 +117,7 @@ class PersonTabbedViewModel @Inject constructor(
     }
   }
 
-  fun fetchPersonIfNotDone(personRef: PersonRef?) {
+  fun fetchPersonIfNotDone(personRef: PersonRef?, force: Boolean = false) {
     if (personData.valueOrNull != null && this.personRef == personRef) return
 
     this.personRef = personRef
@@ -125,7 +125,7 @@ class PersonTabbedViewModel @Inject constructor(
     if (personRef == null) {
       reset()
     } else {
-      fetchPage(0, isPeronInfoFetch = true)
+      fetchPage(0, isPeronInfoFetch = true, force = force)
     }
   }
 

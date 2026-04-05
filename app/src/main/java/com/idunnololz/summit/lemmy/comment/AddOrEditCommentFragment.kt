@@ -36,7 +36,6 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.databinding.ConfigureCommentBinding
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
@@ -58,10 +57,10 @@ import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostListItem
 import com.idunnololz.summit.lemmy.post.PostModel
-import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment

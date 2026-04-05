@@ -37,7 +37,6 @@ import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostListItem
 import com.idunnololz.summit.lemmy.post.PostModel
-import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -137,7 +136,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     requireSummitActivity().apply {
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
       insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
 
       insets.observe(viewLifecycleOwner) { insets ->
         binding.dummyAppBar.updatePadding(bottom = insets.bottomInset * 2)

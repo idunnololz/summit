@@ -7,92 +7,86 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Reactions
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param apId 
- * @param body 
- * @param deleted 
- * @param id 
- * @param languageId 
- * @param local 
- * @param path 
- * @param postId 
- * @param published 
- * @param removed 
- * @param userId 
- * @param distinguished 
- * @param updated 
- * @param locked 
- * @param answer 
- * @param emojiReactions 
+ *
+ * @param apId
+ * @param body
+ * @param deleted
+ * @param id
+ * @param languageId
+ * @param local
+ * @param path
+ * @param postId
+ * @param published
+ * @param removed
+ * @param userId
+ * @param distinguished
+ * @param updated
+ * @param locked
+ * @param answer
+ * @param emojiReactions
  */
 
+data class Comment(
 
-data class Comment (
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("body")
+  val body: kotlin.String,
 
-    @SerializedName("body")
-    val body: kotlin.String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("path")
+  val path: kotlin.String,
 
-    @SerializedName("path")
-    val path: kotlin.String,
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("published")
+  val published: kotlin.String,
 
-    @SerializedName("published")
-    val published: kotlin.String,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("user_id")
+  val userId: kotlin.Int,
 
-    @SerializedName("user_id")
-    val userId: kotlin.Int,
+  @SerializedName("distinguished")
+  val distinguished: kotlin.Boolean? = null,
 
-    @SerializedName("distinguished")
-    val distinguished: kotlin.Boolean? = null,
+  @SerializedName("updated")
+  val updated: kotlin.String? = null,
 
-    @SerializedName("updated")
-    val updated: kotlin.String? = null,
+  @SerializedName("locked")
+  val locked: kotlin.Boolean? = null,
 
-    @SerializedName("locked")
-    val locked: kotlin.Boolean? = null,
+  @SerializedName("answer")
+  val answer: kotlin.Boolean? = null,
 
-    @SerializedName("answer")
-    val answer: kotlin.Boolean? = null,
+  @SerializedName("emoji_reactions")
+  val emojiReactions: kotlin.collections.List<Reactions>? = null,
 
-    @SerializedName("emoji_reactions")
-    val emojiReactions: kotlin.collections.List<Reactions>? = null
-
-) {
-
-
-}
-
+)

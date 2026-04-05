@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.PostLikeView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param postLikes 
- * @param nextPage 
+ *
+ * @param postLikes
+ * @param nextPage
  */
 
+data class ListPostLikesResponse(
 
-data class ListPostLikesResponse (
+  @SerializedName("post_likes")
+  val postLikes: kotlin.collections.List<PostLikeView>,
 
-    @SerializedName("post_likes")
-    val postLikes: kotlin.collections.List<PostLikeView>,
+  @SerializedName("next_page")
+  val nextPage: kotlin.String? = null,
 
-    @SerializedName("next_page")
-    val nextPage: kotlin.String? = null
-
-) {
-
-
-}
-
+)

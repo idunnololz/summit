@@ -210,6 +210,10 @@ class SettingsWebFragment :
         { settingValues.showReadPosts },
         { updateValue(settings.showReadPostsSetting.id, it) },
       ),
+      settings.showBotAccountsSetting.asOnOffSwitch(
+        { settingValues.showBotAccounts },
+        { updateValue(settings.showBotAccountsSetting.id, it) },
+      ),
       settings.botAccountSetting.asOnOffSwitch(
         { settingValues.botAccount },
         { updateValue(settings.botAccountSetting.id, it) },

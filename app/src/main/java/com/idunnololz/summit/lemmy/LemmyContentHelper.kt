@@ -31,7 +31,6 @@ import coil3.request.transitionFactory
 import coil3.transition.CrossfadeDrawable
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getPreviewInfo
@@ -48,6 +47,7 @@ import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.PostVi
 import com.idunnololz.summit.lemmy.utils.NoneTransitionFactory
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.Preferences
@@ -809,7 +809,11 @@ class LemmyContentHelper(
 
     fun startLoadImage(placeholderMemoryCacheKey: MemoryCache.Key? = null) {
       if (isUrlVideo) {
-        onImageLoaded(Either.Left(imageUrl), placeholderMemoryCacheKey)
+        if (preferences.generateMissingVideoThumbnails) {
+          onImageLoaded(Either.Left(imageUrl), placeholderMemoryCacheKey)
+        } else {
+          imageView.load(null)
+        }
       } else {
         offlineManager.fetchImageWithError(
           imageView = imageView,

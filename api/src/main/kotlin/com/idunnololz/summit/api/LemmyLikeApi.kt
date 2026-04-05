@@ -80,7 +80,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
@@ -100,7 +99,6 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
 import com.idunnololz.summit.api.dto.lemmy.Register
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
@@ -485,10 +483,7 @@ interface LemmyLikeApi : ApiCompat {
   /**
    * Save your user settings.
    */
-  suspend fun saveUserSettings(
-    authorization: String?,
-    args: SaveUserSettings,
-  ): Result<Unit>
+  suspend fun saveUserSettings(authorization: String?, args: SaveUserSettings): Result<Unit>
 
   /**
    * Upload an image.

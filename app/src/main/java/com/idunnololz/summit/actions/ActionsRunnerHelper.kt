@@ -12,7 +12,6 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
@@ -21,6 +20,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.models.PostView
 import javax.inject.Inject
 import kotlin.random.Random
 

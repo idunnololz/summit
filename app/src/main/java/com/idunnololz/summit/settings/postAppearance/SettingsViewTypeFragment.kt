@@ -15,6 +15,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
+import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.PostAppearanceDemoCardBinding
@@ -23,6 +24,7 @@ import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.defaultReadPostStyle
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
+import com.idunnololz.summit.preferences.PostHeaderVersion
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.LemmyFakeModels
@@ -230,14 +232,16 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
       },
     ),
     settings.readPostStyle.asSingleChoiceSelectorItem(
-      { viewModel.currentPostUiConfig.readPostStyle
-        ?: preferences.getPostsLayout().defaultReadPostStyle},
+      {
+        viewModel.currentPostUiConfig.readPostStyle
+          ?: preferences.getPostsLayout().defaultReadPostStyle
+      },
       {
         viewModel.currentPostUiConfig =
           viewModel.currentPostUiConfig.copy(readPostStyle = it)
 
         updateRendering()
-      }
+      },
     ),
     settings.preferTextPreviewIcon.asOnOffSwitch(
       {
@@ -258,6 +262,15 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
       {
         viewModel.currentPostUiConfig =
           viewModel.currentPostUiConfig.copy(showUrlDomain = it)
+
+        updateRendering()
+      },
+    ),
+    settings.postHeaderStyle.asSingleChoiceSelectorItem(
+      { viewModel.currentPostUiConfig.postHeaderVersion().value },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(postHeaderVersion = PostHeaderVersion(it))
 
         updateRendering()
       },
@@ -305,6 +318,10 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
           ListingItemViewHolder.fromBinding(
             ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false),
           )
+        CommunityLayout.List2 ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemList2Binding.inflate(inflater, binding.demoViewContainer, false),
+          )
         CommunityLayout.LargeList ->
           ListingItemViewHolder.fromBinding(
             ListingItemLargeListBinding.inflate(inflater, binding.demoViewContainer, false),
@@ -350,6 +367,7 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
       val fetchedPost = LemmyFakeModels.fakeFetchedPost
       postListViewBuilder.bind(
         holder = h,
+        currentCommunity = null,
         fetchedPost = fetchedPost,
         instance = "https://fake.instance",
         isRevealed = true,

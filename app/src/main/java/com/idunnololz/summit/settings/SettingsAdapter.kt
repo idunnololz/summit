@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import coil3.load
+import com.google.android.material.slider.Slider
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
@@ -610,18 +611,24 @@ class SettingsAdapter(
       clazz = Item.SliderItem::class,
       inflateFn = SettingSliderItemBinding::inflate,
       onViewCreated = {
-        it.slider.addOnChangeListener { slider, value, fromUser ->
-          if (!fromUser) return@addOnChangeListener
-
-          val setting = it.root.tag as? SliderSettingItem ?: return@addOnChangeListener
-
-          findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)?.apply {
-            onValueChanged.invoke(value)
-            it.value.text = valueToLabel?.invoke(value)
+//        it.slider.addOnChangeListener { slider, value, fromUser ->
+//          if (!fromUser) return@addOnChangeListener
+//        }
+        it.slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+          override fun onStartTrackingTouch(p0: Slider) {
           }
 
-          onValueChanged()
-        }
+          override fun onStopTrackingTouch(slider: Slider) {
+            val value = slider.value
+            val setting = it.root.tag as? SliderSettingItem ?: return
+
+            findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)?.apply {
+              onValueChanged.invoke(value)
+              it.value.text = valueToLabel?.invoke(value)
+            }
+            onValueChanged()
+          }
+        })
       },
     ) { item, b, h ->
       b.root.tag = null

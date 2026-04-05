@@ -27,11 +27,12 @@ class TemplatesAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.TemplateItem -> old.template.id == (new as Item.TemplateItem).template.id
-        Item.AddTemplateItem -> true
-        Item.EmptyTemplateItem -> true
-      }
+      old::class == new::class &&
+        when (old) {
+          is Item.TemplateItem -> old.template.id == (new as Item.TemplateItem).template.id
+          Item.AddTemplateItem -> true
+          Item.EmptyTemplateItem -> true
+        }
     },
   ).apply {
     addItemType(

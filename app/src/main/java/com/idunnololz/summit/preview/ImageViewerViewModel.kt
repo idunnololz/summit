@@ -6,7 +6,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = ImageViewerViewModel.Factory::class)
 class ImageViewerViewModel @AssistedInject constructor(

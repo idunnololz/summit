@@ -13,6 +13,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
+import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
@@ -65,6 +66,30 @@ class ListingItemViewHolder(
 
   companion object {
     fun fromBinding(binding: ListingItemListBinding) = ListingItemViewHolder(
+      rawBinding = binding,
+      root = binding.root,
+      contentView = binding.contentView,
+      headerContainer = binding.headerContainer,
+      imageView = binding.image,
+      title = binding.title,
+      subtitle = null,
+      commentText = null,
+      commentButton = null,
+      upvoteCount = null,
+      upvoteButton = null,
+      downvoteCount = null,
+      downvoteButton = null,
+      iconImage = binding.iconImage,
+      fullContentContainerView = binding.fullContent,
+      postTypeIcon = binding.postTypeIcon,
+      highlightBg = binding.highlightBg,
+      layoutShowsFullContent = false,
+      createCommentButton = null,
+      themeColorBar = binding.themeColorBar,
+      fullWidthContent = false,
+    )
+
+    fun fromBinding(binding: ListingItemList2Binding) = ListingItemViewHolder(
       rawBinding = binding,
       root = binding.root,
       contentView = binding.contentView,

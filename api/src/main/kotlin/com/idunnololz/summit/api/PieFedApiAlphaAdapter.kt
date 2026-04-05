@@ -121,7 +121,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.LocalSite
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
@@ -142,8 +141,6 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
 import com.idunnololz.summit.api.dto.lemmy.Register
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplication
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
@@ -167,10 +164,10 @@ import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.InputStream
 
 class PieFedApiAlphaAdapter(
   private val api: PieFedApiAlpha,
@@ -546,8 +543,7 @@ class PieFedApiAlphaAdapter(
   override suspend fun changePassword(
     authorization: String?,
     args: ChangePassword,
-  ): Result<LoginResponse> =
-    Result.failure(NotYetImplemented())
+  ): Result<LoginResponse> = Result.failure(NotYetImplemented())
 //    retrofitErrorHandler { api.changePassword(generateHeaders(authorization, false), args) }
 //      .map { it.toLoginResponse() }
 
@@ -675,8 +671,7 @@ class PieFedApiAlphaAdapter(
   override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Result<CommentReportResponse> =
-    Result.failure(NotYetImplemented())
+  ): Result<CommentReportResponse> = Result.failure(NotYetImplemented())
 //    retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
 //      .map {
 //        CommentReportResponse(
@@ -970,7 +965,7 @@ class PieFedApiAlphaAdapter(
       form = RegistrationApproveRequest(
         args.approve,
         args.id,
-      )
+      ),
     )
   }
 
@@ -978,28 +973,31 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> =
-    retrofitErrorHandler {
-      api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
-    }.map {
-      GetModlogResponse(
-        removed_posts              = it.removedPosts.mapNotNull { it.toModRemovePostView() },
-        locked_posts               = it.lockedPosts.mapNotNull { it.toModLockPostView() },
-        featured_posts             = it.featuredPosts.mapNotNull { it.toModFeaturePostView() },
-        removed_comments           = it.removedComments.mapNotNull { it.toModRemoveCommentView() },
-        removed_communities        = it.removedCommunities.mapNotNull { it.toModRemoveCommunityView() },
-        banned_from_community      = it.bannedFromCommunity.mapNotNull { it.toModBanFromCommunityView() },
-        banned                     = it.banned.mapNotNull { it.toModBanView() },
-        added_to_community         = it.addedToCommunity.mapNotNull { it.toModAddCommunityView() },
-        transferred_to_community   = it.transferredToCommunity.mapNotNull { it.toModTransferCommunityView() },
-        added                      = it.added.mapNotNull { it.toModAddView() },
-        admin_purged_persons       = it.adminPurgedPersons.mapNotNull { it.toAdminPurgePersonView() },
-        admin_purged_communities   = it.adminPurgedCommunities.map { it.toAdminPurgeCommunityView() },
-        admin_purged_posts         = it.adminPurgedPosts.mapNotNull { it.toAdminPurgePostView() },
-        admin_purged_comments      = it.adminPurgedComments.mapNotNull { it.toAdminPurgeCommentView() },
-        hidden_communities         = it.hiddenCommunities.mapNotNull { it.toModHideCommunityView() },
-      )
-    }
+  ): Result<GetModlogResponse> = retrofitErrorHandler {
+    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+  }.map {
+    GetModlogResponse(
+      removed_posts = it.removedPosts.mapNotNull { it.toModRemovePostView() },
+      locked_posts = it.lockedPosts.mapNotNull { it.toModLockPostView() },
+      featured_posts = it.featuredPosts.mapNotNull { it.toModFeaturePostView() },
+      removed_comments = it.removedComments.mapNotNull { it.toModRemoveCommentView() },
+      removed_communities = it.removedCommunities.mapNotNull { it.toModRemoveCommunityView() },
+      banned_from_community = it.bannedFromCommunity.mapNotNull {
+        it.toModBanFromCommunityView()
+      },
+      banned = it.banned.mapNotNull { it.toModBanView() },
+      added_to_community = it.addedToCommunity.mapNotNull { it.toModAddCommunityView() },
+      transferred_to_community = it.transferredToCommunity.mapNotNull {
+        it.toModTransferCommunityView()
+      },
+      added = it.added.mapNotNull { it.toModAddView() },
+      admin_purged_persons = it.adminPurgedPersons.mapNotNull { it.toAdminPurgePersonView() },
+      admin_purged_communities = it.adminPurgedCommunities.map { it.toAdminPurgeCommunityView() },
+      admin_purged_posts = it.adminPurgedPosts.mapNotNull { it.toAdminPurgePostView() },
+      admin_purged_comments = it.adminPurgedComments.mapNotNull { it.toAdminPurgeCommentView() },
+      hidden_communities = it.hiddenCommunities.mapNotNull { it.toModHideCommunityView() },
+    )
+  }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
     Result.failure(NotYetImplemented())

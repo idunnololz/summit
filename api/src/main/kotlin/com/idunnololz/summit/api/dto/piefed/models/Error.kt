@@ -7,19 +7,18 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param code Error code
  * @param status Error name
@@ -27,27 +26,22 @@ import com.google.gson.annotations.SerializedName
  * @param errors Errors
  */
 
+data class Error(
 
-data class Error (
+  /* Error code */
+  @SerializedName("code")
+  val code: kotlin.Int? = null,
 
-    /* Error code */
-    @SerializedName("code")
-    val code: kotlin.Int? = null,
+  /* Error name */
+  @SerializedName("status")
+  val status: kotlin.String? = null,
 
-    /* Error name */
-    @SerializedName("status")
-    val status: kotlin.String? = null,
+  /* Error message */
+  @SerializedName("message")
+  val message: kotlin.String? = null,
 
-    /* Error message */
-    @SerializedName("message")
-    val message: kotlin.String? = null,
+  /* Errors */
+  @SerializedName("errors")
+  val errors: kotlin.Any? = null,
 
-    /* Errors */
-    @SerializedName("errors")
-    val errors: kotlin.Any? = null
-
-) : kotlin.collections.HashMap<String, kotlin.Any>() {
-
-
-}
-
+) : kotlin.collections.HashMap<String, kotlin.Any>()

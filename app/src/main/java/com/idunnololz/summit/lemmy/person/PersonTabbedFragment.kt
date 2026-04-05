@@ -54,7 +54,6 @@ import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
-import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
@@ -68,6 +67,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
@@ -211,6 +211,11 @@ class PersonTabbedFragment :
       } else {
         binding.accountImageView.visibility = View.GONE
       }
+
+      loadingView.setOnRefreshClickListener {
+        viewModel.fetchPersonIfNotDone(personRef, force = true)
+      }
+
       viewModel.personData.observe(viewLifecycleOwner) {
         when (it) {
           is StatefulData.Error -> {

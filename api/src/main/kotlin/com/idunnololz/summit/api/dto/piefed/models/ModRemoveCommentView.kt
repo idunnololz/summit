@@ -7,56 +7,50 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Comment
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.ModRemoveComment
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.Post
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param modRemoveComment 
- * @param moderator 
- * @param comment 
- * @param commenter 
- * @param post 
- * @param community 
+ *
+ * @param modRemoveComment
+ * @param moderator
+ * @param comment
+ * @param commenter
+ * @param post
+ * @param community
  */
 
+data class ModRemoveCommentView(
 
-data class ModRemoveCommentView (
+  @SerializedName("mod_remove_comment")
+  val modRemoveComment: ModRemoveComment,
 
-    @SerializedName("mod_remove_comment")
-    val modRemoveComment: ModRemoveComment,
+  @SerializedName("moderator")
+  val moderator: Person? = null,
 
-    @SerializedName("moderator")
-    val moderator: Person? = null,
+  @SerializedName("comment")
+  val comment: Comment? = null,
 
-    @SerializedName("comment")
-    val comment: Comment? = null,
+  @SerializedName("commenter")
+  val commenter: Person? = null,
 
-    @SerializedName("commenter")
-    val commenter: Person? = null,
+  @SerializedName("post")
+  val post: Post? = null,
 
-    @SerializedName("post")
-    val post: Post? = null,
+  @SerializedName("community")
+  val community: Community? = null,
 
-    @SerializedName("community")
-    val community: Community? = null
-
-) {
-
-
-}
-
+)

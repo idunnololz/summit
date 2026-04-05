@@ -2,10 +2,11 @@ package com.otaliastudios.zoom.internal.gestures
 
 import android.content.Context
 import android.graphics.PointF
-import android.os.Build
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import com.otaliastudios.zoom.*
+import com.otaliastudios.zoom.AbsolutePoint
+import com.otaliastudios.zoom.ScaledPoint
+import com.otaliastudios.zoom.ZoomApi
 import com.otaliastudios.zoom.ZoomApi.AbsolutePan
 import com.otaliastudios.zoom.internal.StateController
 import com.otaliastudios.zoom.internal.matrix.MatrixController

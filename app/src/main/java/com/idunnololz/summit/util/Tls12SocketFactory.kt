@@ -1,18 +1,14 @@
 package com.idunnololz.summit.util
 
-import android.os.Build
-import android.util.Log
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
 import java.net.UnknownHostException
 import java.security.KeyStore
-import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
-import okhttp3.OkHttpClient
 import okhttp3.TlsVersion
 
 /**

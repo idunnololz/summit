@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param modPersonId 
- * @param postId 
- * @param featured 
- * @param isFeaturedCommunity 
- * @param `when` 
+ *
+ * @param id
+ * @param modPersonId
+ * @param postId
+ * @param featured
+ * @param isFeaturedCommunity
+ * @param `when`
  */
 
+data class ModFeaturePost(
 
-data class ModFeaturePost (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("mod_person_id")
+  val modPersonId: kotlin.Int?,
 
-    @SerializedName("mod_person_id")
-    val modPersonId: kotlin.Int?,
+  @SerializedName("post_id")
+  val postId: kotlin.Int?,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int?,
+  @SerializedName("featured")
+  val featured: kotlin.Boolean,
 
-    @SerializedName("featured")
-    val featured: kotlin.Boolean,
+  @SerializedName("is_featured_community")
+  val isFeaturedCommunity: kotlin.Boolean,
 
-    @SerializedName("is_featured_community")
-    val isFeaturedCommunity: kotlin.Boolean,
+  @SerializedName("when_")
+  val `when`: kotlin.String,
 
-    @SerializedName("when_")
-    val `when`: kotlin.String
-
-) {
-
-
-}
-
+)

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import com.idunnololz.summit.lemmy.community.CommunityLayout
+import com.idunnololz.summit.preferences.PostHeaderVersion
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -33,6 +34,8 @@ data class PostInListUiConfig(
    * have this special field to tell us not to do that.
    */
   val fullImageWidthWhenFullWidthLayout: Boolean? = null,
+
+  val postHeaderVersion: PostHeaderVersion? = null,
 ) {
   fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
     textSizeMultiplier = it,
@@ -42,6 +45,8 @@ data class PostInListUiConfig(
   fun showUrlDomain() = showUrlDomain ?: false
 
   fun subtitleTextSizeSp() = subtitleTextSizeSp ?: 11f
+
+  fun postHeaderVersion() = postHeaderVersion ?: PostHeaderVersion.V1
 }
 
 @Serializable
@@ -97,11 +102,22 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
       headerTextSizeSp = 12f,
       footerTextSizeSp = 12f,
       readPostStyle = ReadPostStyleIds.DIM_TITLE,
+      showCommunityIcon = false,
+      postHeaderVersion = PostHeaderVersion.V2,
     )
   CommunityLayout.List ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
       readPostStyle = ReadPostStyleIds.DIM_TITLE,
+    )
+  CommunityLayout.List2 ->
+    PostInListUiConfig(
+      imageWidthPercent = 0.25f,
+      headerTextSizeSp = 14f,
+      titleTextSizeSp = 16f,
+      preferImagesAtEnd = true,
+      readPostStyle = ReadPostStyleIds.DIM_TITLE,
+      postHeaderVersion = PostHeaderVersion.V2,
     )
   CommunityLayout.ListWithCards ->
     PostInListUiConfig(
@@ -152,6 +168,7 @@ val CommunityLayout.defaultReadPostStyle
     when (this) {
       CommunityLayout.Compact,
       CommunityLayout.List,
+      CommunityLayout.List2,
       CommunityLayout.ListWithCards,
       CommunityLayout.FullWithCards,
       CommunityLayout.SmartList,

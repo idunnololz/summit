@@ -1,9 +1,9 @@
 package com.idunnololz.summit.hidePosts
 
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.Preferences
 import javax.inject.Inject
 import javax.inject.Singleton

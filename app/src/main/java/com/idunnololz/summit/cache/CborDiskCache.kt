@@ -1,14 +1,13 @@
 package com.idunnololz.summit.cache
 
 import android.util.Log
+import java.io.File
+import java.lang.reflect.Type
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
-import java.io.File
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import java.lang.reflect.Type
 
 @OptIn(ExperimentalSerializationApi::class)
 class CborDiskCache(
@@ -51,7 +50,7 @@ class CborDiskCache(
         cache.put(
           key,
           Cbor.encodeToByteArray(Cbor.serializersModule.serializer(clazz), obj as Any),
-          mapOf()
+          mapOf(),
         )
       }
     } catch (e: Exception) {
@@ -59,18 +58,16 @@ class CborDiskCache(
     }
   }
 
-  fun <T> getCachedObject(key: String, clazz: Type): T? {
-    return try {
-      val value = cache.getCachedDataAsByteArray(key)
-      if (value == null) {
-        null
-      } else {
-        Cbor.decodeFromByteArray(Cbor.serializersModule.serializer(clazz), value) as? T
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "getCachedObject()", e)
+  fun <T> getCachedObject(key: String, clazz: Type): T? = try {
+    val value = cache.getCachedDataAsByteArray(key)
+    if (value == null) {
       null
+    } else {
+      Cbor.decodeFromByteArray(Cbor.serializersModule.serializer(clazz), value) as? T
     }
+  } catch (e: Exception) {
+    Log.e(TAG, "getCachedObject()", e)
+    null
   }
 
   fun printDebugInfo() {

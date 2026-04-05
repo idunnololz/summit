@@ -4,11 +4,11 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountManager.OnAccountChangedListener
 import com.idunnololz.summit.account.GuestOrUserAccount
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.StableAccountId
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.Preferences
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

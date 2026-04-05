@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param url 
- * @param token 
- * @param authors 
- * @param count 
+ *
+ * @param url
+ * @param token
+ * @param authors
+ * @param count
  */
 
+data class Reactions(
 
-data class Reactions (
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("token")
+  val token: kotlin.String? = null,
 
-    @SerializedName("token")
-    val token: kotlin.String? = null,
+  @SerializedName("authors")
+  val authors: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerializedName("authors")
-    val authors: kotlin.collections.List<kotlin.String>? = null,
+  @SerializedName("count")
+  val count: kotlin.Int? = null,
 
-    @SerializedName("count")
-    val count: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

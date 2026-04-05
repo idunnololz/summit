@@ -25,6 +25,8 @@ import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.preferences.PostHeaderVersion
+import com.idunnololz.summit.preferences.PostsFeedHeaderVersions
 import com.idunnololz.summit.preferences.PreferenceKeys
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
@@ -59,6 +61,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_FINISH_APP_ON_BACK
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GENERATE_MISSING_VIDEO_THUMBNAILS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT_COLOR
@@ -96,6 +99,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_MARKDOWN_IN_PO
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_TAGS_FROM_POST_TITLES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PEEK_IMAGES_ON_LONG_PRESS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PERF_DELAY_WHEN_LOADING_DATA
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POSTS_FEED_HEADER_VERSION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_FEED_SHOW_SCROLL_BAR
@@ -973,6 +977,15 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.use_volume_buttons_on_post_feed_desc),
     relatedKeys = listOf(KEY_USE_VOLUME_BUTTONS_ON_POST_FEED),
   )
+  val postsFeedHeaderVersion = RadioGroupSettingItem(
+    icon = null,
+    title = context.getString(R.string.posts_feed_header_version),
+    options = mapOf(
+      PostsFeedHeaderVersions.V1 to context.getString(R.string.posts_feed_header_version_1),
+      PostsFeedHeaderVersions.V2 to context.getString(R.string.posts_feed_header_version_2),
+    ).toOptions(default = HomeFabQuickActionIds.None),
+    relatedKeys = listOf(KEY_POSTS_FEED_HEADER_VERSION),
+  )
 }
 
 class PostAndCommentsSettings @Inject constructor(
@@ -1527,8 +1540,8 @@ class PostsFeedAppearanceSettings @Inject constructor(
     context.getString(R.string.base_view_type),
     "",
     mapOf(
+      CommunityLayout.List2.ordinal to context.getString(R.string.list),
       CommunityLayout.Compact.ordinal to context.getString(R.string.compact),
-      CommunityLayout.List.ordinal to context.getString(R.string.list),
       CommunityLayout.LargeList.ordinal to context.getString(R.string.large_list),
       CommunityLayout.Card.ordinal to context.getString(R.string.card),
       CommunityLayout.Card2.ordinal to context.getString(R.string.card2),
@@ -1537,7 +1550,8 @@ class PostsFeedAppearanceSettings @Inject constructor(
       CommunityLayout.ListWithCards.ordinal to context.getString(R.string.list_with_cards),
       CommunityLayout.FullWithCards.ordinal to context.getString(R.string.full_with_cards),
       CommunityLayout.SmartList.ordinal to context.getString(R.string.smart_list),
-    ).toOptions(CommunityLayout.List.ordinal),
+      CommunityLayout.List.ordinal to context.getString(R.string.list_old),
+    ).toOptions(CommunityLayout.List2.ordinal),
   )
 
   val reset = BasicSettingItem(
@@ -1554,10 +1568,10 @@ class PostsFeedAppearanceSettings @Inject constructor(
   )
 
   val imageSize = SliderSettingItem(
-    context.getString(R.string.image_size),
-    0.1f,
-    1f,
-    0.05f,
+    title = context.getString(R.string.image_size),
+    minValue = 0.1f,
+    maxValue = 1f,
+    stepSize = 0.01f,
   )
 
   val preferImageAtEnd = OnOffSettingItem(
@@ -1633,20 +1647,11 @@ class PostsFeedAppearanceSettings @Inject constructor(
     icon = null,
     title = context.getString(R.string.read_post_style),
     description = context.getString(R.string.read_post_style_desc),
-    options = listOf(
-      RadioGroupSettingItem.RadioGroupOption(
-        ReadPostStyleIds.DIM_TITLE,
-        context.getString(R.string.dim_title),
-      ),
-      RadioGroupSettingItem.RadioGroupOption(
-        ReadPostStyleIds.DIM_CONTENT,
-        context.getString(R.string.dim_content),
-      ),
-      RadioGroupSettingItem.RadioGroupOption(
-        ReadPostStyleIds.NONE,
-        context.getString(R.string.never_indicate_posts_as_read),
-      ),
-    ),
+    options = mapOf(
+      ReadPostStyleIds.DIM_TITLE to context.getString(R.string.dim_title),
+      ReadPostStyleIds.DIM_CONTENT to context.getString(R.string.dim_content),
+      ReadPostStyleIds.NONE to context.getString(R.string.never_indicate_posts_as_read),
+    ).toOptions(ReadPostStyleIds.DIM_TITLE),
   )
   val preferTextPreviewIcon = OnOffSettingItem(
     null,
@@ -1664,6 +1669,20 @@ class PostsFeedAppearanceSettings @Inject constructor(
     0f,
     32f,
     1f,
+  )
+  val postHeaderStyle = RadioGroupSettingItem(
+    icon = null,
+    title = context.getString(R.string.post_header_style),
+    options = listOf(
+      RadioGroupSettingItem.RadioGroupOption(
+        PostHeaderVersion.V1.value,
+        context.getString(R.string.post_header_style_default),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        PostHeaderVersion.V2.value,
+        context.getString(R.string.post_header_style_compact),
+      ),
+    ),
   )
 
   val verticalMarginSize = SliderSettingItem(
@@ -2170,6 +2189,11 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.parse_tags_from_post_titles),
     description = context.getString(R.string.parse_tags_from_post_titles_desc),
     relatedKeys = listOf(KEY_PARSE_TAGS_FROM_POST_TITLES),
+  )
+  val generateMissingVideoThumbnails = OnOffSettingItem(
+    title = context.getString(R.string.generate_missing_video_thumbnails),
+    description = context.getString(R.string.generate_missing_video_thumbnails_desc),
+    relatedKeys = listOf(KEY_GENERATE_MISSING_VIDEO_THUMBNAILS),
   )
 }
 

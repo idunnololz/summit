@@ -10,7 +10,6 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
@@ -22,6 +21,7 @@ import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
 import com.idunnololz.summit.preferences.Preferences
@@ -250,7 +250,7 @@ class PostsRepository @AssistedInject constructor(
           } else {
             hasMore = hasMoreResult.getOrThrow()
             allPostsData.value = allPostsData.value.copy(
-              currentPage = currentPageInternal + 1
+              currentPage = currentPageInternal + 1,
             )
           }
 
@@ -301,7 +301,6 @@ class PostsRepository @AssistedInject constructor(
     get() = apiClient.instanceFlow
 
   suspend fun setCommunity(communityRef: CommunityRef?) {
-    Log.d("HAHA", "setCommunity(): $communityRef")
     withContext(serialContext) {
       mutex.withLock {
         if (this@PostsRepository.communityRef == communityRef && currentDataSource != null) {
@@ -444,7 +443,7 @@ class PostsRepository @AssistedInject constructor(
     endReached = false
 
     allPostsData = dataBackedByCacheFactory.create(
-      primaryKey = "${apiInstance}|${communityRef.getKey()}",
+      primaryKey = "$apiInstance|${communityRef.getKey()}",
       initialValue = AllPostData(),
       cborDiskCache = directoryHelper.listsDiskCache,
     )
@@ -463,7 +462,7 @@ class PostsRepository @AssistedInject constructor(
   suspend fun onHiddenPostsChange() = withContext(serialContext) {
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
     allPostsData.value = allPostsData.value.copy(
-      allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
+      allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) },
     )
   }
 
@@ -576,7 +575,6 @@ class PostsRepository @AssistedInject constructor(
           }
         }
 
-        Log.d(TAG, "Fetched ${newPosts.size} posts.")
         addPosts(
           newPosts = newPosts,
           pageIndex = pageIndex,
@@ -584,9 +582,9 @@ class PostsRepository @AssistedInject constructor(
           duplicatePostsDetector = duplicatePostsDetector,
         )
 
-        if (consecutiveFilteredPostsByFilter > 20) {
+        if (consecutiveFilteredPostsByFilter > 30) {
           Result.failure(FilterTooAggressiveException())
-        } else if (consecutiveFilteredPostsByType > 20) {
+        } else if (consecutiveFilteredPostsByType > 30) {
           Result.failure(ContentTypeFilterTooAggressiveException())
         } else {
           Result.success(newPosts.isNotEmpty())
@@ -714,7 +712,7 @@ class PostsRepository @AssistedInject constructor(
 
     allPostsData.value = AllPostData(
       allPosts = mutableAllPosts,
-      currentPage = pageIndex
+      currentPage = pageIndex,
     )
   }
 
@@ -747,12 +745,9 @@ class PostsRepository @AssistedInject constructor(
 
   suspend fun tryRestore() {
     val start = System.currentTimeMillis()
-    Log.d("HAHA", "tryRestore()")
 
     allPostsData.tryRestore()
     addSeenPosts(allPosts.map { it.post.postView })
-
-    Log.d("HAHA", "restored ${allPosts.size} posts. time: ${System.currentTimeMillis() - start}")
   }
 
   class PageResult(

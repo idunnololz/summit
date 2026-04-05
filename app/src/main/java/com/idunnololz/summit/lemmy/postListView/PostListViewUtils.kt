@@ -6,7 +6,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
 import com.idunnololz.summit.lemmy.PostRef
@@ -22,6 +21,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils

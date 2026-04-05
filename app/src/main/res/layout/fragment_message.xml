@@ -221,6 +221,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:visibility="invisible"
+            app:paddingBottomSystemWindowInsets="true"
             style="@style/Widget.Material3.BottomAppBar"
             app:menu="@menu/menu_message"/>
 
@@ -229,6 +230,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            app:paddingBottomSystemWindowInsets="true"
             style="@style/Widget.Material3.BottomAppBar"
             app:menu="@menu/menu_message" />
 

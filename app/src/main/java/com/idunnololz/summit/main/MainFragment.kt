@@ -49,9 +49,6 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.attachNavHostFragment
-import com.idunnololz.summit.util.ext.attachNavHostFragmentDetachLast
-import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.obtainNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
@@ -578,17 +575,15 @@ class MainFragment :
     }
   }
 
-  private fun getCurrentFragment(): Fragment? {
-    return try {
-      val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
-      if (currentFragment is NavHostFragment) {
-        currentFragment.childFragmentManager.fragments.getOrNull(0)
-      } else {
-        null
-      }
-    } catch (_: Exception) {
+  private fun getCurrentFragment(): Fragment? = try {
+    val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
+    if (currentFragment is NavHostFragment) {
+      currentFragment.childFragmentManager.fragments.getOrNull(0)
+    } else {
       null
     }
+  } catch (_: Exception) {
+    null
   }
 
   private var lastNavHostFragment: NavHostFragment? = null

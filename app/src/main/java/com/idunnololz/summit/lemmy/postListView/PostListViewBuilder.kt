@@ -17,14 +17,12 @@ import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
-import androidx.core.widget.ImageViewCompat
+import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.viewbinding.ViewBinding
 import coil3.dispose
-import coil3.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -32,7 +30,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getType
@@ -46,6 +43,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
+import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
@@ -56,7 +54,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
-import com.idunnololz.summit.lemmy.community.CommunityLayout
+import com.idunnololz.summit.lemmy.community.communityLayout
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.multicommunity.instance
@@ -69,9 +67,11 @@ import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.supportsDownvotes
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PostHeaderVersion
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.HidePost
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.MarkAsRead
 import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
@@ -83,11 +83,9 @@ import com.idunnololz.summit.preferences.PostQuickActionIds.Share
 import com.idunnololz.summit.preferences.PostQuickActionIds.ShareSourceLink
 import com.idunnololz.summit.preferences.PostQuickActionIds.TakeScreenshot
 import com.idunnololz.summit.preferences.PostQuickActionIds.ViewSource
-import com.idunnololz.summit.preferences.PostQuickActionIds.Voting
 import com.idunnololz.summit.preferences.PostQuickActionIds.VotingNoScores
 import com.idunnololz.summit.preferences.PostQuickActionIds.VotingWithScores
 import com.idunnololz.summit.preferences.PostQuickActionIds.VotingWithUpAndDownScores
-import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.generateQuickActions
@@ -114,7 +112,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 typealias OnImageClickCallback =
-    (accountId: Long?, PostView, sharedElementView: View?, imageUrl: String, altUrl: String?, peek: Boolean) -> Unit
+  (
+    accountId: Long?,
+    PostView,
+    sharedElementView: View?,
+    imageUrl: String,
+    altUrl: String?,
+    peek: Boolean,
+  ) -> Unit
 
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
@@ -177,6 +182,7 @@ class PostListViewBuilder @Inject constructor(
   private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
   private var contentMaxLines: Int = postUiConfig.contentMaxLines
   private var contentMaxHeightDp: Int = postUiConfig.contentMaxHeightDp
+  private var postHeaderVersion = postUiConfig.postHeaderVersion()
   var showUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
     private set
   private var displayInstanceStyle = preferences.displayInstanceStyle
@@ -259,6 +265,7 @@ class PostListViewBuilder @Inject constructor(
     openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
     showPostType = preferences.showPostType
     peekImagesOnLongPress = preferences.peekImagesOnLongPress
+    postHeaderVersion = postUiConfig.postHeaderVersion()
   }
 
   /**
@@ -266,6 +273,7 @@ class PostListViewBuilder @Inject constructor(
    */
   fun bind(
     holder: ListingItemViewHolder,
+    currentCommunity: CommunityRef?,
     fetchedPost: FetchedPost,
     instance: String,
     isRevealed: Boolean,
@@ -360,6 +368,13 @@ class PostListViewBuilder @Inject constructor(
             rb.contentView.addView(downvoteCount)
           }
           is ListingItemListBinding -> {
+            ensureActionButtons(
+              root = rb.contentView,
+              leftHandMode = leftHandMode,
+              isSaved = postView.saved,
+            )
+          }
+          is ListingItemList2Binding -> {
             ensureActionButtons(
               root = rb.contentView,
               leftHandMode = leftHandMode,
@@ -505,6 +520,40 @@ class PostListViewBuilder @Inject constructor(
                 this.startToStart = ConstraintLayout.LayoutParams.UNSET
                 this.marginEnd = padding
               }
+              rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                this.marginEnd = padding
+              }
+              rb.iconGoneSpacer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+              }
+              rb.leftBarrier.type = Barrier.START
+              rb.title.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                this.endToStart = rb.leftBarrier.id
+                this.marginStart = padding
+                this.marginEnd = paddingHalf
+              }
+            }
+            is ListingItemList2Binding -> {
+              rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                this.startToStart = ConstraintLayout.LayoutParams.UNSET
+                this.marginEnd = padding
+              }
+              rb.headerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                this.startToEnd = ConstraintLayout.LayoutParams.UNSET
+                this.endToEnd = ConstraintLayout.LayoutParams.UNSET
+
+                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                this.endToStart = rb.image.id
+              }
+              rb.headerView.updatePaddingRelative(
+                start = padding,
+                end = paddingHalf,
+              )
               rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                 this.startToStart = ConstraintLayout.LayoutParams.UNSET
@@ -714,6 +763,32 @@ class PostListViewBuilder @Inject constructor(
       }
 
       if (updateContent) {
+        val listAuthor: Boolean
+        val listCommunity: Boolean
+        val compact: Boolean
+
+        when (postHeaderVersion) {
+          PostHeaderVersion.V1 -> {
+            listAuthor = true
+            listCommunity = true
+            compact = false
+          }
+          else -> {
+            when (currentCommunity) {
+              is CommunityRef.CommunityRefByName -> {
+                listAuthor = true
+                listCommunity = false
+                compact = true
+              }
+              else -> {
+                listAuthor = false
+                listCommunity = true
+                compact = true
+              }
+            }
+          }
+        }
+
         lemmyHeaderHelper.populateHeaderSpan(
           headerContainer = headerContainer,
           postView = postView,
@@ -729,7 +804,7 @@ class PostListViewBuilder @Inject constructor(
           },
           displayInstanceStyle = displayInstanceStyle,
           showUpvotePercentage = showPostUpvotePercentage,
-          useMultilineHeader = useMultilineHeader,
+          useMultilineHeader = useMultilineHeader && !compact,
           wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
           isCurrentUser = if (indicateCurrentUser) {
             currentUser?.id == postView.creator.id &&
@@ -740,13 +815,19 @@ class PostListViewBuilder @Inject constructor(
           showEditedDate = showEditedDate,
           useCondensedTypeface = false,
           postHeaderInfo = postHeaderInfo,
+          listAuthor = listAuthor,
+          listCommunity = listCommunity,
         )
 
         if (showCommunityIcon) {
-          headerContainer.iconSize = if (rawBinding is ListingItemCompactBinding) {
-            Utils.convertDpToPixel(24f).toInt()
+          headerContainer.iconSize = if (compact) {
+            Utils.convertDpToPixel(20f).toInt()
           } else {
-            Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
+            if (rawBinding is ListingItemCompactBinding) {
+              Utils.convertDpToPixel(24f).toInt()
+            } else {
+              Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
+            }
           }
           val iconImageView = headerContainer.getIconImageView()
           avatarHelper.loadCommunityIcon(iconImageView, postView.community)
@@ -1252,6 +1333,11 @@ class PostListViewBuilder @Inject constructor(
             width = postImageWidth
           }
         }
+        if (rawBinding is ListingItemList2Binding) {
+          rawBinding.dummy.updateLayoutParams {
+            width = postImageWidth
+          }
+        }
 
         if (layoutShowsFullContent) {
           showFullContent()
@@ -1584,10 +1670,22 @@ class PostListViewBuilder @Inject constructor(
         }
         topToBottom = R.id.bottom_barrier
       }
-      setIconResource(R.drawable.outline_mode_comment_24)
-      compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
+      setIconResource(R.drawable.ic_comment_24)
+      iconTint = context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor)
+      setTextColor(context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor))
+      iconPadding = context.getDimen(R.dimen.padding_half)
       includeFontPadding = false
-      setPadding(context.getDimen(R.dimen.padding))
+      minWidth = 0
+      minHeight = 0
+      minimumWidth = 0
+      minimumHeight = 0
+//      background = null
+      setPadding(
+        context.getDimen(R.dimen.padding),
+        context.getDimen(R.dimen.padding_half),
+        context.getDimen(R.dimen.padding),
+        context.getDimen(R.dimen.padding_half),
+      )
     }.also {
       commentButton = it
       commentText = it
@@ -1667,6 +1765,7 @@ class PostListViewBuilder @Inject constructor(
                 goneEndMargin = padding
               }
             }
+            setTextColor(context.getColorStateList(R.color.text_color_faint))
           }.also {
             upvoteCount = it
           }
@@ -1941,10 +2040,7 @@ class PostListViewBuilder @Inject constructor(
       paddingHalf,
     )
     setBackgroundResource(selectableItemBackgroundBorderless)
-    ImageViewCompat.setImageTintList(
-      this,
-      context.getColorStateListFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-    )
+    imageTintList = context.getColorStateListFromAttribute(R.attr.postOrCommentActionColor)
   }
 
   fun loadImage(
@@ -1973,19 +2069,3 @@ class PostListViewBuilder @Inject constructor(
     )
   }
 }
-
-val ViewBinding.communityLayout: CommunityLayout?
-  get() =
-    when (this) {
-      is ListingItemCompactBinding -> CommunityLayout.Compact
-      is ListingItemListBinding -> CommunityLayout.List
-      is ListingItemListWithCardsBinding -> CommunityLayout.ListWithCards
-      is ListingItemFullWithCardsBinding -> CommunityLayout.FullWithCards
-      is ListingItemCardBinding -> CommunityLayout.Card
-      is ListingItemCard2Binding -> CommunityLayout.Card2
-      is ListingItemCard3Binding -> CommunityLayout.Card3
-      is ListingItemLargeListBinding -> CommunityLayout.LargeList
-      is ListingItemFullBinding -> CommunityLayout.Full
-      is SearchResultPostItemBinding -> null
-      else -> null
-    }

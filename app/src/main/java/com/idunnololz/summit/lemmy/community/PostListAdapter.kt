@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -24,6 +23,7 @@ import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
 import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
+import com.idunnololz.summit.databinding.ListingItemList2Binding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
@@ -42,6 +42,7 @@ import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.OnImageClickCallback
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -97,6 +98,7 @@ class PostListAdapter(
     private set
 
   private var nsfwMode: Boolean = false
+  private var fatalError: Throwable? = null
 
   /**
    * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
@@ -134,6 +136,7 @@ class PostListAdapter(
     is PostListEngineItem.VisiblePostItem -> when (layout) {
       CommunityLayout.Compact -> R.layout.listing_item_compact
       CommunityLayout.List -> R.layout.listing_item_list
+      CommunityLayout.List2 -> R.layout.listing_item_list2
       CommunityLayout.LargeList -> R.layout.listing_item_large_list
       CommunityLayout.Card -> R.layout.listing_item_card
       CommunityLayout.Card2 -> R.layout.listing_item_card2
@@ -169,6 +172,8 @@ class PostListAdapter(
         ListingItemViewHolder.fromBinding(ListingItemCompactBinding.bind(v))
       R.layout.listing_item_list ->
         ListingItemViewHolder.fromBinding(ListingItemListBinding.bind(v))
+      R.layout.listing_item_list2 ->
+        ListingItemViewHolder.fromBinding(ListingItemList2Binding.bind(v))
       R.layout.listing_item_large_list ->
         ListingItemViewHolder.fromBinding(ListingItemLargeListBinding.bind(v))
       R.layout.listing_item_card ->
@@ -247,6 +252,7 @@ class PostListAdapter(
 
           postListViewBuilder.bind(
             holder = h,
+            currentCommunity = item.feed,
             fetchedPost = item.fetchedPost,
             instance = item.instance,
             isRevealed = isRevealed,
@@ -357,6 +363,7 @@ class PostListAdapter(
 
         postListViewBuilder.bind(
           holder = h,
+          currentCommunity = item.feed,
           fetchedPost = item.fetchedPost,
           instance = item.instance,
           isRevealed = isRevealed,
@@ -425,7 +432,11 @@ class PostListAdapter(
         if (item.isLoading) {
           b.loadingView.showProgressBar()
         } else {
-          b.loadingView.showErrorWithRetry(item.message)
+          if (item.cause != null) {
+            b.loadingView.showDefaultErrorMessageFor(item.cause)
+          } else {
+            b.loadingView.showErrorWithRetry(item.message)
+          }
         }
 
         b.loadingView.setOnRefreshClickListener {
@@ -560,7 +571,20 @@ class PostListAdapter(
   }
 
   fun refreshItems(animate: Boolean) {
-    val newItems = postListEngine.items
+    val fatalError = fatalError
+    val newItems =
+      if (fatalError != null) {
+        listOf(
+          PostListEngineItem.ErrorItem(
+            message = fatalError.toErrorMessage(context),
+            fatalError,
+            0,
+            false,
+          ),
+        )
+      } else {
+        postListEngine.items
+      }
     val oldItems = items
 
     val diff = DiffUtil.calculateDiff(
@@ -653,5 +677,15 @@ class PostListAdapter(
 
   fun clearItemPositionSeen() {
     seenItemPositions.clear()
+  }
+
+  fun setFatalError(error: Throwable) {
+    fatalError = error
+
+    refreshItems(animate = true)
+  }
+
+  fun clearFatalError() {
+    fatalError = null
   }
 }

@@ -19,7 +19,6 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
-import com.idunnololz.summit.api.dto.lemmy.LocalUserId
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
 import com.idunnololz.summit.api.dto.lemmy.ModAdd
 import com.idunnololz.summit.api.dto.lemmy.ModAddCommunity
@@ -43,7 +42,6 @@ import com.idunnololz.summit.api.dto.lemmy.ModRemovePost
 import com.idunnololz.summit.api.dto.lemmy.ModRemovePostView
 import com.idunnololz.summit.api.dto.lemmy.ModTransferCommunity
 import com.idunnololz.summit.api.dto.lemmy.ModTransferCommunityView
-import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PersonMention
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
@@ -53,8 +51,6 @@ import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplication
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
@@ -79,7 +75,6 @@ import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.models.Site
 import com.idunnololz.summit.api.dto.piefed.models.UserRegistration
 import com.idunnololz.summit.api.local.UserRegistrationApplication
-import kotlin.Int
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.PersonView.toPersonView(): PersonView =
   PersonView(
@@ -169,30 +164,33 @@ internal fun Community.toCommunity(): com.idunnololz.summit.api.dto.lemmy.Commun
     instance_id = this.instanceId,
   )
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.toSubscribedType() = when (this) {
-  com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
-  com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
-  com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
-}
+internal fun com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.toSubscribedType() =
+  when (this) {
+    com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
+    com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
+    com.idunnololz.summit.api.dto.piefed.models.PostView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
+  }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.toSubscribedType() = when (this) {
-  com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
-}
+internal fun com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.toSubscribedType() =
+  when (this) {
+    com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommentView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
+  }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.toSubscribedType() = when (this) {
-  com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
-}
+internal fun com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.toSubscribedType() =
+  when (this) {
+    com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommunityView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
+  }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.toSubscribedType() = when (this) {
-  com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
-  com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
-}
-
+internal fun com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.toSubscribedType() =
+  when (this) {
+    com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
+    com.idunnololz.summit.api.dto.piefed.models.CommentReplyView.Subscribed.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
+  }
 
 internal fun Post.toPost(): com.idunnololz.summit.api.dto.lemmy.Post =
   com.idunnololz.summit.api.dto.lemmy.Post(
@@ -373,26 +371,27 @@ internal fun LocalUser.toLocalUser(): com.idunnololz.summit.api.dto.lemmy.LocalU
     totp_2fa_url = null,
   )
 
-internal fun LocalUser.DefaultSortType.toSortType(): com.idunnololz.summit.api.dto.lemmy.SortType? = when (this) {
-  LocalUser.DefaultSortType.Active -> SortType.Active
-  LocalUser.DefaultSortType.Hot -> SortType.Hot
-  LocalUser.DefaultSortType.New -> SortType.New
-  LocalUser.DefaultSortType.TopHour -> SortType.TopHour
-  LocalUser.DefaultSortType.TopSixHour -> SortType.TopSixHour
-  LocalUser.DefaultSortType.TopTwelveHour -> SortType.TopTwelveHour
-  LocalUser.DefaultSortType.TopDay -> SortType.TopDay
-  LocalUser.DefaultSortType.TopWeek -> SortType.TopWeek
-  LocalUser.DefaultSortType.TopMonth -> SortType.TopMonth
-  LocalUser.DefaultSortType.TopThreeMonths -> SortType.TopThreeMonths
-  LocalUser.DefaultSortType.TopSixMonths -> SortType.TopSixMonths
-  LocalUser.DefaultSortType.TopNineMonths -> SortType.TopNineMonths
-  LocalUser.DefaultSortType.TopYear -> SortType.TopYear
-  LocalUser.DefaultSortType.TopAll -> SortType.TopAll
-  LocalUser.DefaultSortType.Scaled -> SortType.Scaled
-  LocalUser.DefaultSortType.Top -> SortType.TopAll
-  LocalUser.DefaultSortType.Old -> SortType.Old
-  LocalUser.DefaultSortType.Relevance -> SortType.Active
-}
+internal fun LocalUser.DefaultSortType.toSortType(): com.idunnololz.summit.api.dto.lemmy.SortType? =
+  when (this) {
+    LocalUser.DefaultSortType.Active -> SortType.Active
+    LocalUser.DefaultSortType.Hot -> SortType.Hot
+    LocalUser.DefaultSortType.New -> SortType.New
+    LocalUser.DefaultSortType.TopHour -> SortType.TopHour
+    LocalUser.DefaultSortType.TopSixHour -> SortType.TopSixHour
+    LocalUser.DefaultSortType.TopTwelveHour -> SortType.TopTwelveHour
+    LocalUser.DefaultSortType.TopDay -> SortType.TopDay
+    LocalUser.DefaultSortType.TopWeek -> SortType.TopWeek
+    LocalUser.DefaultSortType.TopMonth -> SortType.TopMonth
+    LocalUser.DefaultSortType.TopThreeMonths -> SortType.TopThreeMonths
+    LocalUser.DefaultSortType.TopSixMonths -> SortType.TopSixMonths
+    LocalUser.DefaultSortType.TopNineMonths -> SortType.TopNineMonths
+    LocalUser.DefaultSortType.TopYear -> SortType.TopYear
+    LocalUser.DefaultSortType.TopAll -> SortType.TopAll
+    LocalUser.DefaultSortType.Scaled -> SortType.Scaled
+    LocalUser.DefaultSortType.Top -> SortType.TopAll
+    LocalUser.DefaultSortType.Old -> SortType.Old
+    LocalUser.DefaultSortType.Relevance -> SortType.Active
+  }
 
 internal fun LocalUser.DefaultListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.ListingType =
   when (this) {
@@ -426,9 +425,10 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.CommunityAggregates.toC
     users_active_half_year = this.active6monthly ?: 0,
   )
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.GetPostResponse.toPostResponse() = PostResponse(
-  this.postView.toPostView(),
-)
+internal fun com.idunnololz.summit.api.dto.piefed.models.GetPostResponse.toPostResponse() =
+  PostResponse(
+    this.postView.toPostView(),
+  )
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.GetCommentResponse.toCommentResponse() =
   CommentResponse(
@@ -454,7 +454,6 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.UserRepliesResponse.toG
   GetRepliesResponse(
     replies = this.replies.map { it.toCommentReplyView() },
   )
-
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.UserMarkAllReadResponse.toGetRepliesResponse(): GetRepliesResponse =
   GetRepliesResponse(
@@ -600,8 +599,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.PostReport.toPostReport
     updated = null,
   )
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(
-): ModRemovePostView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView? {
   return ModRemovePostView(
     mod_remove_post = modRemovePost.toModRemovePost() ?: return null,
     moderator = moderator?.toPerson(),
@@ -621,8 +619,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePost.toModRemo
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPostView.toModLockPostView(
-): ModLockPostView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPostView.toModLockPostView(): ModLockPostView? {
   return ModLockPostView(
     mod_lock_post = modLockPost.toModLockPost() ?: return null,
     moderator = moderator?.toPerson(),
@@ -631,8 +628,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPostView.toModLo
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPost.toModLockPost(
-): ModLockPost? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPost.toModLockPost(): ModLockPost? {
   return ModLockPost(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -642,8 +638,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPost.toModLockPo
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePostView.toModFeaturePostView(
-): ModFeaturePostView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePostView.toModFeaturePostView(): ModFeaturePostView? {
   return ModFeaturePostView(
     mod_feature_post = modFeaturePost.toModFeaturePost() ?: return null,
     moderator = moderator?.toPerson(),
@@ -652,8 +647,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePostView.toMo
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePost.toModFeaturePost(
-): ModFeaturePost? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePost.toModFeaturePost(): ModFeaturePost? {
   return ModFeaturePost(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -664,8 +658,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePost.toModFea
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommentView.toModRemoveCommentView(
-): ModRemoveCommentView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommentView.toModRemoveCommentView(): ModRemoveCommentView? {
   return ModRemoveCommentView(
     mod_remove_comment = modRemoveComment.toModRemoveComment() ?: return null,
     moderator = moderator?.toPerson(),
@@ -676,8 +669,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommentView.to
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveComment.toModRemoveComment(
-): ModRemoveComment? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveComment.toModRemoveComment(): ModRemoveComment? {
   return ModRemoveComment(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -688,8 +680,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveComment.toModR
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunityView.toModRemoveCommunityView(
-): ModRemoveCommunityView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunityView.toModRemoveCommunityView(): ModRemoveCommunityView? {
   return ModRemoveCommunityView(
     mod_remove_community = modRemoveCommunity.toModRemoveCommunity() ?: return null,
     moderator = moderator?.toPerson(),
@@ -697,8 +688,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunityView.
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunity.toModRemoveCommunity(
-): ModRemoveCommunity? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunity.toModRemoveCommunity(): ModRemoveCommunity? {
   return ModRemoveCommunity(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -710,8 +700,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunity.toMo
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunityView.toModBanFromCommunityView(
-): ModBanFromCommunityView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunityView.toModBanFromCommunityView(): ModBanFromCommunityView? {
   return ModBanFromCommunityView(
     mod_ban_from_community = modBanFromCommunity.toModBanFromCommunity() ?: return null,
     moderator = moderator?.toPerson(),
@@ -720,8 +709,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunityView
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunity.toModBanFromCommunity(
-): ModBanFromCommunity? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunity.toModBanFromCommunity(): ModBanFromCommunity? {
   return ModBanFromCommunity(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -734,8 +722,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunity.toM
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanView.toModBanView(
-): ModBanView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanView.toModBanView(): ModBanView? {
   return ModBanView(
     mod_ban = modBan.toModBan() ?: return null,
     moderator = moderator?.toPerson(),
@@ -755,8 +742,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModBan.toModBan(): ModB
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunityView.toModAddCommunityView(
-): ModAddCommunityView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunityView.toModAddCommunityView(): ModAddCommunityView? {
   return ModAddCommunityView(
     mod_add_community = modAddCommunity.toModAddCommunity() ?: return null,
     moderator = moderator?.toPerson(),
@@ -765,8 +751,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunityView.toM
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunity.toModAddCommunity(
-): ModAddCommunity? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunity.toModAddCommunity(): ModAddCommunity? {
   return ModAddCommunity(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -777,8 +762,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunity.toModAd
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunityView.toModTransferCommunityView(
-): ModTransferCommunityView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunityView.toModTransferCommunityView(): ModTransferCommunityView? {
   return ModTransferCommunityView(
     mod_transfer_community = modTransferCommunity.toModTransferCommunity() ?: return null,
     moderator = moderator?.toPerson(),
@@ -787,8 +771,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunityVie
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunity.toModTransferCommunity(
-): ModTransferCommunity? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunity.toModTransferCommunity(): ModTransferCommunity? {
   return ModTransferCommunity(
     id = id,
     mod_person_id = modPersonId?.toLong() ?: return null,
@@ -816,31 +799,26 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModAdd.toModAdd(): ModA
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePersonView.toAdminPurgePersonView(
-): AdminPurgePersonView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePersonView.toAdminPurgePersonView(): AdminPurgePersonView? {
   return AdminPurgePersonView(
     admin_purge_person = adminPurgePerson.toAdminPurgePerson() ?: return null,
     admin = admin?.toPerson(),
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePerson.toAdminPurgePerson(
-): AdminPurgePerson? {
-  return AdminPurgePerson(
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePerson.toAdminPurgePerson(): AdminPurgePerson? =
+  AdminPurgePerson(
     id = id,
     admin_person_id = adminPersonId.toLong(),
     reason = reason,
     when_ = `when`,
   )
-}
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunityView.toAdminPurgeCommunityView(
-): AdminPurgeCommunityView {
-  return AdminPurgeCommunityView(
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunityView.toAdminPurgeCommunityView(): AdminPurgeCommunityView =
+  AdminPurgeCommunityView(
     admin_purge_community = adminPurgeCommunity.toAdminPurgeCommunity(),
     admin = admin?.toPerson(),
   )
-}
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunity.toAdminPurgeCommunity() =
   AdminPurgeCommunity(
@@ -850,8 +828,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunity.toA
     when_ = `when`,
   )
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePostView.toAdminPurgePostView(
-): AdminPurgePostView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePostView.toAdminPurgePostView(): AdminPurgePostView? {
   return AdminPurgePostView(
     admin_purge_post = adminPurgePost.toAdminPurgePost() ?: return null,
     community = community.toCommunity(),
@@ -859,8 +836,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePostView.toAd
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePost.toAdminPurgePost(
-): AdminPurgePost? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePost.toAdminPurgePost(): AdminPurgePost? {
   return AdminPurgePost(
     id = id,
     admin_person_id = adminPersonId.toLong(),
@@ -870,8 +846,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePost.toAdminP
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommentView.toAdminPurgeCommentView(
-): AdminPurgeCommentView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommentView.toAdminPurgeCommentView(): AdminPurgeCommentView? {
   return AdminPurgeCommentView(
     admin_purge_comment = adminPurgeComment.toAdminPurgeComment() ?: return null,
     post = post.toPost(),
@@ -879,19 +854,16 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommentView.t
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeComment.toAdminPurgeComment(
-): AdminPurgeComment? {
-  return AdminPurgeComment(
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeComment.toAdminPurgeComment(): AdminPurgeComment? =
+  AdminPurgeComment(
     id = id,
     admin_person_id = adminPersonId.toLong(),
     post_id = postId,
     reason = reason,
     when_ = `when`,
   )
-}
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunityView.toModHideCommunityView(
-): ModHideCommunityView? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunityView.toModHideCommunityView(): ModHideCommunityView? {
   return ModHideCommunityView(
     mod_hide_community = modHideCommunity.toModHideCommunity() ?: return null,
     community = community.toCommunity(),
@@ -899,8 +871,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunityView.to
   )
 }
 
-internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunity.toModHideCommunity(
-): ModHideCommunity? {
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunity.toModHideCommunity(): ModHideCommunity? {
   return ModHideCommunity(
     id = id,
     community_id = communityId ?: return null,
@@ -931,13 +902,12 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.UserRegistration.toUser
   isRead = false,
 )
 
-internal fun UserRegistration.Status.toStatus() =
-  when (this) {
-    UserRegistration.Status.approved -> UserRegistrationApplication.Status.Approved
-    UserRegistration.Status.awaiting_review -> UserRegistrationApplication.Status.NoDecision
-  }
+internal fun UserRegistration.Status.toStatus() = when (this) {
+  UserRegistration.Status.approved -> UserRegistrationApplication.Status.Approved
+  UserRegistration.Status.awaiting_review -> UserRegistrationApplication.Status.NoDecision
+}
 
-//internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =
+// internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =
 //  ModRemovePostView(
 //    mod_remove_post = modRemovePost,
 //    moderator,

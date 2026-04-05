@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -75,7 +74,7 @@ class LoadingView : ConstraintLayout {
     errorText: Boolean = false,
     positiveButton: Boolean = false,
     negativeButton: Boolean = false,
-    showImmediately: Boolean = false
+    showImmediately: Boolean = false,
   ) {
     // val animateChanges = rootViewAnimationController.isVisible
 

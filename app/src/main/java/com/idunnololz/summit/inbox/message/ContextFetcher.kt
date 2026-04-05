@@ -9,12 +9,12 @@ import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.scopes.ViewModelScoped
 import java.lang.AutoCloseable

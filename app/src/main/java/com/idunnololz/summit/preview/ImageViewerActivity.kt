@@ -16,6 +16,8 @@ import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -35,6 +37,7 @@ import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
@@ -46,6 +49,7 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.ContentUtils
+
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
@@ -69,10 +73,6 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlinx.coroutines.launch
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.net.toUri
-import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
-import com.idunnololz.summit.util.ContentUtils.isUrlImage
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -316,7 +316,9 @@ class ImageViewerActivity :
                 R.id.peek_expand -> {
                   binding.bottomBar.visibility = View.VISIBLE
                   binding.peekBottomBar.visibility = View.GONE
-                  binding.root.setBackgroundColor(getColorFromAttribute(com.google.android.material.R.attr.backgroundColor))
+                  binding.root.setBackgroundColor(
+                    getColorFromAttribute(com.google.android.material.R.attr.backgroundColor),
+                  )
                   viewModel.peek = false
                 }
                 R.id.peek_share -> {
@@ -328,7 +330,10 @@ class ImageViewerActivity :
                   finish()
                 }
                 R.id.peek_comments -> {
-                  setResult(RESULT_OK, ImageViewerResult.OpenPage(requireNotNull(args.pageRef)).toIntent())
+                  setResult(
+                    RESULT_OK,
+                    ImageViewerResult.OpenPage(requireNotNull(args.pageRef)).toIntent(),
+                  )
                   finish()
                 }
                 else -> {
@@ -340,9 +345,11 @@ class ImageViewerActivity :
               binding.peekBottomBarActionsContainer.children.forEach {
                 it.getLocationOnScreen(tempArr)
 
-                if (peekStatus.x > tempArr[0] && peekStatus.x < (tempArr[0] + it.width) &&
-                  peekStatus.y > tempArr[1] && peekStatus.y < (tempArr[1] + it.height)) {
-
+                if (peekStatus.x > tempArr[0] &&
+                  peekStatus.x < (tempArr[0] + it.width) &&
+                  peekStatus.y > tempArr[1] &&
+                  peekStatus.y < (tempArr[1] + it.height)
+                ) {
                   it.isPressed = true
                   it.isSelected = true
                 } else {

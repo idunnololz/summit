@@ -24,7 +24,6 @@ import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
@@ -43,6 +42,7 @@ import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
@@ -50,9 +50,9 @@ import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
-import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -578,7 +578,7 @@ class CommunityViewModel @Inject constructor(
         force = force,
       )
 
-      Log.d("HAHA", "Getting page ${pageToFetch}. Got: ${result.getOrNull()?.posts?.size} items")
+      Log.d("HAHA", "Getting page $pageToFetch. Got: ${result.getOrNull()?.posts?.size} items")
 
       result
         .onSuccess {
@@ -719,7 +719,10 @@ class CommunityViewModel @Inject constructor(
   }
 
   private suspend fun restorePostListEngineIfNeeded(restorePages: Int) {
-    Log.d("HAHA", "restorePostListEngineIfNeeded(). restored? ${postsRepository.isRestored} infinity? ${infinity} postListEngine cur page: ${postListEngine.currentPageIndex.value}")
+    Log.d(
+      "HAHA",
+      "restorePostListEngineIfNeeded(). restored? ${postsRepository.isRestored} infinity? $infinity postListEngine cur page: ${postListEngine.currentPageIndex.value}",
+    )
     if (postsRepository.isRestored) {
       return
     }
@@ -742,7 +745,7 @@ class CommunityViewModel @Inject constructor(
     // Disable caching while we restore...
     postsRepository.cacheState = false
 
-    Log.d("HAHA", "fetching pages 0 to ${restorePages}")
+    Log.d("HAHA", "fetching pages 0 to $restorePages")
     for (i in 0..restorePages) {
       fetchPageInternal(pageToFetch = i, force = false, isRestoreOperation = true)
       fetchPageJob?.join()
@@ -817,8 +820,8 @@ class CommunityViewModel @Inject constructor(
         } else {
           currentPageIndex.value
         }
-        ?: lastCommunityViewState?.communityState?.currentPageIndex
-        ?: return null,
+          ?: lastCommunityViewState?.communityState?.currentPageIndex
+          ?: return null,
       ),
       pagePositions,
     )
@@ -826,8 +829,11 @@ class CommunityViewModel @Inject constructor(
 
   fun restoreFromState() {
     val state = lastCommunityViewState
-    Log.d("HAHA", "restoreFromState() state: $state")
     state ?: return
+
+    if (postsRepository.isRestored) {
+      return
+    }
 
     loadedPostsData.setIsLoading()
 

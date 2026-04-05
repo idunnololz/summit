@@ -7,59 +7,53 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param creatorId 
- * @param commentId 
- * @param resolved 
- * @param published 
- * @param originalCommentText 
- * @param reason 
- * @param updated 
+ *
+ * @param id
+ * @param creatorId
+ * @param commentId
+ * @param resolved
+ * @param published
+ * @param originalCommentText
+ * @param reason
+ * @param updated
  */
 
+data class CommentReport(
 
-data class CommentReport (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("published")
+  val published: kotlin.String,
 
-    @SerializedName("published")
-    val published: kotlin.String,
+  @SerializedName("original_comment_text")
+  val originalCommentText: kotlin.String? = null,
 
-    @SerializedName("original_comment_text")
-    val originalCommentText: kotlin.String? = null,
+  @SerializedName("reason")
+  val reason: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null,
+  @SerializedName("updated")
+  val updated: kotlin.String? = null,
 
-    @SerializedName("updated")
-    val updated: kotlin.String? = null
-
-) {
-
-
-}
-
+)

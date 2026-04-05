@@ -19,7 +19,6 @@ import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.LiteInboxItem
 import com.idunnololz.summit.inbox.PageType
-import com.idunnololz.summit.inbox.RegistrationDecision
 import com.idunnololz.summit.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.inbox.conversation.ConversationsModel
 import com.idunnololz.summit.inbox.repository.InboxRepository

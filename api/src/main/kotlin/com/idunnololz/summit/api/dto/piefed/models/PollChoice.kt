@@ -7,44 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param choiceText 
- * @param sortOrder 
+ *
+ * @param id
+ * @param choiceText
+ * @param sortOrder
  * @param numVotes Value is ignored when creating/editing a poll
  */
 
+data class PollChoice(
 
-data class PollChoice (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("choice_text")
+  val choiceText: kotlin.String,
 
-    @SerializedName("choice_text")
-    val choiceText: kotlin.String,
+  @SerializedName("sort_order")
+  val sortOrder: kotlin.Int,
 
-    @SerializedName("sort_order")
-    val sortOrder: kotlin.Int,
+  /* Value is ignored when creating/editing a poll */
+  @SerializedName("num_votes")
+  val numVotes: kotlin.Int? = 0,
 
-    /* Value is ignored when creating/editing a poll */
-    @SerializedName("num_votes")
-    val numVotes: kotlin.Int? = 0
-
-) {
-
-
-}
-
+)

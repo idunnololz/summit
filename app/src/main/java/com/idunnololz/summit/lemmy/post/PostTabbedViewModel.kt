@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostTabbedViewModel @Inject constructor(
-  private val savedStateHandle: SavedStateHandle
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
   private val currentPageIndexFlow = savedStateHandle.getMutableStateFlow("current_page_index", 0)
   var currentPageIndex: Int

@@ -51,7 +51,8 @@ class ClientFactory @Inject constructor(
   private fun getUserAgent(purpose: Purpose): String {
     val purposeString = when (purpose) {
       Purpose.LemmyApiClient,
-         Purpose.LemmyApiClientUnauthed -> "lac"
+      Purpose.LemmyApiClientUnauthed,
+      -> "lac"
       Purpose.SummitApiClient -> "sac"
       Purpose.BrowserLike,
       Purpose.BrowserLikeUnauthed,

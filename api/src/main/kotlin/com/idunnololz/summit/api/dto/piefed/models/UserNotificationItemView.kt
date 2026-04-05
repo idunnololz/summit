@@ -7,24 +7,23 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Comment
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.PostView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param author returned for all notif types
  * @param notifBody returned for all notif types
@@ -40,68 +39,70 @@ import com.google.gson.annotations.SerializedName
  * @param postId returned for notif_types: 0, 1, 2, 3, 4, 5, 6 (post_mention subtype)
  */
 
+data class UserNotificationItemView(
 
-data class UserNotificationItemView (
+  /* returned for all notif types */
+  @SerializedName("author")
+  val author: Person,
 
-    /* returned for all notif types */
-    @SerializedName("author")
-    val author: Person,
+  /* returned for all notif types */
+  @SerializedName("notif_body")
+  val notifBody: kotlin.String,
 
-    /* returned for all notif types */
-    @SerializedName("notif_body")
-    val notifBody: kotlin.String,
+  /* returned for all notif types */
+  @SerializedName("notif_id")
+  val notifId: kotlin.Int,
 
-    /* returned for all notif types */
-    @SerializedName("notif_id")
-    val notifId: kotlin.Int,
+  /* returned for all notif types */
+  @SerializedName("notif_subtype")
+  val notifSubtype: kotlin.String,
 
-    /* returned for all notif types */
-    @SerializedName("notif_subtype")
-    val notifSubtype: kotlin.String,
+  /* returned for all notif types */
+  @SerializedName("notif_type")
+  val notifType: kotlin.Int,
 
-    /* returned for all notif types */
-    @SerializedName("notif_type")
-    val notifType: kotlin.Int,
+  /* returned for all notif types */
+  @SerializedName("status")
+  val status: UserNotificationItemView.Status? = null,
 
-    /* returned for all notif types */
-    @SerializedName("status")
-    val status: UserNotificationItemView.Status? = null,
+  /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
+  @SerializedName("comment")
+  val comment: Comment? = null,
 
-    /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
-    @SerializedName("comment")
-    val comment: Comment? = null,
+  /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
+  @SerializedName("comment_view")
+  val commentView: CommentView? = null,
 
-    /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
-    @SerializedName("comment_view")
-    val commentView: CommentView? = null,
+  /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int? = null,
 
-    /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int? = null,
+  /* returned for notif_type 1 */
+  @SerializedName("community")
+  val community: Community? = null,
 
-    /* returned for notif_type 1 */
-    @SerializedName("community")
-    val community: Community? = null,
+  /* returned for notif_types: 0, 1, 2, 3, 4, 5, 6 (post_mention subtype) */
+  @SerializedName("post")
+  val post: PostView? = null,
 
-    /* returned for notif_types: 0, 1, 2, 3, 4, 5, 6 (post_mention subtype) */
-    @SerializedName("post")
-    val post: PostView? = null,
-
-    /* returned for notif_types: 0, 1, 2, 3, 4, 5, 6 (post_mention subtype) */
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null
+  /* returned for notif_types: 0, 1, 2, 3, 4, 5, 6 (post_mention subtype) */
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
 ) {
 
-    /**
-     * returned for all notif types
-     *
-     * Values: Unread,Read
-     */
-    enum class Status(val value: kotlin.String) {
-        @SerializedName(value = "Unread") Unread("Unread"),
-        @SerializedName(value = "Read") Read("Read");
-    }
+  /**
+   * returned for all notif types
+   *
+   * Values: Unread,Read
+   */
+  enum class Status(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "Unread")
+    Unread("Unread"),
 
+    @SerializedName(value = "Read")
+    Read("Read"),
+  }
 }
-

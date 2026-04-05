@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param version 
+ *
+ * @param version
  */
 
+data class GetSiteVersionResponse(
 
-data class GetSiteVersionResponse (
+  @SerializedName("version")
+  val version: kotlin.String,
 
-    @SerializedName("version")
-    val version: kotlin.String
-
-) {
-
-
-}
-
+)

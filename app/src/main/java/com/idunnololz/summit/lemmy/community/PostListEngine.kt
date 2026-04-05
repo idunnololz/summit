@@ -8,7 +8,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -19,14 +18,12 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
-import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.models.PostView
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 sealed interface PostListEngineItem {
 
@@ -76,6 +73,7 @@ sealed interface PostListEngineItem {
 
   data class ErrorItem(
     val message: String,
+    val cause: Throwable?,
     val pageToLoad: Int,
     val isLoading: Boolean,
   ) : PostListEngineItem
@@ -230,8 +228,6 @@ class PostListEngine @AssistedInject constructor(
 
     Log.d(TAG, "createItems()")
 
-    Log.d("HAHA", "createItems()")
-
     val pages = if (infinity) {
       pages
     } else {
@@ -268,6 +264,7 @@ class PostListEngine @AssistedInject constructor(
         items.add(
           PostListEngineItem.ErrorItem(
             message = page.error.errorMessage,
+            cause = null,
             pageToLoad = page.pageIndex,
             isLoading = page.error.isLoading,
           ),

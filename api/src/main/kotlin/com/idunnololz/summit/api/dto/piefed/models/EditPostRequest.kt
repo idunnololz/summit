@@ -7,77 +7,71 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.PostEvent
 import com.idunnololz.summit.api.dto.piefed.models.PostPoll
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param postId 
+ *
+ * @param postId
  * @param altText Pass null to remove the existing alt text
- * @param title 
- * @param body 
+ * @param title
+ * @param body
  * @param url Pass value of null to remove the post url
- * @param nsfw 
- * @param languageId 
- * @param event 
- * @param poll 
+ * @param nsfw
+ * @param languageId
+ * @param event
+ * @param poll
  * @param tags Hashtags, separated by commas with no hash character
  * @param flair Flair, separated by commas with no hash character
  */
 
+data class EditPostRequest(
 
-data class EditPostRequest (
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  /* Pass null to remove the existing alt text */
+  @SerializedName("alt_text")
+  val altText: kotlin.String? = null,
 
-    /* Pass null to remove the existing alt text */
-    @SerializedName("alt_text")
-    val altText: kotlin.String? = null,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null,
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  /* Pass value of null to remove the post url */
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    /* Pass value of null to remove the post url */
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null,
+  @SerializedName("event")
+  val event: PostEvent? = null,
 
-    @SerializedName("event")
-    val event: PostEvent? = null,
+  @SerializedName("poll")
+  val poll: PostPoll? = null,
 
-    @SerializedName("poll")
-    val poll: PostPoll? = null,
+  /* Hashtags, separated by commas with no hash character */
+  @SerializedName("tags")
+  val tags: kotlin.String? = null,
 
-    /* Hashtags, separated by commas with no hash character */
-    @SerializedName("tags")
-    val tags: kotlin.String? = null,
+  /* Flair, separated by commas with no hash character */
+  @SerializedName("flair")
+  val flair: kotlin.String? = null,
 
-    /* Flair, separated by commas with no hash character */
-    @SerializedName("flair")
-    val flair: kotlin.String? = null
-
-) {
-
-
-}
-
+)

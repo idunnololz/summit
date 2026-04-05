@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -38,7 +39,6 @@ class LemmyHeaderView : FrameLayout {
   val textView1: TextView
   val textView2: TextView
   val textView3: TextView
-  private val flairView: FlairView
 
   var multiline: Boolean = false
     set(value) {
@@ -48,6 +48,7 @@ class LemmyHeaderView : FrameLayout {
 
       field = value
 
+      updateTextViewVisibility()
       requestLayout()
     }
 
@@ -65,20 +66,24 @@ class LemmyHeaderView : FrameLayout {
   init {
     textView1 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
       .style()
+      .apply {
+        layoutParams = LayoutParams(
+          LayoutParams.MATCH_PARENT,
+          LayoutParams.MATCH_PARENT,
+        )
+      }
     textView2 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
       .style()
     textView3 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
       .style()
-    flairView = FlairView(context)
 
     originalTypeface = textView1.typeface
 
+    updateTextViewVisibility()
+
     addView(textView1)
-    addView(flairView)
     addView(textView2)
     addView(textView3)
-
-    flairView.visibility = View.GONE
   }
 
   fun setTextFirstPart(text: CharSequence) {
@@ -105,8 +110,6 @@ class LemmyHeaderView : FrameLayout {
       }
     }
 
-  fun getFlairView(): FlairView = flairView
-
   fun getIconImageView(): ImageView {
     ensureIconView()
     return iconImageView!!
@@ -116,7 +119,7 @@ class LemmyHeaderView : FrameLayout {
     if (iconImageView == null) {
       return
     }
-    iconImageView?.visibility = View.GONE
+    iconImageView?.visibility = GONE
   }
 
   private fun LinkifyTextView.style(): LinkifyTextView {
@@ -132,7 +135,7 @@ class LemmyHeaderView : FrameLayout {
     )
     ellipsize = TextUtils.TruncateAt.END
     gravity = Gravity.CENTER_VERTICAL
-    textDirection = View.TEXT_DIRECTION_INHERIT
+    textDirection = TEXT_DIRECTION_INHERIT
 
     return this
   }
@@ -159,7 +162,7 @@ class LemmyHeaderView : FrameLayout {
 
   private fun ensureIconView() {
     if (iconImageView != null) {
-      iconImageView?.visibility = View.VISIBLE
+      iconImageView?.visibility = VISIBLE
       return
     }
 
@@ -176,7 +179,7 @@ class LemmyHeaderView : FrameLayout {
     iconImageView.scaleType = ImageView.ScaleType.CENTER_CROP
     iconImageView.strokeWidth = strokeWidth
     iconImageView.strokeColor = ColorStateList.valueOf(
-      context.getColorFromAttribute(R.attr.colorOnSurface),
+      context.getColorCompat(R2.color.colorTextFaint),
     )
     iconImageView.setPadding(strokeWidthHalf, strokeWidthHalf, strokeWidthHalf, strokeWidthHalf)
 
@@ -188,18 +191,9 @@ class LemmyHeaderView : FrameLayout {
     this.iconImageView = iconImageView
   }
 
-  private val mMatchParentChildren = ArrayList<View>()
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    // We only support match parent width...
-    if (multiline) {
-      // /
-
+    if (multiline || iconImageView != null) {
       val count = size
-
-      val measureMatchParentChildren =
-        MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
-          MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY
-      mMatchParentChildren.clear()
 
       measureIconImageView(widthMeasureSpec, heightMeasureSpec)
 
@@ -211,30 +205,23 @@ class LemmyHeaderView : FrameLayout {
 
       for (i in 0..<count) {
         val child = getChildAt(i)
-        if (child.getVisibility() != GONE) {
+        if (child.visibility != GONE) {
           if (child != iconImageView) {
             measureChildWithMargins(child, nonIconWidthMeasureSpec, 0, heightMeasureSpec, 0)
           } else {
             // view is already measured
             continue
           }
-          val lp = child.getLayoutParams() as LayoutParams
+          val lp = child.layoutParams as LayoutParams
           maxWidth = max(
             maxWidth,
-            child.getMeasuredWidth() + lp.marginStart + lp.marginEnd,
+            child.measuredWidth + lp.marginStart + lp.marginEnd,
           )
           maxHeight = max(
             maxHeight,
-            child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin,
+            child.measuredHeight + lp.topMargin + lp.bottomMargin,
           )
-          childState = combineMeasuredStates(childState, child.getMeasuredState())
-          if (measureMatchParentChildren) {
-            if (lp.width == LayoutParams.MATCH_PARENT ||
-              lp.height == LayoutParams.MATCH_PARENT
-            ) {
-              mMatchParentChildren.add(child)
-            }
-          }
+          childState = combineMeasuredStates(childState, child.measuredState)
         }
       }
 
@@ -243,11 +230,11 @@ class LemmyHeaderView : FrameLayout {
       maxHeight += paddingTop + paddingBottom
 
       // Check against our minimum height and width
-      maxHeight = max(maxHeight, getSuggestedMinimumHeight())
-      maxWidth = max(maxWidth, getSuggestedMinimumWidth())
+      maxHeight = max(maxHeight, suggestedMinimumHeight)
+      maxWidth = max(maxWidth, suggestedMinimumWidth)
 
       // Check against our foreground's minimum height and width
-      val drawable = getForeground()
+      val drawable = foreground
       if (drawable != null) {
         maxHeight = max(maxHeight, drawable.getMinimumHeight())
         maxWidth = max(maxWidth, drawable.getMinimumWidth())
@@ -277,18 +264,18 @@ class LemmyHeaderView : FrameLayout {
         return view.measuredWidth + layoutParams.marginStart + layoutParams.marginEnd
       }
 
-      if (textView1.visibility != View.GONE) {
+      if (textView1.visibility != GONE) {
         totalTextHeight += getViewHeight(textView1)
       }
-      if (textView2.visibility != View.GONE || textView3.visibility != View.GONE) {
+      if (textView2.visibility != GONE || textView3.visibility != GONE) {
         val textView2Height =
-          if (textView2.visibility != View.GONE) {
+          if (textView2.visibility != GONE) {
             getViewHeight(textView2)
           } else {
             0
           }
         val textView3Height =
-          if (textView3.visibility != View.GONE) {
+          if (textView3.visibility != GONE) {
             getViewHeight(textView3)
           } else {
             0
@@ -299,12 +286,15 @@ class LemmyHeaderView : FrameLayout {
 
       var viewHeight = totalTextHeight
       var viewWidth = 0
-      if (iconImageView != null && iconImageView.visibility != View.GONE) {
+      if (iconImageView != null && iconImageView.visibility != GONE) {
         val iconImageViewHeight = getViewHeight(iconImageView)
+        Log.d("HAHA", "iconHeight: $iconImageViewHeight restHeight: $viewHeight")
         viewHeight = max(viewHeight, iconImageViewHeight)
 
         viewWidth += getViewWidth(iconImageView)
       }
+
+      Log.d("HAHA", "finalHeight: ${viewHeight + paddingTop + paddingBottom}")
 
       viewWidth += max(
         getViewWidth(textView1),
@@ -329,7 +319,7 @@ class LemmyHeaderView : FrameLayout {
   private fun getMeasureSpecForNonIconViews(widthMeasureSpec: Int): Int {
     val iconImageView = iconImageView ?: return widthMeasureSpec
 
-    val lp = iconImageView.getLayoutParams() as LayoutParams
+    val lp = iconImageView.layoutParams as LayoutParams
     return MeasureSpec.makeMeasureSpec(
       MeasureSpec.getSize(widthMeasureSpec) -
         iconImageView.measuredWidth -
@@ -347,11 +337,11 @@ class LemmyHeaderView : FrameLayout {
     val height = bottom - top
     val childSpace = height - paddingTop - paddingBottom
 
-    if (!multiline) {
+    if (!multiline && iconImageView == null) {
       if (isRtl) {
         var start = paddingRight
         for (child in children) {
-          if (child.visibility == View.GONE) continue
+          if (child.visibility == GONE) continue
 
           val layoutParams = child.layoutParams as LayoutParams
           val childTop = (
@@ -371,7 +361,7 @@ class LemmyHeaderView : FrameLayout {
       } else {
         var start = paddingStart
         for (child in children) {
-          if (child.visibility == View.GONE) continue
+          if (child.visibility == GONE) continue
 
           val layoutParams = child.layoutParams as LayoutParams
           val childTop = (
@@ -394,15 +384,12 @@ class LemmyHeaderView : FrameLayout {
 
       var start = paddingStart
       val iconImageView = iconImageView
+      val singleLineVisible = textView2.visibility == GONE && textView3.visibility == GONE
 
-      if (iconImageView != null && iconImageView.visibility != View.GONE) {
+      if (iconImageView != null && iconImageView.visibility != GONE) {
         val child = iconImageView
         val layoutParams = child.layoutParams as LayoutParams
         val childTop = paddingTop
-//          (
-//          paddingTop + (childSpace - child.measuredHeight) / 2 +
-//            layoutParams.topMargin
-//          ) - layoutParams.bottomMargin
 
         start += layoutParams.marginStart
         child.layout(
@@ -415,11 +402,15 @@ class LemmyHeaderView : FrameLayout {
       }
 
       val textChildrenTotalHeight =
-        textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight) +
-          marginBetweenLines
+        if (singleLineVisible) {
+          textView1.measuredHeight
+        } else {
+          textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight) +
+            marginBetweenLines
+        }
 
       var top: Int
-      run {
+      if (singleLineVisible) {
         val child = textView1
         val layoutParams = child.layoutParams as LayoutParams
         top = (
@@ -432,28 +423,43 @@ class LemmyHeaderView : FrameLayout {
           start + layoutParams.marginStart + child.measuredWidth,
           top + child.measuredHeight,
         )
-        top += child.measuredHeight + marginBetweenLines
-      }
-      run {
-        val child = textView2
-        val layoutParams = child.layoutParams as LayoutParams
-        child.layout(
-          start + layoutParams.marginStart,
-          top + layoutParams.topMargin,
-          start + child.measuredWidth + layoutParams.marginStart,
-          top + child.measuredHeight,
-        )
-        start += child.measuredWidth + layoutParams.marginStart
-      }
-      run {
-        val child = textView3
-        val layoutParams = child.layoutParams as LayoutParams
-        child.layout(
-          start + layoutParams.marginStart,
-          top + layoutParams.topMargin,
-          start + child.measuredWidth + layoutParams.marginStart,
-          top + child.measuredHeight,
-        )
+      } else {
+        run {
+          val child = textView1
+          val layoutParams = child.layoutParams as LayoutParams
+          top = (
+            paddingTop + (childSpace - textChildrenTotalHeight) / 2 +
+              layoutParams.topMargin
+            ) - layoutParams.bottomMargin
+          child.layout(
+            start + layoutParams.marginStart,
+            top,
+            start + layoutParams.marginStart + child.measuredWidth,
+            top + child.measuredHeight,
+          )
+          top += child.measuredHeight + marginBetweenLines
+        }
+        run {
+          val child = textView2
+          val layoutParams = child.layoutParams as LayoutParams
+          child.layout(
+            start + layoutParams.marginStart,
+            top + layoutParams.topMargin,
+            start + child.measuredWidth + layoutParams.marginStart,
+            top + child.measuredHeight,
+          )
+          start += child.measuredWidth + layoutParams.marginStart
+        }
+        run {
+          val child = textView3
+          val layoutParams = child.layoutParams as LayoutParams
+          child.layout(
+            start + layoutParams.marginStart,
+            top + layoutParams.topMargin,
+            start + child.measuredWidth + layoutParams.marginStart,
+            top + child.measuredHeight,
+          )
+        }
       }
     }
   }
@@ -462,4 +468,14 @@ class LemmyHeaderView : FrameLayout {
     LayoutParams.WRAP_CONTENT,
     LayoutParams.WRAP_CONTENT,
   )
+
+  private fun updateTextViewVisibility() {
+    if (multiline) {
+      textView2.visibility = View.VISIBLE
+      textView3.visibility = View.VISIBLE
+    } else {
+      textView2.visibility = View.GONE
+      textView3.visibility = View.GONE
+    }
+  }
 }

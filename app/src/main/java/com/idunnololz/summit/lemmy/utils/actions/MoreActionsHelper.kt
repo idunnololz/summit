@@ -18,7 +18,6 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -28,6 +27,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences

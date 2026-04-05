@@ -26,10 +26,8 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNavControlsState
-import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
@@ -43,6 +41,7 @@ import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.models.GetPostResponse
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
@@ -666,7 +665,10 @@ class PostViewModel @Inject constructor(
   }
 
   private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
-    Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0} comments: ${commentsFlow.value}")
+    Log.d(
+      TAG,
+      "updateData() - pendingComments: ${pendingComments?.size ?: 0} comments: ${commentsFlow.value}",
+    )
 
     val context = ContextCompat.getContextForLanguage(context)
     val postResult = postViewFlow.value ?: return@withContext
@@ -857,6 +859,8 @@ class PostViewModel @Inject constructor(
   }
 
   fun fetchCommentPath(instance: String, commentPath: String) {
+    Log.d(TAG, "fetchCommentPath() $instance $commentPath")
+
     val commentIds = commentPath.split(".").map { it.toIntOrNull() }
     val topCommentId = if (commentIds.size > 1) {
       commentIds[1]

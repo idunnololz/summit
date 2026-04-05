@@ -51,22 +51,20 @@ fun SortType.toSortType() = when (this) {
   SortType.Scaled -> SortApiAlphaUserGet.Scaled
 }
 
-internal fun EditComment.toEditComment() =
-  EditCommentRequest(
-    commentId = this.comment_id,
-    body = this.content ?: "",
-    languageId = this.language_id,
-  )
+internal fun EditComment.toEditComment() = EditCommentRequest(
+  commentId = this.comment_id,
+  body = this.content ?: "",
+  languageId = this.language_id,
+)
 
-internal fun EditPost.toEditPost() =
-  EditPostRequest(
-    postId = this.post_id,
-    title = this.name,
-    url = this.url,
-    body = this.body,
-    nsfw = this.nsfw,
-    languageId = this.language_id,
-  )
+internal fun EditPost.toEditPost() = EditPostRequest(
+  postId = this.post_id,
+  title = this.name,
+  url = this.url,
+  body = this.body,
+  nsfw = this.nsfw,
+  languageId = this.language_id,
+)
 
 internal fun RegistrationApplicationView.toUserRegistrationApplication(instance: String) =
   UserRegistrationApplication(

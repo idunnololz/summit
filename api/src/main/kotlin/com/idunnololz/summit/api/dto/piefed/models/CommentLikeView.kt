@@ -7,44 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param score 
- * @param creatorBannedFromCommunity 
- * @param creatorBanned 
- * @param creator 
+ *
+ * @param score
+ * @param creatorBannedFromCommunity
+ * @param creatorBanned
+ * @param creator
  */
 
+data class CommentLikeView(
 
-data class CommentLikeView (
+  @SerializedName("score")
+  val score: kotlin.Int,
 
-    @SerializedName("score")
-    val score: kotlin.Int,
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person
-
-) {
-
-
-}
-
+)

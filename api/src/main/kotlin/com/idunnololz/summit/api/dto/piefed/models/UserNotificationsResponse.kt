@@ -7,60 +7,65 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.UserNotificationItemView
 import com.idunnololz.summit.api.dto.piefed.models.UserNotificationsCounts
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param counts 
- * @param items 
- * @param username 
- * @param status 
- * @param nextPage 
+ *
+ * @param counts
+ * @param items
+ * @param username
+ * @param status
+ * @param nextPage
  */
 
+data class UserNotificationsResponse(
 
-data class UserNotificationsResponse (
+  @SerializedName("counts")
+  val counts: UserNotificationsCounts,
 
-    @SerializedName("counts")
-    val counts: UserNotificationsCounts,
+  @SerializedName("items")
+  val items: kotlin.collections.List<UserNotificationItemView>,
 
-    @SerializedName("items")
-    val items: kotlin.collections.List<UserNotificationItemView>,
+  @SerializedName("username")
+  val username: kotlin.String,
 
-    @SerializedName("username")
-    val username: kotlin.String,
+  @SerializedName("status")
+  val status: UserNotificationsResponse.Status? = null,
 
-    @SerializedName("status")
-    val status: UserNotificationsResponse.Status? = null,
-
-    @SerializedName("next_page")
-    val nextPage: kotlin.String? = null
+  @SerializedName("next_page")
+  val nextPage: kotlin.String? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: All,Unread,Read,New
-     */
-    enum class Status(val value: kotlin.String) {
-        @SerializedName(value = "All") All("All"),
-        @SerializedName(value = "Unread") Unread("Unread"),
-        @SerializedName(value = "Read") Read("Read"),
-        @SerializedName(value = "New") New("New");
-    }
+  /**
+   *
+   *
+   * Values: All,Unread,Read,New
+   */
+  enum class Status(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "All")
+    All("All"),
 
+    @SerializedName(value = "Unread")
+    Unread("Unread"),
+
+    @SerializedName(value = "Read")
+    Read("Read"),
+
+    @SerializedName(value = "New")
+    New("New"),
+  }
 }
-

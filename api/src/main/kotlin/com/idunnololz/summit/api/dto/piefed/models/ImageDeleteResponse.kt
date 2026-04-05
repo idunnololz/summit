@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param result 
+ *
+ * @param result
  */
 
+data class ImageDeleteResponse(
 
-data class ImageDeleteResponse (
+  @SerializedName("result")
+  val result: kotlin.String,
 
-    @SerializedName("result")
-    val result: kotlin.String
-
-) {
-
-
-}
-
+)

@@ -3,9 +3,9 @@ package com.idunnololz.summit.util
 import android.os.Parcelable
 import arrow.core.Either
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.models.PostView
 import kotlinx.parcelize.Parcelize
 
 /**

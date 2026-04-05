@@ -9,7 +9,6 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.customview.widget.ViewDragHelper
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.math.max
 

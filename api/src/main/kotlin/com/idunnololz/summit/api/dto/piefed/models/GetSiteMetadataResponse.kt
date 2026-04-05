@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.SiteMetadataView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param metadata 
+ *
+ * @param metadata
  */
 
+data class GetSiteMetadataResponse(
 
-data class GetSiteMetadataResponse (
+  @SerializedName("metadata")
+  val metadata: SiteMetadataView,
 
-    @SerializedName("metadata")
-    val metadata: SiteMetadataView
-
-) {
-
-
-}
-
+)

@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param adminPersonId 
- * @param `when` 
- * @param reason 
+ *
+ * @param id
+ * @param adminPersonId
+ * @param `when`
+ * @param reason
  */
 
+data class AdminPurgePerson(
 
-data class AdminPurgePerson (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("admin_person_id")
+  val adminPersonId: kotlin.Int,
 
-    @SerializedName("admin_person_id")
-    val adminPersonId: kotlin.Int,
+  @SerializedName("when_")
+  val `when`: kotlin.String,
 
-    @SerializedName("when_")
-    val `when`: kotlin.String,
+  @SerializedName("reason")
+  val reason: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -1066,7 +1066,7 @@
     <!-- Keep short. Button text. -->
     <string name="unblock_this_community_format">Unblock this community (%1$s)</string>
     <!-- Error text. -->
-    <string name="error_filter_too_aggressive">Your filters are too aggressive for this community/instance.An overly aggressive filter filters out too many posts resulting in little or no results. An aggressive filter can also negatively impact performance. Please edit your filters to be less aggressive or choose a different instance/community.</string>
+    <string name="error_filter_too_aggressive">Your filters are too aggressive for this community/instance. An overly aggressive filter filters out too many posts resulting in little or no results. An aggressive filter can also negatively impact performance. Please edit your filters to be less aggressive or choose a different instance/community.</string>
     <!-- Title text. -->
     <string name="add_filter">Add filter</string>
     <!-- Hint text for input field. -->
@@ -1926,7 +1926,7 @@
     <string name="use_posts_feed_header">Use posts feed header</string>
     <string name="use_posts_feed_header_desc">Display a descriptive header at the top of the posts feed.</string>
     <string name="sign_in_or_sign_up">Sign in or sign up</string>
-    <string name="all_feed_desc">Posts from all communities</string>
+    <string name="all_feed_desc">Browse *all* of the communities.</string>
     <string name="subscribed_feed_desc">Posts from subscribed communities</string>
     <string name="local_feed_desc">Posts from communities on this instance</string>
     <string name="moderated_feed_desc">Posts from communities you moderate</string>
@@ -2386,6 +2386,15 @@
     <string name="parse_tags_from_post_titles_desc">Adds support for [Spoiler] tags.</string>
     <string name="reveal_warning_spoiler">This post is marked as a spoiler</string>
     <string name="error_couldnt_find_post">Could not find post on this instance.</string>
+    <string name="generate_missing_video_thumbnails">Generate missing video thumbnails</string>
+    <string name="generate_missing_video_thumbnails_desc">When enabled thumbnails are generated for video posts if the post does not have a thumbnail. May use more bandwidth.</string>
+    <string name="list_old">List (old)</string>
+    <string name="post_header_style">Post header style</string>
+    <string name="post_header_style_default">Default</string>
+    <string name="post_header_style_compact">Compact</string>
+    <string name="posts_feed_header_version">Posts feed header version</string>
+    <string name="posts_feed_header_version_1">Original</string>
+    <string name="posts_feed_header_version_2">Compact</string>
 
 
     <!-- uCrop string resource end -->

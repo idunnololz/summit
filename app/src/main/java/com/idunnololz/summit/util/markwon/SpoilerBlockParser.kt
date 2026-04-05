@@ -56,7 +56,7 @@ class SpoilerBlockParser(
   class SpoilerBlockParserFactory : AbstractBlockParserFactory() {
 
     // Matches: ::: spoiler <title>
-    private val OPENING_PATTERN = Regex(""":::\s+spoiler\s+(.+)$""")
+    private val OPENING_PATTERN = Regex(""":::\s*spoiler\s+(.+)$""")
 
     override fun tryStart(
       state: ParserState?,

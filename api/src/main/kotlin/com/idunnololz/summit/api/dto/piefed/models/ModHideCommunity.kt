@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param communityId 
- * @param modPersonId 
- * @param hidden 
- * @param `when` 
- * @param reason 
+ *
+ * @param id
+ * @param communityId
+ * @param modPersonId
+ * @param hidden
+ * @param `when`
+ * @param reason
  */
 
+data class ModHideCommunity(
 
-data class ModHideCommunity (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("community_id")
+  val communityId: kotlin.Int?,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int?,
+  @SerializedName("mod_person_id")
+  val modPersonId: kotlin.Int?,
 
-    @SerializedName("mod_person_id")
-    val modPersonId: kotlin.Int?,
+  @SerializedName("hidden")
+  val hidden: kotlin.Boolean,
 
-    @SerializedName("hidden")
-    val hidden: kotlin.Boolean,
+  @SerializedName("when_")
+  val `when`: kotlin.String,
 
-    @SerializedName("when_")
-    val `when`: kotlin.String,
+  @SerializedName("reason")
+  val reason: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null
-
-) {
-
-
-}
-
+)

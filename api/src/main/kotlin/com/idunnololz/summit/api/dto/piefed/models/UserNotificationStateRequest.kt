@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param notifId 
+ *
+ * @param notifId
  * @param readState true sets notification as read, false marks it unread
  */
 
+data class UserNotificationStateRequest(
 
-data class UserNotificationStateRequest (
+  @SerializedName("notif_id")
+  val notifId: kotlin.Int,
 
-    @SerializedName("notif_id")
-    val notifId: kotlin.Int,
+  /* true sets notification as read, false marks it unread */
+  @SerializedName("read_state")
+  val readState: kotlin.Boolean,
 
-    /* true sets notification as read, false marks it unread */
-    @SerializedName("read_state")
-    val readState: kotlin.Boolean
-
-) {
-
-
-}
-
+)

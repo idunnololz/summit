@@ -5,12 +5,14 @@
     android:id="@+id/screenshot_mode_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?colorSurface">
+    android:background="?colorSurface"
+    android:fitsSystemWindows="false">
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/screenshot_mode_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:paddingBottomSystemWindowInsets="true"
         app:menu="@menu/screenshot_mode"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

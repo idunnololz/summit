@@ -1,7 +1,6 @@
 package com.idunnololz.summit.api
 
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
-import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.BanFromCommunity
 import com.idunnololz.summit.api.dto.lemmy.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.BanPerson
@@ -35,7 +34,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
@@ -48,7 +46,6 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeComment
 import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
@@ -133,7 +130,10 @@ interface PieFedApiAlpha {
    * Log into lemmy.
    */
   @POST("user/login")
-  fun login(@HeaderMap headers: Map<String, String>, @Body form: UserLoginRequest): Call<UserLoginResponse>
+  fun login(
+    @HeaderMap headers: Map<String, String>,
+    @Body form: UserLoginRequest,
+  ): Call<UserLoginResponse>
 
   /**
    * Like / vote on a post.

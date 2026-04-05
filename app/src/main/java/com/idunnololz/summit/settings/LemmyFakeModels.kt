@@ -7,10 +7,10 @@ import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.PostAggregates
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.models.PostView
 
 object LemmyFakeModels {
 

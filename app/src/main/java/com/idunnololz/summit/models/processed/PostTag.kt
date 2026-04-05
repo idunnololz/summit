@@ -13,5 +13,7 @@ sealed interface PostTag : Parcelable {
 
   @Serializable
   @Parcelize
-  data class CustomTag(val key: String) : PostTag
+  data class CustomTag(
+    val key: String,
+  ) : PostTag
 }

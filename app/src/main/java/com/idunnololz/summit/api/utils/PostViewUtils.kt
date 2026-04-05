@@ -25,18 +25,17 @@ fun PostView.getUniqueKey(): String = "${post.community_id.toULong()}_${post.id.
 
 fun PostView.shouldBlurItem(): Boolean = post.nsfw || isSpoiler
 
-fun PostView.hideReasonMessage(context: Context): String =
-  when {
-    post.nsfw -> {
-      context.getString(R.string.reveal_warning_nsfw)
-    }
-    isSpoiler -> {
-      context.getString(R.string.reveal_warning_spoiler)
-    }
-    else -> {
-      context.getString(R.string.reveal_warning_default)
-    }
+fun PostView.hideReasonMessage(context: Context): String = when {
+  post.nsfw -> {
+    context.getString(R.string.reveal_warning_nsfw)
   }
+  isSpoiler -> {
+    context.getString(R.string.reveal_warning_spoiler)
+  }
+  else -> {
+    context.getString(R.string.reveal_warning_default)
+  }
+}
 
 fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
   return PreviewInfo(

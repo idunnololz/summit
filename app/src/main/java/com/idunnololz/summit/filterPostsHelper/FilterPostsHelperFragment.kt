@@ -24,8 +24,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.databinding.FragmentFilterPostsHelperBinding
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute

@@ -38,7 +38,6 @@ import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostReportId
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageId
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
@@ -48,6 +47,7 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.models.GetPersonDetailsResponse
 import com.idunnololz.summit.models.GetPostResponse
 import com.idunnololz.summit.models.GetPostsResponse
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.models.SearchResponse
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -7,60 +7,54 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Community
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param children 
- * @param communities 
- * @param communitiesCount 
- * @param id 
- * @param name 
- * @param showPostsFromChildren 
- * @param title 
- * @param parentTopicId 
+ *
+ * @param children
+ * @param communities
+ * @param communitiesCount
+ * @param id
+ * @param name
+ * @param showPostsFromChildren
+ * @param title
+ * @param parentTopicId
  */
 
+data class TopicView(
 
-data class TopicView (
+  @SerializedName("children")
+  val children: kotlin.collections.List<TopicView>,
 
-    @SerializedName("children")
-    val children: kotlin.collections.List<TopicView>,
+  @SerializedName("communities")
+  val communities: kotlin.collections.List<Community>,
 
-    @SerializedName("communities")
-    val communities: kotlin.collections.List<Community>,
+  @SerializedName("communities_count")
+  val communitiesCount: kotlin.Int,
 
-    @SerializedName("communities_count")
-    val communitiesCount: kotlin.Int,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("show_posts_from_children")
+  val showPostsFromChildren: kotlin.Boolean,
 
-    @SerializedName("show_posts_from_children")
-    val showPostsFromChildren: kotlin.Boolean,
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("parent_topic_id")
+  val parentTopicId: kotlin.Int? = null,
 
-    @SerializedName("parent_topic_id")
-    val parentTopicId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

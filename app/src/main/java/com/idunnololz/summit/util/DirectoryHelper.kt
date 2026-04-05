@@ -5,13 +5,11 @@ import android.util.Log
 import com.idunnololz.summit.cache.CborDiskCache
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.cbor.Cbor
 import java.io.File
 import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.ExperimentalSerializationApi
 
 @OptIn(ExperimentalSerializationApi::class)
 @Singleton

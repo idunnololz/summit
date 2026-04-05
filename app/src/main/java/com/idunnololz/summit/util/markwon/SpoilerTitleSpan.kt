@@ -15,8 +15,6 @@ import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
-import java.util.regex.Pattern
-import org.commonmark.node.CustomBlock
 import org.commonmark.parser.Parser
 
 abstract class DetailsClickableSpan : ClickableSpan()
@@ -35,22 +33,7 @@ class DetailsEndSpan
 
 private const val TAG = "SpoilerPlugin"
 
-class SpoilerNode(
-  private val delimiter: String,
-) : CustomBlock()
-
 class SpoilerPlugin : AbstractMarkwonPlugin() {
-
-  companion object {
-    private const val SPOILER_START_REGEX = "(:::\\s*spoiler\\s+)(.*)\n?"
-    private const val SPOILER_END_REGEX = ":::(?!\\s*spoiler)"
-
-    private const val COLLAPSED_ARROW = "▶ "
-    private const val EXPANDED_ARROW = "▼ "
-  }
-
-  private val spoilerStartMatcher = Pattern.compile(SPOILER_START_REGEX)
-  private val spoilerEndMatcher = Pattern.compile(SPOILER_END_REGEX)
 
   override fun configureParser(builder: Parser.Builder) {
     builder.customBlockParserFactory(SpoilerBlockParser.SpoilerBlockParserFactory())
@@ -73,7 +56,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         val headerEnd = builder.length
 
         visitor.visitChildren(spoilerBlock)
-        visitor.ensureNewLine()
+//        visitor.ensureNewLine()
 
         builder.setSpan(
           DetailsStartSpan(

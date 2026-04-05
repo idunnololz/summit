@@ -1,15 +1,18 @@
 package com.idunnololz.summit.preview
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Singleton
 class PeekImageManager @Inject constructor() {
 
   sealed interface PeekStatus {
     data object Idle : PeekStatus
-    data class Started(val x: Int, val y: Int) : PeekStatus
+    data class Started(
+      val x: Int,
+      val y: Int,
+    ) : PeekStatus
   }
 
   val peekStatusFlow = MutableStateFlow<PeekStatus>(PeekStatus.Idle)

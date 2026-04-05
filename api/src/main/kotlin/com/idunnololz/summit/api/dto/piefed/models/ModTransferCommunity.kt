@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param modPersonId 
- * @param otherPersonId 
- * @param communityId 
- * @param `when` 
+ *
+ * @param id
+ * @param modPersonId
+ * @param otherPersonId
+ * @param communityId
+ * @param `when`
  */
 
+data class ModTransferCommunity(
 
-data class ModTransferCommunity (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("mod_person_id")
+  val modPersonId: kotlin.Int?,
 
-    @SerializedName("mod_person_id")
-    val modPersonId: kotlin.Int?,
+  @SerializedName("other_person_id")
+  val otherPersonId: kotlin.Int?,
 
-    @SerializedName("other_person_id")
-    val otherPersonId: kotlin.Int?,
+  @SerializedName("community_id")
+  val communityId: kotlin.Int?,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int?,
+  @SerializedName("when_")
+  val `when`: kotlin.String,
 
-    @SerializedName("when_")
-    val `when`: kotlin.String
-
-) {
-
-
-}
-
+)

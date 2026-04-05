@@ -50,7 +50,6 @@ class TagParserTest {
     assertThat(result.tags).isEmpty()
   }
 
-
   @Test
   fun `aaa2`() {
     val title = "d]fsd]f]asd[ad"
@@ -104,7 +103,6 @@ class TagParserTest {
     assertThat(result.title).isEqualTo(title)
     assertThat(result.tags).isEmpty()
   }
-
 
   @Test
   fun `aaaaa 32432 42321`() {

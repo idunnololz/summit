@@ -100,7 +100,6 @@ import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostReportId
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageId
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
@@ -127,12 +126,13 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.Consts
-import com.idunnololz.summit.models.processed.DtoConverter
-import com.idunnololz.summit.models.GetPostResponse
-import com.idunnololz.summit.models.GetPostsResponse
 import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.models.GetPersonDetailsResponse
+import com.idunnololz.summit.models.GetPostResponse
+import com.idunnololz.summit.models.GetPostsResponse
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.models.SearchResponse
+import com.idunnololz.summit.models.processed.DtoConverter
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData

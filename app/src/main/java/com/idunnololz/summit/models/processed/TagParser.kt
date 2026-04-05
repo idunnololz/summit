@@ -30,7 +30,6 @@ object TagParser {
             tagStartIndex = index
             titleStartIndex = index
           } else if (c.isWhitespace()) {
-
           } else {
             break
           }
@@ -63,7 +62,6 @@ object TagParser {
             tagStartIndex = index
             titleEndIndex = index
           } else if (c.isWhitespace()) {
-
           } else {
             break
           }
@@ -112,9 +110,8 @@ object TagParser {
     return true
   }
 
-  private fun String.toPostTag() =
-    when (this.lowercase()) {
-      "spoiler" -> PostTag.Spoiler
-      else -> PostTag.CustomTag(this)
-    }
+  private fun String.toPostTag() = when (this.lowercase()) {
+    "spoiler" -> PostTag.Spoiler
+    else -> PostTag.CustomTag(this)
+  }
 }

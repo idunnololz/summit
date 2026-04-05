@@ -7,41 +7,35 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.ModBan
 import com.idunnololz.summit.api.dto.piefed.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param modBan 
- * @param moderator 
- * @param bannedPerson 
+ *
+ * @param modBan
+ * @param moderator
+ * @param bannedPerson
  */
 
+data class ModBanView(
 
-data class ModBanView (
+  @SerializedName("mod_ban")
+  val modBan: ModBan,
 
-    @SerializedName("mod_ban")
-    val modBan: ModBan,
+  @SerializedName("moderator")
+  val moderator: Person? = null,
 
-    @SerializedName("moderator")
-    val moderator: Person? = null,
+  @SerializedName("banned_person")
+  val bannedPerson: Person? = null,
 
-    @SerializedName("banned_person")
-    val bannedPerson: Person? = null
-
-) {
-
-
-}
-
+)

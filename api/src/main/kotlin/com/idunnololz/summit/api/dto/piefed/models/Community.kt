@@ -7,111 +7,105 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param actorId 
- * @param deleted 
- * @param hidden 
- * @param id 
- * @param instanceId 
- * @param local 
- * @param name 
- * @param nsfw 
- * @param aiGenerated 
- * @param published 
- * @param removed 
- * @param restrictedToMods 
- * @param title 
- * @param apDomain 
- * @param banned 
- * @param questionAnswer 
- * @param banner 
- * @param description 
- * @param icon 
- * @param postingWarning 
- * @param updated 
+ *
+ * @param actorId
+ * @param deleted
+ * @param hidden
+ * @param id
+ * @param instanceId
+ * @param local
+ * @param name
+ * @param nsfw
+ * @param aiGenerated
+ * @param published
+ * @param removed
+ * @param restrictedToMods
+ * @param title
+ * @param apDomain
+ * @param banned
+ * @param questionAnswer
+ * @param banner
+ * @param description
+ * @param icon
+ * @param postingWarning
+ * @param updated
  */
 
+data class Community(
 
-data class Community (
+  @SerializedName("actor_id")
+  val actorId: kotlin.String,
 
-    @SerializedName("actor_id")
-    val actorId: kotlin.String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("hidden")
+  val hidden: kotlin.Boolean,
 
-    @SerializedName("hidden")
-    val hidden: kotlin.Boolean,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean,
+  @SerializedName("ai_generated")
+  val aiGenerated: kotlin.Boolean,
 
-    @SerializedName("ai_generated")
-    val aiGenerated: kotlin.Boolean,
+  @SerializedName("published")
+  val published: kotlin.String,
 
-    @SerializedName("published")
-    val published: kotlin.String,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("restricted_to_mods")
+  val restrictedToMods: kotlin.Boolean,
 
-    @SerializedName("restricted_to_mods")
-    val restrictedToMods: kotlin.Boolean,
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("ap_domain")
+  val apDomain: kotlin.String? = null,
 
-    @SerializedName("ap_domain")
-    val apDomain: kotlin.String? = null,
+  @SerializedName("banned")
+  val banned: kotlin.Boolean? = null,
 
-    @SerializedName("banned")
-    val banned: kotlin.Boolean? = null,
+  @SerializedName("question_answer")
+  val questionAnswer: kotlin.Boolean? = null,
 
-    @SerializedName("question_answer")
-    val questionAnswer: kotlin.Boolean? = null,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
-    @SerializedName("description")
-    val description: kotlin.String? = null,
+  @SerializedName("icon")
+  val icon: kotlin.String? = null,
 
-    @SerializedName("icon")
-    val icon: kotlin.String? = null,
+  @SerializedName("posting_warning")
+  val postingWarning: kotlin.String? = null,
 
-    @SerializedName("posting_warning")
-    val postingWarning: kotlin.String? = null,
+  @SerializedName("updated")
+  val updated: kotlin.String? = null,
 
-    @SerializedName("updated")
-    val updated: kotlin.String? = null
-
-) {
-
-
-}
-
+)

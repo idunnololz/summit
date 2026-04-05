@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param communityId 
- * @param userId 
+ *
+ * @param communityId
+ * @param userId
  */
 
+data class CommunityModerationUnbanRequest(
 
-data class CommunityModerationUnbanRequest (
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("user_id")
+  val userId: kotlin.Int,
 
-    @SerializedName("user_id")
-    val userId: kotlin.Int
-
-) {
-
-
-}
-
+)

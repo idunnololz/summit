@@ -20,6 +20,7 @@ import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.CreateComment
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
@@ -84,7 +85,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
@@ -104,7 +104,6 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
 import com.idunnololz.summit.api.dto.lemmy.Register
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
@@ -266,7 +265,56 @@ class LemmyApiV3Adapter(
     args: GetComments,
     force: Boolean,
   ): Result<GetCommentsResponse> = retrofitErrorHandler {
-    api.getComments(generateHeaders(authorization, force), args.serializeToMap())
+    if (args.post_id != null) {
+      return@retrofitErrorHandler api.getComments(
+        generateHeaders(authorization, force),
+        args.serializeToMap(),
+      )
+    }
+
+    val limit = args.limit
+    val headers = generateHeaders(authorization = authorization, force = force)
+
+    suspend fun getResult(): Result<GetCommentsResponse> {
+      if (limit != null) {
+        return retrofitErrorHandler {
+          api.getComments(
+            headers = headers,
+            form = args.serializeToMap(),
+          )
+        }
+      }
+
+      val perRequestLimit = 20
+      val comments = mutableListOf<CommentView>()
+      var page = 0
+      while (true) {
+        val result = retrofitErrorHandler {
+          api.getComments(
+            headers = headers,
+            form = args.copy(
+              page = page.toLemmyPageIndex(),
+              limit = perRequestLimit,
+            ).serializeToMap(),
+          )
+        }
+
+        if (result.isFailure) {
+          return result
+        }
+        val cs = result.getOrThrow().comments
+        comments.addAll(cs)
+
+        if (cs.size < perRequestLimit) {
+          break
+        }
+        page++
+      }
+
+      return Result.success(GetCommentsResponse(comments))
+    }
+
+    return getResult()
   }
 
   override suspend fun distinguishComment(

@@ -10,12 +10,10 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
-import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.api.utils.isSpoiler
@@ -23,7 +21,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
-import com.idunnololz.summit.models.processed.PostTag
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.Preferences
@@ -81,8 +79,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
   private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
   private val whiteTextColor: Int = context.getColorCompat(R.color.white97)
   private val blackTextColor: Int = context.getColorCompat(R.color.black97)
-  private val colorSecondary: Int = context.getColorFromAttribute(com.google.android.material.R.attr.colorSecondary)
-  private val colorOnSecondary: Int = context.getColorFromAttribute(com.google.android.material.R.attr.colorOnSecondary)
+  private val colorSecondary: Int = context.getColorFromAttribute(
+    com.google.android.material.R.attr.colorSecondary,
+  )
+  private val colorOnSecondary: Int = context.getColorFromAttribute(
+    com.google.android.material.R.attr.colorOnSecondary,
+  )
 
   fun populateHeaderSpan(
     headerContainer: LemmyHeaderView,
@@ -92,7 +94,6 @@ class LemmyHeaderHelper @AssistedInject constructor(
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
     displayInstanceStyle: Int,
-    listAuthor: Boolean = true,
     showUpvotePercentage: Boolean,
     useMultilineHeader: Boolean,
     wrapHeader: Boolean,
@@ -100,6 +101,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
     showEditedDate: Boolean,
     useCondensedTypeface: Boolean,
     postHeaderInfo: PostHeaderInfo,
+    listAuthor: Boolean = true,
+    listCommunity: Boolean = true,
   ) {
     var currentTextView = headerContainer.textView1
 
@@ -116,6 +119,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
 
     if (isCurrentUser) {
+      sb.appendSeparatorIfNeeded()
+
       val s = sb.length
       sb.append(context.getString(R.string.you))
       val e = sb.length
@@ -129,6 +134,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
 
     if (postView.post.nsfw) {
+      sb.appendSeparatorIfNeeded()
+
       val s = sb.length
       sb.append(context.getString(R.string.nsfw))
       val e = sb.length
@@ -138,10 +145,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
 
     if (postView.isSpoiler) {
+      sb.appendSeparatorIfNeeded()
+
       val s = sb.length
       sb.append(context.getString(R.string.spoiler))
       val e = sb.length
@@ -151,10 +159,10 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
 
     if (postView.saved) {
+      sb.appendSeparatorIfNeeded()
       val d = Utils.tint(
         context = context,
         res = R.drawable.baseline_bookmark_24,
@@ -171,10 +179,10 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
 
     if (postView.post.removed || postView.post.deleted) {
+      sb.appendSeparatorIfNeeded()
       val d = Utils.tint(
         context = context,
         res = R.drawable.baseline_delete_24,
@@ -191,10 +199,10 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
 
     if (postView.post.featured_local || postView.post.featured_community) {
+      sb.appendSeparatorIfNeeded()
       val d = Utils.tint(
         context = context,
         res = R.drawable.baseline_push_pin_24,
@@ -211,9 +219,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
     if (postView.post.locked) {
+      sb.appendSeparatorIfNeeded()
       val d = Utils.tint(
         context = context,
         res = R.drawable.outline_lock_24,
@@ -230,97 +238,16 @@ class LemmyHeaderHelper @AssistedInject constructor(
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
-      sb.appendSeparator()
     }
 
-    val postInstance = postView.community.instance
-    val displayFullName = when (displayInstanceStyle) {
-      DisplayInstanceOptions.NeverDisplayInstance -> {
-        false
+    var authorListed = false
+    fun listAuthor() {
+      if (authorListed) { // don't list the author multiple times
+        return
       }
-      DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
-        instance != postInstance
-      }
-      DisplayInstanceOptions.AlwaysDisplayInstance -> {
-        true
-      }
-      else -> false
-    }
 
-    if (displayFullName) {
-      sb.appendNameWithInstance(
-        context = context,
-        name = if (preferences.preferCommunityDisplayName) {
-          postView.community.title
-        } else {
-          postView.community.name
-        },
-        instance = postInstance,
-        url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-      )
-    } else {
-      sb.appendLink(
-        if (preferences.preferCommunityDisplayName) {
-          postView.community.title
-        } else {
-          postView.community.name
-        },
-        LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-      )
-    }
-
-    sb.appendSeparator()
-    sb.append(postHeaderInfo.publishedTsString)
-
-    val updated = postView.post.updated
-    if (showEditedDate && postHeaderInfo.editedTsString != null) {
-      sb.append(" (${postHeaderInfo.editedTsString})")
-    }
-
-    if (wrapHeader) {
-//            currentTextView.setSingleLineAvoidingRelayout(false)
-      if (currentTextView.maxLines != 2) {
-        currentTextView.maxLines = 2
-      }
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
-      }
-      currentTextView.isSingleLine = false
-    } else {
-      currentTextView.isSingleLine = true
-    }
-
-    if (useMultilineHeader) {
-      currentTextView.movementMethod = makeMovementMethod(
-        instance = instance,
-        onPageClick = onPageClick,
-        onLinkClick = onLinkClick,
-        onLinkLongClick = onLinkLongClick,
-      )
-      currentTextView.text = sb
-//            currentTextView.setSingleLineAvoidingRelayout(true)
-      headerContainer.multiline = true
-
-      currentTextView = headerContainer.textView2
-      sb = SpannableStringBuilder()
-
-      if (wrapHeader) {
-        currentTextView.isSingleLine = false
-        currentTextView.maxLines = 2
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-          currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
-        }
-      } else {
-        currentTextView.isSingleLine = true
-      }
-    } else {
-      headerContainer.multiline = false
-    }
-
-    if (listAuthor) {
-      if (sb.isNotEmpty()) {
-        sb.appendSeparator()
-      }
+      authorListed = true
+      sb.appendSeparatorIfNeeded()
 
       val displayFullName = when (displayInstanceStyle) {
         DisplayInstanceOptions.NeverDisplayInstance -> {
@@ -410,7 +337,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       sb.appendNewUserWarningIfNeeded(postHeaderInfo)
 
       if (postHeaderInfo.isAuthorCakeDay) {
-        sb.appendSeparator()
+        sb.appendSeparatorIfNeeded()
         val d = Utils.tint(
           context = context,
           res = R.drawable.outline_cake_24,
@@ -445,8 +372,104 @@ class LemmyHeaderHelper @AssistedInject constructor(
         )
       }
     }
+
+    if (listCommunity) {
+      sb.appendSeparatorIfNeeded()
+
+      val postInstance = postView.community.instance
+      val displayFullName = when (displayInstanceStyle) {
+        DisplayInstanceOptions.NeverDisplayInstance -> {
+          false
+        }
+
+        DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+          instance != postInstance
+        }
+
+        DisplayInstanceOptions.AlwaysDisplayInstance -> {
+          true
+        }
+
+        else -> false
+      }
+
+      if (displayFullName) {
+        sb.appendNameWithInstance(
+          context = context,
+          name = if (preferences.preferCommunityDisplayName) {
+            postView.community.title
+          } else {
+            postView.community.name
+          },
+          instance = postInstance,
+          url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+        )
+      } else {
+        sb.appendLink(
+          if (preferences.preferCommunityDisplayName) {
+            postView.community.title
+          } else {
+            postView.community.name
+          },
+          LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+        )
+      }
+    } else {
+      listAuthor()
+    }
+
+    sb.appendSeparatorIfNeeded()
+    sb.append(postHeaderInfo.publishedTsString)
+
+    if (showEditedDate && postHeaderInfo.editedTsString != null) {
+      sb.append(" (${postHeaderInfo.editedTsString})")
+    }
+
+    if (wrapHeader) {
+//            currentTextView.setSingleLineAvoidingRelayout(false)
+      if (currentTextView.maxLines != 2) {
+        currentTextView.maxLines = 2
+      }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+      }
+      currentTextView.isSingleLine = false
+    } else {
+      currentTextView.isSingleLine = true
+    }
+
+    if (useMultilineHeader) {
+      currentTextView.movementMethod = makeMovementMethod(
+        instance = instance,
+        onPageClick = onPageClick,
+        onLinkClick = onLinkClick,
+        onLinkLongClick = onLinkLongClick,
+      )
+      currentTextView.text = sb
+//            currentTextView.setSingleLineAvoidingRelayout(true)
+      headerContainer.multiline = true
+
+      currentTextView = headerContainer.textView2
+      sb = SpannableStringBuilder()
+
+      if (wrapHeader) {
+        currentTextView.isSingleLine = false
+        currentTextView.maxLines = 2
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+        }
+      } else {
+        currentTextView.isSingleLine = true
+      }
+    } else {
+      headerContainer.multiline = false
+    }
+
+    if (listAuthor) {
+      listAuthor()
+    }
     if (showUpvotePercentage) {
-      sb.appendSeparator()
+      sb.appendSeparatorIfNeeded()
       sb.append(
         PrettyPrintUtils.defaultShortPercentFormat.format(
           postView.upvotePercentage,
@@ -718,7 +741,6 @@ class LemmyHeaderHelper @AssistedInject constructor(
     if (showEditedDate && updated != null) {
       sb.append(" ($updated)")
     }
-    headerContainer.getFlairView().visibility = View.GONE
 
     if (detailed) {
       sb.appendSeparator()
@@ -842,6 +864,21 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun SpannableStringBuilder.appendSeparator() {
+  val s = length
+  append(LemmyHeaderHelper.SEPARATOR)
+  val e = length
+  setSpan(
+    HorizontalDividerSpan(),
+    s + 1,
+    e - 1,
+    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+  )
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun SpannableStringBuilder.appendSeparatorIfNeeded() {
+  if (isEmpty()) return
+
   val s = length
   append(LemmyHeaderHelper.SEPARATOR)
   val e = length

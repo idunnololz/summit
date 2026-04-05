@@ -20,6 +20,9 @@ import com.idunnololz.summit.api.RateLimitException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
+import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
+import com.idunnololz.summit.lemmy.FilterTooAggressiveException
+import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.NoModeratedCommunitiesException
 import com.idunnololz.summit.util.crashLogger.crashLogger
@@ -104,6 +107,12 @@ fun Throwable.toErrorMessage(context: Context): String = when (val t = this) {
     )
   is NoModeratedCommunitiesException ->
     context.getString(R.string.error_no_moderated_communities)
+  is LoadNsfwCommunityWhenNsfwDisabled ->
+    context.getString(R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden)
+  is FilterTooAggressiveException ->
+    context.getString(R.string.error_filter_too_aggressive)
+  is ContentTypeFilterTooAggressiveException ->
+    context.getString(R.string.error_content_type_filter_too_aggressive)
   else -> {
     Log.e(TAG, "Unknown throwable ${t::class.java.canonicalName}", t)
     context.getString(R.string.error_unknown)

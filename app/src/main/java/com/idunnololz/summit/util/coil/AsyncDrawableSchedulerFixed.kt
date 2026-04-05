@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.TextView
 import com.idunnololz.summit.R
 import io.noties.markwon.ext.tables.TableRowSpan
-import io.noties.markwon.ext.tables.TableRowSpan.Cell
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableSpan
 

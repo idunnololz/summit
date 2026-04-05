@@ -7,27 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param name URL-safe name/slug for the feed
- * @param title 
- * @param description 
- * @param iconUrl 
- * @param bannerUrl 
- * @param nsfw 
- * @param nsfl 
+ * @param title
+ * @param description
+ * @param iconUrl
+ * @param bannerUrl
+ * @param nsfw
+ * @param nsfl
  * @param `public` Whether the feed is publicly visible
  * @param communities Newline-separated list of community ap_ids to include in the feed
  * @param isInstanceFeed Whether this is an instance-level feed (admin only)
@@ -35,53 +34,48 @@ import com.google.gson.annotations.SerializedName
  * @param parentFeedId ID of parent feed, if any
  */
 
+data class CreateFeedRequest(
 
-data class CreateFeedRequest (
+  /* URL-safe name/slug for the feed */
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    /* URL-safe name/slug for the feed */
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
-    @SerializedName("description")
-    val description: kotlin.String? = null,
+  @SerializedName("icon_url")
+  val iconUrl: kotlin.String? = null,
 
-    @SerializedName("icon_url")
-    val iconUrl: kotlin.String? = null,
+  @SerializedName("banner_url")
+  val bannerUrl: kotlin.String? = null,
 
-    @SerializedName("banner_url")
-    val bannerUrl: kotlin.String? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  @SerializedName("nsfl")
+  val nsfl: kotlin.Boolean? = null,
 
-    @SerializedName("nsfl")
-    val nsfl: kotlin.Boolean? = null,
+  /* Whether the feed is publicly visible */
+  @SerializedName("public")
+  val `public`: kotlin.Boolean? = true,
 
-    /* Whether the feed is publicly visible */
-    @SerializedName("public")
-    val `public`: kotlin.Boolean? = true,
+  /* Newline-separated list of community ap_ids to include in the feed */
+  @SerializedName("communities")
+  val communities: kotlin.String? = null,
 
-    /* Newline-separated list of community ap_ids to include in the feed */
-    @SerializedName("communities")
-    val communities: kotlin.String? = null,
+  /* Whether this is an instance-level feed (admin only) */
+  @SerializedName("is_instance_feed")
+  val isInstanceFeed: kotlin.Boolean? = null,
 
-    /* Whether this is an instance-level feed (admin only) */
-    @SerializedName("is_instance_feed")
-    val isInstanceFeed: kotlin.Boolean? = null,
+  /* Whether to show posts from child feeds */
+  @SerializedName("show_child_posts")
+  val showChildPosts: kotlin.Boolean? = null,
 
-    /* Whether to show posts from child feeds */
-    @SerializedName("show_child_posts")
-    val showChildPosts: kotlin.Boolean? = null,
+  /* ID of parent feed, if any */
+  @SerializedName("parent_feed_id")
+  val parentFeedId: kotlin.Int? = null,
 
-    /* ID of parent feed, if any */
-    @SerializedName("parent_feed_id")
-    val parentFeedId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)
