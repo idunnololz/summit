@@ -630,7 +630,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
       }
     }
 
-    requireSummitActivity().showBottomMenu(bottomMenu)
+    getSummitActivity()?.showBottomMenu(bottomMenu)
   }
 
   private fun showOverflowMenu(siteView: SiteView) {

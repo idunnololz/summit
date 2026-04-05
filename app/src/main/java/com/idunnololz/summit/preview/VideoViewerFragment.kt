@@ -30,6 +30,7 @@ import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.getVideoTypeStrippingParams
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
 import com.idunnololz.summit.util.getParcelableCompat
@@ -311,8 +312,19 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             (activity as? MainActivity)?.showSystemUI()
           }
         } else {
-          showUnsupportedVideoTypeError(url)
-          (activity as? MainActivity)?.showSystemUI()
+          val videoType = getVideoTypeStrippingParams(url)
+
+          if (videoType == VideoType.Unknown) {
+            showUnsupportedVideoTypeError(url)
+            (activity as? MainActivity)?.showSystemUI()
+          } else {
+            loadVideo(
+              context,
+              url,
+              videoType,
+              videoState,
+            )
+          }
         }
       }
       VideoType.Dash,

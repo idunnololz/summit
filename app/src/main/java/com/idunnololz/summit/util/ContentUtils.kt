@@ -31,6 +31,11 @@ object ContentUtils {
 
   fun isUrlDash(url: String) = url.endsWith(".mpd", ignoreCase = true)
 
+  fun getVideoTypeStrippingParams(url: String): VideoType {
+    val urlWithoutParams = url.split("?").getOrElse(0) { "" }
+    return getVideoType(urlWithoutParams)
+  }
+
   fun getVideoType(urlWithoutParams: String) = if (isUrlMp4(urlWithoutParams)) {
     VideoType.Mp4
   } else if (isUrlHls(urlWithoutParams)) {

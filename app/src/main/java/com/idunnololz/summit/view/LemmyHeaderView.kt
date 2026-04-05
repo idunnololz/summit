@@ -27,6 +27,10 @@ import com.idunnololz.summit.util.ext.getTextSizeFromTextAppearance
 import com.idunnololz.summit.util.ext.spToPx
 import kotlin.math.max
 
+/**
+ * |---| textView1
+ * |___| textView2 textView3
+ */
 class LemmyHeaderView : FrameLayout {
 
   companion object {
@@ -50,6 +54,16 @@ class LemmyHeaderView : FrameLayout {
 
       updateTextViewVisibility()
       requestLayout()
+    }
+  var showTextView3: Boolean = false
+    set(value) {
+      if (field == value) {
+        return
+      }
+
+      field = value
+
+      updateTextViewVisibility()
     }
 
   var iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
@@ -472,9 +486,13 @@ class LemmyHeaderView : FrameLayout {
   private fun updateTextViewVisibility() {
     if (multiline) {
       textView2.visibility = View.VISIBLE
-      textView3.visibility = View.VISIBLE
     } else {
       textView2.visibility = View.GONE
+    }
+
+    if (showTextView3 && multiline) {
+      textView3.visibility = View.VISIBLE
+    } else {
       textView3.visibility = View.GONE
     }
   }

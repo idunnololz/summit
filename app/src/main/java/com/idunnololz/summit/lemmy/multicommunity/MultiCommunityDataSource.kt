@@ -219,15 +219,15 @@ class MultiCommunityDataSource(
     while (true) {
       val validSources = validSources
       var sourceToResult = validSources.map { it to it.peekNextItem() }
-      val sourceAndError = sourceToResult
-        .firstOrNull { (_, result) -> result.isFailure }
+      val sourceAndError = sourceToResult.firstOrNull { (_, result) -> result.isFailure }
 
       if (sourceAndError != null) {
         val exception = requireNotNull(sourceAndError.second.exceptionOrNull())
         if (exception is ClientApiException && exception.errorCode == 404) {
-          communityNotFoundOnInstance.add(
-            sourceAndError.first.source as CommunityRef.CommunityRefByName,
-          )
+          val source = sourceAndError.first.source
+          if (source is CommunityRef.CommunityRefByName) {
+            communityNotFoundOnInstance.add(source)
+          }
         } else {
           return@a Result.failure(exception)
         }

@@ -54,6 +54,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.getVideoType
+import com.idunnololz.summit.util.ContentUtils.getVideoTypeStrippingParams
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
@@ -418,8 +419,7 @@ class LemmyContentHelper(
         return
       }
 
-      val urlWithoutParams = videoInfo.videoUrl.split("?").getOrElse(0) { "" }
-      val videoType = getVideoType(urlWithoutParams)
+      val videoType = getVideoTypeStrippingParams(videoInfo.videoUrl)
 
       if (videoType == VideoType.Unknown) {
         playerView.visibility = View.GONE

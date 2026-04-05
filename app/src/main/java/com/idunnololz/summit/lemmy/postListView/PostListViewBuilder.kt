@@ -91,6 +91,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.generateQuickActions
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Size
@@ -420,7 +421,7 @@ class PostListViewBuilder @Inject constructor(
               isSaved = postView.saved,
             )
             commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
-              topToBottom = R.id.header_container
+              topToBottom = R.id.bottom_space
               bottomToBottom = ConstraintLayout.LayoutParams.UNSET
               bottomToTop = ConstraintLayout.LayoutParams.UNSET
             }
@@ -552,7 +553,7 @@ class PostListViewBuilder @Inject constructor(
               }
               rb.headerView.updatePaddingRelative(
                 start = padding,
-                end = paddingHalf,
+                end = padding,
               )
               rb.iconImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
@@ -568,7 +569,7 @@ class PostListViewBuilder @Inject constructor(
                 this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                 this.endToStart = rb.leftBarrier.id
                 this.marginStart = padding
-                this.marginEnd = paddingHalf
+                this.marginEnd = padding
               }
             }
             is ListingItemListWithCardsBinding -> {
@@ -1140,7 +1141,7 @@ class PostListViewBuilder @Inject constructor(
 
           fun showImageOrVideo(peek: Boolean) {
             if (urlVideo) {
-              onVideoClick(imageUrl, VideoType.Mp4, null)
+              onVideoClick(imageUrl, VideoType.Unknown, null)
             } else {
               onImageClick(
                 accountId,

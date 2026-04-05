@@ -109,6 +109,14 @@
                 app:layout_constraintTop_toBottomOf="@+id/image"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <Space
+                android:id="@+id/bottom_space"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/padding_half"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/header_container"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

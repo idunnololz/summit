@@ -848,12 +848,12 @@ class PostAndCommentViewBuilder @Inject constructor(
       if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
         holder.state.preferUpAndDownVotes = commentShowUpAndDownVotes
         if (commentShowUpAndDownVotes) {
-          holder.headerView.textView3.visibility = View.VISIBLE
+          holder.headerView.showTextView3 = true
 
           holder.upvoteCount = holder.headerView.textView2
           holder.downvoteCount = holder.headerView.textView3
         } else {
-          holder.headerView.textView3.visibility = View.GONE
+          holder.headerView.showTextView3 = false
 
           holder.upvoteCount = null
           holder.downvoteCount = null

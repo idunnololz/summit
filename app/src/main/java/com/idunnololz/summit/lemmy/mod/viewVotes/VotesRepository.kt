@@ -36,10 +36,10 @@ class VotesRepository @AssistedInject constructor(
     MultiLemmyListSource(
       listOf(
         LemmyListSource<VoteView, Unit, Long>(
-          context,
-          { this.creator.id },
+          context = context,
+          id = { this.creator.id },
           defaultSortOrder = Unit,
-          {
+          fetchObjects = {
               pageIndex: Int,
               sortOrder: Unit,
               limit: Int,
