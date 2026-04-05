@@ -1050,7 +1050,7 @@
     <string name="cb_date">日期</string>
     <string name="cb_watermark">水印</string>
     <string name="change_instance">更改实例</string>
-    <string name="purge_person">清除人員</string>
+    <string name="purge_person">清除用户</string>
     <string name="undo_user_ban">撤消用户禁令</string>
     <string name="undo_user_ban_from_instance">撤消实例中的用户禁令</string>
     <string name="remove_community">移除社区</string>
@@ -1550,4 +1550,8 @@
     <string name="auto_focus_search_bar_desc">启用此功能后，打开屏幕时搜索栏将自动获得焦点。</string>
     <string name="video_details">视频详情</string>
     <string name="sign_in_or_sign_up">登录或注册</string>
+    <string name="colorPickerDialog_reset">重置</string>
+    <string name="post_fab_quick_action">FAB 快速操作</string>
+    <string name="gravity_top">顶部</string>
+    <string name="action_cancel">取消</string>
 </resources>
