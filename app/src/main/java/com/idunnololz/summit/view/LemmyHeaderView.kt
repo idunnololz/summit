@@ -243,8 +243,6 @@ class LemmyHeaderView : FrameLayout {
         }
       }
 
-      Log.d("HAHA", "textView2: ${textView2.measuredWidth}, ${textView2.measuredHeight}")
-
       // Account for padding too
       maxWidth += paddingStart + paddingEnd
       maxHeight += paddingTop + paddingBottom

@@ -312,7 +312,6 @@ class CommunityViewModel @Inject constructor(
   }
 
   private suspend fun onPostReadChanged() {
-    Log.d("HAHA", "onPostReadChanged() ${currentCommunityRef.value}")
     if (duplicatePostsDetector.isEnabled) {
       postListEngine.markDuplicatePostsAsRead()
     }
@@ -578,8 +577,6 @@ class CommunityViewModel @Inject constructor(
         force = force,
       )
 
-      Log.d("HAHA", "Getting page $pageToFetch. Got: ${result.getOrNull()?.posts?.size} items")
-
       result
         .onSuccess {
           val pageData =
@@ -745,7 +742,6 @@ class CommunityViewModel @Inject constructor(
     // Disable caching while we restore...
     postsRepository.cacheState = false
 
-    Log.d("HAHA", "fetching pages 0 to $restorePages")
     for (i in 0..restorePages) {
       fetchPageInternal(pageToFetch = i, force = false, isRestoreOperation = true)
       fetchPageJob?.join()
@@ -810,7 +806,6 @@ class CommunityViewModel @Inject constructor(
   }
 
   fun createState(): CommunityViewState? {
-    Log.d("HAHA", "createState(): ${postListEngine.biggestPageIndex}")
     return CommunityViewState(
       CommunityState(
         communityRef = currentCommunityRef.value ?: return null,

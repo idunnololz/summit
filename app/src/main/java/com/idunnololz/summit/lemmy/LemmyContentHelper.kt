@@ -346,6 +346,8 @@ class LemmyContentHelper(
     fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
       if (!showImage) return
 
+      Log.d("HAHA", "insertAndLoadFullImage()")
+
       val fullContentImageView =
         if (fullBleedImage) {
           getAndEnsureView<View>(R.layout.full_content_image_view)
@@ -500,7 +502,11 @@ class LemmyContentHelper(
         }
       }
 
-      if (postView.getVideoInfo(embedded = true) != null) {
+      if (postView.getVideoInfo(embedded = true) != null
+        && (postType != PostType.Video || postUrl != postView.post.embed_video_url)) {
+        // Don't load the video again if postType is video unless the post url and the embedded
+        // video url are two different links
+        
         insertAndLoadVideo(embeddedVideo = true)
       }
 
