@@ -91,7 +91,6 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.generateQuickActions
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
-import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Size
@@ -775,6 +774,9 @@ class PostListViewBuilder @Inject constructor(
             compact = false
           }
           else -> {
+            lemmyHeaderView.showTextView2 = false
+            lemmyHeaderView.showTextView3 = false
+
             when (currentCommunity) {
               is CommunityRef.CommunityRefByName -> {
                 listAuthor = true
@@ -791,7 +793,7 @@ class PostListViewBuilder @Inject constructor(
         }
 
         lemmyHeaderHelper.populateHeaderSpan(
-          headerContainer = headerContainer,
+          lemmyHeaderView = lemmyHeaderView,
           postView = postView,
           instance = instance,
           onPageClick = { url, pageRef ->
@@ -821,7 +823,7 @@ class PostListViewBuilder @Inject constructor(
         )
 
         if (showCommunityIcon) {
-          headerContainer.iconSize = if (compact) {
+          lemmyHeaderView.iconSize = if (compact) {
             Utils.convertDpToPixel(20f).toInt()
           } else {
             if (rawBinding is ListingItemCompactBinding) {
@@ -830,7 +832,7 @@ class PostListViewBuilder @Inject constructor(
               Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
             }
           }
-          val iconImageView = headerContainer.getIconImageView()
+          val iconImageView = lemmyHeaderView.getIconImageView()
           avatarHelper.loadCommunityIcon(iconImageView, postView.community)
           iconImageView.setOnClickListener {
             onPageClick(accountId, "", postView.community.toCommunityRef())
@@ -844,7 +846,7 @@ class PostListViewBuilder @Inject constructor(
             true
           }
         } else {
-          headerContainer.ensureNoIconImageView()
+          lemmyHeaderView.ensureNoIconImageView()
         }
 
         fun showDefaultImage() {
@@ -1605,7 +1607,7 @@ class PostListViewBuilder @Inject constructor(
   }
 
   private fun ListingItemViewHolder.scaleTextSizes() {
-    headerContainer.textSize = postUiConfig.headerTextSizeSp.toTextSize() * 0.9f
+    lemmyHeaderView.textSize = postUiConfig.headerTextSizeSp.toTextSize() * 0.9f
 
     title.textSize = postUiConfig.titleTextSizeSp.toTextSize()
     subtitle?.textSize = postUiConfig.subtitleTextSizeSp()

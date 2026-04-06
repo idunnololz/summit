@@ -55,7 +55,17 @@ class LemmyHeaderView : FrameLayout {
       updateTextViewVisibility()
       requestLayout()
     }
-  var showTextView3: Boolean = false
+  var showTextView2: Boolean = true
+    set(value) {
+      if (field == value) {
+        return
+      }
+
+      field = value
+
+      updateTextViewVisibility()
+    }
+  var showTextView3: Boolean = true
     set(value) {
       if (field == value) {
         return
@@ -80,12 +90,6 @@ class LemmyHeaderView : FrameLayout {
   init {
     textView1 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
       .style()
-      .apply {
-        layoutParams = LayoutParams(
-          LayoutParams.MATCH_PARENT,
-          LayoutParams.MATCH_PARENT,
-        )
-      }
     textView2 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
       .style()
     textView3 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
@@ -239,6 +243,8 @@ class LemmyHeaderView : FrameLayout {
         }
       }
 
+      Log.d("HAHA", "textView2: ${textView2.measuredWidth}, ${textView2.measuredHeight}")
+
       // Account for padding too
       maxWidth += paddingStart + paddingEnd
       maxHeight += paddingTop + paddingBottom
@@ -262,8 +268,6 @@ class LemmyHeaderView : FrameLayout {
           childState shl MEASURED_HEIGHT_STATE_SHIFT,
         ),
       )
-
-      // /
 
       val iconImageView = iconImageView
       var totalTextHeight = 0
@@ -302,13 +306,10 @@ class LemmyHeaderView : FrameLayout {
       var viewWidth = 0
       if (iconImageView != null && iconImageView.visibility != GONE) {
         val iconImageViewHeight = getViewHeight(iconImageView)
-        Log.d("HAHA", "iconHeight: $iconImageViewHeight restHeight: $viewHeight")
         viewHeight = max(viewHeight, iconImageViewHeight)
 
         viewWidth += getViewWidth(iconImageView)
       }
-
-      Log.d("HAHA", "finalHeight: ${viewHeight + paddingTop + paddingBottom}")
 
       viewWidth += max(
         getViewWidth(textView1),
@@ -484,16 +485,16 @@ class LemmyHeaderView : FrameLayout {
   )
 
   private fun updateTextViewVisibility() {
-    if (multiline) {
-      textView2.visibility = View.VISIBLE
+    if (showTextView2) {
+      textView2.visibility = VISIBLE
     } else {
-      textView2.visibility = View.GONE
+      textView2.visibility = GONE
     }
 
-    if (showTextView3 && multiline) {
-      textView3.visibility = View.VISIBLE
+    if (showTextView3) {
+      textView3.visibility = VISIBLE
     } else {
-      textView3.visibility = View.GONE
+      textView3.visibility = GONE
     }
   }
 }

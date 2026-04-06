@@ -87,7 +87,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
   )
 
   fun populateHeaderSpan(
-    headerContainer: LemmyHeaderView,
+    lemmyHeaderView: LemmyHeaderView,
     postView: PostView,
     instance: String,
     onPageClick: (url: String, PageRef) -> Unit,
@@ -104,18 +104,18 @@ class LemmyHeaderHelper @AssistedInject constructor(
     listAuthor: Boolean = true,
     listCommunity: Boolean = true,
   ) {
-    var currentTextView = headerContainer.textView1
+    var currentTextView = lemmyHeaderView.textView1
 
-    val context = headerContainer.context
+    val context = lemmyHeaderView.context
     var sb = SpannableStringBuilder()
 
     fun iconSize() = // Use SP since the icons are inline with text.
-      context.spToPx(headerContainer.textSize * 1.33f).toInt()
+      context.spToPx(lemmyHeaderView.textSize * 1.33f).toInt()
 
     if (useCondensedTypeface) {
-      headerContainer.setTypeface(condensedTypeface)
+      lemmyHeaderView.setTypeface(condensedTypeface)
     } else {
-      headerContainer.setTypeface(Utils.defaultTypeface)
+      lemmyHeaderView.setTypeface(Utils.defaultTypeface)
     }
 
     if (isCurrentUser) {
@@ -447,9 +447,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
       currentTextView.text = sb
 //            currentTextView.setSingleLineAvoidingRelayout(true)
-      headerContainer.multiline = true
+      lemmyHeaderView.multiline = true
 
-      currentTextView = headerContainer.textView2
+      currentTextView = lemmyHeaderView.textView2
       sb = SpannableStringBuilder()
 
       if (wrapHeader) {
@@ -462,7 +462,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         currentTextView.isSingleLine = true
       }
     } else {
-      headerContainer.multiline = false
+      lemmyHeaderView.multiline = false
     }
 
     if (listAuthor) {

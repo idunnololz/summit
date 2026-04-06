@@ -421,7 +421,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     viewHolder.scaleTextSizes()
 
     lemmyHeaderHelper.populateHeaderSpan(
-      headerContainer = headerContainer,
+      lemmyHeaderView = headerContainer,
       postView = postView,
       instance = instance,
       onPageClick = onPageClick,
