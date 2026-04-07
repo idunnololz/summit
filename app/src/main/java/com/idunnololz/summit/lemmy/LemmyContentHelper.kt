@@ -506,7 +506,7 @@ class LemmyContentHelper(
         && (postType != PostType.Video || postUrl != postView.post.embed_video_url)) {
         // Don't load the video again if postType is video unless the post url and the embedded
         // video url are two different links
-        
+
         insertAndLoadVideo(embeddedVideo = true)
       }
 

@@ -285,6 +285,7 @@ class LemmyApiV3Adapter(
         }
       }
 
+      val seen = mutableSetOf<Int>()
       val perRequestLimit = 20
       val comments = mutableListOf<CommentView>()
       var page = 0
@@ -303,7 +304,18 @@ class LemmyApiV3Adapter(
           return result
         }
         val cs = result.getOrThrow().comments
-        comments.addAll(cs)
+        var added = 0
+        for (c in cs) {
+          if (seen.add(c.comment.id)) {
+            comments.addAll(cs)
+            added++
+          }
+        }
+
+        if (added == 0) {
+          // Lemmy has a bug where if the requested page is root then it ignores the limit.
+          break
+        }
 
         if (cs.size < perRequestLimit) {
           break
