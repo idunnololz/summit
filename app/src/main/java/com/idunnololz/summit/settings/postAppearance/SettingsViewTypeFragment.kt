@@ -275,6 +275,51 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         updateRendering()
       },
     ),
+    SettingModelItem.SubgroupItem(
+      getString(R.string.advanced_settings),
+      listOf(
+        settings.headerSize.asSliderItem(
+          { viewModel.currentPostUiConfig.headerTextSizeSp },
+          {
+            viewModel.currentPostUiConfig =
+              viewModel.currentPostUiConfig.copy(headerTextSizeSp = it)
+
+            updateRendering()
+          },
+        ),
+        settings.titleSize.asSliderItem(
+          { viewModel.currentPostUiConfig.titleTextSizeSp },
+          {
+            viewModel.currentPostUiConfig =
+              viewModel.currentPostUiConfig.updateTitleTextSize(it)
+
+            updateRendering()
+          },
+        ),
+        settings.bodySize.asSliderItem(
+          { viewModel.currentPostUiConfig.fullContentConfig.bodyTextSizeSp },
+          {
+            viewModel.currentPostUiConfig =
+              viewModel.currentPostUiConfig.copy(
+                fullContentConfig = viewModel.currentPostUiConfig.fullContentConfig.copy(
+                  bodyTextSizeSp = it
+                )
+              )
+
+            updateRendering()
+          },
+        ),
+        settings.footerSize.asSliderItem(
+          { viewModel.currentPostUiConfig.footerTextSizeSp },
+          {
+            viewModel.currentPostUiConfig =
+              viewModel.currentPostUiConfig.copy(footerTextSizeSp = it)
+
+            updateRendering()
+          },
+        ),
+      )
+    ),
   )
 
   private var lastH = listOf<ListingItemViewHolder>()

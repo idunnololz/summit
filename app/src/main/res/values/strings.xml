@@ -2395,6 +2395,12 @@
     <string name="posts_feed_header_version">Posts feed header version</string>
     <string name="posts_feed_header_version_1">Original</string>
     <string name="posts_feed_header_version_2">Compact</string>
+    <string name="header_font_size">Header font size</string>
+    <string name="title_font_size">Title font size</string>
+    <string name="footer_font_size">Footer font size</string>
+    <string name="advanced">Advanced settings</string>
+    <string name="body_font_size">Body font size</string>
+    <string name="advanced_settings">Advanced settings</string>
 
 
     <!-- uCrop string resource end -->

@@ -772,19 +772,19 @@ class CommunityAppBarController(
     }
 
     if (vh.subtitle == null) {
-      if (body == null) {
+      if (currentCommunity is CommunityRef.All) {
+        body = context.getString(R.string.all_feed_desc)
+      } else {
         body = when (currentCommunity) {
           is CommunityRef.All -> context.getString(R.string.all_feed_desc)
           is CommunityRef.AllSubscribed -> context.getString(R.string.all_subscribed_feed_desc)
-          is CommunityRef.CommunityRefByName -> null
+          is CommunityRef.CommunityRefByName -> body
           is CommunityRef.Local -> context.getString(R.string.local_feed_desc)
           is CommunityRef.ModeratedCommunities -> context.getString(R.string.moderated_feed_desc)
           is CommunityRef.MultiCommunity -> context.getString(R.string.multi_community_desc)
           is CommunityRef.Subscribed -> context.getString(R.string.subscribed_feed_desc)
           null -> null
         }
-      } else if (currentCommunity is CommunityRef.All) {
-        body = context.getString(R.string.all_feed_desc)
       }
     }
 

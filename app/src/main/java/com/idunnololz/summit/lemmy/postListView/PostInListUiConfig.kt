@@ -41,6 +41,10 @@ data class PostInListUiConfig(
     textSizeMultiplier = it,
     fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
   )
+  fun updateTitleTextSize(it: Float): PostInListUiConfig = this.copy(
+    titleTextSizeSp = it,
+    fullContentConfig = this.fullContentConfig.copy(titleTextSizeSp = it),
+  )
 
   fun showUrlDomain() = showUrlDomain ?: false
 

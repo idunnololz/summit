@@ -1691,6 +1691,30 @@ class PostsFeedAppearanceSettings @Inject constructor(
     32f,
     1f,
   )
+  val headerSize = SliderSettingItem(
+    context.getString(R.string.header_font_size),
+    1f,
+    100f,
+    1f,
+  )
+  val titleSize = SliderSettingItem(
+    context.getString(R.string.title_font_size),
+    1f,
+    100f,
+    1f,
+  )
+  val bodySize = SliderSettingItem(
+    context.getString(R.string.body_font_size),
+    1f,
+    100f,
+    1f,
+  )
+  val footerSize = SliderSettingItem(
+    context.getString(R.string.footer_font_size),
+    1f,
+    100f,
+    1f,
+  )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
