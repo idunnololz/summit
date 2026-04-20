@@ -204,6 +204,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
               limit = pageSize,
               force = force,
               upvotedOnly = true,
+              showRead = true,
             )
             .map {
               it.posts
@@ -221,6 +222,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                 limit = pageSize,
                 force = force,
                 downvotedOnly = true,
+                showRead = true,
               )
               .map {
                 it.posts
