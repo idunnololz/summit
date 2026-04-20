@@ -387,6 +387,13 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<GetCommentsResponse> {
     val limit = args.limit
+    val args = args.copy(
+      max_depth = if (args.max_depth == null) {
+        null
+      } else {
+        args.max_depth - 1
+      }
+    )
     val headers = generateHeaders(authorization = authorization, force = force)
 
     suspend fun getResult(): Result<ListCommentsResponse> {
