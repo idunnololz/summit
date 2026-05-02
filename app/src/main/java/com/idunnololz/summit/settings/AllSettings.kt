@@ -2236,7 +2236,7 @@ class LoggingSettings @Inject constructor(
   @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
-  val useFirebase = OnOffSettingItem(
+  val useCrashLogger = OnOffSettingItem(
     null,
     context.getString(R.string.use_crash_logger),
     context.getString(R.string.use_crash_logger_desc),

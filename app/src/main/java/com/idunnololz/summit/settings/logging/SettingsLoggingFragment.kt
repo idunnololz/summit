@@ -18,7 +18,7 @@ class SettingsLoggingFragment : BaseSettingsFragment() {
 
   private val enableLogCrashesDialogLauncher = newAlertDialogLauncher("enable_log_crashes") {
     if (it.isOk) {
-      preferences.useFirebase = true
+      preferences.useCrashLogger = true
       ProcessPhoenix.triggerRebirth(requireContext())
     } else {
       refresh()
@@ -26,7 +26,7 @@ class SettingsLoggingFragment : BaseSettingsFragment() {
   }
   private val disableLogCrashesDialogLauncher = newAlertDialogLauncher("disable_log_crashes") {
     if (it.isOk) {
-      preferences.useFirebase = false
+      preferences.useCrashLogger = false
       ProcessPhoenix.triggerRebirth(requireContext())
     } else {
       refresh()
@@ -34,8 +34,8 @@ class SettingsLoggingFragment : BaseSettingsFragment() {
   }
 
   override fun generateData(): List<SettingModelItem> = listOf(
-    settings.useFirebase.asOnOffSwitch(
-      { preferences.useFirebase },
+    settings.useCrashLogger.asOnOffSwitch(
+      { preferences.useCrashLogger },
       {
         if (it) {
           enableLogCrashesDialogLauncher

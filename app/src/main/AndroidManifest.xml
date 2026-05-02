@@ -260,13 +260,13 @@
 
         <provider
             android:name="com.idunnololz.summit.search.SuggestionProvider"
-            android:authorities="com.idunnololz.summit.search.SuggestionProvider"
+            android:authorities="${applicationId}.search.SuggestionProvider"
             android:exported="false"
             android:enabled="true" />
 
         <provider
             android:name="com.idunnololz.summit.SummitFileProvider"
-            android:authorities="com.idunnololz.summit.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data

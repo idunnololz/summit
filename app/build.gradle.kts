@@ -30,6 +30,7 @@ android {
       "SUMMIT_JWT",
       "\"${gradleLocalProperties(rootDir, providers).getProperty("summit.jwt")}\"",
     )
+    buildConfigField("String", "TARGET", "\"default\"")
   }
   buildTypes {
     release {
@@ -50,6 +51,20 @@ android {
 //        getDefaultProguardFile("proguard-android-optimize.txt"),
 //        "proguard-rules.pro",
 //      )
+    }
+  }
+  flavorDimensions += "target"
+  productFlavors {
+    create("default") {
+      isDefault = true
+      dimension = "target"
+    }
+    create("fdroid") {
+      dimension = "target"
+      applicationIdSuffix = ".fdroid"
+      versionNameSuffix = "-fdroid"
+
+      buildConfigField("String", "TARGET", "\"fdroid\"")
     }
   }
 

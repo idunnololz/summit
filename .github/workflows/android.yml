@@ -1,18 +1,17 @@
-name: Build release APK
+name: Build release APK for default
 
 on:
   push:
     tags:
-      - "v*.*.*"
-      - "!v*.*.*-fd"
+      - "v[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  apk:
-    name: Generate release APK
+  apk-default:
+    name: Generate release APK for GitHub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +25,7 @@ jobs:
       - name: chmod gradlew
         run: chmod +x gradlew
       - name: Build APK
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleDefaultRelease --stacktrace
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
@@ -62,3 +61,44 @@ jobs:
           repository: idunnololz/summit-for-lemmy
           token: ${{ secrets.GH_TOKEN }}
           files: release.apk
+
+  create-fdroid-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract version
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}        # v1.0.0
+          VERSION=${TAG#v}                     # 1.0.0
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "branch=release-${VERSION}-fdroid" >> $GITHUB_OUTPUT
+          echo "fdroid_tag=${TAG}-fd" >> $GITHUB_OUTPUT
+
+      - name: Create branch
+        run: |
+          git checkout -b ${{ steps.version.outputs.branch }}
+
+      - name: Create empty commit
+        run: |
+          git commit --allow-empty -m "chore: F-Droid release ${{ steps.version.outputs.fdroid_tag }}"
+
+      - name: Create F-Droid tag
+        run: |
+          git tag -a ${{ steps.version.outputs.fdroid_tag }} -m "F-Droid Release ${{ steps.version.outputs.fdroid_tag }}"
+
+      - name: Push branch and tag
+        run: |
+          git push origin ${{ steps.version.outputs.branch }}
+          git push origin ${{ steps.version.outputs.fdroid_tag }}

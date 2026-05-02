@@ -9,6 +9,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -197,6 +198,7 @@ import com.idunnololz.summit.util.ext.base
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getJsonValue
 import com.idunnololz.summit.util.ext.putJsonValue
+import com.idunnololz.summit.util.isFdroidBuild
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -480,8 +482,8 @@ class Preferences(
   var screenshotWatermark: Int
     by intPreference(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.LEMMY)
 
-  var useFirebase: Boolean
-    by booleanPreference(KEY_USE_FIREBASE, true)
+  var useCrashLogger: Boolean
+    by booleanPreference(KEY_USE_FIREBASE, !isFdroidBuild)
 
   var autoCollapseCommentThreshold: Float
     by floatPreference(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD, 0.3f)

@@ -142,7 +142,7 @@ class MainApplication :
     hiltEntryPoint.conversationsManager().init()
     hiltEntryPoint.communityTracker().init()
 
-    if (preferences.useFirebase) {
+    if (preferences.useCrashLogger) {
       SentryAndroid.init(this) { options ->
         options.dsn =
           "https://decaf7c0aa19b1c009de539fb95ad4a4@o4509018554630144.ingest.us.sentry.io/4509018556465152"
