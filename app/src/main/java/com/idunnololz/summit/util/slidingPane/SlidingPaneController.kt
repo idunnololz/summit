@@ -25,30 +25,64 @@ import com.idunnololz.summit.lemmy.post.PostTabbedFragmentArgs
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.FixedSlidingPaneLayout
+import dagger.Component
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SlidingPaneController(
-  private val fragment: BaseFragment<*>,
-  private val slidingPaneLayout: FixedSlidingPaneLayout,
-  private val childFragmentManager: FragmentManager,
-  private val viewModel: PostViewPagerViewModel,
-  private val globalLayoutMode: GlobalLayoutMode,
+class SlidingPaneController @AssistedInject constructor(
+  private val animationsHelper: AnimationsHelper,
+  @Assisted private val fragment: BaseFragment<*>,
+  @Assisted private val slidingPaneLayout: FixedSlidingPaneLayout,
+  @Assisted private val childFragmentManager: FragmentManager,
+  @Assisted private val viewModel: PostViewPagerViewModel,
+  @Assisted private val globalLayoutMode: GlobalLayoutMode,
   /**
    * Used for tablets. The message is shown on the side pane when nothing is selected.
    */
-  private val emptyScreenText: String,
-  @IdRes private val fragmentContainerId: Int,
+  @Assisted private val emptyScreenText: String,
+  @Assisted("fragmentContainerId") @IdRes private val fragmentContainerId: Int,
+  @Assisted("retainClosedPosts")
   private val retainClosedPosts: Boolean = false,
+  @Assisted("useSwipeBetweenPosts")
   private val useSwipeBetweenPosts: Boolean = false,
+  @Assisted("isPreview")
   private val isPreview: Boolean = false,
 ) {
+
+  @AssistedFactory
+  interface Factory {
+    fun create(
+      fragment: BaseFragment<*>,
+      slidingPaneLayout: FixedSlidingPaneLayout,
+      childFragmentManager: FragmentManager,
+      viewModel: PostViewPagerViewModel,
+      globalLayoutMode: GlobalLayoutMode,
+      /**
+       * Used for tablets. The message is shown on the side pane when nothing is selected.
+       */
+      emptyScreenText: String,
+
+      @Assisted("fragmentContainerId")
+      @IdRes fragmentContainerId: Int,
+
+      @Assisted("retainClosedPosts")
+      retainClosedPosts: Boolean = false,
+      @Assisted("useSwipeBetweenPosts")
+      useSwipeBetweenPosts: Boolean = false,
+      @Assisted("isPreview")
+      isPreview: Boolean = false,
+    ): SlidingPaneController
+  }
 
   interface PostViewPagerViewModel {
     val postReadManager: PostReadManager
@@ -318,8 +352,10 @@ class SlidingPaneController(
 
       openPane()
 
-      withContext(Dispatchers.IO) {
-        delay(250)
+      if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Navigation)) {
+        withContext(Dispatchers.IO) {
+          delay(250)
+        }
       }
       activeOpenPostJob = null
     }
@@ -334,8 +370,10 @@ class SlidingPaneController(
     activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
       closePane()
 
-      withContext(Dispatchers.IO) {
-        delay(250)
+      if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Navigation)) {
+        withContext(Dispatchers.IO) {
+          delay(250)
+        }
       }
       activeClosePostJob = null
     }
@@ -346,14 +384,22 @@ class SlidingPaneController(
   }
 
   private fun openPane() {
-    slidingPaneLayout.openPane()
+    if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Navigation)) {
+      slidingPaneLayout.openPane()
+    } else {
+      slidingPaneLayout.openPaneNoAnimation()
+    }
     if (!slidingPaneLayout.isSlideable) {
       _panelSlideListener.onPanelOpened(slidingPaneLayout)
     }
   }
 
   private fun closePane() {
-    slidingPaneLayout.closePane()
+    if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Navigation)) {
+      slidingPaneLayout.closePane()
+    } else {
+      slidingPaneLayout.closePaneNoAnimation()
+    }
     if (!slidingPaneLayout.isSlideable) {
       _panelSlideListener.onPanelClosed(slidingPaneLayout)
     }

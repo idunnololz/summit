@@ -192,6 +192,9 @@ class CommunityFragment :
   @Inject
   lateinit var tracker: LocalTracker
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   lateinit var preferences: Preferences
 
   override var slidingPaneController: SlidingPaneController? = null
@@ -774,7 +777,7 @@ class CommunityFragment :
       requireActivity().onBackPressedDispatcher
         .addCallback(viewLifecycleOwner, onBackPressedHandler)
 
-      slidingPaneController = SlidingPaneController(
+      slidingPaneController = slidingPaneControllerFactory.create(
         fragment = this@CommunityFragment,
         slidingPaneLayout = slidingPaneLayout,
         childFragmentManager = childFragmentManager,

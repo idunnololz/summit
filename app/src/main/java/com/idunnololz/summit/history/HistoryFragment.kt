@@ -76,6 +76,9 @@ class HistoryFragment :
   @Inject
   lateinit var postReadManager: PostReadManager
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   override var slidingPaneController: SlidingPaneController? = null
 
   private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
@@ -246,7 +249,7 @@ class HistoryFragment :
         viewModel.loadHistory(force = true)
       }
 
-      slidingPaneController = SlidingPaneController(
+      slidingPaneController = slidingPaneControllerFactory.create(
         fragment = this@HistoryFragment,
         slidingPaneLayout = slidingPaneLayout,
         childFragmentManager = childFragmentManager,

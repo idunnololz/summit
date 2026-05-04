@@ -110,6 +110,9 @@ class PersonTabbedFragment :
   @Inject
   lateinit var userTagsManager: UserTagsManager
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   val viewModel: PersonTabbedViewModel by viewModels()
   var slidingPaneController: SlidingPaneController? = null
 
@@ -255,7 +258,7 @@ class PersonTabbedFragment :
       }
       binding.fab.setup(preferences)
 
-      slidingPaneController = SlidingPaneController(
+      slidingPaneController = slidingPaneControllerFactory.create(
         fragment = this@PersonTabbedFragment,
         slidingPaneLayout = binding.slidingPaneLayout,
         childFragmentManager = childFragmentManager,

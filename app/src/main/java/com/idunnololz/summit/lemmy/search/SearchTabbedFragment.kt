@@ -91,6 +91,9 @@ class SearchTabbedFragment :
   @Inject
   lateinit var siteBackendHelper: SiteBackendHelper
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   private var isOnViewCreatedCalled = false
 
   private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
@@ -306,7 +309,7 @@ class SearchTabbedFragment :
         },
       )
 
-      slidingPaneController = SlidingPaneController(
+      slidingPaneController = slidingPaneControllerFactory.create(
         fragment = this@SearchTabbedFragment,
         slidingPaneLayout = binding.slidingPaneLayout,
         childFragmentManager = childFragmentManager,

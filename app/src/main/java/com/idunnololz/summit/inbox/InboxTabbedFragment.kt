@@ -56,6 +56,9 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
   @Inject
   lateinit var preferences: Preferences
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   private var argsHandled: Boolean = false
 
   private val onNavigationItemReselectedListener =
@@ -106,7 +109,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
       pagerAdapter.setPages(it)
     }
 
-    val slidingPaneController = SlidingPaneController(
+    val slidingPaneController = slidingPaneControllerFactory.create(
       fragment = this,
       slidingPaneLayout = binding.slidingPaneLayout,
       childFragmentManager = childFragmentManager,

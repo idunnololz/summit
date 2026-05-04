@@ -51,6 +51,9 @@ class FilteredPostsAndCommentsTabbedFragment :
   @Inject
   lateinit var preferences: Preferences
 
+  @Inject
+  lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -113,7 +116,7 @@ class FilteredPostsAndCommentsTabbedFragment :
         binding.viewPager.adapter as ViewPagerAdapter,
       ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
 
-      slidingPaneController = SlidingPaneController(
+      slidingPaneController = slidingPaneControllerFactory.create(
         fragment = this@FilteredPostsAndCommentsTabbedFragment,
         slidingPaneLayout = slidingPaneLayout,
         childFragmentManager = childFragmentManager,
