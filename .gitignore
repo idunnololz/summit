@@ -24,3 +24,6 @@
 sentry.properties
 /.kotlin
 patreon.properties
+
+# where the default APK/AAB is saved
+/app/default
