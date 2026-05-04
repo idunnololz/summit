@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -94,6 +95,7 @@ class PostTabbedFragment :
     val pagerAdapter = PostAdapter(
       this,
     ).apply {
+      // saveEnabled is false so this doesn't do anything!!!
       stateRestorationPolicy =
         RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
@@ -175,8 +177,12 @@ class PostTabbedFragment :
             if (!restoreHandled) {
               restoreHandled = true
               viewPager.setCurrentItem(viewModel.currentPageIndex, false)
+            } else if (argumentsHandled) {
+              // this means the user navigated to another page and came back
+              // we disable save on the view so we have to handle this manually
+              viewPager.setCurrentItem(viewModel.currentPageIndex, false)
             } else if (position > 0) {
-              // Guard again activity recreate, don't scroll if this is an activity recreate
+              // Guard against activity recreate, don't scroll if this is an activity recreate
               viewPager.runPredrawDiscardingFrame {
                 viewPager.setCurrentItem(position, true)
               }

@@ -205,7 +205,7 @@ class SlidingPaneController(
       val lastPostFragment = lastPostFragment
 
       if (lastPostFragment != null) {
-        val args = PostFragmentArgs.Companion.fromBundle(requireNotNull(lastPostFragment.arguments))
+        val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
 
         if (id == args.id) {
           openPostInternal(

@@ -8,6 +8,7 @@ include(":thirdPartyModules:markwon:markwon-ext-tables")
 include(":thirdPartyModules:markwon:markwon-linkify")
 include(":thirdPartyModules:markwon:markwon-simple-ext")
 include(":thirdPartyModules:zoomLayout")
+include(":tools")
 
 rootProject.name = "summit"
 
@@ -18,7 +19,3 @@ pluginManagement {
     mavenCentral()
   }
 }
-plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
-include(":tools")
