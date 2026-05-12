@@ -19,3 +19,12 @@ val SearchHomeConfig.anySectionsEnabled
     showTrendingCommunitySuggestions ||
     showRisingCommunitySuggestions ||
     showRandomCommunitySuggestions
+
+/**
+ * True if any section that requires data from the Summit server is enabled.
+ */
+val SearchHomeConfig.anyServerBasedSectionsEnabled
+  get() = showTopCommunity7DaysSuggestions ||
+    showTrendingCommunitySuggestions ||
+    showRisingCommunitySuggestions ||
+    showRandomCommunitySuggestions

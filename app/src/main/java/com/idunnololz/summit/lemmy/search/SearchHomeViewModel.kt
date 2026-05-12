@@ -25,6 +25,8 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.PersonFilter
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.anyServerBasedSectionsEnabled
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.getStringOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,6 +47,7 @@ class SearchHomeViewModel @Inject constructor(
   private val summitServerClient: SummitServerClient,
   private val apiClient: AccountAwareLemmyClient,
   private val savedStateHandle: SavedStateHandle,
+  private val preferences: Preferences,
 ) : ViewModel() {
 
   companion object {
@@ -229,28 +232,30 @@ class SearchHomeViewModel @Inject constructor(
         )
       }
 
-      val communitySessions = summitServerClient.communitySuggestions(seed, force)
+      if (preferences.searchHomeConfig.anyServerBasedSectionsEnabled) {
+        val communitySessions = summitServerClient.communitySuggestions(seed, force)
 
-      communitySessions
-        .onFailure {
-          errors.add(it)
+        communitySessions
+          .onFailure {
+            errors.add(it)
+          }
+
+        withContext(Dispatchers.Main) {
+          model.setValue(
+            SearchHomeModel(
+              suggestions = searchSuggestions.take(4),
+              myCommunities = subscriptionCommunities.map {
+                MyCommunity(
+                  it.toCommunityRef(),
+                  it,
+                )
+              },
+              communitySuggestionsDto = communitySessions.getOrNull(),
+              isCommunitySuggestionsLoading = false,
+              errors = errors,
+            ),
+          )
         }
-
-      withContext(Dispatchers.Main) {
-        model.setValue(
-          SearchHomeModel(
-            suggestions = searchSuggestions.take(4),
-            myCommunities = subscriptionCommunities.map {
-              MyCommunity(
-                it.toCommunityRef(),
-                it,
-              )
-            },
-            communitySuggestionsDto = communitySessions.getOrNull(),
-            isCommunitySuggestionsLoading = false,
-            errors = errors,
-          ),
-        )
       }
     }
   }
