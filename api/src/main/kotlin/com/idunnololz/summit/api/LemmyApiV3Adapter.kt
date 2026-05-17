@@ -40,6 +40,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FederatedInstances
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetComments
@@ -739,6 +740,15 @@ class LemmyApiV3Adapter(
       generateHeaders(authorization, force),
       args.serializeToMap(),
     )
+  }
+
+  override suspend fun federatedInstances(
+    authorization: String?,
+    force: Boolean,
+  ): Result<FederatedInstances> = retrofitErrorHandler {
+    api.federatedInstances(generateHeaders(authorization, force))
+  }.map {
+    it.federated_instances ?: FederatedInstances(listOf(), listOf(), listOf())
   }
 
   override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =

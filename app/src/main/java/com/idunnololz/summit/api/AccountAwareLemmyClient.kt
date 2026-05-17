@@ -1147,6 +1147,12 @@ class AccountAwareLemmyClient @Inject constructor(
     createAccountErrorResult()
   }
 
+  suspend fun federatedInstances(force: Boolean, account: Account? = accountForInstance()) =
+    apiClient.federatedInstances(
+      account = account,
+      force = force,
+    )
+
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 
   fun defaultInstance() {

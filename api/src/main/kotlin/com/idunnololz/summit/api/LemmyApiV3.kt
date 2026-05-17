@@ -38,6 +38,7 @@ import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetFederatedInstancesResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
@@ -668,6 +669,11 @@ interface LemmyApiV3 {
 
 //  @DELETE("account")
 //  fun deleteAccount()
+
+  @GET("federated_instances")
+  fun federatedInstances(
+    @HeaderMap headers: Map<String, String>,
+  ): Call<GetFederatedInstancesResponse>
 
   @GET
   fun deleteMedia(@Url url: String, @HeaderMap headers: Map<String, String>): Call<Unit>

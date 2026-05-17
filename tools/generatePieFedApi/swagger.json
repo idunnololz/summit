@@ -560,7 +560,11 @@
               "TopAll",
               "Scaled",
               "Old",
-              "Relevance"
+              "Relevance",
+              "TopPosts",
+              "TopSubscribers",
+              "NewFederated",
+              "OldFederated"
             ]
           },
           "email_unread": {
@@ -1303,6 +1307,7 @@
           }
         },
         "required": [
+          "end",
           "start"
         ]
       },
@@ -4260,6 +4265,9 @@
           "creator_is_moderator": {
             "type": "boolean"
           },
+          "distinguished": {
+            "type": "boolean"
+          },
           "my_vote": {
             "type": "integer"
           },
@@ -4546,6 +4554,14 @@
               "Old",
               "Scaled"
             ]
+          },
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 255,
+            "description": "Pass a null value to remove the display name"
           },
           "email_unread": {
             "type": "boolean",
@@ -4910,6 +4926,82 @@
           "person_id"
         ]
       },
+      "UserRegistrationRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "password_verify": {
+            "type": "string"
+          },
+          "show_nsfw": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string"
+          },
+          "captcha_uuid": {
+            "type": "string"
+          },
+          "captcha_answer": {
+            "type": "string"
+          },
+          "honeypot": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "password_verify",
+          "username"
+        ]
+      },
+      "UserRegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "jwt": {
+            "type": "string"
+          },
+          "registration_created": {
+            "type": "boolean"
+          },
+          "verify_email_sent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CaptchaFields": {
+        "type": "object",
+        "properties": {
+          "png": {
+            "type": "string"
+          },
+          "wav": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "FetchCaptchaResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CaptchaFields"
+            }
+          }
+        }
+      },
       "ListCommentsResponse": {
         "type": "object",
         "properties": {
@@ -5094,7 +5186,12 @@
             "type": "string"
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "description": "Categories of report selected by the reporter"
+          },
+          "description": {
+            "type": "string",
+            "description": "Any additional information provided by the reporter"
           },
           "resolved": {
             "type": "boolean"
@@ -5207,6 +5304,26 @@
           "comment_report_view"
         ]
       },
+      "GetCommentReportListResponse": {
+        "type": "object",
+        "properties": {
+          "comment_reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentReportView"
+            }
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "comment_reports"
+        ]
+      },
       "RemoveCommentRequest": {
         "type": "object",
         "properties": {
@@ -5264,6 +5381,21 @@
         "required": [
           "answer",
           "comment_reply_id"
+        ]
+      },
+      "MarkCommentAsDistinguishedRequest": {
+        "type": "object",
+        "properties": {
+          "comment_reply_id": {
+            "type": "integer"
+          },
+          "distinguished": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "comment_reply_id",
+          "distinguished"
         ]
       },
       "LockCommentRequest": {
@@ -6722,7 +6854,7 @@
           {
             "in": "query",
             "name": "listing_type",
-            "description": "Only some types are supported for each `type_`.\n\nFor `Comments` and `Communities`, `Popular` will return the same results as `All`.\n\nFor `Users`, only `Local` will differ from `All`.\n\nAll listing types supported for `Posts` and `Url` (simply an alias for `Posts`).",
+            "description": "Only some types are supported for each `type_`.\n\n- `Comments` and `Communities`: `Popular` will return the same results as `All`.\n- `Users`: only `Local` will differ from `All`.\n- `Posts` and `Url`: These types are equivalent.",
             "schema": {
               "type": "string",
               "enum": [
@@ -6747,7 +6879,7 @@
           {
             "in": "query",
             "name": "sort",
-            "description": "Only some sorting options supported for each `type_`.\n\nFor `Comments`, `Scaled` is not supported and `Hot` will be returned instead.\n\nFor `Communities`, all `Top` sorts are equivalent. The `New` and `Old` sorts are supported. And all others are equivalent to `Active`.\n\nFor `Users`, only `New` and `Top` (by number of posts) are supported. Otherwise will be sorted by user id.\n\nAll sorting methods supported for `Posts`. `Url` is simply an alias for `Posts`.",
+            "description": "Only some sorting options supported for each `type_`. `NewFederated` and `OldFederated` are equivalent to `New` and `Old` respectively for each type except for `Communities`.\n\n- `Comments`: `Scaled` is not supported and `Hot` will be returned instead.\n- `Communities`: `Top` sorts that are not present in `/community/list` are equivalent to `Top`.\n- `Users`: only `New`, `Old`, and `Top` (by number of posts, all `Top` sorts are equivalent) are supported. Otherwise will be sorted by user id.\n- `Posts` and `Url`: These types are equivalent. `TopPosts` and `TopSubscribers` are equivalent to `Top`.",
             "schema": {
               "type": "string",
               "enum": [
@@ -6768,7 +6900,11 @@
                 "TopAll",
                 "Scaled",
                 "Old",
-                "Relevance"
+                "Relevance",
+                "TopPosts",
+                "TopSubscribers",
+                "NewFederated",
+                "OldFederated"
               ]
             },
             "required": false
@@ -8300,7 +8436,11 @@
                 "TopAll",
                 "Scaled",
                 "Old",
-                "Relevance"
+                "Relevance",
+                "TopPosts",
+                "TopSubscribers",
+                "NewFederated",
+                "OldFederated"
               ]
             },
             "required": false
@@ -9269,6 +9409,79 @@
         "summary": "Unban a user"
       }
     },
+    "/api/alpha/api/alpha/user/register": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegistrationResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistrationRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "summary": "Register a new user"
+      }
+    },
+    "/api/alpha/api/alpha/user/get_captcha": {
+      "get": {
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchCaptchaResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "summary": "Fetch a Captcha"
+      }
+    },
     "/api/alpha/comment/list": {
       "get": {
         "parameters": [
@@ -9303,6 +9516,23 @@
                 "New",
                 "Old",
                 "Controversial"
+              ]
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type_",
+            "schema": {
+              "type": "string",
+              "default": "All",
+              "enum": [
+                "All",
+                "Local",
+                "Subscribed",
+                "Popular",
+                "Moderating",
+                "ModeratorView"
               ]
             },
             "required": false
@@ -9754,6 +9984,86 @@
         "summary": "Report a comment."
       }
     },
+    "/api/alpha/comment/report/list": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "comment_id",
+            "description": "Get the reports for a single comment",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "community_id",
+            "description": "Limit reports to within a single community",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "unresolved_only",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCommentReportListResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Get list of comment reports."
+      }
+    },
     "/api/alpha/comment/remove": {
       "post": {
         "responses": {
@@ -9881,6 +10191,49 @@
           "Comment"
         ],
         "summary": "Mark a comment as the preferred answer to a question."
+      }
+    },
+    "/api/alpha/comment/distinguish": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCommentResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkCommentAsDistinguishedRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Distinguish your comment as a moderator comment"
       }
     },
     "/api/alpha/comment/lock": {
@@ -10070,6 +10423,20 @@
           },
           {
             "in": "query",
+            "name": "nsfw",
+            "schema": {
+              "type": "string",
+              "default": "Include",
+              "enum": [
+                "Exclude",
+                "Only",
+                "Include"
+              ]
+            },
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "person_id",
             "schema": {
               "type": "integer"
@@ -10239,6 +10606,20 @@
             "schema": {
               "type": "boolean",
               "default": false
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "nsfw",
+            "schema": {
+              "type": "string",
+              "default": "Include",
+              "enum": [
+                "Exclude",
+                "Only",
+                "Include"
+              ]
             },
             "required": false
           },

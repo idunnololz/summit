@@ -50,6 +50,7 @@ import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFr
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
@@ -395,6 +396,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     viewModel.onCommunityChanged(args.communityRef)
 
+    installOnActionResultHandler(
+      context = context,
+      moreActionsHelper = moreActionsHelper,
+      snackbarContainer = binding.coordinatorLayout,
+    )
+
     if (savedInstanceState == null && !wasLoadedBefore) {
       wasLoadedBefore = true
     }
@@ -686,10 +693,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             Utils.shareLink(context, url)
           }
           R.id.block_instance -> {
-            moreActionsHelper.blockInstance(requireNotNull(siteView.site.instance_id), true)
+            moreActionsHelper.blockInstance(siteView.site.instance, true)
           }
           R.id.unblock_instance -> {
-            moreActionsHelper.blockInstance(requireNotNull(siteView.site.instance_id), false)
+            moreActionsHelper.blockInstance(siteView.site.instance, false)
           }
           R.id.view_mod_log -> {
             val directions = CommunityInfoFragmentDirections

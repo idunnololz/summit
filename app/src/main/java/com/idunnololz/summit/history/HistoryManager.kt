@@ -1,6 +1,7 @@
 package com.idunnololz.summit.history
 
 import android.util.Log
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -20,6 +21,7 @@ import kotlinx.serialization.json.Json
 @Singleton
 class HistoryManager @Inject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val accountManager: AccountManager,
   private val historyDao: HistoryDao,
   private val apiClient: AccountAwareLemmyClient,
   private val preferences: Preferences,
@@ -70,6 +72,7 @@ class HistoryManager @Inject constructor(
         val ts = System.currentTimeMillis()
         val newEntry = HistoryEntry(
           id = 0,
+          userId = accountManager.currentAccount.value.id,
           type = HistoryEntry.TYPE_PAGE_VISIT,
           reason = saveReason,
           url = jsonUrl,
@@ -103,6 +106,7 @@ class HistoryManager @Inject constructor(
         val ts = System.currentTimeMillis()
         val historyEntry = HistoryEntry(
           id = 0,
+          userId = accountManager.currentAccount.value.id,
           type = HistoryEntry.TYPE_COMMUNITY_STATE,
           reason = saveReason,
           url = state.toUrl(apiClient.instance),

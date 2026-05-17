@@ -123,6 +123,20 @@ class MainApplication :
             ),
           )
           add(AvifDecoder.Factory(preferences))
+
+          // below code can be used to test image load lag
+//          add(
+//            OkHttpNetworkFetcherFactory(
+//              callFactory = {
+//                OkHttpClient.Builder()
+//                  .addInterceptor { chain ->
+//                    Thread.sleep(1000)
+//                    chain.proceed(chain.request())
+//                  }
+//                  .build()
+//              }
+//            )
+//          )
         }
         .apply {
           if (BuildConfig.DEBUG) {
@@ -141,6 +155,7 @@ class MainApplication :
     hiltEntryPoint.accountInfoManager().init()
     hiltEntryPoint.conversationsManager().init()
     hiltEntryPoint.communityTracker().init()
+    hiltEntryPoint.personTracker().init()
 
     if (preferences.useCrashLogger) {
       SentryAndroid.init(this) { options ->

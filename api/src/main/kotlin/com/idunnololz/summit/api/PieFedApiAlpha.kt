@@ -29,7 +29,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
-import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
@@ -62,9 +61,11 @@ import com.idunnololz.summit.api.dto.piefed.models.CreateCommentRequest
 import com.idunnololz.summit.api.dto.piefed.models.CreatePostRequest
 import com.idunnololz.summit.api.dto.piefed.models.EditCommentRequest
 import com.idunnololz.summit.api.dto.piefed.models.EditPostRequest
+import com.idunnololz.summit.api.dto.piefed.models.GetCommentReportListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetCommentReportResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetCommentResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetFederatedInstancesResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetModLogResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetPostResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetRegistrationListResponse
@@ -403,7 +404,7 @@ interface PieFedApiAlpha {
   fun getCommentReports(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<ListCommentReportsResponse>
+  ): Call<GetCommentReportListResponse>
 
 //  @PUT("comment/report/resolve")
 //  fun resolveCommentReport(
@@ -678,6 +679,11 @@ interface PieFedApiAlpha {
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
   ): Call<ListMediaResponse>
+
+  @GET("federated_instances")
+  fun federatedInstances(
+    @HeaderMap headers: Map<String, String>,
+  ): Call<GetFederatedInstancesResponse>
 
   // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
 }

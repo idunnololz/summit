@@ -12,9 +12,11 @@ import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.inbox.db.InboxEntriesDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.PerAccountDuplicatePostsDao
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.community.CommunityTrackerDao
+import com.idunnololz.summit.localTracking.person.PersonTrackerDao
 import com.idunnololz.summit.templates.db.TemplatesDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
@@ -84,6 +86,13 @@ class DatabaseModule {
 
   @Provides
   fun provideCommunityTrackerDao(db: MainDatabase): CommunityTrackerDao = db.communityTrackerDao()
+
+  @Provides
+  fun providePersonTrackerDao(db: MainDatabase): PersonTrackerDao = db.personTrackerDao()
+
+  @Provides
+  fun providePerAccountDuplicatePostsDao(db: MainDatabase): PerAccountDuplicatePostsDao =
+    db.perAccountDuplicatePostsDao()
 
   @Provides
   @Singleton

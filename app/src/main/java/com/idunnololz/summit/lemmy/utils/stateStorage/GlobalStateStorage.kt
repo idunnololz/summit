@@ -22,4 +22,7 @@ class GlobalStateStorage(
 
   var migratedTrackingDataToCommunityData: Boolean
     by booleanPreference("MIGRATED_TRACKING_DATA_TO_COMMUNITY_DATA")
+
+  var migratedTrackingDataToPersonData: Boolean
+    by booleanPreference("MIGRATED_TRACKING_DATA_TO_PERSON_DATA")
 }

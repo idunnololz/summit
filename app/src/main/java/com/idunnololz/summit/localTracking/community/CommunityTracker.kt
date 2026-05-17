@@ -7,8 +7,9 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
+import com.idunnololz.summit.localTracking.DerivedTracker
 import com.idunnololz.summit.localTracking.LocalTracker
-import com.idunnololz.summit.localTracking.OnTrackingEventListener
+import com.idunnololz.summit.localTracking.SimpleOnTrackingEventListener
 import com.idunnololz.summit.localTracking.TrackedAction
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +23,7 @@ class CommunityTracker @Inject constructor(
   private val communityTrackerDao: CommunityTrackerDao,
   private val globalStateStorage: GlobalStateStorage,
   private val accountAwareLemmyClient: AccountAwareLemmyClient,
-) {
+) : DerivedTracker {
 
   companion object {
     private const val TAG = "CommunityTracker"
@@ -33,7 +34,7 @@ class CommunityTracker @Inject constructor(
 
   private val coroutineScope = coroutineScopeFactory.create()
 
-  fun init() {
+  override fun init() {
     if (!globalStateStorage.migratedTrackingDataToCommunityData) {
       coroutineScope.launch {
         globalStateStorage.migratedTrackingDataToCommunityData = true
@@ -48,7 +49,7 @@ class CommunityTracker @Inject constructor(
       }
     }
 
-    localTracker.registerOnTrackingEventListener(object : OnTrackingEventListener {
+    localTracker.registerOnTrackingEventListener(object : SimpleOnTrackingEventListener() {
       override fun onDeleteAll() {
         coroutineScope.launch {
           communityTrackerDao.deleteAll()

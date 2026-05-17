@@ -22,6 +22,6 @@ pluginManagement {
 
 // Uncomment this to install JAVA dependencies easily. Can't commit uncommented because FDroid
 // throws a fit.
-//plugins {
+// plugins {
 //  id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
-//}
+// }

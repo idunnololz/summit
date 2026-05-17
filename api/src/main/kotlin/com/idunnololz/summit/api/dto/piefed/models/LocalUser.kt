@@ -257,7 +257,7 @@ data class LocalUser(
   /**
    *
    *
-   * Values: Active,Hot,New,Top,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled,Old,Relevance
+   * Values: Active,Hot,New,Top,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled,Old,Relevance,TopPosts,TopSubscribers,NewFederated,OldFederated
    */
   enum class DefaultSortType(
     val value: kotlin.String,
@@ -315,6 +315,18 @@ data class LocalUser(
 
     @SerializedName(value = "Relevance")
     Relevance("Relevance"),
+
+    @SerializedName(value = "TopPosts")
+    TopPosts("TopPosts"),
+
+    @SerializedName(value = "TopSubscribers")
+    TopSubscribers("TopSubscribers"),
+
+    @SerializedName(value = "NewFederated")
+    NewFederated("NewFederated"),
+
+    @SerializedName(value = "OldFederated")
+    OldFederated("OldFederated"),
   }
 
   /**

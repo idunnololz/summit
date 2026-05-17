@@ -1,5 +1,6 @@
 package com.idunnololz.summit.history
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
@@ -8,6 +9,7 @@ import androidx.room.TypeConverter
 data class HistoryEntry(
   @PrimaryKey(autoGenerate = true)
   val id: Long,
+  @ColumnInfo(name = "user_id", defaultValue = "0") val userId: Long,
   val type: Int,
   val reason: HistorySaveReason,
   val url: String,

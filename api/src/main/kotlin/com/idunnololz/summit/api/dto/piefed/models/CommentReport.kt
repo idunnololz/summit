@@ -26,7 +26,8 @@ import com.google.gson.annotations.SerializedName
  * @param resolved
  * @param published
  * @param originalCommentText
- * @param reason
+ * @param reason Categories of report selected by the reporter
+ * @param description Any additional information provided by the reporter
  * @param updated
  */
 
@@ -50,8 +51,13 @@ data class CommentReport(
   @SerializedName("original_comment_text")
   val originalCommentText: kotlin.String? = null,
 
+  /* Categories of report selected by the reporter */
   @SerializedName("reason")
   val reason: kotlin.String? = null,
+
+  /* Any additional information provided by the reporter */
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
   @SerializedName("updated")
   val updated: kotlin.String? = null,

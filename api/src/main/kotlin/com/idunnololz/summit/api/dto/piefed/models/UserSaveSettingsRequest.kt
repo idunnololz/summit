@@ -30,6 +30,7 @@ import com.idunnololz.summit.api.dto.piefed.models.NewUserExtraField
  * @param cover Pass a null value to remove the image
  * @param defaultCommentSortType
  * @param defaultSortType
+ * @param displayName Pass a null value to remove the display name
  * @param emailUnread Receive email about missed notifications (if set up by local admin)
  * @param extraFields A user can't have more than four total extra fields.
  * @param federateVotes If false, votes are only counted on local instance instead of federated remotely
@@ -82,6 +83,10 @@ data class UserSaveSettingsRequest(
 
   @SerializedName("default_sort_type")
   val defaultSortType: UserSaveSettingsRequest.DefaultSortType? = null,
+
+  /* Pass a null value to remove the display name */
+  @SerializedName("display_name")
+  val displayName: kotlin.String? = null,
 
   /* Receive email about missed notifications (if set up by local admin) */
   @SerializedName("email_unread")

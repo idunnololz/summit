@@ -40,6 +40,7 @@ import com.idunnololz.summit.api.dto.piefed.models.Post
  * @param post
  * @param recipient
  * @param saved
+ * @param distinguished
  * @param subscribed
  */
 
@@ -86,6 +87,9 @@ data class CommentReplyView(
 
   @SerializedName("saved")
   val saved: kotlin.Boolean,
+
+  @SerializedName("distinguished")
+  val distinguished: kotlin.Boolean? = null,
 
   @SerializedName("subscribed")
   val subscribed: CommentReplyView.Subscribed? = null,

@@ -12,6 +12,7 @@ import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.CouldntFindObjectError
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityId
@@ -224,6 +225,44 @@ class MoreActionsHelper(
     }
   }
 
+  fun blockInstance(instance: String, block: Boolean = true) {
+    blockInstanceResult.setIsLoading()
+    coroutineScope.launch {
+      val instanceDataResult = ensureRightInstance(apiClient) {
+        apiClient.federatedInstances(force = false)
+      }
+        .map {
+          it.linked.firstOrNull { it.domain == instance }
+            ?: it.allowed.firstOrNull { it.domain == instance }
+            ?: it.blocked.firstOrNull { it.domain == instance }
+        }
+
+      instanceDataResult.exceptionOrNull()?.let {
+        blockInstanceResult.postErrorAndClear(it)
+        return@launch
+      }
+
+      val instanceData = instanceDataResult.getOrNull()
+      if (instanceData == null) {
+        blockInstanceResult.postErrorAndClear(CouldntFindObjectError())
+        return@launch
+      }
+
+      ensureRightInstance(apiClient) { apiClient.blockInstance(instanceData.id, block) }
+        .onSuccess {
+          blockInstanceResult.postValueAndClear(
+            BlockInstanceResult(
+              blocked = block,
+              instanceId = instanceData.id,
+            ),
+          )
+        }
+        .onFailure {
+          blockInstanceResult.postErrorAndClear(it)
+        }
+    }
+  }
+
   fun blockInstance(id: InstanceId, block: Boolean = true) {
     blockInstanceResult.setIsLoading()
     coroutineScope.launch {
@@ -387,6 +426,8 @@ class MoreActionsHelper(
       )
       if (read) {
         duplicatePostsDetector.addReadOrHiddenPost(postView)
+      } else {
+        duplicatePostsDetector.removeReadOrHiddenPost(postView)
       }
     }
   }
@@ -405,6 +446,8 @@ class MoreActionsHelper(
       )
       if (newRead) {
         duplicatePostsDetector.addReadOrHiddenPost(postView)
+      } else {
+        duplicatePostsDetector.removeReadOrHiddenPost(postView)
       }
     }
   }

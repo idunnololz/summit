@@ -135,6 +135,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_B
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NAVIGATION_BAR_ON_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PER_USER_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PROFILE_ICONS
@@ -2218,6 +2219,11 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.generate_missing_video_thumbnails),
     description = context.getString(R.string.generate_missing_video_thumbnails_desc),
     relatedKeys = listOf(KEY_GENERATE_MISSING_VIDEO_THUMBNAILS),
+  )
+  val showPerUserScores = OnOffSettingItem(
+    title = context.getString(R.string.show_per_user_scores),
+    description = context.getString(R.string.show_per_user_scores_desc),
+    relatedKeys = listOf(KEY_SHOW_PER_USER_SCORES),
   )
 }
 

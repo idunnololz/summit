@@ -60,4 +60,5 @@ kersploosh
 WeeScottishMan
     </string>
 
+    <string name="search_authority" translatable="false">com.idunnololz.summit.search.SuggestionProvider</string>
 </resources>

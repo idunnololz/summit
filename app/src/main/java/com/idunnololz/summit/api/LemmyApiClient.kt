@@ -44,6 +44,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FederatedInstances
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetComments
@@ -1504,6 +1505,11 @@ class LemmyApiClient @Inject constructor(
       getApi().listMedia(authorization = account.bearer, form, force = force)
     }
   }
+
+  suspend fun federatedInstances(account: Account?, force: Boolean): Result<FederatedInstances> =
+    onApiClient {
+      getApi().federatedInstances(authorization = account?.bearer, force = force)
+    }
 
   suspend fun deleteMediaItem(
     deleteToken: String,

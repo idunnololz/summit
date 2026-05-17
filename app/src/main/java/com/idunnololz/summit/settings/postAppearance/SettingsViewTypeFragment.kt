@@ -302,8 +302,8 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
             viewModel.currentPostUiConfig =
               viewModel.currentPostUiConfig.copy(
                 fullContentConfig = viewModel.currentPostUiConfig.fullContentConfig.copy(
-                  bodyTextSizeSp = it
-                )
+                  bodyTextSizeSp = it,
+                ),
               )
 
             updateRendering()
@@ -318,7 +318,7 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
             updateRendering()
           },
         ),
-      )
+      ),
     ),
   )
 

@@ -9,7 +9,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -152,6 +151,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_B
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NAVIGATION_BAR_ON_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PER_USER_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PROFILE_ICONS
@@ -613,6 +613,8 @@ class Preferences(
     by intPreference(KEY_DISPLAY_DELETED_POSTS, ALWAYS_HIDE_DELETED_POSTS)
   var useCommunityDownloadFolder: Boolean
     by booleanPreference(KEY_USE_COMMUNITY_DOWNLOAD_FOLDER, false)
+  var showPerUserScores: Boolean
+    by booleanPreference(KEY_SHOW_PER_USER_SCORES, true)
 
   var animationLevel: AnimationsHelper.AnimationLevel
     get() = AnimationsHelper.AnimationLevel.parse(

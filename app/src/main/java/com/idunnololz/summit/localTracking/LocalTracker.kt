@@ -24,11 +24,6 @@ import kotlinx.serialization.encodeToByteArray
 
 private const val TAG = "LocalTracker"
 
-interface OnTrackingEventListener {
-  fun onDeleteAll()
-  fun onViewCommunity(communityRef: CommunityRef)
-}
-
 @Singleton
 class LocalTracker @Inject constructor(
   private val accountManager: AccountManager,
@@ -138,6 +133,16 @@ class LocalTracker @Inject constructor(
             override fun onViewCommunity(communityRef: CommunityRef) {
               listeners.forEach { it.onViewCommunity(communityRef) }
             }
+
+            override fun onVote(
+              userId: Long,
+              targetPersonId: Long,
+              postId: Long?,
+              commentId: Long?,
+              direction: Int,
+            ) {
+              listeners.forEach { it.onVote(userId, targetPersonId, postId, commentId, direction) }
+            }
           },
         )
       }
@@ -239,12 +244,30 @@ class PerAccountLocalTracker @AssistedInject constructor(
         ),
       )
 
-      if (action == TrackedAction.VIEW &&
-        communityRef != null &&
-        postId == null &&
-        commentId == null
-      ) {
-        listener.onViewCommunity(communityRef)
+      when (action) {
+        TrackedAction.UPVOTE -> {
+          if (targetUserId != null) {
+            listener.onVote(userId, targetUserId, postId, commentId, 1)
+          }
+        }
+        TrackedAction.DOWNVOTE -> {
+          if (targetUserId != null) {
+            listener.onVote(userId, targetUserId, postId, commentId, -1)
+          }
+        }
+        TrackedAction.CLEAR_VOTE -> {
+          if (targetUserId != null) {
+            listener.onVote(userId, targetUserId, postId, commentId, 0)
+          }
+        }
+        TrackedAction.VIEW -> {
+          if (communityRef != null && postId == null && commentId == null) {
+            listener.onViewCommunity(communityRef)
+          }
+        }
+        TrackedAction.REPLY -> {}
+        TrackedAction.DELETE_REPLY -> {}
+        TrackedAction.POST -> {}
       }
     }
   }

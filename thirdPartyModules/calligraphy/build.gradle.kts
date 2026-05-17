@@ -33,9 +33,4 @@ android {
 dependencies {
   implementation(libs.appcompat)
   implementation(libs.viewpump)
-//    compileOnly 'androidx.appcompat:appcompat:1.0.2'
-//    implementation 'io.github.inflationx:viewpump:1.0.0'
-//
-//    testImplementation 'androidx.annotation:annotation:1.0.0'
-//    testImplementation 'androidx.test:runner:1.1.0'
 }

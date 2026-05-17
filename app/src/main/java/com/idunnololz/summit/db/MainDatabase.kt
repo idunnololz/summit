@@ -44,6 +44,8 @@ import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.getAllCompletedActions
 import com.idunnololz.summit.lemmy.actions.getAllFailedActions
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.PerAccountDuplicatePostsDao
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.PerAccountDuplicatePostsEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
@@ -52,6 +54,8 @@ import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.community.CommunityStatEntry
 import com.idunnololz.summit.localTracking.community.CommunityStatEntryConverters
 import com.idunnololz.summit.localTracking.community.CommunityTrackerDao
+import com.idunnololz.summit.localTracking.person.PersonStatEntry
+import com.idunnololz.summit.localTracking.person.PersonTrackerDao
 import com.idunnololz.summit.templates.db.TemplateConverters
 import com.idunnololz.summit.templates.db.TemplateEntry
 import com.idunnololz.summit.templates.db.TemplatesDao
@@ -86,6 +90,8 @@ private const val TAG = "MainDatabase"
     TemplateEntry::class,
     TrackingEventEntry::class,
     CommunityStatEntry::class,
+    PersonStatEntry::class,
+    PerAccountDuplicatePostsEntry::class,
   ],
   autoMigrations = [
     AutoMigration(from = 20, to = 21),
@@ -103,8 +109,9 @@ private const val TAG = "MainDatabase"
     AutoMigration(from = 49, to = 50),
     AutoMigration(from = 50, to = 51),
     AutoMigration(from = 51, to = 52),
+    AutoMigration(from = 54, to = 55),
   ],
-  version = 52,
+  version = 55,
   exportSchema = true,
 )
 @TypeConverters(
@@ -131,6 +138,8 @@ abstract class MainDatabase : RoomDatabase() {
   abstract fun templatesDao(): TemplatesDao
   abstract fun trackingEventsDao(): TrackingEventsDao
   abstract fun communityTrackerDao(): CommunityTrackerDao
+  abstract fun personTrackerDao(): PersonTrackerDao
+  abstract fun perAccountDuplicatePostsDao(): PerAccountDuplicatePostsDao
 
   companion object {
 
@@ -190,6 +199,8 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_48_49(json))
         .addMigrations(MIGRATION_50_51)
         .addMigrations(MIGRATION_51_52)
+        .addMigrations(MIGRATION_52_53)
+        .addMigrations(MIGRATION_53_54)
         .build()
     }
   }
@@ -445,6 +456,23 @@ val MIGRATION_51_52 =
       db.execSQL(
         "CREATE TABLE IF NOT EXISTS `community_tracker` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `lastUpdateTs` INTEGER NOT NULL, `createdTs` INTEGER NOT NULL, `communityRef` TEXT NOT NULL, `icon` TEXT, `hits` INTEGER NOT NULL, `lastMetadataUpdateTs` INTEGER NOT NULL, `mau` INTEGER)",
       )
+    }
+  }
+
+val MIGRATION_52_53 =
+  object : Migration(52, 53) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("DROP TABLE IF EXISTS `person_tracker`;")
+      db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `person_tracker` (`userId` INTEGER NOT NULL, `targetPersonId` INTEGER NOT NULL, `lastUpdateTs` INTEGER NOT NULL, `createdTs` INTEGER NOT NULL, `totalScore` INTEGER NOT NULL, `personIntermediateStats` BLOB NOT NULL, PRIMARY KEY(`userId`, `targetPersonId`))",
+      )
+    }
+  }
+
+val MIGRATION_53_54 =
+  object : Migration(53, 54) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("ALTER TABLE `history` ADD COLUMN `user_id` INTEGER NOT NULL DEFAULT 0")
     }
   }
 

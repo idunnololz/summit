@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.converters.toEditComment
 import com.idunnololz.summit.api.converters.toEditPost
 import com.idunnololz.summit.api.converters.toGetPersonMentionsResponse
 import com.idunnololz.summit.api.converters.toGetRepliesResponse
+import com.idunnololz.summit.api.converters.toInstance
 import com.idunnololz.summit.api.converters.toLoginResponse
 import com.idunnololz.summit.api.converters.toModAddCommunityView
 import com.idunnololz.summit.api.converters.toModAddView
@@ -76,6 +77,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FederatedInstances
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetComments
@@ -392,7 +394,7 @@ class PieFedApiAlphaAdapter(
         null
       } else {
         args.max_depth - 1
-      }
+      },
     )
     val headers = generateHeaders(authorization = authorization, force = force)
 
@@ -674,6 +676,11 @@ class PieFedApiAlphaAdapter(
   ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
     api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
   }
+    .map {
+      ListCommentReportsResponse(
+        comment_reports = it.commentReports.map { it.toCommentReportView() },
+      )
+    }
 
   override suspend fun resolveCommentReport(
     authorization: String?,
@@ -1022,6 +1029,19 @@ class PieFedApiAlphaAdapter(
     api.listMedia(
       generateHeaders(authorization, force),
       args.serializeToMap(),
+    )
+  }
+
+  override suspend fun federatedInstances(
+    authorization: String?,
+    force: Boolean,
+  ): Result<FederatedInstances> = retrofitErrorHandler {
+    api.federatedInstances(generateHeaders(authorization, force))
+  }.map { response ->
+    FederatedInstances(
+      linked = response.federatedInstances?.linked?.map { it.toInstance() } ?: listOf(),
+      allowed = response.federatedInstances?.allowed?.map { it.toInstance() } ?: listOf(),
+      blocked = response.federatedInstances?.blocked?.map { it.toInstance() } ?: listOf(),
     )
   }
 

@@ -1,24 +1,24 @@
 [versions]
-androidGradlePlugin = "9.1.0"
+androidGradlePlugin = "9.1.1"
 arrowCore = "2.2.2.1"
 datastorePreferences = "1.2.1"
 desugar_jdk_libs = "2.1.5"
 exifinterface = "1.4.2"
 hilt = "2.59.2"
 javaStringSimilarity = "2.0.0"
-kotlin = "2.3.20"
-kotlinxSerialization = "1.10.0"
-ksp = "2.3.6"
-kotlinx = "1.10.2"
-navigation = "2.9.7"
+kotlin = "2.3.21"
+kotlinxSerialization = "1.11.0"
+ksp = "2.3.7"
+kotlinx = "1.11.0"
+navigation = "2.9.8"
 room = "2.8.4"
 lifecycle = "2.10.0"
-media3 = "1.9.3"
+media3 = "1.10.0"
 viewpump = "2.1.1"
-work = "2.11.1"
+work = "2.11.2"
 coil = "3.4.0"
 retrofit = "3.0.0"
-jetbrainsKotlinJvm = "2.3.20"
+jetbrainsKotlinJvm = "2.3.21"
 #noinspection NewerVersionAvailable
 commonmark = "0.13.0" # DO NOT BUMP THIS PAST 0.13.0
 paletteKtx = "1.0.0"
@@ -77,29 +77,29 @@ coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil"}
 coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.6" }
-material = { module = "com.google.android.material:material", version = "1.14.0-alpha10" }
+material = { module = "com.google.android.material:material", version = "1.14.0-rc01" }
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
-gson = { module = "com.google.code.gson:gson", version = "2.13.2" }
+gson = { module = "com.google.code.gson:gson", version = "2.14.0" }
 process-phoenix = { module = "com.jakewharton:process-phoenix", version = "3.0.0" }
 
 # AndroidX
-core = { module = "androidx.core:core", version = "1.17.0" }
-core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
+core = { module = "androidx.core:core", version = "1.18.0" }
+core-ktx = { module = "androidx.core:core-ktx", version = "1.18.0" }
 window = { module = "androidx.window:window", version = "1.5.1" }
 appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
-browser = { module = "androidx.browser:browser", version = "1.9.0" }
+browser = { module = "androidx.browser:browser", version = "1.10.0" }
 cardview = { module = "androidx.cardview:cardview", version = "1.0.0" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.4.0" }
 preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
 #swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.2.0-beta01" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.9" }
-activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.12.4" }
+activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.13.0" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.2.0" }
 transition-ktx = { module = "androidx.transition:transition-ktx", version = "1.7.0" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 documentfile = { module = "androidx.documentfile:documentfile", version = "1.1.0" }
-annotation = { module = "androidx.annotation:annotation", version = "1.9.1"}
+annotation = { module = "androidx.annotation:annotation", version = "1.10.0"}
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version = "1.1.0" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version = "1.1.0" }
 
@@ -127,6 +127,6 @@ kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", ve
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "14.2.0" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
-versions = { id = "com.github.ben-manes.versions", version = "0.53.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.54.0" }
 sentry = { id = "io.sentry.android.gradle", version = "6.1.0"}
 legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "androidGradlePlugin" }

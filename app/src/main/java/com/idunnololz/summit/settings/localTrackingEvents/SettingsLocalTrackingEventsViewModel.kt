@@ -2,9 +2,8 @@ package com.idunnololz.summit.settings.localTrackingEvents
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.localTracking.LocalTracker
-import com.idunnololz.summit.localTracking.OnTrackingEventListener
+import com.idunnololz.summit.localTracking.SimpleOnTrackingEventListener
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.getTableSize
 import com.idunnololz.summit.util.StatefulLiveData
@@ -27,14 +26,12 @@ class SettingsLocalTrackingEventsViewModel @Inject constructor(
 
   val data = StatefulLiveData<Model>()
 
-  private val onTrackingEventListener = object : OnTrackingEventListener {
+  private val onTrackingEventListener = object : SimpleOnTrackingEventListener() {
     override fun onDeleteAll() {
       viewModelScope.launch(Dispatchers.Main) {
         load()
       }
     }
-
-    override fun onViewCommunity(communityRef: CommunityRef) {}
   }
 
   init {

@@ -49,7 +49,6 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.ContentUtils
-
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider

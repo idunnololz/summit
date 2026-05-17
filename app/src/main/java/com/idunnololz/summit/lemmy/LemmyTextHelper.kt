@@ -364,9 +364,9 @@ class LemmyTextHelper @Inject constructor(
         if (inlineMedia) {
           usePlugin(
             CoilImagesPlugin(
-              context,
-              preferences,
-              object : CoilStore {
+              context = context,
+              preferences = preferences,
+              coilStore = object : CoilStore {
                 override fun load(drawable: AsyncDrawable): ImageRequest =
                   ImageRequest.Builder(context)
                     // Needed for the "take screenshot" feature
@@ -378,7 +378,7 @@ class LemmyTextHelper @Inject constructor(
                   disposable.dispose()
                 }
               },
-              context.applicationContext.imageLoader,
+              imageLoader = context.applicationContext.imageLoader,
             ),
           )
         } else {

@@ -19,16 +19,14 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     private val sEdgeSizeUsingSystemGestureInsets = Build.VERSION.SDK_INT >= 29
   }
 
-  private val mDragHelper: Field?
-  private val mSlideEnabled = true
-  private val mSlideOffsetField: Field?
-  private val mSlideableViewField: Field?
+  private val dragHelperField: Field?
+  private val slideOffsetField: Field?
+  private val slideableViewField: Field?
   private val updateObscuredViewsVisibilityMethod: Method?
   private val dispatchOnPanelOpenedMethod: Method?
   private val dispatchOnPanelClosedMethod: Method?
-  private val mPreservedOpenStateField: Field?
+  private val preservedOpenStateField: Field?
   private val parallaxOtherViewsMethod: Method?
-
 
   var isSwipeEnabled: Boolean = true
   private val smoothSlideToFn: Method?
@@ -74,12 +72,12 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
       null
     }
 
-    mSlideOffsetField = try {
+    slideOffsetField = try {
       SlidingPaneLayout::class.java.getDeclaredField("mSlideOffset")
     } catch (_: Exception) {
       null
     }
-    mSlideableViewField = try {
+    slideableViewField = try {
       SlidingPaneLayout::class.java.getDeclaredField("mSlideableView")
     } catch (_: Exception) {
       null
@@ -102,48 +100,36 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     } catch (_: Exception) {
       null
     }
-    mPreservedOpenStateField = try {
+    preservedOpenStateField = try {
       SlidingPaneLayout::class.java.getDeclaredField("mPreservedOpenState")
     } catch (_: Exception) {
       null
     }
     parallaxOtherViewsMethod = try {
-      SlidingPaneLayout::class.java.getDeclaredMethod("parallaxOtherViews", Float::class.javaPrimitiveType)
+      SlidingPaneLayout::class.java.getDeclaredMethod(
+        "parallaxOtherViews",
+        Float::class.javaPrimitiveType,
+      )
     } catch (_: Exception) {
       null
     }
-    mDragHelper = try {
+    dragHelperField = try {
       SlidingPaneLayout::class.java.getDeclaredField("mDragHelper")
     } catch (_: Exception) {
       null
     }
 
     try {
-      mSlideOffsetField?.isAccessible = true
-      mSlideableViewField?.isAccessible = true
+      slideOffsetField?.isAccessible = true
+      slideableViewField?.isAccessible = true
       updateObscuredViewsVisibilityMethod?.isAccessible = true
       dispatchOnPanelOpenedMethod?.isAccessible = true
       dispatchOnPanelClosedMethod?.isAccessible = true
-      mPreservedOpenStateField?.isAccessible = true
+      preservedOpenStateField?.isAccessible = true
       parallaxOtherViewsMethod?.isAccessible = true
-      mDragHelper?.isAccessible = true
+      dragHelperField?.isAccessible = true
     } catch (_: Exception) {
     }
-
-//    addPanelSlideListener(
-//      object : PanelSlideListener {
-//        override fun onPanelSlide(p0: View, p1: Float) {
-//          (mDragHelper?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
-//        }
-//
-//        override fun onPanelOpened(p0: View) {
-//        }
-//
-//        override fun onPanelClosed(p0: View) {
-//        }
-//
-//      },
-//    )
   }
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
@@ -200,34 +186,17 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     onPanelDragged?.invoke(this, offset)
   }
 
-
   fun openPaneNoAnimation() {
     openPane()
-    (mDragHelper?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
+    (dragHelperField?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
   }
 
   fun closePaneNoAnimation() {
     closePane()
-//    mSlideOffsetField?.set(this, 0.0f)
-//    requestLayout()
-//    invalidate()
 
     post {
-
-      (mDragHelper?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
+      (dragHelperField?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
     }
-
-//    try {
-//      val slideableView = mSlideableViewField?.get(this) as View?
-//      mSlideOffsetField?.set(this, 0.0f)
-//      requestLayout()
-//      invalidate()
-//      updateObscuredViewsVisibilityMethod?.invoke(this, slideableView)
-//      dispatchOnPanelClosedMethod?.invoke(this, slideableView)
-//      mPreservedOpenStateField?.set(this, false)
-//    } catch (_: Exception) {
-//      closePane()
-//    }
   }
 
   private fun getSystemGestureInsets(): Insets? {

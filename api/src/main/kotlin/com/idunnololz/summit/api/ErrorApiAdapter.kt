@@ -35,6 +35,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FederatedInstances
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetComments
@@ -496,6 +497,11 @@ class ErrorApiAdapter(
     args: ListMedia,
     force: Boolean,
   ): Result<ListMediaResponse> = Result.failure(error)
+
+  override suspend fun federatedInstances(
+    authorization: String?,
+    force: Boolean,
+  ): Result<FederatedInstances> = Result.failure(error)
 
   override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =
     Result.failure(error)

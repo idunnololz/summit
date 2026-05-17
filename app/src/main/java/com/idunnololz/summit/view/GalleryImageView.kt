@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
 import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
@@ -13,6 +14,8 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.ScaleGestureDetectorCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.preferences.ImageViewerControlStyleId
 import com.idunnololz.summit.preferences.ImageViewerControlStyleIds
@@ -101,6 +104,8 @@ class GalleryImageView : ShapeableImageView {
 
   private var savedZoomState: ZoomState? = null
 
+  private var gestureRegion = Rect()
+
   private data class ZoomState(
     val relativeZoom: Double,
     val imageRatio: Double,
@@ -168,9 +173,7 @@ class GalleryImageView : ShapeableImageView {
               ) &&
             (
               abs(velocityX) > 500 ||
-                Math.abs(
-                  velocityY,
-                ) > 500
+                abs(velocityY) > 500
               ) &&
             !isZooming
           ) {
@@ -265,6 +268,19 @@ class GalleryImageView : ShapeableImageView {
       },
     )
 
+    ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+      val windowGestureRegion = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+
+      gestureRegion.set(
+        windowGestureRegion.left,
+        windowGestureRegion.top,
+        windowGestureRegion.right,
+        windowGestureRegion.bottom,
+      )
+
+      insets
+    }
+
     scaleType = ScaleType.MATRIX
   }
 
@@ -284,6 +300,16 @@ class GalleryImageView : ShapeableImageView {
 
   @SuppressLint("ClickableViewAccessibility")
   override fun onTouchEvent(event: MotionEvent): Boolean {
+    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+      if (event.x < gestureRegion.left ||
+        event.x > (width - gestureRegion.right) ||
+        event.y < gestureRegion.top ||
+        event.y > (height - gestureRegion.bottom)
+      ) {
+        return false
+      }
+    }
+
     // val g1 = !zoomGestureOngoing && detector.onTouchEvent(event)
     val g1 = detector.onTouchEvent(event)
     val g2 = scaleDetector.onTouchEvent(event)
@@ -374,13 +400,6 @@ class GalleryImageView : ShapeableImageView {
     }
 
     return super.onTouchEvent(event)
-  }
-
-  override fun setScaleType(scaleType: ScaleType?) {
-//        if (scaleType != ScaleType.MATRIX) {
-//            throw UnsupportedOperationException("GalleryImageView only supports Matrix scale type.")
-//        }
-    super.setScaleType(scaleType)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

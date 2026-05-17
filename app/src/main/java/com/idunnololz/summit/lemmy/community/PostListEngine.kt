@@ -17,6 +17,7 @@ import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.models.PostView
 import dagger.assisted.Assisted
@@ -523,6 +524,11 @@ class PostListEngine @AssistedInject constructor(
         posts = page.posts.map {
           val postView = it.fetchedPost.postView
           if (duplicatePostsDetector.isPostDuplicateOfRead(postView)) {
+            Log.d(
+              TAG,
+              "Duplicate post detected! Title: ${postView.post.name} Community: ${postView.community.toCommunityRef().fullName}",
+            )
+
             if (!postView.read) {
               accountActionsManager.markPostAsRead(
                 instance = postView.instance,

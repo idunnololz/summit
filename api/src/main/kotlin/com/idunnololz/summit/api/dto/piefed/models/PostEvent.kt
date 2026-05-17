@@ -43,7 +43,7 @@ data class PostEvent(
   val start: kotlin.String,
 
   @SerializedName("end")
-  val end: kotlin.String? = null,
+  val end: kotlin.String,
 
   @SerializedName("timezone")
   val timezone: kotlin.String? = null,

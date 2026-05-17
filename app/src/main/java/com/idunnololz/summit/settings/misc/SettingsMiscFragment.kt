@@ -316,6 +316,10 @@ class SettingsMiscFragment :
         { preferences.generateMissingVideoThumbnails },
         { preferences.generateMissingVideoThumbnails = it },
       ),
+      settings.showPerUserScores.asOnOffSwitch(
+        { preferences.showPerUserScores },
+        { preferences.showPerUserScores = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

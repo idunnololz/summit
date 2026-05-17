@@ -2401,6 +2401,8 @@
     <string name="advanced">Advanced settings</string>
     <string name="body_font_size">Body font size</string>
     <string name="advanced_settings">Advanced settings</string>
+    <string name="show_per_user_scores">Show per-user scores</string>
+    <string name="show_per_user_scores_desc">When enabled, the total score of each user is shown in the header of posts/comments. Note these scores are calculated locally so they may not be fully accurate.</string>
 
 
     <!-- uCrop string resource end -->

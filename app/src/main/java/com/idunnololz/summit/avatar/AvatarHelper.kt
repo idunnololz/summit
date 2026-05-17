@@ -87,21 +87,37 @@ class AvatarHelper @Inject constructor(
     (imageView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
 
     if (imageUrl.isNullOrBlank()) {
-      val job = coroutineScope.launch {
+      val key = accountImageGenerator.personKey(
+        personName,
+        personId,
+        personInstance,
+      )
+
+      if (accountImageGenerator.isCached(key)) {
         val d = accountImageGenerator.generateDrawableForPerson(
           personName,
           personId,
           personInstance,
         )
+        imageView.dispose()
+        imageView.setImageDrawable(d)
+      } else {
+        val job = coroutineScope.launch {
+          val d = accountImageGenerator.generateDrawableForPerson(
+            personName,
+            personId,
+            personInstance,
+          )
 
-        withContext(Dispatchers.Main) {
-          onLoaded(d.bitmap)
+          withContext(Dispatchers.Main) {
+            onLoaded(d.bitmap)
 
-          imageView.dispose()
-          imageView.setImageDrawable(d)
+            imageView.dispose()
+            imageView.setImageDrawable(d)
+          }
         }
+        imageView.setTag(R.id.generate_profile_icon_job, job)
       }
-      imageView.setTag(R.id.generate_profile_icon_job, job)
     } else {
       imageView.load(imageUrl) {
         placeholder(newShimmerDrawableSquare(context).asImage())
@@ -163,20 +179,29 @@ class AvatarHelper @Inject constructor(
         imageView.setImageDrawable(cached)
       } else {
         imageView.dispose()
-        imageView.setImageDrawable(null)
 
-        val job = coroutineScope.launch {
+        if (accountImageGenerator.isCached(communityRef.getKey())) {
           val d = accountImageGenerator.generateDrawableForGeneric(
             communityRef.getKey(),
             context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
           )
+          imageView.setImageDrawable(d)
+        } else {
+          imageView.setImageDrawable(null)
 
-          withContext(Dispatchers.Main) {
-            imageView.dispose()
-            imageView.setImageDrawable(d)
+          val job = coroutineScope.launch {
+            val d = accountImageGenerator.generateDrawableForGeneric(
+              communityRef.getKey(),
+              context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
+            )
+
+            withContext(Dispatchers.Main) {
+              imageView.dispose()
+              imageView.setImageDrawable(d)
+            }
           }
+          imageView.setTag(R.id.generate_profile_icon_job, job)
         }
-        imageView.setTag(R.id.generate_profile_icon_job, job)
       }
     } else {
             /*

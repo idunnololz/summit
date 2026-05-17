@@ -63,6 +63,7 @@ import com.idunnololz.summit.api.dto.piefed.models.CommunityFollowerView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 import com.idunnololz.summit.api.dto.piefed.models.Instance
 import com.idunnololz.summit.api.dto.piefed.models.InstanceBlockView
+import com.idunnololz.summit.api.dto.piefed.models.InstanceWithoutFederationState
 import com.idunnololz.summit.api.dto.piefed.models.LocalUser
 import com.idunnololz.summit.api.dto.piefed.models.LocalUserView
 import com.idunnololz.summit.api.dto.piefed.models.MyUserInfo
@@ -390,7 +391,13 @@ internal fun LocalUser.DefaultSortType.toSortType(): com.idunnololz.summit.api.d
     LocalUser.DefaultSortType.Scaled -> SortType.Scaled
     LocalUser.DefaultSortType.Top -> SortType.TopAll
     LocalUser.DefaultSortType.Old -> SortType.Old
+
+    // TODO: Not supported at the moment...
     LocalUser.DefaultSortType.Relevance -> SortType.Active
+    LocalUser.DefaultSortType.TopPosts -> SortType.Active
+    LocalUser.DefaultSortType.TopSubscribers -> SortType.Active
+    LocalUser.DefaultSortType.NewFederated -> SortType.Active
+    LocalUser.DefaultSortType.OldFederated -> SortType.Active
   }
 
 internal fun LocalUser.DefaultListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.ListingType =
@@ -906,6 +913,16 @@ internal fun UserRegistration.Status.toStatus() = when (this) {
   UserRegistration.Status.approved -> UserRegistrationApplication.Status.Approved
   UserRegistration.Status.awaiting_review -> UserRegistrationApplication.Status.NoDecision
 }
+
+internal fun InstanceWithoutFederationState.toInstance() =
+  com.idunnololz.summit.api.dto.lemmy.Instance(
+    id = id,
+    domain = domain,
+    published = published,
+    updated = updated,
+    software = software,
+    version = version,
+  )
 
 // internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =
 //  ModRemovePostView(

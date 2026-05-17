@@ -53,7 +53,6 @@ import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
-import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.ContentUtils.getVideoTypeStrippingParams
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -502,8 +501,9 @@ class LemmyContentHelper(
         }
       }
 
-      if (postView.getVideoInfo(embedded = true) != null
-        && (postType != PostType.Video || postUrl != postView.post.embed_video_url)) {
+      if (postView.getVideoInfo(embedded = true) != null &&
+        (postType != PostType.Video || postUrl != postView.post.embed_video_url)
+      ) {
         // Don't load the video again if postType is video unless the post url and the embedded
         // video url are two different links
 

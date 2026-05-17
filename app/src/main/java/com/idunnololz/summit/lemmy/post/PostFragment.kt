@@ -72,6 +72,7 @@ import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.localTracking.person.PersonTracker
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -150,6 +151,9 @@ class PostFragment :
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var personTracker: PersonTracker
 
   lateinit var moreActionsHelper: MoreActionsHelper
 
@@ -850,6 +854,11 @@ class PostFragment :
 
       viewLifecycleOwner.lifecycleScope.launch {
         userTagsManager.onChangedFlow.collect {
+          adapter?.notifyDataSetChanged()
+        }
+      }
+      viewLifecycleOwner.lifecycleScope.launch {
+        personTracker.onChangedFlow.collect {
           adapter?.notifyDataSetChanged()
         }
       }

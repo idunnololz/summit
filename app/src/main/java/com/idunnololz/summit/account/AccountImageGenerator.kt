@@ -108,6 +108,9 @@ class AccountImageGenerator @Inject constructor(
     return bitmap.toDrawable(context.resources)
   }
 
+  fun isCached(key: String, circleClip: Boolean = false): Boolean =
+    memoryCache?.get("$key|$circleClip") != null
+
   fun getCachedDrawableForGeneric(key: String, circleClip: Boolean = false): BitmapDrawable? {
     val cacheKey = "$key|$circleClip"
     return memoryCache?.get(cacheKey)?.toDrawable(context.resources)
@@ -181,6 +184,6 @@ class AccountImageGenerator @Inject constructor(
   }
 
   @Suppress("NOTHING_TO_INLINE")
-  private inline fun personKey(personName: String, personId: PersonId, personInstance: String) =
+  inline fun personKey(personName: String, personId: PersonId, personInstance: String) =
     "$personName@$personId@$personInstance"
 }

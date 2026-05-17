@@ -1,4 +1,4 @@
-Summit is an app for Lemmy that enables you to explore hundreds of communities with ease.
+Summit is an app for Lemmy and PieFed that enables you to explore hundreds of communities with ease.
 
 Summit is optimized for Android and offers a smooth browsing experience.
 

@@ -29,7 +29,6 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.FixedSlidingPaneLayout
-import dagger.Component
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -71,10 +70,8 @@ class SlidingPaneController @AssistedInject constructor(
        * Used for tablets. The message is shown on the side pane when nothing is selected.
        */
       emptyScreenText: String,
-
       @Assisted("fragmentContainerId")
       @IdRes fragmentContainerId: Int,
-
       @Assisted("retainClosedPosts")
       retainClosedPosts: Boolean = false,
       @Assisted("useSwipeBetweenPosts")

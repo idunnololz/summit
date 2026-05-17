@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.localTracking.person.PersonTracker
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.OpTagStyleIds
@@ -48,6 +49,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
   private val userTagsManager: UserTagsManager,
   private val preferences: Preferences,
   private val linkResolver: LinkResolver,
+  private val personTracker: PersonTracker,
 ) {
 
   @AssistedFactory
@@ -333,6 +335,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
           Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
       }
+
+      sb.appendPersonScore(postView.creator.id)
 
       sb.appendNewUserWarningIfNeeded(postHeaderInfo)
 
@@ -691,6 +695,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
       }
     }
 
+    sb.appendPersonScore(commentView.creator.id)
+
     sb.appendNewUserWarningIfNeeded(commentHeaderInfo)
 
     val tag = userTagsManager.getUserTag(commentView.creator.fullName)
@@ -858,6 +864,34 @@ class LemmyHeaderHelper @AssistedInject constructor(
         )
         append(" ")
       }
+    }
+  }
+
+  private fun SpannableStringBuilder.appendPersonScore(personId: Long) {
+    if (!preferences.showPerUserScores) {
+      return
+    }
+
+    val personScore = personTracker.getPersonScore(targetPersonId = personId)
+    if (personScore != 0) {
+      append(" [")
+      val s = length
+      append(personScore.toString())
+      val e = length
+      append("]")
+
+      setSpan(
+        ForegroundColorSpan(
+          if (personScore > 0) {
+            preferences.upvoteColor
+          } else {
+            preferences.downvoteColor
+          },
+        ),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
     }
   }
 }

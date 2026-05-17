@@ -35,6 +35,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FederatedInstances
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetComments
@@ -555,6 +556,11 @@ interface LemmyLikeApi : ApiCompat {
     args: ListMedia,
     force: Boolean,
   ): Result<ListMediaResponse>
+
+  suspend fun federatedInstances(
+    authorization: String?,
+    force: Boolean,
+  ): Result<FederatedInstances>
 
   suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit>
 }
