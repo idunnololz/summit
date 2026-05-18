@@ -517,43 +517,6 @@ class PostListEngine @AssistedInject constructor(
     _pages = pages
   }
 
-  suspend fun markDuplicatePostsAsRead() {
-    val pages = _pages.toMutableList()
-    for ((index, page) in pages.withIndex()) {
-      pages[index] = page.copy(
-        posts = page.posts.map {
-          val postView = it.fetchedPost.postView
-          if (duplicatePostsDetector.isPostDuplicateOfRead(postView)) {
-            Log.d(
-              TAG,
-              "Duplicate post detected! Title: ${postView.post.name} Community: ${postView.community.toCommunityRef().fullName}",
-            )
-
-            if (!postView.read) {
-              accountActionsManager.markPostAsRead(
-                instance = postView.instance,
-                id = postView.post.id,
-                read = true,
-                accountId = null,
-              )
-            }
-            it.copy(
-              fetchedPost = it.fetchedPost.copy(
-                postView = postView.copy(
-                  read = true,
-                ),
-              ),
-              isDuplicatePost = true,
-            )
-          } else {
-            it
-          }
-        },
-      )
-    }
-    _pages = pages
-  }
-
   fun removePost(id: PostId) {
     val pages = _pages.toMutableList()
     for ((index, page) in pages.withIndex()) {

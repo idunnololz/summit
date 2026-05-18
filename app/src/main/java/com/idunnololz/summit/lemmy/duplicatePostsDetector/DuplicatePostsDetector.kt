@@ -147,11 +147,25 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
 
     val previousValue = readPosts.put(key, postView.post.id.toLong())
 
-    if (previousValue != null) {
-      // This entry was already in the list. Do not commit to DB.
-      return
+    if (previousValue == null) {
+      // ReadPosts modified. Update db.
+      commitToDb()
     }
+  }
 
+  fun removeReadOrHiddenPost(postView: PostView) {
+    val key = generateKeyForPostView(postView)
+      ?: return
+
+    val removed = readPosts.remove(key)
+
+    if (removed != null) {
+      // ReadPosts modified. Update db.
+      commitToDb()
+    }
+  }
+
+  private fun commitToDb() {
     val copy = readPosts.toList()
 
     coroutineScope.launch(Dispatchers.IO) {
@@ -168,14 +182,6 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
           ),
         ),
       )
-    }
-  }
-
-  fun removeReadOrHiddenPost(postView: PostView) {
-    val key = generateKeyForPostView(postView)
-
-    if (key != null) {
-      readPosts.remove(key)
     }
   }
 

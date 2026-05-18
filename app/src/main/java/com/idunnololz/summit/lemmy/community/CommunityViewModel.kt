@@ -313,7 +313,7 @@ class CommunityViewModel @Inject constructor(
 
   private suspend fun onPostReadChanged() {
     if (duplicatePostsDetector.isEnabled) {
-      postListEngine.markDuplicatePostsAsRead()
+      postsRepository.markDuplicatePostsAsRead()
     }
 
     val pagesCopy = withContext(Dispatchers.Main) {

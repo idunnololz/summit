@@ -17,6 +17,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
@@ -597,6 +598,59 @@ class PostsRepository @AssistedInject constructor(
     )
   }
 
+  suspend fun markDuplicatePostsAsRead() {
+    val postsToMarkAsRead = mutableListOf<FetchedPost>()
+    allPostsData.value = allPostsData.value.copy(
+      allPosts = allPosts.map { postData ->
+        val accountInstance = postData.post.source.instance ?: apiInstance
+        val postView = postData.post.postView
+        if (duplicatePostsDetector.isPostDuplicateOfRead(postView)) {
+          Log.d(
+            TAG,
+            "Duplicate post detected! Title: ${postView.post.name} Community: ${postView.community.toCommunityRef().fullName}",
+          )
+
+          if (postReadManager.isPostRead(accountInstance, postView.post.id) == false) {
+            postsToMarkAsRead += postData.post
+          }
+
+          postData.copy(
+            isDuplicatePost = true,
+          )
+        } else if (postData.isDuplicatePost) {
+          postData.copy(
+            isDuplicatePost = false,
+          )
+        } else {
+          postData
+        }
+      }
+    )
+
+    // Mark posts as read last to prevent a callback loop
+    for (fetchedPost in postsToMarkAsRead) {
+      val accountInstance = fetchedPost.source.instance ?: apiInstance
+      val postView = fetchedPost.postView
+
+      Log.d(
+        TAG,
+        "Marking duplicate post as read! Title: ${postView.post.name} Community: ${postView.community.toCommunityRef().fullName}",
+      )
+
+      postReadManager.markPostAsReadLocal(
+        instance = accountInstance,
+        postId = postView.post.id,
+        read = true,
+      )
+      accountActionsManager.markPostAsRead(
+        instance = accountInstance,
+        id = postView.post.id,
+        read = true,
+        accountId = null,
+      )
+    }
+  }
+
   private suspend fun addPosts(
     newPosts: List<FetchedPost>,
     pageIndex: Int,
@@ -613,6 +667,8 @@ class PostsRepository @AssistedInject constructor(
 
       if (duplicatePostsDetector?.isPostDuplicateOfRead(post) == true) {
         isDuplicatePost = true
+
+        Log.d(TAG, "Duplicate post found. Title: ${post.post.name} community: ${post.community.toCommunityRef().fullName}")
 
         if (!post.read) {
           accountActionsManager.markPostAsRead(

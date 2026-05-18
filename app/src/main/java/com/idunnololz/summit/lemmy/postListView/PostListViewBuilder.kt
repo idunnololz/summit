@@ -1378,7 +1378,7 @@ class PostListViewBuilder @Inject constructor(
         title.text = postTitle
       }
 
-      val renderAsRead = (postView.read || isDuplicatePost) && !alwaysRenderAsUnread
+      val renderAsRead = postView.read && !alwaysRenderAsUnread
       val readPostStyle = readPostStyle
         ?: rawBinding.communityLayout?.defaultReadPostStyle
       when (readPostStyle) {
