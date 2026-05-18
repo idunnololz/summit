@@ -610,7 +610,11 @@ class PostsRepository @AssistedInject constructor(
             "Duplicate post detected! Title: ${postView.post.name} Community: ${postView.community.toCommunityRef().fullName}",
           )
 
-          if (postReadManager.isPostRead(accountInstance, postView.post.id) == false) {
+          val isPostReadLocalState = postReadManager.isPostRead(accountInstance, postView.post.id)
+          val isPostRead = isPostReadLocalState == true ||
+            (isPostReadLocalState == null && postView.read)
+
+          if (!isPostRead) {
             postsToMarkAsRead += postData.post
           }
 

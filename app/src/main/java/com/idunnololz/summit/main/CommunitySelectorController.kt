@@ -50,6 +50,7 @@ import com.idunnololz.summit.databinding.DummyTopItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.appendNameWithInstance
@@ -79,6 +80,9 @@ import kotlinx.coroutines.withContext
 typealias CommunitySelectedListener =
   ((controller: CommunitySelectorController, communityRef: CommunityRef) -> Unit)
 
+/**
+ * This is a bottom sheet.
+ */
 class CommunitySelectorController @AssistedInject constructor(
   @Assisted private val context: Context,
   @Assisted private val viewModel: MainActivityViewModel,
@@ -92,6 +96,7 @@ class CommunitySelectorController @AssistedInject constructor(
   private val animationsHelper: AnimationsHelper,
   private val avatarHelper: AvatarHelper,
   private val preferences: Preferences,
+  private val lemmyTextHelper: LemmyTextHelper,
 ) {
 
   companion object {
@@ -121,6 +126,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
   private val adapter = CommunitiesAdapter(
     preferences = preferences,
+    lemmyTextHelper = lemmyTextHelper,
     onCurrentInstanceClick = {
       onChangeInstanceClick?.invoke()
     },
@@ -422,8 +428,9 @@ class CommunitySelectorController @AssistedInject constructor(
   )
 
   private inner class CommunitiesAdapter(
-    private val onCurrentInstanceClick: () -> Unit,
     private val preferences: Preferences,
+    private val lemmyTextHelper: LemmyTextHelper,
+    private val onCurrentInstanceClick: () -> Unit,
     private val onEditCommunitiesListClick: () -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -680,7 +687,7 @@ class CommunitySelectorController @AssistedInject constructor(
       ) { item, b, h ->
         b.icon.setImageResource(item.iconResId)
         b.title.text = item.text
-        b.subtitle.text = item.description
+        lemmyTextHelper.bindSimpleText(b.subtitle, item.description)
 
         h.itemView.setOnClickListener {
           onCommunitySelectedListener?.invoke(

@@ -169,6 +169,20 @@
                         app:drawableTint="?colorControlNormal" />
 
                     <TextView
+                        android:id="@+id/change_feed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:textAppearance="?textAppearanceTitleSmall"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/secondary_chip_bg"
+                        android:paddingHorizontal="@dimen/padding_three_quarters"
+                        android:drawablePadding="@dimen/padding_half"
+                        android:layout_marginHorizontal="@dimen/padding_quarter"
+                        android:text="@string/change_feed"
+                        app:drawableStartCompat="@drawable/outline_swap_horiz_18"
+                        app:drawableTint="?colorControlNormal"/>
+
+                    <TextView
                         android:id="@+id/info"
                         android:layout_width="wrap_content"
                         android:layout_height="56dp"

@@ -160,6 +160,7 @@ class CommunityAppBarController(
       val toolbarPlaceholder: View,
       val icon: ImageView,
       val subscribe: TextView,
+      val changeFeed: TextView?,
       val info: TextView,
       val titleHotspot: View,
       val feedInfoText: TextView?,
@@ -292,6 +293,9 @@ class CommunityAppBarController(
       }
       vh.headerBg.setOnLongClickListener {
         onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
+      }
+      vh.changeFeed?.setOnClickListener {
+        showCommunitySelectorInternal()
       }
       vh.communitySortOrder2.setOnClickListener {
         onSortOrderClick()
@@ -1154,6 +1158,7 @@ class CommunityAppBarController(
               toolbarPlaceholder = b.toolbarPlaceholder,
               icon = b.icon,
               subscribe = b.subscribe,
+              changeFeed = null,
               info = b.info,
               titleHotspot = b.titleHotspot,
               feedInfoText = b.feedInfoText,
@@ -1187,6 +1192,7 @@ class CommunityAppBarController(
               toolbarPlaceholder = b.toolbarPlaceholder,
               icon = b.icon,
               subscribe = b.subscribe,
+              changeFeed = b.changeFeed,
               info = b.info,
               titleHotspot = b.titleHotspot,
               feedInfoText = null,
