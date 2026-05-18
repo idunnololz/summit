@@ -713,7 +713,7 @@ class Preferences(
   var autoFocusSearchBar: Boolean
     by booleanPreference(KEY_AUTO_FOCUS_SEARCH_BAR, false)
   var hideHeaderBannerIfNoBanner
-    by booleanPreference(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER, false)
+    by booleanPreference(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER, true)
   var restoreBrowsingSessions
     by booleanPreference(KEY_RESTORE_BROWSING_SESSIONS, true)
   var finishAppOnBack

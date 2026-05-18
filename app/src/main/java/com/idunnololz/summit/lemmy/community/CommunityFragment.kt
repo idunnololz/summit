@@ -1318,6 +1318,8 @@ class CommunityFragment :
       if (!args.isPreview) {
         if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
           // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
+
+          (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
         } else {
           if (viewModel.lockBottomBar &&
             !slidingPaneLayout.isOpen &&

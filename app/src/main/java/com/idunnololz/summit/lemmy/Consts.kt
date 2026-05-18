@@ -6,7 +6,8 @@ object Consts {
   const val DEFAULT_INSTANCE = "lemmy.zip"
   const val INSTANCE_LEMMY_WORLD = "lemmy.world"
 
-  val DEFAULT_LEMMY_INSTANCES = LEMMY_INSTANCES + listOf(
+  val DEFAULT_LEMMY_INSTANCES =
+    (LEMMY_INSTANCES + listOf(
     INSTANCE_LEMMY_WORLD,
 
     // piefed
@@ -17,5 +18,5 @@ object Consts {
     "piefed.zip",
     "feddit.online",
     "fedinsfw.app",
-  )
+  )).toSet().toList()
 }
