@@ -191,7 +191,7 @@
                                 android:textIsSelectable="true"
                                 android:scrollbars="vertical"
                                 android:textAppearance="?textAppearanceBodyMedium"
-                                android:inputType="textMultiLine|textUri"
+                                android:inputType="textMultiLine|textCapSentences"
                                 android:hint="@string/post_alt_text_hint"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
