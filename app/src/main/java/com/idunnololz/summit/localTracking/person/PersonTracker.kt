@@ -67,7 +67,7 @@ class PersonTracker @Inject constructor(
     localTracker.registerOnTrackingEventListener(object : SimpleOnTrackingEventListener() {
       override fun onDeleteAll() {
         coroutineScope.launch {
-          TODO()
+          personTrackerDao.deleteAll()
         }
       }
 
