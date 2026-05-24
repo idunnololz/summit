@@ -134,7 +134,7 @@ class EmojiPopupWindow @AssistedInject constructor(
 //        showAsDropDown(anchor)
 
     if (distanceToBottom > distanceToTop) {
-//            showAsDropDown(anchor, 0, 0)
+      showAsDropDown(anchor, 0, 0)
     } else {
 //            showAtLocation(anchor, Gravity.TOP, 0, 0)
       showAsDropDown(anchor, 0, -distanceToTop, Gravity.TOP or Gravity.START)

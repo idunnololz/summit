@@ -111,7 +111,7 @@ private const val TAG = "MainDatabase"
     AutoMigration(from = 51, to = 52),
     AutoMigration(from = 54, to = 55),
   ],
-  version = 55,
+  version = 56,
   exportSchema = true,
 )
 @TypeConverters(
@@ -201,6 +201,7 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_51_52)
         .addMigrations(MIGRATION_52_53)
         .addMigrations(MIGRATION_53_54)
+        .addMigrations(MIGRATION_55_56)
         .build()
     }
   }
@@ -473,6 +474,13 @@ val MIGRATION_53_54 =
   object : Migration(53, 54) {
     override fun migrate(db: SupportSQLiteDatabase) {
       db.execSQL("ALTER TABLE `history` ADD COLUMN `user_id` INTEGER NOT NULL DEFAULT 0")
+    }
+  }
+
+val MIGRATION_55_56 =
+  object : Migration(55, 56) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("UPDATE `text_emojis` SET `read` = '¯\\\\_(ツ)_/¯' WHERE `read` = '¯\\_(ツ)_/¯';")
     }
   }
 
