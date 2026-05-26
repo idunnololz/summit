@@ -1,23 +1,31 @@
 package com.idunnololz.summit.filterLists
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.util.coroutines.IoDispatcher
 import com.idunnololz.summit.util.crashLogger.crashLogger
+import kotlinx.coroutines.CoroutineDispatcher
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.set
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class ContentFiltersManager @Inject constructor(
   private val dao: ContentFiltersDao,
   private val coroutineScopeFactory: CoroutineScopeFactory,
+  @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
   companion object {
@@ -25,6 +33,7 @@ class ContentFiltersManager @Inject constructor(
   }
 
   private val coroutineScope = coroutineScopeFactory.create()
+  private var initJob: Job? = null
 
   private var postListFilters: Filters = Filters(listOf())
   private var commentListFilters: Filters = Filters(listOf())
@@ -32,10 +41,10 @@ class ContentFiltersManager @Inject constructor(
   private var regexCache = mutableMapOf<Long, Pattern>()
 
   init {
-    coroutineScope.launch {
+    initJob = coroutineScope.launch {
       refreshFilters()
 
-      withContext(Dispatchers.IO) {
+      withContext(ioDispatcher) {
         val filterCount = dao.count()
 
         if (filterCount > 1000) {
@@ -48,8 +57,12 @@ class ContentFiltersManager @Inject constructor(
     }
   }
 
+  suspend fun initialize() {
+    initJob?.join()
+  }
+
   private suspend fun refreshFilters() {
-    val filters = withContext(Dispatchers.IO) {
+    val filters = withContext(ioDispatcher) {
       dao.getAllFilters()
     }
 
@@ -96,6 +109,17 @@ class ContentFiltersManager @Inject constructor(
           } else {
             false
           }
+        }
+        else -> false
+      }
+    }
+
+  @VisibleForTesting
+  fun testPostTitle(postTitle: String): Boolean =
+    postListFilters.patternByType.any { (type, pattern) ->
+      when (type) {
+        FilterTypeIds.KeywordFilter -> {
+          pattern.matcher(postTitle).find()
         }
         else -> false
       }
@@ -196,10 +220,10 @@ class ContentFiltersManager @Inject constructor(
         } else {
           if (filter.options?.matchWholeWord == true) {
             sb.append("\\b")
-            sb.append(Pattern.quote(filter.filter))
+            sb.append(Regex.escape(filter.filter))
             sb.append("\\b")
           } else {
-            sb.append(Pattern.quote(filter.filter))
+            sb.append(Regex.escape(filter.filter))
           }
         }
         sb.append("|")

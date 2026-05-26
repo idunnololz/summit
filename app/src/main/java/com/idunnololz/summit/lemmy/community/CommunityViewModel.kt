@@ -716,10 +716,6 @@ class CommunityViewModel @Inject constructor(
   }
 
   private suspend fun restorePostListEngineIfNeeded(restorePages: Int) {
-    Log.d(
-      "HAHA",
-      "restorePostListEngineIfNeeded(). restored? ${postsRepository.isRestored} infinity? $infinity postListEngine cur page: ${postListEngine.currentPageIndex.value}",
-    )
     if (postsRepository.isRestored) {
       return
     }

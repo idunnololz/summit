@@ -613,8 +613,6 @@ class Preferences(
     by intPreference(KEY_DISPLAY_DELETED_POSTS, ALWAYS_HIDE_DELETED_POSTS)
   var useCommunityDownloadFolder: Boolean
     by booleanPreference(KEY_USE_COMMUNITY_DOWNLOAD_FOLDER, false)
-  var showPerUserScores: Boolean
-    by booleanPreference(KEY_SHOW_PER_USER_SCORES, true)
 
   var animationLevel: AnimationsHelper.AnimationLevel
     get() = AnimationsHelper.AnimationLevel.parse(
@@ -762,6 +760,8 @@ class Preferences(
 
   var postsFeedHeaderVersion: Int
     by intPreference(KEY_POSTS_FEED_HEADER_VERSION, PostsFeedHeaderVersions.V2)
+  var showPerUserScores: Boolean
+    by booleanPreference(KEY_SHOW_PER_USER_SCORES, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

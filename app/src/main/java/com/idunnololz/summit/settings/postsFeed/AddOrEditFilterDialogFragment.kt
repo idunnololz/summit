@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
@@ -31,6 +32,8 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
         arguments = AddOrEditFilterDialogFragmentArgs(initialEntry).toBundle()
       }
   }
+
+  private val wordRegex = Regex("""\w*""")
 
   private var currentFilter: FilterEntry? = null
 
@@ -62,6 +65,12 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
         ?: savedInstanceState?.getParcelableCompat(SIS_CURRENT_FILTER)
         ?: args.filterToEdit
 
+      filterField.editText?.addTextChangedListener(
+        afterTextChanged = {
+          checkForErrors()
+        }
+      )
+
       filterField.editText?.setText(currentFilter?.filter)
 
       regexSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -74,11 +83,27 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
       regexSwitch.isChecked = currentFilter?.isRegex == true
       matchWholeWordSwitch.isChecked = currentFilter?.options?.matchWholeWord != false
 
+      matchWholeWordSwitch.setOnCheckedChangeListener { _, _ ->
+        checkForErrors()
+      }
+
+      checkForErrors()
+
       cancel.setOnClickListener {
         dismiss()
       }
       add.setOnClickListener {
         commitAndDismiss()
+      }
+    }
+  }
+
+  private fun checkForErrors() {
+    with(binding) {
+      if (matchWholeWordSwitch.isEnabled && !wordRegex.matches(filterField.editText?.text.toString())) {
+        filterField.error = getString(R.string.warn_match_whole_word_enabled)
+      } else {
+        filterField.isErrorEnabled = false
       }
     }
   }

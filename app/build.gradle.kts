@@ -219,6 +219,10 @@ dependencies {
 
   testImplementation("junit:junit:4.13.2")
   testImplementation("com.google.truth:truth:1.4.5")
+  testImplementation(libs.mockk)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation("org.robolectric:robolectric:4.13")
+  testImplementation(libs.junit.ktx)
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

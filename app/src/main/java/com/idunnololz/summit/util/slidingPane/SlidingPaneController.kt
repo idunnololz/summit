@@ -107,6 +107,11 @@ class SlidingPaneController @AssistedInject constructor(
   var panelClosedNavBarOpenPercent: Float = 1f
   var panelOpenNavBarOpenPercent: Float = 0f
 
+  fun getNavUiOpenPercent(slideOffset: Float = slidingPaneLayout.getSlideOffset() ?: 0f): Float {
+    val delta = panelOpenNavBarOpenPercent - panelClosedNavBarOpenPercent
+    return panelClosedNavBarOpenPercent + delta * (1f - slideOffset)
+  }
+
   private val _panelSlideListener =
     object : SlidingPaneLayout.PanelSlideListener {
       override fun onPanelSlide(panel: View, slideOffset: Float) {
@@ -114,10 +119,9 @@ class SlidingPaneController @AssistedInject constructor(
 
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
-            val delta = panelOpenNavBarOpenPercent - panelClosedNavBarOpenPercent
             if (!lockNavBar) {
               setNavUiOpenPercent(
-                panelClosedNavBarOpenPercent + delta * (1f - slideOffset),
+                getNavUiOpenPercent(slideOffset),
                 force = isSlideable,
               )
             }
@@ -191,7 +195,7 @@ class SlidingPaneController @AssistedInject constructor(
             setReorderingAllowed(true)
             replace(
               fragmentContainerId,
-              EmptyScreenFragment.Companion.newInstance(emptyScreenText),
+              EmptyScreenFragment.newInstance(emptyScreenText),
             )
           }
         }

@@ -654,10 +654,10 @@ class CommunityFragment :
               return@observe
             }
 
+            slidingPaneController?.panelClosedNavBarOpenPercent = it
             if (!navBarController.useNavigationRail && slidingPaneController?.isOpen != true) {
               (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
             }
-            slidingPaneController?.panelClosedNavBarOpenPercent = it
 
             isCustomAppBarExpandedPercent = it
 
@@ -962,7 +962,8 @@ class CommunityFragment :
   fun navBarPercentShown(): Float = if (viewModel.lockBottomBar) {
     1f
   } else {
-    communityAppBarController?.percentShown?.value ?: 1f
+    (communityAppBarController?.percentShown?.value ?: 1f) *
+      (slidingPaneController?.getNavUiOpenPercent() ?: 1f)
   }
 
   fun scrollToTop() {
@@ -1319,7 +1320,9 @@ class CommunityFragment :
         if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
           // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
 
-          (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
+          binding.root.post {
+            (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
+          }
         } else {
           if (viewModel.lockBottomBar &&
             !slidingPaneLayout.isOpen &&

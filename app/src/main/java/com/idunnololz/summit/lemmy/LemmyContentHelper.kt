@@ -345,8 +345,6 @@ class LemmyContentHelper(
     fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
       if (!showImage) return
 
-      Log.d("HAHA", "insertAndLoadFullImage()")
-
       val fullContentImageView =
         if (fullBleedImage) {
           getAndEnsureView<View>(R.layout.full_content_image_view)
