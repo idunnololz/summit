@@ -134,13 +134,12 @@ class LoadingIndicatorDrawable internal constructor(
     invalidateSelf()
   }
 
+  @Deprecated("Deprecated in Java")
   override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
   override fun invalidateDrawable(drawable: Drawable) {
     val callback = getCallback()
-    if (callback != null) {
-      callback.invalidateDrawable(this)
-    }
+    callback?.invalidateDrawable(this)
   }
 
   override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) {

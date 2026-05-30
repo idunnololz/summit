@@ -8,7 +8,6 @@ plugins {
   id("androidx.navigation.safeargs.kotlin")
   id("org.jetbrains.kotlin.plugin.parcelize")
   id("com.google.devtools.ksp")
-  alias(libs.plugins.legacy.kapt)
   alias(libs.plugins.sentry)
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.plugin.serialization)
@@ -199,8 +198,8 @@ dependencies {
   implementation(libs.hilt.android)
   // Tried to switch to KSP + Dagger/Hilt but the build performance was terrible. Specifically
   // for incremental builds. Make sure to test this when switching to KSP again in the future.
-  kapt(libs.hilt.android.compiler)
-  kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+  ksp(libs.hilt.android.compiler)
+  ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
 
   implementation(libs.process.phoenix)
 
@@ -225,8 +224,4 @@ dependencies {
   testImplementation(libs.junit.ktx)
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-}
-
-kapt {
-  correctErrorTypes = true
 }
