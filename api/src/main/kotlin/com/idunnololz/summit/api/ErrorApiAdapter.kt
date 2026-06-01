@@ -114,6 +114,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
 
@@ -270,7 +271,7 @@ class ErrorApiAdapter(
   override suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Result<GetRepliesResponse> = Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun getPersonMentions(
     authorization: String?,
@@ -331,13 +332,7 @@ class ErrorApiAdapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> = Result.failure(error)
-
-  override suspend fun getReportCount(
-    authorization: String?,
-    args: GetReportCount,
-    force: Boolean,
-  ): Result<GetReportCountResponse> = Result.failure(error)
+  ): Result<UnreadCount> = Result.failure(error)
 
   override suspend fun followCommunity(
     authorization: String?,

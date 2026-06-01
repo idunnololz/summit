@@ -6,5 +6,4 @@ data class ListCommunities(
     null,
   val page: Int? = null,
   val limit: Int? = null,
-  val auth: String? = null,
 )

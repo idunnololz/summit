@@ -255,9 +255,9 @@ class InboxPaneController @AssistedInject constructor(
       newItems.add(Item.TitleItem)
       newItems.add(newCategoryItem(InboxCategory.Unread, unreadCounts?.totalUnreadCount))
       newItems.add(newCategoryItem(InboxCategory.All, unreadCounts?.totalUnreadCount))
-      newItems.add(newCategoryItem(InboxCategory.Replies, unreadCounts?.replies))
-      newItems.add(newCategoryItem(InboxCategory.Mentions, unreadCounts?.mentions))
-      newItems.add(newCategoryItem(InboxCategory.Messages, unreadCounts?.privateMessages))
+      newItems.add(newCategoryItem(InboxCategory.Replies, 0))
+      newItems.add(newCategoryItem(InboxCategory.Mentions, 0))
+      newItems.add(newCategoryItem(InboxCategory.Messages, 0))
 
       val isMod = fullAccount?.isMod() == true
       val isAdmin = fullAccount?.isAdmin() == true

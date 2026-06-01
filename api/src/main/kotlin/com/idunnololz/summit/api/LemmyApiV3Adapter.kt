@@ -119,7 +119,12 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -139,28 +144,6 @@ class LemmyApiV3Adapter(
 
   override fun supportsFeature(apiFeature: ApiFeature): Boolean =
     apiInfo.supportsFeature(apiFeature)
-
-  private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
-    val headers = mutableMapOf<String, String>()
-    if (authorization != null) {
-      headers["Authorization"] = authorization
-    }
-    if (force) {
-      headers[CACHE_CONTROL_HEADER] = CACHE_CONTROL_NO_CACHE
-    }
-    return headers
-  }
-
-  fun <T> T.serializeToMap(): Map<String, String> = convert()
-
-  // convert an object of type I to type O
-  private inline fun <I, reified O> I.convert(): O {
-    val json = gson.toJson(this)
-    return gson.fromJson(
-      json,
-      object : TypeToken<O>() {}.type,
-    )
-  }
 
   override suspend fun getSite(
     authorization: String?,
@@ -324,7 +307,7 @@ class LemmyApiV3Adapter(
         page++
       }
 
-      return Result.success(GetCommentsResponse(comments))
+      return Result.success(GetCommentsResponse(comments, null, null))
     }
 
     return getResult()
@@ -427,7 +410,7 @@ class LemmyApiV3Adapter(
   override suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Result<GetRepliesResponse> =
+  ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markAllAsRead(generateHeaders(authorization, false), args) }
 
   override suspend fun getPersonMentions(
@@ -509,17 +492,45 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> = retrofitErrorHandler {
-    api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
-  }
+  ): Result<UnreadCount> =
+    withContext(Dispatchers.IO) {
+      val j1 = async {
+        retrofitErrorHandler {
+          api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
+      val j2 = async {
+        retrofitErrorHandler {
+          api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
+      val j3 = async {
+        retrofitErrorHandler {
+          api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
 
-  override suspend fun getReportCount(
-    authorization: String?,
-    args: GetReportCount,
-    force: Boolean,
-  ): Result<GetReportCountResponse> = retrofitErrorHandler {
-    api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
-  }
+      val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+      val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+      val registrationCount = j3.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+
+      Result.success(
+        UnreadCount(
+          notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
+          registrationApplicationCount = registrationCount.registration_applications,
+          pendingFollowCount = 0,
+          reportCount = reportCount.comment_reports + reportCount.post_reports + (reportCount.private_message_reports ?: 0),
+
+          mentions = unreadCount.mentions,
+          privateMessages = unreadCount.private_messages,
+          replies = unreadCount.replies,
+
+          commentReports = reportCount.comment_reports,
+          postReports = reportCount.post_reports,
+          privateMessageReports = reportCount.private_message_reports,
+        )
+      )
+    }
 
   override suspend fun followCommunity(
     authorization: String?,
@@ -749,6 +760,17 @@ class LemmyApiV3Adapter(
     api.federatedInstances(generateHeaders(authorization, force))
   }.map {
     it.federated_instances ?: FederatedInstances(listOf(), listOf(), listOf())
+  }
+
+  private fun <T> T.serializeToMap(): Map<String, String> = convert()
+
+  // convert an object of type I to type O
+  private inline fun <I, reified O> I.convert(): O {
+    val json = gson.toJson(this)
+    return gson.fromJson(
+      json,
+      object : TypeToken<O>() {}.type,
+    )
   }
 
   override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =

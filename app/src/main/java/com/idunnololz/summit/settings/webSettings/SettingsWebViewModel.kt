@@ -90,7 +90,6 @@ class SettingsWebViewModel @Inject constructor(
         display_name = person.name,
         bio = person.bio,
         email = localUser.email,
-        auth = accountData.account.jwt,
         avatar = person.avatar,
         banner = person.banner,
         matrix_user_id = person.matrix_user_id,
@@ -170,7 +169,7 @@ class SettingsWebViewModel @Inject constructor(
 
     viewModelScope.launch {
       lemmyApiClient.changeInstance(accountData.account.instance)
-      lemmyApiClient.saveUserSettings(settings)
+      lemmyApiClient.saveUserSettings(settings, accountData.account)
         .onSuccess {
           defaultSettingValues = defaultSettingValues + updatedSettingValues
           updatedSettingValues.clear()

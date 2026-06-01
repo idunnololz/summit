@@ -41,5 +41,4 @@ data class CreateSite(
   val blocked_instances: List<String>? = null,
   val taglines: List<String>? = null,
   val registration_mode: RegistrationMode? /* "Closed" | "RequireApplication" | "Open" */ = null,
-  val auth: String,
 )

@@ -11,5 +11,4 @@ data class Search(
   val listing_type: ListingType? /* "All" | "Local" | "Subscribed" */ = null,
   val page: Int? = null,
   val limit: Int? = null,
-  val auth: String? = null,
 )

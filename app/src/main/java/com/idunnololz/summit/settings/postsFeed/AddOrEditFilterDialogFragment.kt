@@ -100,6 +100,10 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
 
   private fun checkForErrors() {
     with(binding) {
+      if (filterField.editText?.text?.isEmpty() == true) {
+        return
+      }
+
       if (matchWholeWordSwitch.isEnabled && !wordRegex.matches(filterField.editText?.text.toString())) {
         filterField.error = getString(R.string.warn_match_whole_word_enabled)
       } else {

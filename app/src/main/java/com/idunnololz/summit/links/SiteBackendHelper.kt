@@ -66,15 +66,15 @@ class SiteBackendHelper @Inject constructor(
             )
           }
         }
-//        val v4Job = async {
-//          runCatching {
-//            linkFetcher.downloadSite(
-//              url = "https://$instance/api/v4/site",
-//              cache = true,
-//              client = okHttpClient
-//            )
-//          }
-//        }
+        val v4Job = async {
+          retry {
+            linkFetcher.downloadSite(
+              url = "https://$instance/api/v4/site",
+              cache = true,
+              client = okHttpClient
+            )
+          }
+        }
         val alphaJob = async {
           retry {
             linkFetcher.downloadSite(
@@ -94,6 +94,7 @@ class SiteBackendHelper @Inject constructor(
 
         val allJobs = listOf(
           v3Job,
+          v4Job,
           alphaJob,
           homePageJob,
         )
@@ -119,6 +120,26 @@ class SiteBackendHelper @Inject constructor(
                   instance = instance,
                   backendType = ApiType.PieFedAlpha,
                   downvoteAllowed = site?.site?.enableDownvotes != false,
+                ),
+              )
+            } catch (e: Exception) {
+              Log.e(TAG, "Error parsing site object", e)
+            }
+          }
+        }
+        v4Job.await().let { result ->
+          if (result.isSiteView()) {
+            try {
+              allJobs.forEach { it.cancel() }
+
+              Log.d(TAG, "instance: $instance is type V4")
+              val site = gson.fromJson(result.getOrNull(), GetSiteResponse::class.java)
+
+              return@withContext Result.success(
+                ApiInfo(
+                  instance = instance,
+                  backendType = ApiType.LemmyV4,
+                  downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
                 ),
               )
             } catch (e: Exception) {
@@ -206,6 +227,6 @@ class SiteBackendHelper @Inject constructor(
 val ApiType.isLemmy
   get() = when (this) {
     ApiType.LemmyV3 -> true
-//    ApiType.LemmyV4 -> true
+    ApiType.LemmyV4 -> true
     ApiType.PieFedAlpha -> false
   }

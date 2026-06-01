@@ -339,7 +339,7 @@ interface LemmyApiV3 {
   fun markAllAsRead(
     @HeaderMap headers: Map<String, String>,
     @Body form: MarkAllAsRead,
-  ): Call<GetRepliesResponse>
+  ): Call<SuccessResponse>
 
   /**
    * Get mentions for your user.

@@ -18,6 +18,20 @@ data class ApiInfo(
         ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
         ApiFeature.GetPostsByCursor -> true
+        ApiFeature.ListByCursorRequired -> false
+      }
+    ApiType.LemmyV4 ->
+      when (apiFeature) {
+        ApiFeature.Reports -> true
+        ApiFeature.Register -> true
+        ApiFeature.Downvoted -> true
+        ApiFeature.UploadsList -> true
+        ApiFeature.Downvote -> downvoteAllowed
+        ApiFeature.SearchAll -> true
+        ApiFeature.SearchComments -> true
+        ApiFeature.GetCommunitiesAll -> true
+        ApiFeature.GetPostsByCursor -> true
+        ApiFeature.ListByCursorRequired -> true
       }
     ApiType.PieFedAlpha ->
       when (apiFeature) {
@@ -30,6 +44,7 @@ data class ApiInfo(
         ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
         ApiFeature.GetPostsByCursor -> false
+        ApiFeature.ListByCursorRequired -> false
       }
     null ->
       when (apiFeature) {
@@ -42,6 +57,7 @@ data class ApiInfo(
         ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
         ApiFeature.GetPostsByCursor -> false
+        ApiFeature.ListByCursorRequired -> false
       }
   }
 }

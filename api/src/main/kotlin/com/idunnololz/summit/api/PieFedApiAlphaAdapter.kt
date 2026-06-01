@@ -165,7 +165,11 @@ import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -261,6 +265,7 @@ class PieFedApiAlphaAdapter(
       GetPostsResponse(
         posts = it.posts.map { it.toPostView() },
         next_page = null,
+        prev_page = null,
       )
     }
 
@@ -600,9 +605,11 @@ class PieFedApiAlphaAdapter(
   override suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Result<GetRepliesResponse> =
+  ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markAllAsRead(generateHeaders(authorization, false), args) }
-      .map { it.toGetRepliesResponse() }
+      .map { SuccessResponse(
+        true
+      ) }
 
   override suspend fun getPersonMentions(
     authorization: String?,
@@ -708,17 +715,45 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> = retrofitErrorHandler {
-    api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
-  }
+  ): Result<UnreadCount> =
+    withContext(Dispatchers.IO) {
+      val j1 = async {
+        retrofitErrorHandler {
+          api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
+      val j2 = async {
+        retrofitErrorHandler {
+          api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
+      val j3 = async {
+        retrofitErrorHandler {
+          api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap())
+        }
+      }
 
-  override suspend fun getReportCount(
-    authorization: String?,
-    args: GetReportCount,
-    force: Boolean,
-  ): Result<GetReportCountResponse> = retrofitErrorHandler {
-    api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
-  }
+      val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+      val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+      val registrationCount = j3.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+
+      Result.success(
+        UnreadCount(
+          notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
+          registrationApplicationCount = registrationCount.registration_applications,
+          pendingFollowCount = 0,
+          reportCount = reportCount.comment_reports + reportCount.post_reports + (reportCount.private_message_reports ?: 0),
+
+          mentions = unreadCount.mentions,
+          privateMessages = unreadCount.private_messages,
+          replies = unreadCount.replies,
+
+          commentReports = reportCount.comment_reports,
+          postReports = reportCount.post_reports,
+          privateMessageReports = reportCount.private_message_reports,
+        )
+      )
+    }
 
   override suspend fun followCommunity(
     authorization: String?,

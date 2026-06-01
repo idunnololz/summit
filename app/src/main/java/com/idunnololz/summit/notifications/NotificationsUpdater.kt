@@ -54,34 +54,31 @@ class NotificationsUpdater @AssistedInject constructor(
         .fold(
           {
             val jobs = mutableListOf<Deferred<List<InboxItem>>>()
+            val mentions = it.mentions
+            val privateMessages = it.privateMessages
+            val replies = it.replies
+            val commentReports = it.commentReports
+            val postReports = it.postReports
+            val privateMessageReports = it.privateMessageReports
 
-            if (it.mentions > 0) {
+            // TODO(lemmyv1): Add support for LemmyV1
+
+            if (mentions != null && mentions > 0) {
               jobs.add(runMentionsJob(account))
             }
-            if (it.private_messages > 0) {
+            if (privateMessages != null && privateMessages > 0) {
               jobs.add(runPrivateMessagesJob(account))
             }
-            if (it.replies > 0) {
+            if (replies != null && replies > 0) {
               jobs.add(runRepliesJob(account))
             }
-            jobs.flatMap { it.await() }
-          },
-          { listOf() },
-        )
-    }
-    val j2: Deferred<List<InboxItem>> = coroutineScope.async {
-      apiClient.fetchUnresolvedReportsCount(force = true, account)
-        .fold(
-          {
-            val jobs = mutableListOf<Deferred<List<InboxItem>>>()
-
-            if (it.comment_reports > 0) {
+            if (commentReports != null && commentReports > 0) {
               jobs.add(runCommentReportsJob(account))
             }
-            if (it.post_reports > 0) {
+            if (postReports != null && postReports > 0) {
               jobs.add(runPostReportsJob(account))
             }
-            if ((it.private_message_reports ?: 0) > 0) {
+            if (privateMessageReports != null && privateMessageReports > 0) {
               jobs.add(runPrivateMessageReportsJob(account))
             }
             jobs.flatMap { it.await() }
@@ -92,7 +89,6 @@ class NotificationsUpdater @AssistedInject constructor(
 
     val inboxItems = mutableListOf<InboxItem>()
     inboxItems.addAll(j1.await())
-    inboxItems.addAll(j2.await())
 
     val thresholdTs = notificationsManager.getLastNotificationItemTsForAccount(account)
 

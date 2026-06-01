@@ -124,6 +124,7 @@ import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.Consts
@@ -253,7 +254,6 @@ class LemmyApiClient @Inject constructor(
         limit = limit,
         liked_only = upvotedOnly,
         disliked_only = downvotedOnly,
-        auth = account?.jwt,
         show_read = show_read,
       )
 
@@ -269,9 +269,9 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
   ): Result<GetPostResponse> {
     val postForm = id.fold({
-      GetPost(id = it, auth = account?.jwt)
+      GetPost(id = it)
     }, {
-      GetPost(comment_id = it, auth = account?.jwt)
+      GetPost(comment_id = it)
     })
 
     return onApiClient {
@@ -289,7 +289,6 @@ class LemmyApiClient @Inject constructor(
       post_id = postId,
       post_ids = listOf(postId),
       read = read,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -311,7 +310,6 @@ class LemmyApiClient @Inject constructor(
       page = page,
       limit = limit,
       saved_only = true,
-      auth = account?.jwt,
     )
 
     return onApiClient {
@@ -334,7 +332,6 @@ class LemmyApiClient @Inject constructor(
         post_id = null,
         sort = CommentSortType.New,
         saved_only = true,
-        auth = account?.jwt,
         page = page,
         limit = limit,
       )
@@ -361,7 +358,6 @@ class LemmyApiClient @Inject constructor(
         type_ = ListingType.All,
         post_id = it,
         sort = sort,
-        auth = account?.jwt,
         limit = limit,
         page = page,
       )
@@ -371,7 +367,6 @@ class LemmyApiClient @Inject constructor(
         type_ = ListingType.All,
         parent_id = it,
         sort = sort,
-        auth = account?.jwt,
         limit = limit,
         page = page,
       )
@@ -381,7 +376,6 @@ class LemmyApiClient @Inject constructor(
         type_ = ListingType.All,
         post_id = null,
         sort = sort,
-        auth = account?.jwt,
         liked_only = upvotedOnly,
         disliked_only = downvotedOnly,
         limit = limit,
@@ -415,9 +409,9 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
   ): Result<GetCommunityResponse> {
     val form = idOrName.fold({ id ->
-      GetCommunity(id = id, auth = account?.jwt)
+      GetCommunity(id = id)
     }, { name ->
-      GetCommunity(name = name, auth = account?.jwt)
+      GetCommunity(name = name)
     })
 
     return onApiClient {
@@ -469,7 +463,6 @@ class LemmyApiClient @Inject constructor(
       listing_type = listingType,
       page = page,
       limit = limit,
-      auth = account?.jwt,
     )
 
     return onApiClient {
@@ -490,7 +483,6 @@ class LemmyApiClient @Inject constructor(
       sort = sortType,
       page = page,
       limit = limit,
-      auth = account?.jwt,
     )
     return onApiClient {
       getApi().getCommunityList(authorization = account?.bearer, args = form, force = false)
@@ -525,32 +517,18 @@ class LemmyApiClient @Inject constructor(
   }
 
   suspend fun fetchSiteWithRetry(auth: String?, force: Boolean): Result<GetSiteResponse> = retry {
-    val form = GetSite(auth = auth)
+    val form = GetSite()
 
     onApiClient {
       getApi().getSite(authorization = auth?.toBearer(), args = form, force = force)
     }
   }
 
-  suspend fun fetchUnreadCount(force: Boolean, account: Account): Result<GetUnreadCountResponse> {
-    val form = GetUnreadCount(account.jwt)
+  suspend fun fetchUnreadCount(force: Boolean, account: Account): Result<UnreadCount> {
+    val form = GetUnreadCount()
 
     return onApiClient {
       getApi().getUnreadCount(authorization = account.bearer, form, force = force)
-    }
-  }
-
-  suspend fun fetchUnresolvedReportsCount(
-    force: Boolean,
-    account: Account,
-  ): Result<GetReportCountResponse> {
-    val form = GetReportCount(
-      null,
-      account.jwt,
-    )
-
-    return onApiClient {
-      getApi().getReportCount(authorization = account.bearer, form, force = force)
     }
   }
 
@@ -559,7 +537,6 @@ class LemmyApiClient @Inject constructor(
       val form = CreatePostLike(
         post_id = postId,
         score = score,
-        auth = account.jwt,
       )
 
       onApiClient { getApi().likePost(authorization = account.bearer, form) }
@@ -663,7 +640,6 @@ class LemmyApiClient @Inject constructor(
       communityId,
       personId,
       add,
-      account.jwt,
     )
 
     return onApiClient {
@@ -679,7 +655,6 @@ class LemmyApiClient @Inject constructor(
     val form = DistinguishComment(
       commentId,
       distinguish,
-      account.jwt,
     )
 
     return onApiClient {
@@ -697,7 +672,6 @@ class LemmyApiClient @Inject constructor(
       commentId,
       remove,
       reason,
-      account.jwt,
     )
 
     return onApiClient {
@@ -1012,11 +986,12 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
   ): Result<List<PersonMentionView>> {
     val form = GetPersonMentions(
-      sort,
-      page,
-      limit,
-      unreadOnly,
-      account.jwt,
+      sort = sort,
+      page = page,
+      limit = limit,
+      unread_only = unreadOnly,
+      page_cursor = null,
+      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1052,10 +1027,9 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
   ): Result<ListPrivateMessageReportsResponse> {
     val form = ListPrivateMessageReports(
-      page,
-      limit,
-      unresolvedOnly,
-      account.jwt,
+      page = page,
+      limit = limit,
+      unresolved_only = unresolvedOnly,
     )
 
     return onApiClient {
@@ -1167,9 +1141,8 @@ class LemmyApiClient @Inject constructor(
     account: Account,
   ): Result<SuccessResponse> {
     val form = MarkCommentReplyAsRead(
-      id,
-      read,
-      account.jwt,
+      comment_reply_id = id,
+      read = read,
     )
     return onApiClient {
       getApi().markCommentReplyAsRead(authorization = account.bearer, form)
@@ -1180,11 +1153,10 @@ class LemmyApiClient @Inject constructor(
     id: PersonMentionId,
     read: Boolean,
     account: Account,
-  ): Result<PersonMentionView> {
+  ): Result<PersonMentionView?> {
     val form = MarkPersonMentionAsRead(
-      id,
-      read,
-      account.jwt,
+      person_mention_id = id,
+      read = read,
     )
     return onApiClient {
       getApi().markPersonMentionAsRead(authorization = account.bearer, form)
@@ -1195,21 +1167,18 @@ class LemmyApiClient @Inject constructor(
     id: PrivateMessageId,
     read: Boolean,
     account: Account,
-  ): Result<PrivateMessageView> {
+  ): Result<PrivateMessageView?> {
     val form = MarkPrivateMessageAsRead(
-      id,
-      read,
-      account.jwt,
+      private_message_id = id,
+      read = read,
     )
     return onApiClient {
       getApi().markPrivateMessageAsRead(authorization = account.bearer, form)
     }.map { it.private_message_view }
   }
 
-  suspend fun markAllAsRead(account: Account): Result<GetRepliesResponse> {
-    val form = MarkAllAsRead(
-      account.jwt,
-    )
+  suspend fun markAllAsRead(account: Account): Result<SuccessResponse> {
+    val form = MarkAllAsRead()
     return onApiClient {
       getApi().markAllAsRead(authorization = account.bearer, form)
     }
@@ -1219,7 +1188,7 @@ class LemmyApiClient @Inject constructor(
     content: String,
     recipient: PersonId,
     account: Account,
-  ): Result<PrivateMessageView> {
+  ): Result<PrivateMessageView?> {
     val form = CreatePrivateMessage(
       content = content,
       recipient_id = recipient,
@@ -1230,7 +1199,7 @@ class LemmyApiClient @Inject constructor(
   }
 
   suspend fun savePost(postId: PostId, save: Boolean, account: Account): Result<PostView> {
-    val form = SavePost(postId, save, account.jwt)
+    val form = SavePost(post_id = postId, save = save)
 
     return onApiClient {
       getApi().savePost(authorization = account.bearer, form)
@@ -1242,7 +1211,7 @@ class LemmyApiClient @Inject constructor(
     save: Boolean,
     account: Account,
   ): Result<CommentView> {
-    val form = SaveComment(commentId, save, account.jwt)
+    val form = SaveComment(commentId, save)
 
     return onApiClient {
       getApi().saveComment(authorization = account.bearer, form)
@@ -1257,7 +1226,6 @@ class LemmyApiClient @Inject constructor(
     val form = CreatePostReport(
       postId,
       reason,
-      account.jwt,
     )
 
     return onApiClient {
@@ -1273,7 +1241,6 @@ class LemmyApiClient @Inject constructor(
     val form = CreateCommentReport(
       commentId,
       reason,
-      account.jwt,
     )
 
     return onApiClient {
@@ -1281,8 +1248,11 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> = onApiClient {
-    getApi().saveUserSettings(authorization = settings.auth.toBearer(), settings)
+  suspend fun saveUserSettings(
+    settings: SaveUserSettings,
+    account: Account,
+  ): Result<Unit> = onApiClient {
+    getApi().saveUserSettings(authorization = account.bearer, settings)
   }.map { Unit }
 
   suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
@@ -1649,7 +1619,16 @@ class LemmyApiClient @Inject constructor(
           instance = instance,
           apiInfo = it,
         )
-//          SiteBackendHelper.ApiType.LemmyV4,
+        ApiType.LemmyV4 -> LemmyApiV4Adapter(
+          api = Retrofit.Builder()
+            .baseUrl("https://$instance/api/v4/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(LemmyApiV4::class.java),
+          instance = instance,
+          apiInfo = it,
+        )
         ApiType.LemmyV3,
         null,
         -> LemmyApiV3Adapter(

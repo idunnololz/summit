@@ -796,7 +796,8 @@ class PostsRepository @AssistedInject constructor(
     listingType: ListingType?,
   ): PostsDataSource =
     if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true &&
-      preferences.useCursorsWhenLoadingPostFeed
+      (preferences.useCursorsWhenLoadingPostFeed ||
+        apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true)
     ) {
       cursorBackedSinglePostsDataSourceFactory.create(communityName, listingType)
     } else {

@@ -355,7 +355,6 @@ class CommunityInfoViewModel @Inject constructor(
         DeleteCommunity(
           community_id = communityId,
           deleted = delete,
-          auth = "",
         ),
       )
         .onFailure {

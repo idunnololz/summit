@@ -7,7 +7,7 @@ data class PersonMentionView(
   val post: Post,
   val community: Community,
   val recipient: Person,
-  val counts: CommentAggregates,
+  val counts: CommentAggregates?,
   val creator_banned_from_community: Boolean,
   val subscribed: SubscribedType /* "Subscribed" | "NotSubscribed" | "Pending" */,
   val saved: Boolean,

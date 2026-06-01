@@ -114,6 +114,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
 
@@ -307,7 +308,7 @@ interface LemmyLikeApi : ApiCompat {
   suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Result<GetRepliesResponse>
+  ): Result<SuccessResponse>
 
   /**
    * Get mentions for your user.
@@ -383,13 +384,7 @@ interface LemmyLikeApi : ApiCompat {
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse>
-
-  suspend fun getReportCount(
-    authorization: String?,
-    args: GetReportCount,
-    force: Boolean,
-  ): Result<GetReportCountResponse>
+  ): Result<UnreadCount>
 
   /**
    * Follow / subscribe to a community.

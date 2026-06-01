@@ -22,5 +22,4 @@ data class SaveUserSettings(
   val show_new_post_notifs: Boolean? = null,
   val discussion_languages: List<LanguageId>? = null,
   val generate_totp_2fa: Boolean? = null,
-  val auth: String,
 )

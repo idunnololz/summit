@@ -43,6 +43,7 @@ import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.models.GetPersonDetailsResponse
 import com.idunnololz.summit.models.GetPostResponse
@@ -447,18 +448,13 @@ class AccountAwareLemmyClient @Inject constructor(
   suspend fun fetchUnreadCountWithRetry(
     force: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<GetUnreadCountResponse> = retry {
+  ): Result<UnreadCount> = retry {
     if (account == null) {
       createAccountErrorResult()
     } else {
       apiClient.fetchUnreadCount(force, account)
         .autoSignOut(account)
     }
-  }
-
-  suspend fun fetchUnresolvedReportsCountWithRetry(force: Boolean, account: Account) = retry {
-    apiClient.fetchUnresolvedReportsCount(force, account)
-      .autoSignOut(account)
   }
 
   suspend fun listCommentVotesWithRetry(
@@ -833,7 +829,7 @@ class AccountAwareLemmyClient @Inject constructor(
     id: PersonMentionId,
     read: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<PersonMentionView> = if (account == null) {
+  ): Result<PersonMentionView?> = if (account == null) {
     createAccountErrorResult()
   } else {
     apiClient.markMentionAsRead(id, read, account)
@@ -844,14 +840,14 @@ class AccountAwareLemmyClient @Inject constructor(
     id: PrivateMessageId,
     read: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<PrivateMessageView> = if (account == null) {
+  ): Result<PrivateMessageView?> = if (account == null) {
     createAccountErrorResult()
   } else {
     apiClient.markPrivateMessageAsRead(id, read, account)
       .autoSignOut(account)
   }
 
-  suspend fun markAllAsRead(account: Account? = accountForInstance()): Result<GetRepliesResponse> =
+  suspend fun markAllAsRead(account: Account? = accountForInstance()): Result<SuccessResponse> =
     if (account == null) {
       createAccountErrorResult()
     } else {
@@ -863,7 +859,7 @@ class AccountAwareLemmyClient @Inject constructor(
     content: String,
     recipient: PersonId,
     account: Account? = accountForInstance(),
-  ): Result<PrivateMessageView> = if (account == null) {
+  ): Result<PrivateMessageView?> = if (account == null) {
     createAccountErrorResult()
   } else {
     apiClient.createPrivateMessage(content, recipient, account)

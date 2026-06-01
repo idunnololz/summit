@@ -163,7 +163,6 @@ class CreateOrEditCommunityViewModel @Inject constructor(
           nsfw = curCommunity.nsfw,
           posting_restricted_to_mods = curCommunity.posting_restricted_to_mods,
           discussion_languages = curCommunityData.discussionLanguages,
-          auth = "",
         ),
       )
 
@@ -198,7 +197,6 @@ class CreateOrEditCommunityViewModel @Inject constructor(
           nsfw = curCommunity.nsfw,
           posting_restricted_to_mods = curCommunity.posting_restricted_to_mods,
           discussion_languages = curCommunityData.discussionLanguages,
-          auth = "",
         ),
       )
 

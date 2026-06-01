@@ -42,5 +42,4 @@ data class EditSite(
   val taglines: List<String>? = null,
   val registration_mode: RegistrationMode? /* "Closed" | "RequireApplication" | "Open" */ = null,
   val reports_email_admins: Boolean? = null,
-  val auth: String,
 )

@@ -25,4 +25,7 @@ enum class ApiFeature {
   GetCommunitiesAll,
 
   GetPostsByCursor,
+
+  // True if the server ONLY supports listing items using cursors.
+  ListByCursorRequired,
 }
