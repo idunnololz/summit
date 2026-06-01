@@ -142,7 +142,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
           val fragment = childFragmentManager.findFragmentById(R.id.message_fragment_container)
 
           if (fragment != null) {
-            childFragmentManager.commit {
+            childFragmentManager.commit(allowStateLoss = true) {
               setReorderingAllowed(true)
               remove(fragment)
             }

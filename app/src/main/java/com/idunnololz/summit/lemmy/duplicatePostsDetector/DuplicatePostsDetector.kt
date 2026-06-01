@@ -18,6 +18,8 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -56,13 +58,13 @@ class DuplicatePostsDetector @Inject constructor(
     }
   }
 
-  fun addReadOrHiddenPost(postView: PostView) {
+  suspend fun addReadOrHiddenPost(postView: PostView) {
     if (!isEnabled) return
 
     currentDuplicatePostsDetector?.addReadOrHiddenPost(postView)
   }
 
-  fun removeReadOrHiddenPost(postView: PostView) {
+  suspend fun removeReadOrHiddenPost(postView: PostView) {
     if (!isEnabled) return
 
     currentDuplicatePostsDetector?.removeReadOrHiddenPost(postView)
@@ -114,6 +116,7 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
   }
 
   private var readPosts = newLinkedHashMap()
+  private val mutex = Mutex()
 
   init {
     coroutineScope.launch(Dispatchers.IO) {
@@ -141,11 +144,13 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
       size > MAX_DUPLICATE_POSTS_MEMORY_LIMIT
   }
 
-  fun addReadOrHiddenPost(postView: PostView) {
+  suspend fun addReadOrHiddenPost(postView: PostView) {
     val key = generateKeyForPostView(postView)
       ?: return
 
-    val previousValue = readPosts.put(key, postView.post.id.toLong())
+    val previousValue = mutex.withLock {
+      readPosts.put(key, postView.post.id.toLong())
+    }
 
     if (previousValue == null) {
       // ReadPosts modified. Update db.
@@ -153,11 +158,13 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
     }
   }
 
-  fun removeReadOrHiddenPost(postView: PostView) {
+  suspend fun removeReadOrHiddenPost(postView: PostView) {
     val key = generateKeyForPostView(postView)
       ?: return
 
-    val removed = readPosts.remove(key)
+    val removed = mutex.withLock {
+      readPosts.remove(key)
+    }
 
     if (removed != null) {
       // ReadPosts modified. Update db.
@@ -166,10 +173,12 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
   }
 
   private fun commitToDb() {
-    val copy = readPosts.toList()
-
     coroutineScope.launch(Dispatchers.IO) {
       Log.d(TAG, "Updating db...")
+
+      val copy = mutex.withLock {
+        readPosts.toList()
+      }
 
       perAccountDuplicatePostsDao.insert(
         PerAccountDuplicatePostsEntry(

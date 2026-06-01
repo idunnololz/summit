@@ -256,7 +256,7 @@ class PostViewModel @Inject constructor(
     fetchPostData(force = true, switchToNativeInstance = true)
   }
 
-  fun markPostAsRead(postView: PostView) {
+  private suspend fun markPostAsRead(postView: PostView) {
     val postView = postView
     postReadManager.markPostAsReadLocal(apiInstance, postView.post.id, read = true)
     duplicatePostsDetector.addReadOrHiddenPost(postView)

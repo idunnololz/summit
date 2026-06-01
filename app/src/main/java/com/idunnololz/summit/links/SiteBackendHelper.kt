@@ -138,7 +138,8 @@ class SiteBackendHelper @Inject constructor(
               return@withContext Result.success(
                 ApiInfo(
                   instance = instance,
-                  backendType = ApiType.LemmyV4,
+                  // LemmyV4 should be backwards compatible with V3. Use V3 until we support V4.
+                  backendType = ApiType.LemmyV3,
                   downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
                 ),
               )
