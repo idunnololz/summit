@@ -930,7 +930,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
       ) { item, b, _ ->
         lemmyTextHelper.bindText(
           textView = b.text,
-          text = item.content,
+          text = if (item.content.isEmpty()) {
+            context.getString(R.string.no_description)
+          } else {
+            item.content
+          },
           instance = instance,
           onImageClick = { url, peek ->
             onImageClick("", null, url, peek)

@@ -177,18 +177,6 @@ class AccountInfoManager @Inject constructor(
   private suspend fun updateUnreadCount(fullAccount: FullAccount) {
     val account = fullAccount.account
 
-    /*
-
-    val lastUpdateTimeMs: Long = 0,
-    val account: Account? = null,
-    val totalUnreadCount: Int = 0,
-    val mentions: Int = 0,
-    val privateMessages: Int = 0,
-    val replies: Int = 0,
-    val totalUnresolvedReportsCount: Int = 0,
-    val totalUnreadApplicationsCount: Int = 0,
-     */
-
     accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
       .onSuccess {
         unreadCount.emit(

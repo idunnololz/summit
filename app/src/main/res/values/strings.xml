@@ -2405,6 +2405,7 @@
     <string name="show_per_user_scores_desc">When enabled, the total score of each user is shown in the header of posts/comments. Note these scores are calculated locally so they may not be fully accurate.</string>
     <string name="change_feed">Change feed</string>
     <string name="warn_match_whole_word_enabled">"Match whole word" only works if the filter is a single word. Uncheck \"Match whole word\" to fix.</string>
+    <string name="no_description">*No description.*</string>
 
 
     <!-- uCrop string resource end -->

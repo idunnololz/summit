@@ -1,7 +1,9 @@
 package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType as CommentSortTypeV3
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -64,3 +66,13 @@ fun SortType.toTimeInSeconds(): Long? =
     SortType.Controversial,
     SortType.Scaled -> null
   }
+
+fun CommentSortTypeV3.toCommentSortType(): CommentSortType {
+  return when (this) {
+    CommentSortTypeV3.Hot -> CommentSortType.hot
+    CommentSortTypeV3.Top -> CommentSortType.top
+    CommentSortTypeV3.New -> CommentSortType.new
+    CommentSortTypeV3.Old -> CommentSortType.old
+    CommentSortTypeV3.Controversial -> CommentSortType.controversial
+  }
+}

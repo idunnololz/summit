@@ -13,4 +13,5 @@ data class GetComments(
   val saved_only: Boolean? = null,
   val liked_only: Boolean? = null,
   val disliked_only: Boolean? = null,
+  val page_cursor: String? = null,
 )

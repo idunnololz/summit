@@ -1,7 +1,9 @@
 package com.idunnololz.summit.links
 
+import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
@@ -139,7 +141,11 @@ class SiteBackendHelper @Inject constructor(
                 ApiInfo(
                   instance = instance,
                   // LemmyV4 should be backwards compatible with V3. Use V3 until we support V4.
-                  backendType = ApiType.LemmyV3,
+                  backendType = if (BuildConfig.DEBUG) {
+                    ApiType.LemmyV4
+                  } else {
+                    ApiType.LemmyV3
+                  },
                   downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
                 ),
               )

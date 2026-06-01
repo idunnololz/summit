@@ -511,23 +511,28 @@ class LemmyApiV3Adapter(
       }
 
       val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-      val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-      val registrationCount = j3.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+      val reportCount = j2.await().getOrNull()
+      val registrationCount = j3.await().getOrNull()
+
+      val registrationApplications = registrationCount?.registration_applications ?: 0
+      val commentReports = reportCount?.comment_reports ?: 0
+      val postReports = reportCount?.post_reports ?: 0
+      val privateMessageReports = reportCount?.private_message_reports ?: 0
 
       Result.success(
         UnreadCount(
           notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
-          registrationApplicationCount = registrationCount.registration_applications,
+          registrationApplicationCount = registrationApplications,
           pendingFollowCount = 0,
-          reportCount = reportCount.comment_reports + reportCount.post_reports + (reportCount.private_message_reports ?: 0),
+          reportCount = commentReports + postReports + privateMessageReports,
 
           mentions = unreadCount.mentions,
           privateMessages = unreadCount.private_messages,
           replies = unreadCount.replies,
 
-          commentReports = reportCount.comment_reports,
-          postReports = reportCount.post_reports,
-          privateMessageReports = reportCount.private_message_reports,
+          commentReports = commentReports,
+          postReports = postReports,
+          privateMessageReports = privateMessageReports,
         )
       )
     }

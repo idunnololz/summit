@@ -4,6 +4,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.api.converters.getGetPostsResponse
+import com.idunnololz.summit.api.converters.toCommentSortType
 import com.idunnololz.summit.api.converters.toCommentView
 import com.idunnololz.summit.api.converters.toCommunityModeratorView
 import com.idunnololz.summit.api.converters.toCommunityView
@@ -132,6 +133,7 @@ import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
@@ -442,7 +444,21 @@ class LemmyApiV4Adapter(
   ): Result<GetCommentsResponse> = retrofitErrorHandler {
     api.getComments(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      GetCommentsI(
+        searchTerm = null,
+        parentId = args.parent_id,
+        postId = args.post_id,
+        creatorUsername = null,
+        creatorId = null,
+        communityName = args.community_name,
+        communityId = args.community_id,
+        limit = args.limit,
+        pageCursor = args.page_cursor,
+        maxDepth = args.max_depth,
+        timeRangeSeconds = null,
+        sort = args.sort?.toCommentSortType(),
+        type = args.type_?.toType(),
+      ).serializeToMap(),
     )
   }.map {
     GetCommentsResponse(
