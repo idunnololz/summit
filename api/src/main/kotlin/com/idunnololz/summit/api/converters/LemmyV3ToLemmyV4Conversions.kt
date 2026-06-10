@@ -2,9 +2,12 @@ package com.idunnololz.summit.api.converters
 
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType as CommentSortTypeV3
 import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.SearchType as SearchTypeV3
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunitySortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -44,6 +47,29 @@ fun SortType.toPostSortType() =
     SortType.Scaled -> PostSortType.scaled
   }
 
+fun SortType.toCommunitySortType() =
+  when (this) {
+    SortType.Active -> CommunitySortType.hot
+    SortType.Hot -> CommunitySortType.hot
+    SortType.New -> CommunitySortType.new
+    SortType.Old -> CommunitySortType.old
+    SortType.TopDay -> CommunitySortType.active_daily
+    SortType.TopWeek -> CommunitySortType.active_weekly
+    SortType.TopMonth -> CommunitySortType.active_monthly
+    SortType.TopYear -> CommunitySortType.active_six_months
+    SortType.TopHour -> CommunitySortType.active_daily
+    SortType.TopSixHour -> CommunitySortType.active_daily
+    SortType.TopTwelveHour -> CommunitySortType.active_daily
+    SortType.TopThreeMonths -> CommunitySortType.active_six_months
+    SortType.TopSixMonths -> CommunitySortType.active_six_months
+    SortType.TopNineMonths -> CommunitySortType.active_six_months
+    SortType.TopAll -> CommunitySortType.active_six_months
+    SortType.MostComments -> CommunitySortType.comments
+    SortType.NewComments -> CommunitySortType.comments
+    SortType.Controversial -> CommunitySortType.hot
+    SortType.Scaled -> CommunitySortType.hot
+  }
+
 fun SortType.toTimeInSeconds(): Long? =
   when (this) {
     SortType.TopDay -> 1.days.inWholeSeconds
@@ -76,3 +102,13 @@ fun CommentSortTypeV3.toCommentSortType(): CommentSortType {
     CommentSortTypeV3.Controversial -> CommentSortType.controversial
   }
 }
+
+fun SearchTypeV3.toSearchType(): SearchType? =
+  when (this) {
+    SearchTypeV3.All -> SearchType.all
+    SearchTypeV3.Comments -> SearchType.comments
+    SearchTypeV3.Posts -> SearchType.posts
+    SearchTypeV3.Communities -> SearchType.communities
+    SearchTypeV3.Users -> SearchType.users
+    SearchTypeV3.Url -> null
+  }

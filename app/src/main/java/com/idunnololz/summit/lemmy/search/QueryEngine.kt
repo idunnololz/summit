@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -11,14 +12,20 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.toLemmyPageIndex
-import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
-import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.lemmy.multicommunity.Source.*
+import com.idunnololz.summit.lemmy.search.QueryEngine.QueryResultsPage.*
+import com.idunnololz.summit.lemmy.search.QueryEngine.SearchResultView.*
 import com.idunnololz.summit.lemmy.toCommentHeaderInfo
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
+import com.idunnololz.summit.lemmy.utils.listSource.CursorBackedSingleDataSource
+import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.Page
+import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
+import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -73,6 +80,174 @@ class QueryEngine(
   private val type: SearchType,
 ) {
 
+  class SearchSource(
+    context: Context,
+    simpleDataSource: SimpleDataSource<SearchResultView, SortType>
+  ) : LemmyListSource<SearchResultView, SortType, Long>(
+    context,
+    { id },
+    SortType.New,
+    {
+      pageIndex: Int,
+      sortOrder: SortType,
+      limit: Int,
+      force: Boolean ->
+
+      simpleDataSource.fetchItems(sortOrder, pageIndex, force, limit = limit, showRead = true)
+    },
+  )
+
+  class PagedSearchSource(
+    private val apiClient: AccountAwareLemmyClient,
+    private val trigram: NGram,
+    private val communityIdFilter: Int?,
+    private val currentSortType: SortType,
+    private val listingTypeFilter: ListingType?,
+    private val type: SearchType,
+    private val currentQuery: String,
+    private val personIdFilter: Long?,
+  ) : SimpleDataSource<SearchResultView, SortType> {
+    override suspend fun fetchItems(
+      sortOrder: SortType?,
+      page: Int,
+      force: Boolean,
+      limit: Int,
+      showRead: Boolean?,
+    ): Result<List<SearchResultView>> {
+      return apiClient
+        .searchWithRetry(
+          communityId = communityIdFilter,
+          communityName = null,
+          sortType = currentSortType,
+          listingType = listingTypeFilter ?: ListingType.All,
+          searchType = type,
+          page = page.toLemmyPageIndex(),
+          query = currentQuery,
+          limit = limit,
+          creatorId = personIdFilter,
+          force = force,
+        )
+        .map {
+          val items = mutableListOf<SearchResultView>()
+
+          it.comments.mapTo(items) { CommentResultView(it) }
+          it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
+          it.communities.mapTo(items) { CommunityResultView(it) }
+          it.users.mapTo(items) { UserResultView(it) }
+
+          val sortedItems =
+            if (currentSortType == SortType.Active) {
+              items.sortedBy {
+                when (it) {
+                  is CommentResultView ->
+                    trigram.distance(
+                      it.commentView.comment.content,
+                      currentQuery,
+                    )
+                  is CommunityResultView -> {
+                    trigram.distance(
+                      it.communityView.community.name,
+                      currentQuery,
+                    )
+                  }
+                  is PostResultView -> {
+                    val post = it.fetchedPost.postView.post
+                    val toMatch = post.name + " " + post.body
+                    trigram.distance(toMatch, currentQuery)
+                  }
+                  is UserResultView ->
+                    trigram.distance(
+                      it.personView.person.name,
+                      currentQuery,
+                    )
+                }
+              }
+            } else {
+              items
+            }
+
+          sortedItems
+        }
+    }
+  }
+
+  class CursorSearchSource(
+    private val apiClient: AccountAwareLemmyClient,
+    private val trigram: NGram,
+    private val communityIdFilter: Int?,
+    private val currentSortType: SortType,
+    private val listingTypeFilter: ListingType?,
+    private val type: SearchType,
+    private val currentQuery: String,
+    private val personIdFilter: Long?,
+  ) : CursorBackedSingleDataSource<SearchResultView, SortType>(
+    fetchObjects = {
+      pageCursor: String?,
+      sortOrder: SortType?,
+      limit: Int,
+      force: Boolean,
+      showRead: Boolean?, ->
+
+      apiClient
+        .searchWithRetry(
+          communityId = communityIdFilter,
+          communityName = null,
+          sortType = currentSortType,
+          listingType = listingTypeFilter ?: ListingType.All,
+          searchType = type,
+          query = currentQuery,
+          limit = limit,
+          creatorId = personIdFilter,
+          pageCursor = pageCursor,
+          force = force,
+        )
+        .map {
+          val items = mutableListOf<SearchResultView>()
+
+          it.comments.mapTo(items) { CommentResultView(it) }
+          it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
+          it.communities.mapTo(items) { CommunityResultView(it) }
+          it.users.mapTo(items) { UserResultView(it) }
+
+          val sortedItems =
+            if (currentSortType == SortType.Active) {
+              items.sortedBy {
+                when (it) {
+                  is CommentResultView ->
+                    trigram.distance(
+                      it.commentView.comment.content,
+                      currentQuery,
+                    )
+                  is CommunityResultView -> {
+                    trigram.distance(
+                      it.communityView.community.name,
+                      currentQuery,
+                    )
+                  }
+                  is PostResultView -> {
+                    val post = it.fetchedPost.postView.post
+                    val toMatch = post.name + " " + post.body
+                    trigram.distance(toMatch, currentQuery)
+                  }
+                  is UserResultView ->
+                    trigram.distance(
+                      it.personView.person.name,
+                      currentQuery,
+                    )
+                }
+              }
+            } else {
+              items
+            }
+
+          Page(
+            items = sortedItems,
+            nextCursor = it.nextCursor,
+          )
+        }
+    }
+  )
+
   companion object {
     private const val TAG = "QueryEngine"
 
@@ -80,26 +255,37 @@ class QueryEngine(
   }
 
   sealed interface SearchResultView {
-    val isUrlResult: Boolean
+
+    val id: Long
+
     data class PostResultView(
       val fetchedPost: FetchedPost,
-      override val isUrlResult: Boolean,
-    ) : SearchResultView
+    ) : SearchResultView {
+      override val id: Long
+        get() = fetchedPost.postView.post.id.toLong()
+    }
 
     data class CommentResultView(
       val commentView: CommentView,
-      override val isUrlResult: Boolean,
-    ) : SearchResultView
+    ) : SearchResultView {
+      override val id: Long
+        get() = commentView.comment.id.toLong()
+    }
 
     data class CommunityResultView(
       val communityView: CommunityView,
-      override val isUrlResult: Boolean,
-    ) : SearchResultView
+    ) : SearchResultView {
+      override val id: Long
+        get() = communityView.community.id.toLong()
+    }
 
     data class UserResultView(
       val personView: PersonView,
-      override val isUrlResult: Boolean,
-    ) : SearchResultView
+    ) : SearchResultView {
+      override val id: Long
+        get() = personView.person.id
+    }
+
   }
 
   sealed interface QueryResultsPage {
@@ -169,6 +355,8 @@ class QueryEngine(
   private var listingTypeFilter: ListingType? = null
 
   private val trigram = NGram(3)
+
+  private var searchSource: SearchSource? = null
 
   val onItemsChangeFlow = MutableSharedFlow<Unit>()
 
@@ -247,11 +435,8 @@ class QueryEngine(
 
     activePageQueries.add(pageIndex)
 
-    val currentQuery = currentQuery
+    val currentQuery = currentQuery ?: return
 
-    if (currentQuery == null) {
-      return
-    }
     coroutineScope.launch {
       currentState.value = StatefulData.Loading()
 
@@ -263,189 +448,84 @@ class QueryEngine(
         reset()
       }
 
-      apiClient
-        .searchWithRetry(
-          communityId = communityIdFilter,
-          communityName = null,
-          sortType = currentSortType,
-          listingType = listingTypeFilter ?: ListingType.All,
-          searchType = type,
-          page = pageIndex.toLemmyPageIndex(),
-          query = currentQuery,
-          limit = MAX_QUERY_PAGE_LIMIT,
-          creatorId = personIdFilter,
-          force = force,
+
+      if (searchSource == null) {
+        searchSource = SearchSource(
+          context,
+          if (apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true) {
+            CursorSearchSource(
+              apiClient,
+              trigram,
+              communityIdFilter,
+              currentSortType,
+              listingTypeFilter,
+              type,
+              currentQuery,
+              personIdFilter,
+            )
+          } else {
+            PagedSearchSource(
+              apiClient,
+              trigram,
+              communityIdFilter,
+              currentSortType,
+              listingTypeFilter,
+              type,
+              currentQuery,
+              personIdFilter,
+            )
+          }
         )
-        .onSuccess {
-          val result: QueryResultsPage = when (it.type) {
-            SearchType.All -> {
-              val items = mutableListOf<SearchResultView>()
+      }
 
-              it.posts.mapTo(items) {
-                SearchResultView.PostResultView(
-                  FetchedPost(
-                    it,
-                    Source.StandardSource(),
-                  ),
-                  false,
-                )
-              }
-              it.comments.mapTo(items) {
-                SearchResultView.CommentResultView(it, false)
-              }
-              it.communities.mapTo(items) {
-                SearchResultView.CommunityResultView(it, false)
-              }
-              it.users.mapTo(items) {
-                SearchResultView.UserResultView(it, false)
-              }
+      val pageResult = searchSource?.getPage(pageIndex, force)
+        ?: return@launch
 
-              val sortedItems =
-                if (currentSortType == SortType.Active) {
-                  items.sortedBy {
-                    when (it) {
-                      is SearchResultView.CommentResultView ->
-                        trigram.distance(
-                          it.commentView.comment.content,
-                          currentQuery,
-                        )
-                      is SearchResultView.CommunityResultView -> {
-                        trigram.distance(
-                          it.communityView.community.name,
-                          currentQuery,
-                        )
-                      }
-                      is SearchResultView.PostResultView -> {
-                        val post = it.fetchedPost.postView.post
-                        val toMatch = post.name + " " + post.body
-                        trigram.distance(toMatch, currentQuery)
-                      }
-                      is SearchResultView.UserResultView ->
-                        trigram.distance(
-                          it.personView.person.name,
-                          currentQuery,
-                        )
-                    }
-                  }
-                } else {
-                  items
-                }
-
-              QueryResultsPage.AllResultsPage(
-                sortedItems,
-                pageIndex,
-                sortedItems.size >= MAX_QUERY_PAGE_LIMIT,
-              )
-            }
-            SearchType.Comments ->
-              QueryResultsPage.CommentResultsPage(
-                if (currentSortType == SortType.Active) {
-                  it.comments.sortedBy {
-                    trigram.distance(it.comment.content, currentQuery)
-                  }
-                } else {
-                  it.comments
+      pageResult.fold(
+        {
+          val result: QueryResultsPage? = when (type) {
+            SearchType.All ->
+              AllResultsPage(
+                it.items.also {
+                  Log.d("HAHA", "items: ${it.size}")
                 },
                 pageIndex,
-                it.comments.size >= MAX_QUERY_PAGE_LIMIT,
+                it.hasMore,
+              )
+            SearchType.Url ->
+              AllResultsPage(
+                it.items,
+                pageIndex,
+                it.hasMore,
+              )
+            SearchType.Comments ->
+              CommentResultsPage(
+                it.items.filterIsInstance<CommentResultView>().map { it.commentView },
+                pageIndex,
+                it.hasMore,
               )
             SearchType.Posts ->
-              QueryResultsPage.PostResultsPage(
-                if (currentSortType == SortType.Active) {
-                  it.posts.sortedBy {
-                    trigram.distance(
-                      it.post.name + " " + it.post.body,
-                      currentQuery,
-                    )
-                  }
-                } else {
-                  it.posts
-                },
+              PostResultsPage(
+                it.items.filterIsInstance<PostResultView>().map { it.fetchedPost.postView },
                 pageIndex,
-                it.posts.size >= MAX_QUERY_PAGE_LIMIT,
+                it.hasMore,
               )
             SearchType.Communities ->
-              QueryResultsPage.CommunityResultsPage(
-                if (currentSortType == SortType.Active) {
-                  it.communities.sortedBy {
-                    trigram.distance(it.community.fullName, currentQuery)
-                  }
-                } else {
-                  it.communities
-                },
+              CommunityResultsPage(
+                it.items.filterIsInstance<CommunityResultView>().map { it.communityView },
                 pageIndex,
-                it.communities.size >= MAX_QUERY_PAGE_LIMIT,
+                it.hasMore,
               )
             SearchType.Users ->
-              QueryResultsPage.UserResultsPage(
-                if (currentSortType == SortType.Active) {
-                  it.users.sortedBy {
-                    trigram.distance(it.person.name, currentQuery)
-                  }
-                } else {
-                  it.users
-                },
+              UserResultsPage(
+                it.items.filterIsInstance<UserResultView>().map { it.personView },
                 pageIndex,
-                it.users.size >= MAX_QUERY_PAGE_LIMIT,
+                it.hasMore,
               )
-            SearchType.Url -> {
-              val items = mutableListOf<SearchResultView>()
+          }
 
-              it.posts.mapTo(items) {
-                SearchResultView.PostResultView(
-                  FetchedPost(
-                    it,
-                    Source.StandardSource(),
-                  ),
-                  true,
-                )
-              }
-              it.comments.mapTo(items) {
-                SearchResultView.CommentResultView(it, true)
-              }
-              it.communities.mapTo(items) {
-                SearchResultView.CommunityResultView(it, true)
-              }
-              it.users.mapTo(items) {
-                SearchResultView.UserResultView(it, true)
-              }
-
-              val sortedItems =
-                if (currentSortType == SortType.Active) {
-                  items.sortedBy { view ->
-                    when (view) {
-                      is SearchResultView.CommentResultView ->
-                        trigram.distance(
-                          view.commentView.comment.ap_id,
-                          currentQuery,
-                        )
-                      is SearchResultView.CommunityResultView ->
-                        trigram.distance(
-                          view.communityView.community.actor_id,
-                          currentQuery,
-                        )
-                      is SearchResultView.PostResultView ->
-                        trigram.distance(
-                          view.fetchedPost.postView.post.ap_id,
-                          currentQuery,
-                        )
-                      is SearchResultView.UserResultView ->
-                        trigram.distance(
-                          view.personView.person.actor_id,
-                          currentQuery,
-                        )
-                    }
-                  }
-                } else {
-                  items
-                }
-
-              QueryResultsPage.UrlResultsPage(
-                sortedItems,
-                pageIndex,
-                sortedItems.size >= MAX_QUERY_PAGE_LIMIT,
-              )
-            }
+          if (result == null) {
+            return@launch
           }
 
           val newPages = pages.toMutableList().apply {
@@ -460,11 +540,11 @@ class QueryEngine(
           withContext(Dispatchers.Main) {
             activePageQueries.remove(pageIndex)
           }
-        }
-        .onFailure {
+        },
+        {
           val newPages = pages.toMutableList().apply {
             val existingItemIndex = indexOfFirst { it.pageIndex == pageIndex }
-            val errorPage = QueryResultsPage.ErrorPage(it, pageIndex, false)
+            val errorPage = ErrorPage(it, pageIndex, false)
 
             if (existingItemIndex == -1) {
               add(errorPage)
@@ -482,6 +562,25 @@ class QueryEngine(
             activePageQueries.remove(pageIndex)
           }
         }
+      )
+
+//      apiClient
+//        .searchWithRetry(
+//          communityId = communityIdFilter,
+//          communityName = null,
+//          sortType = currentSortType,
+//          listingType = listingTypeFilter ?: ListingType.All,
+//          searchType = type,
+//          page = pageIndex.toLemmyPageIndex(),
+//          query = currentQuery,
+//          limit = MAX_QUERY_PAGE_LIMIT,
+//          creatorId = personIdFilter,
+//          force = force,
+//        )
+//        .onSuccess {
+//        }
+//        .onFailure {
+//        }
     }
   }
 
@@ -507,59 +606,59 @@ class QueryEngine(
     val pages = pages
     val instance = currentInstance
 
-    val firstPage = pages.first()
+    pages.first()
     val lastPage = pages.last()
 
     for (page in pages) {
       when (page) {
-        is QueryResultsPage.AllResultsPage -> {
+        is AllResultsPage -> {
           page.results.mapTo(newItems) {
             when (it) {
-              is SearchResultView.CommentResultView ->
+              is CommentResultView ->
                 Item.CommentItem(
                   commentView = it.commentView,
                   instance = instance,
                   pageIndex = page.pageIndex,
                   commentHeaderInfo = it.commentView.toCommentHeaderInfo(context),
                 )
-              is SearchResultView.CommunityResultView ->
+              is CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
-              is SearchResultView.PostResultView ->
+              is PostResultView ->
                 Item.PostItem(
                   fetchedPost = it.fetchedPost,
                   instance = instance,
                   pageIndex = page.pageIndex,
                   postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context),
                 )
-              is SearchResultView.UserResultView ->
+              is UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
             }
           }
         }
-        is QueryResultsPage.UrlResultsPage ->
+        is UrlResultsPage ->
           page.results.mapTo(newItems) {
             when (it) {
-              is SearchResultView.CommentResultView ->
+              is CommentResultView ->
                 Item.CommentItem(
                   commentView = it.commentView,
                   instance = instance,
                   pageIndex = page.pageIndex,
                   commentHeaderInfo = it.commentView.toCommentHeaderInfo(context),
                 )
-              is SearchResultView.CommunityResultView ->
+              is CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
-              is SearchResultView.PostResultView ->
+              is PostResultView ->
                 Item.PostItem(
                   fetchedPost = it.fetchedPost,
                   instance = instance,
                   pageIndex = page.pageIndex,
                   postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context),
                 )
-              is SearchResultView.UserResultView ->
+              is UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
             }
           }
-        is QueryResultsPage.CommentResultsPage ->
+        is CommentResultsPage ->
           page.results.mapTo(newItems) {
             Item.CommentItem(
               commentView = it,
@@ -568,32 +667,32 @@ class QueryEngine(
               commentHeaderInfo = it.toCommentHeaderInfo(context),
             )
           }
-        is QueryResultsPage.CommunityResultsPage ->
+        is CommunityResultsPage ->
           page.results.mapTo(newItems) {
             Item.CommunityItem(it, instance, page.pageIndex)
           }
-        is QueryResultsPage.PostResultsPage ->
+        is PostResultsPage ->
           page.results.mapTo(newItems) {
             Item.PostItem(
               fetchedPost = FetchedPost(
                 it,
-                Source.StandardSource(),
+                StandardSource(),
               ),
               instance = instance,
               pageIndex = page.pageIndex,
               postHeaderInfo = it.toPostHeaderInfo(context),
             )
           }
-        is QueryResultsPage.UserResultsPage ->
+        is UserResultsPage ->
           page.results.mapTo(newItems) {
             Item.UserItem(it, instance, page.pageIndex)
           }
-        is QueryResultsPage.ErrorPage ->
+        is ErrorPage ->
           newItems.add(Item.ErrorItem(page.error, page.pageIndex))
       }
     }
 
-    if (lastPage is QueryResultsPage.ErrorPage) {
+    if (lastPage is ErrorPage) {
       // add nothing!
     } else if (lastPage.hasMore) {
       newItems.add(Item.AutoLoadItem(lastPage.pageIndex + 1))
@@ -613,6 +712,7 @@ class QueryEngine(
   private fun reset() {
     pages = listOf()
     activePageQueries.clear()
+    searchSource = null
   }
 
   fun getItems() = _items

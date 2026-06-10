@@ -17,11 +17,11 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
-import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
+import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
@@ -83,7 +83,7 @@ class PostsRepository @AssistedInject constructor(
     val currentPage: Int = 0,
   )
 
-  private var currentDataSource: PostsDataSource? = null
+  private var currentDataSource: SimpleDataSource<FetchedPost, SortType>? = null
 
   private var allPostsData = dataBackedByCacheFactory.create<AllPostData>(
     "all_posts_data",
@@ -543,8 +543,8 @@ class PostsRepository @AssistedInject constructor(
 
     Log.d(TAG, "Fetching page $pageIndex from data source... force = $force")
 
-    val newPostResults = currentDataSource.fetchPosts(
-      sortType = sortType,
+    val newPostResults = currentDataSource.fetchItems(
+      sortOrder = sortType,
       page = pageIndex,
       force = force,
       showRead = !hideRead,
@@ -794,7 +794,7 @@ class PostsRepository @AssistedInject constructor(
   private suspend fun newDataSource(
     communityName: String?,
     listingType: ListingType?,
-  ): PostsDataSource =
+  ): SimpleDataSource<FetchedPost, SortType> =
     if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true &&
       (preferences.useCursorsWhenLoadingPostFeed ||
         apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true)

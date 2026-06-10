@@ -30,6 +30,7 @@ import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
+import com.idunnololz.summit.api.dto.lemmy.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.PersonId
@@ -312,6 +313,7 @@ class AccountAwareLemmyClient @Inject constructor(
     listingType: ListingType,
     searchType: SearchType,
     page: Int? = null,
+    pageCursor: String? = null,
     query: String,
     limit: Int? = null,
     creatorId: Long? = null,
@@ -327,6 +329,7 @@ class AccountAwareLemmyClient @Inject constructor(
         listingType = listingType,
         searchType = searchType,
         page = page,
+        pageCursor = pageCursor,
         limit = limit,
         query = query,
         creatorId = creatorId,
@@ -338,12 +341,19 @@ class AccountAwareLemmyClient @Inject constructor(
   suspend fun fetchCommunitiesWithRetry(
     sortType: SortType,
     listingType: ListingType,
+    pageCursor: String? = null,
     page: Int = 1,
     limit: Int = 50,
     account: Account? = accountForInstance(),
-  ): Result<List<CommunityView>> = retry {
-    apiClient.fetchCommunities(account, sortType, listingType, page, limit)
-      .autoSignOut(account)
+  ): Result<ListCommunitiesResponse> = retry {
+    apiClient.fetchCommunities(
+      account = account,
+      sortType = sortType,
+      listingType = listingType,
+      pageCursor = pageCursor,
+      page = page,
+      limit = limit
+    ).autoSignOut(account)
   }
 
   suspend fun followCommunityWithRetry(

@@ -2,6 +2,8 @@ package com.idunnololz.summit.api.converters
 
 import com.idunnololz.summit.api.dto.lemmy.Comment
 import com.idunnololz.summit.api.dto.lemmy.CommentAggregates
+import com.idunnololz.summit.api.dto.lemmy.CommentReply
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
@@ -21,6 +23,8 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.PostAggregates
 import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.RegistrationMode
 import com.idunnololz.summit.api.dto.lemmy.Site
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
@@ -314,10 +318,54 @@ fun NotificationView.toPersonMentionView(): PersonMentionView {
   )
 }
 
+fun NotificationView.toPrivateMessageView(): PrivateMessageView {
+  val d = data
+  return PrivateMessageView(
+    private_message = PrivateMessage(
+      d.privateMessage.id,
+      d.privateMessage.creatorId,
+      d.privateMessage.recipientId,
+      d.privateMessage.content,
+      d.privateMessage.deleted,
+      notification.read,
+      d.privateMessage.publishedAt,
+      d.privateMessage.updatedAt,
+      d.privateMessage.apId,
+      d.privateMessage.local,
+    ),
+    creator = d.creator.toPerson(d.creatorBanned, d.creatorBanExpiresAt, d.creatorIsAdmin),
+    recipient = d.recipient.toPerson(false, null, false)
+  )
+}
+
+fun NotificationView.toCommentReplyView(): CommentReplyView {
+  val d = data
+  return CommentReplyView(
+    comment_reply = CommentReply(
+      id = notification.id,
+      recipient_id = d.recipient.id,
+      comment_id = d.comment.id,
+      read = notification.read,
+      published = notification.publishedAt,
+    ),
+    comment = d.comment.toComment(),
+    creator = d.creator.toPerson(d.creatorBanned, d.creatorBanExpiresAt, d.creatorIsAdmin),
+    post = d.post.toPost(),
+    community = d.community.toCommunity(),
+    recipient = d.recipient.toPerson(false, null, false),
+    counts = d.comment.toCommentAggregates(),
+    creator_banned_from_community = d.creatorBannedFromCommunity,
+    subscribed = d.communityActions?.followState?.toSubscribedType(),
+    saved = d.commentActions?.savedAt != null,
+    creator_blocked = d.personActions?.blockedAt != null,
+    my_vote = d.commentActions?.voteIsUpvote.toVoteInt(),
+  )
+}
+
 private fun PersonViewV4.toPersonAggregates(): PersonAggregates {
   return PersonAggregates(
     id = person.id.toInt(),
-    person_id = person.id.toLong(),
+    person_id = person.id,
     post_count = person.postCount.toInt(),
     comment_count = person.commentCount.toInt(),
   )

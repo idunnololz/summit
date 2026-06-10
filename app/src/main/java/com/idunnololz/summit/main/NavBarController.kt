@@ -276,8 +276,8 @@ class NavBarController(
     // To easily debug what is messing with the nav bar, add an exception to this log statement.
     Log.d(
       TAG,
-      "animateNavBar() p$percentShown diff${abs(currentPercentShown - percentShown)}",
-//      kotlin.RuntimeException(),
+      "animateNavBar() %shown: $percentShown diff: ${abs(currentPercentShown - percentShown)} animate? $animate",
+      kotlin.RuntimeException(),
     )
 
     val navigationBarOffset =
@@ -289,16 +289,18 @@ class NavBarController(
 
     if (useNavigationRail) {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
-        navBarContainer.visibility = View.VISIBLE
-        navBarContainer.translationX = -navBar.width.toFloat() * (1f - percentShown)
+        if (percentShown != 0f) {
+          navBarContainer.visibility = View.VISIBLE
+          navBarContainer.translationX = navigationBarOffset
+          navBarContainer.alpha = 0f
 
-        navBarContainer.animate().cancel()
-        navBarContainer.animate()
-          .translationX(navigationBarOffset)
-          .alpha(1f)
-          .apply {
-            duration = 250
-          }
+          navBarContainer.animate().cancel()
+          navBarContainer.animate()
+            .alpha(1f)
+            .apply {
+              duration = 250
+            }
+        }
       } else if (animate) {
         navBarContainer.animate().cancel()
         navBarContainer.animate()
@@ -310,16 +312,18 @@ class NavBarController(
       }
     } else {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
-        navBarContainer.visibility = View.VISIBLE
-        navBarContainer.translationY = navBarContainer.height.toFloat() * (1f - percentShown)
+        if (percentShown != 0f) {
+          navBarContainer.visibility = View.VISIBLE
+          navBarContainer.translationY = navigationBarOffset
+          navBarContainer.alpha = 0f
 
-        navBarContainer.animate().cancel()
-        navBarContainer.animate()
-          .translationY(navigationBarOffset)
-          .alpha(1f)
-          .apply {
-            duration = 250
-          }
+          navBarContainer.animate().cancel()
+          navBarContainer.animate()
+            .alpha(1f)
+            .apply {
+              duration = 250
+            }
+        }
       } else if (animate) {
         navBarContainer.animate().cancel()
         navBarContainer.animate()
@@ -483,6 +487,7 @@ class NavBarController(
     }
 
     if (!useBottomNavBar) {
+      Log.d(TAG, "useBottomNavBar == false. hiding!")
       navBarContainer.visibility = View.GONE
     }
   }

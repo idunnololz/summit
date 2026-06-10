@@ -7,8 +7,11 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.view.MotionEvent
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -37,7 +40,33 @@ class InboxSwipeToActionCallback(
   }
   private var lastVhSwiped: ViewHolder? = null
 
+  private var gestureInsetLeft = 0
+  private var gestureInsetRight = Int.MAX_VALUE
+  private var startX = 0f
+
   init {
+    ViewCompat.setOnApplyWindowInsetsListener(recyclerView) { _, insets ->
+      val windowGestureRegion = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+      gestureInsetLeft = windowGestureRegion.left
+      gestureInsetRight = recyclerView.resources.displayMetrics.widthPixels -
+        windowGestureRegion.right
+
+      insets
+    }
+    recyclerView.requestApplyInsets()
+    recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+      override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+        startX = e.x
+        return false
+      }
+
+      override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+      }
+
+      override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+      }
+    })
+
     clearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
     deleteDrawable = context.getDrawableCompat(icon)
     intrinsicWidth = deleteDrawable!!.intrinsicWidth
@@ -48,7 +77,11 @@ class InboxSwipeToActionCallback(
 
   override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int =
     if (viewHolder.isSwipeEnabled()) {
-      makeMovementFlags(0, ItemTouchHelper.LEFT)
+      if (startX < gestureInsetLeft || startX > gestureInsetRight) {
+        0
+      } else {
+        makeMovementFlags(0, ItemTouchHelper.LEFT)
+      }
     } else {
       0
     }

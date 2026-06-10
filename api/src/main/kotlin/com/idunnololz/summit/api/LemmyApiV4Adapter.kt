@@ -4,15 +4,19 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.api.converters.getGetPostsResponse
+import com.idunnololz.summit.api.converters.toCommentReplyView
 import com.idunnololz.summit.api.converters.toCommentSortType
 import com.idunnololz.summit.api.converters.toCommentView
 import com.idunnololz.summit.api.converters.toCommunityModeratorView
+import com.idunnololz.summit.api.converters.toCommunitySortType
 import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toGetSiteResponse
 import com.idunnololz.summit.api.converters.toPersonMentionView
 import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostSortType
 import com.idunnololz.summit.api.converters.toPostView
+import com.idunnololz.summit.api.converters.toPrivateMessageView
+import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
 import com.idunnololz.summit.api.converters.toTimeInSeconds
 import com.idunnololz.summit.api.converters.toType
@@ -135,9 +139,11 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
@@ -602,7 +608,17 @@ class LemmyApiV4Adapter(
   ): Result<ListCommunitiesResponse> = retrofitErrorHandler {
     api.getCommunityList(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      ListCommunitiesI(
+        limit = args.limit,
+        pageCursor = args.page_cursor,
+        searchTitleOnly = null,
+        searchTerm = null,
+        multiCommunityId = null,
+        showNsfw = null,
+        timeRangeSeconds = args.sort?.toTimeInSeconds(),
+        sort = args.sort?.toCommunitySortType(),
+        type = args.type_?.toType(),
+      ).serializeToMap(),
     )
   }.map {
     ListCommunitiesResponse(
@@ -654,8 +670,21 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Result<GetRepliesResponse> {
-    TODO("Not yet implemented")
+  ): Result<GetRepliesResponse> = retrofitErrorHandler {
+    api.listInbox(
+      generateHeaders(authorization, false),
+      ListInboxArgs(
+        limit = args.limit?.toDouble(),
+        page_cursor = args.page_cursor,
+        creator_id = null,
+        unread_only = args.unread_only,
+        type = NotificationTypeFilter.reply,
+      ).serializeToMap()
+    )
+  }.map {
+    GetRepliesResponse(
+      replies = it.items.map { it.toCommentReplyView() }
+    )
   }
 
   override suspend fun markCommentReplyAsRead(
@@ -747,8 +776,21 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Result<PrivateMessagesResponse> {
-    TODO("Not yet implemented")
+  ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
+    api.listInbox(
+      generateHeaders(authorization, false),
+      ListInboxArgs(
+        limit = args.limit?.toDouble(),
+        page_cursor = args.page_cursor,
+        creator_id = null,
+        unread_only = args.unread_only,
+        type = NotificationTypeFilter.private_message,
+      ).serializeToMap()
+    )
+  }.map {
+    PrivateMessagesResponse(
+      private_messages = it.items.map { it.toPrivateMessageView() },
+    )
   }
 
   override suspend fun getPrivateMessageReports(
@@ -903,8 +945,35 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Result<SearchResponse> {
-    TODO("Not yet implemented")
+  ): Result<SearchResponse> = retrofitErrorHandler {
+    api.search(
+      generateHeaders(authorization, force),
+      SearchI(
+        searchTerm = args.q,
+        limit = args.limit,
+        pageCursor = args.page_cursor,
+        showNsfw = null,
+        postUrlOnly = null,
+        titleOnly = null,
+        listingType = args.listing_type?.toType(),
+        timeRangeSeconds = args.sort?.toTimeInSeconds(),
+        type = args.type_?.toSearchType(),
+        creatorUsername = null,
+        creatorId = args.creator_id,
+        communityName = args.community_name,
+        communityId = args.community_id,
+      ).serializeToMap(),
+    )
+  }.map {
+    SearchResponse(
+      type_ = args.type_,
+      comments = it.comments.map { it.toCommentView() },
+      posts = it.posts.map { it.toPostView() },
+      communities = it.communities.map { it.toCommunityView() },
+      users = it.persons.map { it.toPersonView() },
+      nextCursor = it.nextPage,
+      prevCursor = it.prevPage,
+    )
   }
 
   override suspend fun getSiteMetadata(

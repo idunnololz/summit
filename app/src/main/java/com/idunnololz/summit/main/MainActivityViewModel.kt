@@ -207,7 +207,7 @@ class MainActivityViewModel @Inject constructor(
             )
           }.onSuccess {
             communities.postValue(
-              it.map {
+              it.communities.map {
                 RawCommunityData(
                   it.community.toCommunityRef(),
                   it.community.icon,

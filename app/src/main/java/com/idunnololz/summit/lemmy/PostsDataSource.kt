@@ -8,49 +8,45 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.toLemmyPageIndex
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.lemmy.utils.listSource.CursorBackedSingleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
+import com.idunnololz.summit.lemmy.utils.listSource.Page
+import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import com.idunnololz.summit.models.GetPostsResponse
+import com.idunnololz.summit.models.PostView
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-
-interface PostsDataSource {
-  suspend fun fetchPosts(
-    sortType: SortType? = null,
-    page: Int,
-    force: Boolean,
-    showRead: Boolean?,
-  ): Result<List<FetchedPost>>
-}
 
 class SinglePostsDataSource @AssistedInject constructor(
   @Assisted private val communityName: String?,
   @Assisted private val listingType: ListingType?,
   private val apiClient: AccountAwareLemmyClient,
-) : PostsDataSource {
+) : SimpleDataSource<FetchedPost, SortType> {
 
   @AssistedFactory
   interface Factory {
     fun create(communityName: String?, listingType: ListingType?): SinglePostsDataSource
   }
 
-  override suspend fun fetchPosts(
-    sortType: SortType?,
+  override suspend fun fetchItems(
+    sortOrder: SortType?,
     page: Int,
     force: Boolean,
+    limit: Int,
     showRead: Boolean?,
-  ) = apiClient
+  ): Result<List<FetchedPost>> = apiClient
     .fetchPosts(
       communityIdOrName = if (communityName == null) {
         null
       } else {
         Either.Right(communityName)
       },
-      sortType = sortType,
+      sortType = sortOrder,
       listingType = listingType ?: ListingType.All,
       page = page.toLemmyPageIndex(),
       cursor = null,
-      limit = DEFAULT_PAGE_SIZE,
+      limit = limit,
       force = force,
       showRead = showRead,
     )
@@ -63,127 +59,40 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
   @Assisted private val communityName: String?,
   @Assisted private val listingType: ListingType?,
   private val apiClient: AccountAwareLemmyClient,
-) : PostsDataSource {
-
-  companion object {
-    private const val TAG = "CursorBackedSinglePostsDataSource"
-  }
-
-  @AssistedFactory
-  interface Factory {
-    fun create(communityName: String?, listingType: ListingType?): CursorBackedSinglePostsDataSource
-  }
-
-  private var cursorIds = listOf<String?>("0")
-
-  override suspend fun fetchPosts(
-    sortType: SortType?,
-    page: Int,
+) : CursorBackedSingleDataSource<FetchedPost, SortType>(
+  fetchObjects = suspend {
+    pageCursor: String?,
+    sortOrder: SortType?,
+    limit: Int,
     force: Boolean,
-    showRead: Boolean?,
-  ): Result<List<FetchedPost>> {
-    Log.d(TAG, "fetchPosts - page: $page cursors: ${cursorIds.size}")
+    showRead: Boolean? ->
 
-    buildCursorIds(
-      sortType = sortType,
-      page = page,
-      force = force,
-      showRead = showRead,
-    ).onFailure {
-      return Result.failure(it)
-    }
-
-    return _fetchPosts(
-      sortType = sortType,
-      page = page,
-      force = force,
-      showRead = showRead,
-    )
-      .onSuccess {
-        if (page + 1 == cursorIds.size) {
-          cursorIds += it.nextPage
-        } else {
-          if (cursorIds[page + 1] != it.nextPage) {
-            Log.d(TAG, "inconsistency cursor ids... wiping cached cursor ids")
-
-            cursorIds = cursorIds.take(page + 1)
-            cursorIds += it.nextPage
-          }
-        }
-      }
-      .map {
-        it.posts.map { FetchedPost(it, Source.StandardSource()) }
-      }
-  }
-
-  private suspend fun buildCursorIds(
-    sortType: SortType?,
-    page: Int,
-    force: Boolean,
-    showRead: Boolean?,
-  ): Result<Unit> {
-    if (cursorIds.size > page) {
-      return Result.success(Unit)
-    }
-
-    Log.d(TAG, "cursor index outside of current range, fetching more cursors...")
-
-    while (cursorIds.size <= page) {
-      _fetchPosts(
-        sortType = sortType,
-        page = cursorIds.lastIndex,
-        force = force,
-        showRead = showRead,
-      ).fold(
-        {
-          cursorIds += it.nextPage
-        },
-        {
-          return Result.failure(it)
-        },
-      )
-    }
-
-    return Result.success(Unit)
-  }
-
-  private suspend fun _fetchPosts(
-    sortType: SortType?,
-    page: Int,
-    force: Boolean,
-    showRead: Boolean?,
-  ): Result<GetPostsResponse> {
-    if (page > 0 && cursorIds[page] == null) {
-      return Result.success(GetPostsResponse(listOf(), null))
-    }
-
-    val pageIndex = if (page == 0) {
-      page.toLemmyPageIndex()
-    } else {
-      null
-    }
-    val cursor = if (page == 0) {
-      null
-    } else {
-      cursorIds[page]
-    }
-
-    Log.d(TAG, "_fetchPosts - $pageIndex $cursor")
-
-    return apiClient
+    apiClient
       .fetchPosts(
         communityIdOrName = if (communityName == null) {
           null
         } else {
           Either.Right(communityName)
         },
-        sortType = sortType,
+        sortType = sortOrder,
         listingType = listingType ?: ListingType.All,
-        page = pageIndex,
-        cursor = cursor,
-        limit = DEFAULT_PAGE_SIZE,
+        cursor = pageCursor,
+        limit = limit,
         force = force,
         showRead = showRead,
+        page = null,
       )
+      .map {
+        Page(
+          items = it.posts.map { FetchedPost(it, Source.StandardSource()) },
+          nextCursor = it.nextPage,
+        )
+      }
+  }
+) {
+
+  @AssistedFactory
+  interface Factory {
+    fun create(communityName: String?, listingType: ListingType?): CursorBackedSinglePostsDataSource
   }
 }

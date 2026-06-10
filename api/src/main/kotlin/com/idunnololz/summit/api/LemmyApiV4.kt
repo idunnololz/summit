@@ -270,7 +270,7 @@ interface LemmyApiV4 {
   /**
    * Get the details for a person.
    */
-  @GET("user")
+  @GET("account")
   fun getPersonDetails(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,

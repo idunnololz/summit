@@ -46,7 +46,7 @@ data class SearchI (
     val searchTerm: kotlin.String,
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     @SerializedName("page_cursor")
     val pageCursor: kotlin.String? = null,
@@ -66,7 +66,7 @@ data class SearchI (
 
     /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
     @SerializedName("time_range_seconds")
-    val timeRangeSeconds: kotlin.Double? = null,
+    val timeRangeSeconds: kotlin.Long? = null,
 
     @SerializedName("type_")
     val type: SearchType? = null,
@@ -76,14 +76,14 @@ data class SearchI (
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double? = null,
+    val creatorId: kotlin.Long? = null,
 
     @SerializedName("community_name")
     val communityName: kotlin.String? = null,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double? = null
+    val communityId: kotlin.Int? = null
 
 ) {
 

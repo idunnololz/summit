@@ -70,10 +70,12 @@ class DtoConverter @Inject constructor(
   fun convertSearchResponse(
     searchResponse: SearchResponse,
   ): com.idunnololz.summit.models.SearchResponse = com.idunnololz.summit.models.SearchResponse(
-    searchResponse.type_,
-    searchResponse.comments,
-    searchResponse.posts.map { convertPostView(it) },
-    searchResponse.communities,
-    searchResponse.users,
+    type = searchResponse.type_,
+    comments = searchResponse.comments,
+    posts = searchResponse.posts.map { convertPostView(it) },
+    communities = searchResponse.communities,
+    users = searchResponse.users,
+    nextCursor = searchResponse.nextCursor,
+    prevCursor = searchResponse.prevCursor,
   )
 }

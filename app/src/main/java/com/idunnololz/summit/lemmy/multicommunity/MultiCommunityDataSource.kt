@@ -10,13 +10,13 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.getActiveRank
 import com.idunnololz.summit.lemmy.utils.getControversialRank
 import com.idunnololz.summit.lemmy.utils.getHotRank
 import com.idunnololz.summit.lemmy.utils.getScaledRank
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class MultiCommunityDataSource(
   private val instance: String,
   private val sources: List<LemmyListSource<FetchedPost, SortType, Long>>,
   private val apiClient: AccountAwareLemmyClient,
-) : PostsDataSource {
+) : SimpleDataSource<FetchedPost, SortType> {
 
   companion object {
     private const val TAG = "MultiCommunityDataS"
@@ -149,10 +149,11 @@ class MultiCommunityDataSource(
   private val validSources
     get() = sources.filter { !communityNotFoundOnInstance.contains(it.source) }
 
-  override suspend fun fetchPosts(
-    sortType: SortType?,
+  override suspend fun fetchItems(
+    sortOrder: SortType?,
     page: Int,
     force: Boolean,
+    limit: Int,
     showRead: Boolean?,
   ): Result<List<FetchedPost>> = withContext(Dispatchers.Default) {
     if (force) {

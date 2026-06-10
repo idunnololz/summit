@@ -74,6 +74,7 @@ import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListCommentReports
 import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListCommunities
+import com.idunnololz.summit.api.dto.lemmy.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListMedia
 import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostLikes
@@ -448,6 +449,7 @@ class LemmyApiClient @Inject constructor(
     listingType: ListingType,
     searchType: SearchType,
     page: Int? = null,
+    pageCursor: String? = null,
     query: String,
     limit: Int? = null,
     creatorId: Long? = null,
@@ -462,6 +464,7 @@ class LemmyApiClient @Inject constructor(
       sort = sortType,
       listing_type = listingType,
       page = page,
+      page_cursor = pageCursor,
       limit = limit,
     )
 
@@ -475,18 +478,20 @@ class LemmyApiClient @Inject constructor(
     account: Account?,
     sortType: SortType,
     listingType: ListingType,
+    pageCursor: String? = null,
     page: Int = 1,
     limit: Int = 50,
-  ): Result<List<CommunityView>> {
+  ): Result<ListCommunitiesResponse> {
     val form = ListCommunities(
       type_ = listingType,
       sort = sortType,
       page = page,
+      page_cursor = pageCursor,
       limit = limit,
     )
     return onApiClient {
       getApi().getCommunityList(authorization = account?.bearer, args = form, force = false)
-    }.map { it.communities }
+    }
   }
 
   suspend fun login(

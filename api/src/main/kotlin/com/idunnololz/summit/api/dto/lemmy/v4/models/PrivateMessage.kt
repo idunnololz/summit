@@ -60,15 +60,15 @@ data class PrivateMessage (
 
     /* The person id. */
     @SerializedName("recipient_id")
-    val recipientId: kotlin.Double,
+    val recipientId: kotlin.Long,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Long,
 
     /* The private message id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null

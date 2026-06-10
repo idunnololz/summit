@@ -9,7 +9,7 @@ data class CommentReplyView(
   val recipient: Person,
   val counts: CommentAggregates,
   val creator_banned_from_community: Boolean,
-  val subscribed: SubscribedType /* "Subscribed" | "NotSubscribed" | "Pending" */,
+  val subscribed: SubscribedType? /* "Subscribed" | "NotSubscribed" | "Pending" */,
   val saved: Boolean,
   val creator_blocked: Boolean,
   val my_vote: Int? = null,

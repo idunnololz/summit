@@ -13,6 +13,7 @@ import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.PageType
 import com.idunnololz.summit.inbox.repository.InboxRepository
 import com.idunnololz.summit.inbox.repository.InboxSource
+import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

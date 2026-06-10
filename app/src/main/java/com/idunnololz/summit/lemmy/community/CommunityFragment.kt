@@ -8,8 +8,12 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnPreDrawListener
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -1321,6 +1325,8 @@ class CommunityFragment :
           // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
 
           binding.root.post {
+            if (!isBindingAvailable()) return@post
+
             (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
           }
         } else {

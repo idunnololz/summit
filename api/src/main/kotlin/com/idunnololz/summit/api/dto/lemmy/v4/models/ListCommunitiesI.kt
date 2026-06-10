@@ -38,7 +38,7 @@ import com.google.gson.annotations.SerializedName
 data class ListCommunitiesI (
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
@@ -51,14 +51,14 @@ data class ListCommunitiesI (
     val searchTerm: kotlin.String? = null,
 
     @SerializedName("multi_community_id")
-    val multiCommunityId: kotlin.Double? = null,
+    val multiCommunityId: kotlin.Int? = null,
 
     @SerializedName("show_nsfw")
     val showNsfw: kotlin.Boolean? = null,
 
     /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
     @SerializedName("time_range_seconds")
-    val timeRangeSeconds: kotlin.Double? = null,
+    val timeRangeSeconds: kotlin.Long? = null,
 
     @SerializedName("sort")
     val sort: CommunitySortType? = null,

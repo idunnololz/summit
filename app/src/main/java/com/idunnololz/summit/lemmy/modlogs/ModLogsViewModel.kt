@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.requireMainThread

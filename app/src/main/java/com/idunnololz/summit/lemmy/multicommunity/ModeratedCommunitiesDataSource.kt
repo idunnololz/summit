@@ -5,8 +5,8 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.SortType
-import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -17,7 +17,7 @@ class ModeratedCommunitiesDataSource(
   private val apiClient: AccountAwareLemmyClient,
   private val accountInfoManager: AccountInfoManager,
   private val dataSourceFactory: MultiCommunityDataSource.Factory,
-) : PostsDataSource {
+) : SimpleDataSource<FetchedPost, SortType> {
 
   class Factory @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
@@ -30,17 +30,18 @@ class ModeratedCommunitiesDataSource(
 
   private var dataSource: MultiCommunityDataSource? = null
 
-  override suspend fun fetchPosts(
-    sortType: SortType?,
+  override suspend fun fetchItems(
+    sortOrder: SortType?,
     page: Int,
     force: Boolean,
+    limit: Int,
     showRead: Boolean?,
   ): Result<List<FetchedPost>> = getDataSource().fold(
     onSuccess = {
       if (it.sourcesCount == 0) {
         Result.failure(NoModeratedCommunitiesException())
       } else {
-        it.fetchPosts(sortType, page, force, showRead = showRead)
+        it.fetchItems(sortOrder, page, force, showRead = showRead)
       }
     },
     onFailure = {

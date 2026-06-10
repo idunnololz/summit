@@ -197,9 +197,9 @@ open class LemmyListSource<T, O, Key>(
 
     return result.fold(
       onSuccess = { newObjects ->
-        Log.d(TAG, "Fetched ${newObjects.size} posts.")
+        Log.d(TAG, "Fetched ${newObjects.size} posts. Limit = $limit")
         addObjects(newObjects, pageIndex)
-        Result.success(newObjects.isNotEmpty() && newObjects.size == limit)
+        Result.success(newObjects.isNotEmpty() && newObjects.size >= limit)
       },
       onFailure = {
         Result.failure(it)

@@ -828,6 +828,8 @@ class PieFedApiAlphaAdapter(
         posts = it.posts.map { it.toPostView() },
         communities = it.communities.map { it.toCommunityView() },
         users = it.users.map { it.toPersonView() },
+        nextCursor = null,
+        prevCursor = null,
       )
     }
 
