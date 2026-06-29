@@ -931,7 +931,6 @@ class LemmyApiClient @Inject constructor(
     val form = GetPersonDetails(
       person_id = personId,
       username = name,
-
       page = page,
       limit = limit,
       sort = sort,

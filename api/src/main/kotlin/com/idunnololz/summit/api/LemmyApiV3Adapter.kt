@@ -385,7 +385,10 @@ class LemmyApiV3Adapter(
     args: GetReplies,
     force: Boolean,
   ): Result<GetRepliesResponse> = retrofitErrorHandler {
-    api.getReplies(generateHeaders(authorization, force), args.serializeToMap())
+    api.getReplies(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun markCommentReplyAsRead(
@@ -425,7 +428,10 @@ class LemmyApiV3Adapter(
     args: GetPersonMentions,
     force: Boolean,
   ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
-    api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPersonMentions(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun getPrivateMessages(
@@ -433,7 +439,10 @@ class LemmyApiV3Adapter(
     args: GetPrivateMessages,
     force: Boolean,
   ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
-    api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPrivateMessages(
+      generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun getPrivateMessageReports(
@@ -441,7 +450,10 @@ class LemmyApiV3Adapter(
     args: ListPrivateMessageReports,
     force: Boolean,
   ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
-    api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPrivateMessageReports(
+      headers = generateHeaders(authorization = authorization, force = force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun createPrivateMessageReport(
@@ -466,7 +478,10 @@ class LemmyApiV3Adapter(
     args: ListPostReports,
     force: Boolean,
   ): Result<ListPostReportsResponse> = retrofitErrorHandler {
-    api.getPostReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPostReports(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun resolvePostReport(
@@ -480,7 +495,10 @@ class LemmyApiV3Adapter(
     args: ListCommentReports,
     force: Boolean,
   ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
-    api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getCommentReports(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun resolveCommentReport(

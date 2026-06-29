@@ -112,7 +112,7 @@ class NotificationsUpdater @AssistedInject constructor(
   private fun runMentionsJob(account: Account): Deferred<List<InboxItem>> = coroutineScope.async {
     apiClient.fetchMentions(
       sort = CommentSortType.New,
-      page = 1,
+      page = 0,
       limit = 10,
       unreadOnly = true,
       force = true,
@@ -126,7 +126,7 @@ class NotificationsUpdater @AssistedInject constructor(
   private fun runPrivateMessagesJob(account: Account): Deferred<List<InboxItem>> =
     coroutineScope.async {
       apiClient.fetchPrivateMessages(
-        page = 1,
+        page = 0,
         limit = 10,
         unreadOnly = true,
         force = true,
@@ -140,7 +140,7 @@ class NotificationsUpdater @AssistedInject constructor(
   private fun runRepliesJob(account: Account): Deferred<List<InboxItem>> = coroutineScope.async {
     apiClient.fetchReplies(
       sort = CommentSortType.New,
-      page = 1,
+      page = 0,
       limit = 10,
       unreadOnly = true,
       force = true,
@@ -155,7 +155,7 @@ class NotificationsUpdater @AssistedInject constructor(
     coroutineScope.async {
       apiClient.fetchCommentReports(
         unresolvedOnly = true,
-        page = 1,
+        page = 0,
         limit = 10,
         account = account,
         force = true,
@@ -169,7 +169,7 @@ class NotificationsUpdater @AssistedInject constructor(
     coroutineScope.async {
       apiClient.fetchPostReports(
         unresolvedOnly = true,
-        page = 1,
+        page = 0,
         limit = 10,
         account = account,
         force = true,
@@ -183,7 +183,7 @@ class NotificationsUpdater @AssistedInject constructor(
     coroutineScope.async {
       apiClient.fetchPrivateMessageReports(
         unresolvedOnly = true,
-        page = 1,
+        page = 0,
         limit = 10,
         account = account,
         force = true,

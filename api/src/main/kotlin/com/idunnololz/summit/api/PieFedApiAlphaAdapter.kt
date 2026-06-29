@@ -576,7 +576,7 @@ class PieFedApiAlphaAdapter(
   ): Result<GetRepliesResponse> = retrofitErrorHandler {
     api.getReplies(
       headers = generateHeaders(authorization, force),
-      form = args.serializeToMap(),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map { it.toGetRepliesResponse() }
 
@@ -624,7 +624,10 @@ class PieFedApiAlphaAdapter(
     args: GetPersonMentions,
     force: Boolean,
   ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
-    api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPersonMentions(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
     .map { it.toGetPersonMentionsResponse() }
 
@@ -633,7 +636,10 @@ class PieFedApiAlphaAdapter(
     args: GetPrivateMessages,
     force: Boolean,
   ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
-    api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPrivateMessages(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }.map {
     PrivateMessagesResponse(
       private_messages = it.privateMessages.map { it.toPrivateMessageView() },
@@ -645,7 +651,10 @@ class PieFedApiAlphaAdapter(
     args: ListPrivateMessageReports,
     force: Boolean,
   ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
-    api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPrivateMessageReports(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+    )
   }
 
   override suspend fun createPrivateMessageReport(
@@ -670,7 +679,10 @@ class PieFedApiAlphaAdapter(
     args: ListPostReports,
     force: Boolean,
   ): Result<ListPostReportsResponse> = retrofitErrorHandler {
-    api.getPostReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getPostReports(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+    )
   }
 
   override suspend fun resolvePostReport(
@@ -689,7 +701,10 @@ class PieFedApiAlphaAdapter(
     args: ListCommentReports,
     force: Boolean,
   ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
-    api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
+    api.getCommentReports(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
     .map {
       ListCommentReportsResponse(
