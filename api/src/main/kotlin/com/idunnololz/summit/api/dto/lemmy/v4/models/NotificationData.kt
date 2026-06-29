@@ -160,10 +160,7 @@ data class NotificationData (
      * Values: mod_action
      */
     enum class Type(val value: kotlin.String) {
-      @SerializedName(value = "comment") comment("comment"),
-      @SerializedName(value = "post") post("post"),
-      @SerializedName(value = "private_message") private_message("private_message"),
-      @SerializedName(value = "mod_action") mod_action("mod_action");
+        @SerializedName(value = "mod_action") mod_action("mod_action");
     }
 
 }

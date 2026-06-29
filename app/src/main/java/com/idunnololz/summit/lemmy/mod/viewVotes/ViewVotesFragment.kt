@@ -127,7 +127,7 @@ class ViewVotesFragment :
       )
 
       swipeRefreshLayout.setOnRefreshListener {
-        viewModel.resetAndLoad()
+        viewModel.resetAndLoad(force = true)
       }
 
       viewModel.votesModel.observe(viewLifecycleOwner) {

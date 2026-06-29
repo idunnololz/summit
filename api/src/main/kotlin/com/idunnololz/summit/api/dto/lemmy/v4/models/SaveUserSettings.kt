@@ -27,7 +27,7 @@ import com.google.gson.annotations.SerializedName
  * Saves settings for your user.
  *
  * @param showPersonVotes Whether to show vote totals given to others.
- * @param hideMedia Whether to hide posts containing images/videos.
+ * @param hidePostsWithMedia Whether to hide posts containing images/videos. Often labeled hide_memes.
  * @param autoMarkFetchedPostsAsRead Whether to automatically mark fetched posts as read.
  * @param showUpvotePercentage 
  * @param showDownvotes 
@@ -44,6 +44,7 @@ import com.google.gson.annotations.SerializedName
  * @param showBotAccounts Whether to show bot accounts.
  * @param botAccount Whether this account is a bot account. Users can hide these accounts easily if they wish.
  * @param sendNotificationsToEmail Sends notifications to your email.
+ * @param showMedia Whether to show media in the UI.
  * @param showAvatars Whether to show or hide avatars.
  * @param matrixUserId Your matrix user id. Ex:
  * @param bio Your bio / info, in markdown.
@@ -68,9 +69,9 @@ data class SaveUserSettings (
     @SerializedName("show_person_votes")
     val showPersonVotes: kotlin.Boolean? = null,
 
-    /* Whether to hide posts containing images/videos. */
-    @SerializedName("hide_media")
-    val hideMedia: kotlin.Boolean? = null,
+    /* Whether to hide posts containing images/videos. Often labeled hide_memes. */
+    @SerializedName("hide_posts_with_media")
+    val hidePostsWithMedia: kotlin.Boolean? = null,
 
     /* Whether to automatically mark fetched posts as read. */
     @SerializedName("auto_mark_fetched_posts_as_read")
@@ -131,6 +132,10 @@ data class SaveUserSettings (
     /* Sends notifications to your email. */
     @SerializedName("send_notifications_to_email")
     val sendNotificationsToEmail: kotlin.Boolean? = null,
+
+    /* Whether to show media in the UI. */
+    @SerializedName("show_media")
+    val showMedia: kotlin.Boolean? = null,
 
     /* Whether to show or hide avatars. */
     @SerializedName("show_avatars")

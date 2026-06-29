@@ -226,11 +226,11 @@ class CommunityInfoViewModel @Inject constructor(
         icon = R.drawable.outline_shield_24,
         communitiesData = successResults.map {
           CommunityInfo(
-            it.community_view.community.toCommunityRef(),
-            it.community_view.community.id,
-            it.community_view.community.name,
-            it.community_view.community.title,
-            it.community_view.community.icon,
+            communityRef = it.community_view.community.toCommunityRef(),
+            id = it.community_view.community.id,
+            name = it.community_view.community.name,
+            title = it.community_view.community.title,
+            icon = it.community_view.community.icon,
           )
         },
       ),
@@ -379,7 +379,7 @@ class CommunityInfoViewModel @Inject constructor(
     val communityRef: CommunityRef.CommunityRefByName,
     val id: CommunityId,
     val name: String,
-    val title: String,
+    val title: String?,
     val icon: String?,
   )
 

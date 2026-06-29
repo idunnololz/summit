@@ -1,5 +1,6 @@
 package com.idunnololz.summit.api
 
+import android.util.Log
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -163,7 +164,7 @@ class LemmyApiV3Adapter(
   ): Result<GetPostsResponse> = retrofitErrorHandler {
     api.getPosts(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -200,7 +201,10 @@ class LemmyApiV3Adapter(
     args: ListCommentLikes,
     force: Boolean,
   ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
-    api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap())
+    api.listCommentVotes(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun listPostVotes(
@@ -208,7 +212,10 @@ class LemmyApiV3Adapter(
     args: ListPostLikes,
     force: Boolean,
   ): Result<ListPostLikesResponse> = retrofitErrorHandler {
-    api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap())
+    api.listPostVotes(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun createComment(
@@ -738,7 +745,10 @@ class LemmyApiV3Adapter(
     args: GetModlog,
     force: Boolean,
   ): Result<GetModlogResponse> = retrofitErrorHandler {
-    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+    api.getModLogs(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
@@ -754,7 +764,7 @@ class LemmyApiV3Adapter(
   ): Result<ListMediaResponse> = retrofitErrorHandler {
     api.listMedia(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 

@@ -402,6 +402,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
           context = context,
           name = if (preferences.preferCommunityDisplayName) {
             postView.community.title
+              ?: postView.community.name
           } else {
             postView.community.name
           },
@@ -412,6 +413,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         sb.appendLink(
           if (preferences.preferCommunityDisplayName) {
             postView.community.title
+              ?: postView.community.name
           } else {
             postView.community.name
           },

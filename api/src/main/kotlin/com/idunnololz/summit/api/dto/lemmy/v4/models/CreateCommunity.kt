@@ -22,24 +22,18 @@ import com.google.gson.annotations.SerializedName
 /**
  * Create a community.
  *
- * @param title A longer title.
  * @param name The unique name.
  * @param visibility 
  * @param discussionLanguages 
  * @param postingRestrictedToMods Whether to restrict posting only to moderators.
  * @param nsfw Whether its an NSFW community.
- * @param banner A banner URL.
- * @param icon An icon URL.
  * @param summary A shorter, one line summary of your community.
  * @param sidebar A sidebar for the community in markdown.
+ * @param title A longer title.
  */
 
 
 data class CreateCommunity (
-
-    /* A longer title. */
-    @SerializedName("title")
-    val title: kotlin.String,
 
     /* The unique name. */
     @SerializedName("name")
@@ -59,21 +53,17 @@ data class CreateCommunity (
     @SerializedName("nsfw")
     val nsfw: kotlin.Boolean? = null,
 
-    /* A banner URL. */
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
-
-    /* An icon URL. */
-    @SerializedName("icon")
-    val icon: kotlin.String? = null,
-
     /* A shorter, one line summary of your community. */
     @SerializedName("summary")
     val summary: kotlin.String? = null,
 
     /* A sidebar for the community in markdown. */
     @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null
+    val sidebar: kotlin.String? = null,
+
+    /* A longer title. */
+    @SerializedName("title")
+    val title: kotlin.String? = null
 
 ) {
 

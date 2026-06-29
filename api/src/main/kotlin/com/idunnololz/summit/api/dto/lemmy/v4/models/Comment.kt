@@ -117,7 +117,7 @@ data class Comment (
 
     /* The comment id. */
     @SerializedName("id")
-    val id: kotlin.Int,
+    val id: Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null

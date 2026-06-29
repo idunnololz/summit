@@ -4,6 +4,7 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **maxInvitesPerUserAllowed** | **kotlin.Double** | How many active invite links a user can have |  |
 | **imageUploadDisabled** | **kotlin.Boolean** |  |  |
 | **imageAllowVideoUploads** | **kotlin.Boolean** | This affects post and comment images, but not avatars and banners. |  |
 | **imageMaxUploadSize** | **kotlin.Double** | This affects post and comment images, but not avatar and banner sizes. |  |

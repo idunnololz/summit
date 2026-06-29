@@ -25,7 +25,7 @@ import com.google.gson.annotations.SerializedName
  *
  * @param searchTerm The search query. Can be a plain text, or an object ID which will be resolved (eg `https://lemmy.world/comment/1` or `!fediverse@lemmy.ml`).
  * @param limit 
- * @param pageCursor 
+ * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
  * @param showNsfw If true, then show the nsfw posts (even if your user setting is to hide them)
  * @param postUrlOnly 
  * @param titleOnly 
@@ -46,8 +46,9 @@ data class SearchI (
     val searchTerm: kotlin.String,
 
     @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+    val limit: Int? = null,
 
+    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
     val pageCursor: kotlin.String? = null,
 
@@ -66,7 +67,7 @@ data class SearchI (
 
     /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
     @SerializedName("time_range_seconds")
-    val timeRangeSeconds: kotlin.Long? = null,
+    val timeRangeSeconds: Long? = null,
 
     @SerializedName("type_")
     val type: SearchType? = null,
@@ -76,14 +77,14 @@ data class SearchI (
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Long? = null,
+    val creatorId: Long? = null,
 
     @SerializedName("community_name")
     val communityName: kotlin.String? = null,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Int? = null
+    val communityId: Int? = null
 
 ) {
 

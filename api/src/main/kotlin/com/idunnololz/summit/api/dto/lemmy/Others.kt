@@ -11,6 +11,9 @@ enum class RegistrationMode {
 
   @SerializedName("Open")
   Open,
+
+  @SerializedName("RequireInvitation")
+  RequireInvitation,
 }
 
 /**

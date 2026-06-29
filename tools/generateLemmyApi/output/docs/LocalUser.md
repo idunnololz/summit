@@ -4,13 +4,14 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **showMedia** | **kotlin.Boolean** | Whether to show media in the UI. |  |
 | **defaultItemsPerPage** | **kotlin.Double** |  |  |
 | **showPersonVotes** | **kotlin.Boolean** |  |  |
 | **showUpvotePercentage** | **kotlin.Boolean** |  |  |
 | **showDownvotes** | [**VoteShow**](VoteShow.md) |  |  |
 | **showUpvotes** | **kotlin.Boolean** |  |  |
 | **showScore** | **kotlin.Boolean** |  |  |
-| **hideMedia** | **kotlin.Boolean** | Whether to hide posts containing images/videos |  |
+| **hidePostsWithMedia** | **kotlin.Boolean** | Whether to hide posts containing images/videos. Often labeled hide_memes. |  |
 | **autoMarkFetchedPostsAsRead** | **kotlin.Boolean** | Whether to automatically mark fetched posts as read. |  |
 | **defaultCommentSortType** | [**CommentSortType**](CommentSortType.md) |  |  |
 | **privateMessagesEnabled** | **kotlin.Boolean** | Whether a user can send / receive private messages |  |
@@ -36,6 +37,7 @@
 | **showNsfw** | **kotlin.Boolean** | Whether to show NSFW content. |  |
 | **personId** | **kotlin.Double** | The person id. |  |
 | **id** | **kotlin.Double** | The local user id. |  |
+| **invitedByLocalUserId** | **kotlin.Double** | The local user id. |  [optional] |
 | **defaultPostTimeRangeSeconds** | **kotlin.Double** | A default time range limit to apply to post sorts, in seconds. |  [optional] |
 | **email** | **kotlin.String** |  |  [optional] |
 

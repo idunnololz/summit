@@ -15,6 +15,7 @@
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 
 import com.google.gson.annotations.SerializedName
@@ -26,6 +27,7 @@ import com.google.gson.annotations.SerializedName
  * @param showCommunityRuleViolations Only for admins: also show reports with `violates_instance_rules=false`
  * @param limit 
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
+ * @param sort 
  * @param communityId The community id.
  * @param postId The post id.
  * @param type 
@@ -49,6 +51,9 @@ data class ListReportsI (
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
     val pageCursor: kotlin.String? = null,
+
+    @SerializedName("sort")
+    val sort: ReportSortType? = null,
 
     /* The community id. */
     @SerializedName("community_id")

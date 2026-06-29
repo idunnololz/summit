@@ -15,49 +15,46 @@
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKind
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * 
  *
- * @param childCount 
  * @param publishedAt 
- * @param isRevert 
- * @param kind 
- * @param id 
- * @param bulkActionParentId 
+ * @param usesCount 
+ * @param localUserId The local user id.
+ * @param token 
+ * @param id The invitation id.
  * @param expiresAt 
- * @param reason 
+ * @param maxUses 
  */
 
 
-data class Modlog (
-
-    @SerializedName("child_count")
-    val childCount: kotlin.Double,
+data class LocalUserInvite (
 
     @SerializedName("published_at")
     val publishedAt: kotlin.String,
 
-    @SerializedName("is_revert")
-    val isRevert: kotlin.Boolean,
+    @SerializedName("uses_count")
+    val usesCount: kotlin.Double,
 
-    @SerializedName("kind")
-    val kind: ModlogKind,
+    /* The local user id. */
+    @SerializedName("local_user_id")
+    val localUserId: kotlin.Double,
 
+    @SerializedName("token")
+    val token: kotlin.String,
+
+    /* The invitation id. */
     @SerializedName("id")
     val id: kotlin.Double,
-
-    @SerializedName("bulk_action_parent_id")
-    val bulkActionParentId: kotlin.Double? = null,
 
     @SerializedName("expires_at")
     val expiresAt: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null
+    @SerializedName("max_uses")
+    val maxUses: kotlin.Double? = null
 
 ) {
 

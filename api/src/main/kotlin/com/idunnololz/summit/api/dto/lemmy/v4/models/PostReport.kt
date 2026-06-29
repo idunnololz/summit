@@ -56,22 +56,22 @@ data class PostReport (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: Long,
 
     /* The post report id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("resolver_id")
-    val resolverId: kotlin.Double? = null,
+    val resolverId: Long? = null,
 
     /* The original post body. */
     @SerializedName("original_post_body")

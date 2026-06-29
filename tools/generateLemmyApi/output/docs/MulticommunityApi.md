@@ -15,7 +15,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createMultiCommunity"></a>
 # **createMultiCommunity**
-> RequestStateMultiCommunityResponse createMultiCommunity(createMultiCommunity)
+> MultiCommunityResponse createMultiCommunity(createMultiCommunity)
 
 
 
@@ -28,7 +28,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 val apiInstance = MulticommunityApi()
 val createMultiCommunity : CreateMultiCommunity =  // CreateMultiCommunity | 
 try {
-    val result : RequestStateMultiCommunityResponse = apiInstance.createMultiCommunity(createMultiCommunity)
+    val result : MultiCommunityResponse = apiInstance.createMultiCommunity(createMultiCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#createMultiCommunity")
@@ -46,7 +46,7 @@ try {
 
 ### Return type
 
-[**RequestStateMultiCommunityResponse**](RequestStateMultiCommunityResponse.md)
+[**MultiCommunityResponse**](MultiCommunityResponse.md)
 
 ### Authorization
 
@@ -61,7 +61,7 @@ Configure bearerAuth:
 
 <a id="createMultiCommunityEntry"></a>
 # **createMultiCommunityEntry**
-> RequestStateCommunityResponse createMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
+> CommunityResponse createMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
 
 
 
@@ -74,7 +74,7 @@ Configure bearerAuth:
 val apiInstance = MulticommunityApi()
 val createOrDeleteMultiCommunityEntry : CreateOrDeleteMultiCommunityEntry =  // CreateOrDeleteMultiCommunityEntry | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.createMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
+    val result : CommunityResponse = apiInstance.createMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#createMultiCommunityEntry")
@@ -92,7 +92,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -107,7 +107,7 @@ Configure bearerAuth:
 
 <a id="deleteMultiCommunityEntry"></a>
 # **deleteMultiCommunityEntry**
-> RequestStateSuccessResponse deleteMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
+> SuccessResponse deleteMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
 
 
 
@@ -120,7 +120,7 @@ Configure bearerAuth:
 val apiInstance = MulticommunityApi()
 val createOrDeleteMultiCommunityEntry : CreateOrDeleteMultiCommunityEntry =  // CreateOrDeleteMultiCommunityEntry | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
+    val result : SuccessResponse = apiInstance.deleteMultiCommunityEntry(createOrDeleteMultiCommunityEntry)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#deleteMultiCommunityEntry")
@@ -138,7 +138,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -153,7 +153,7 @@ Configure bearerAuth:
 
 <a id="editMultiCommunity"></a>
 # **editMultiCommunity**
-> RequestStateMultiCommunityResponse editMultiCommunity(editMultiCommunity)
+> MultiCommunityResponse editMultiCommunity(editMultiCommunity)
 
 
 
@@ -166,7 +166,7 @@ Configure bearerAuth:
 val apiInstance = MulticommunityApi()
 val editMultiCommunity : EditMultiCommunity =  // EditMultiCommunity | 
 try {
-    val result : RequestStateMultiCommunityResponse = apiInstance.editMultiCommunity(editMultiCommunity)
+    val result : MultiCommunityResponse = apiInstance.editMultiCommunity(editMultiCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#editMultiCommunity")
@@ -184,7 +184,7 @@ try {
 
 ### Return type
 
-[**RequestStateMultiCommunityResponse**](RequestStateMultiCommunityResponse.md)
+[**MultiCommunityResponse**](MultiCommunityResponse.md)
 
 ### Authorization
 
@@ -199,7 +199,7 @@ Configure bearerAuth:
 
 <a id="followMultiCommunity"></a>
 # **followMultiCommunity**
-> RequestStateMultiCommunityResponse followMultiCommunity(followMultiCommunity)
+> MultiCommunityResponse followMultiCommunity(followMultiCommunity)
 
 
 
@@ -212,7 +212,7 @@ Configure bearerAuth:
 val apiInstance = MulticommunityApi()
 val followMultiCommunity : FollowMultiCommunity =  // FollowMultiCommunity | 
 try {
-    val result : RequestStateMultiCommunityResponse = apiInstance.followMultiCommunity(followMultiCommunity)
+    val result : MultiCommunityResponse = apiInstance.followMultiCommunity(followMultiCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#followMultiCommunity")
@@ -230,7 +230,7 @@ try {
 
 ### Return type
 
-[**RequestStateMultiCommunityResponse**](RequestStateMultiCommunityResponse.md)
+[**MultiCommunityResponse**](MultiCommunityResponse.md)
 
 ### Authorization
 
@@ -243,7 +243,7 @@ No authorization required
 
 <a id="getMultiCommunity"></a>
 # **getMultiCommunity**
-> RequestStateGetMultiCommunityResponse getMultiCommunity(name, id)
+> GetMultiCommunityResponse getMultiCommunity(name, id)
 
 
 
@@ -257,7 +257,7 @@ val apiInstance = MulticommunityApi()
 val name : kotlin.String = name_example // kotlin.String | 
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateGetMultiCommunityResponse = apiInstance.getMultiCommunity(name, id)
+    val result : GetMultiCommunityResponse = apiInstance.getMultiCommunity(name, id)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#getMultiCommunity")
@@ -276,7 +276,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetMultiCommunityResponse**](RequestStateGetMultiCommunityResponse.md)
+[**GetMultiCommunityResponse**](GetMultiCommunityResponse.md)
 
 ### Authorization
 
@@ -289,7 +289,7 @@ No authorization required
 
 <a id="listMultiCommunities"></a>
 # **listMultiCommunities**
-> RequestStatePagedResponseMultiCommunityView listMultiCommunities(limit, pageCursor, searchTitleOnly, searchTerm, timeRangeSeconds, creatorId, sort, type)
+> PagedResponseMultiCommunityView listMultiCommunities(limit, pageCursor, searchTitleOnly, searchTerm, timeRangeSeconds, creatorId, sort, type)
 
 
 
@@ -309,7 +309,7 @@ val creatorId : kotlin.Double = 1.2 // kotlin.Double |
 val sort : MultiCommunitySortType =  // MultiCommunitySortType | 
 val type : MultiCommunityListingType =  // MultiCommunityListingType | 
 try {
-    val result : RequestStatePagedResponseMultiCommunityView = apiInstance.listMultiCommunities(limit, pageCursor, searchTitleOnly, searchTerm, timeRangeSeconds, creatorId, sort, type)
+    val result : PagedResponseMultiCommunityView = apiInstance.listMultiCommunities(limit, pageCursor, searchTitleOnly, searchTerm, timeRangeSeconds, creatorId, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MulticommunityApi#listMultiCommunities")
@@ -334,7 +334,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseMultiCommunityView**](RequestStatePagedResponseMultiCommunityView.md)
+[**PagedResponseMultiCommunityView**](PagedResponseMultiCommunityView.md)
 
 ### Authorization
 

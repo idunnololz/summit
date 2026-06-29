@@ -594,7 +594,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         nameEditText.setText(community.name)
       }
 
-      if (displayNameEditText.text.isNullOrBlank() && community.title.isNotBlank()) {
+      if (displayNameEditText.text.isNullOrBlank() && !community.title.isNullOrBlank()) {
         displayNameEditText.setText(community.title)
       }
 

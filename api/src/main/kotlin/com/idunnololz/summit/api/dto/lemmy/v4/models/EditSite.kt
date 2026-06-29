@@ -28,6 +28,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Edits a site.
  *
+ * @param maxInvitesPerUserAllowed 
  * @param imageUploadDisabled 
  * @param imageAllowVideoUploads 
  * @param imageMaxUploadSize 
@@ -87,6 +88,9 @@ import com.google.gson.annotations.SerializedName
 
 
 data class EditSite (
+
+    @SerializedName("max_invites_per_user_allowed")
+    val maxInvitesPerUserAllowed: kotlin.Double? = null,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean? = null,

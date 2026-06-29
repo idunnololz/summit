@@ -4,6 +4,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
+| [**adminListUsers**](MiscellaneousApi.md#adminListUsers) | **GET** /api/v4/admin/users | Get a list of users. |
 | [**authenticateWithOAuth**](MiscellaneousApi.md#authenticateWithOAuth) | **POST** /api/v4/oauth/authenticate | Authenticate with OAuth |
 | [**createOAuthProvider**](MiscellaneousApi.md#createOAuthProvider) | **POST** /api/v4/oauth_provider | Create a new oauth provider method |
 | [**deleteOAuthProvider**](MiscellaneousApi.md#deleteOAuthProvider) | **DELETE** /api/v4/oauth_provider | Delete an oauth provider method |
@@ -11,14 +12,65 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**getFederatedInstances**](MiscellaneousApi.md#getFederatedInstances) | **GET** /api/v4/federated_instances | Fetch federated instances. |
 | [**getModlog**](MiscellaneousApi.md#getModlog) | **GET** /api/v4/modlog | Get the modlog. |
 | [**getSiteMetadata**](MiscellaneousApi.md#getSiteMetadata) | **GET** /api/v4/post/site_metadata | Fetch metadata for any given site. |
-| [**listUsers**](MiscellaneousApi.md#listUsers) | **GET** /api/v4/admin/users | Get a list of users. |
 | [**resolveObject**](MiscellaneousApi.md#resolveObject) | **GET** /api/v4/resolve_object | Fetch a non-local / federated object. |
 | [**search**](MiscellaneousApi.md#search) | **GET** /api/v4/search | Search lemmy. If &#x60;search_term&#x60; is a url it also attempts to fetch it, just like &#x60;resolve_object&#x60;. |
 
 
+<a id="adminListUsers"></a>
+# **adminListUsers**
+> PagedResponseLocalUserView adminListUsers(limit, sort, pageCursor, bannedOnly)
+
+Get a list of users.
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = MiscellaneousApi()
+val limit : kotlin.Double = 1.2 // kotlin.Double | 
+val sort : LocalUserSortType =  // LocalUserSortType | 
+val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+val bannedOnly : kotlin.Boolean = true // kotlin.Boolean | 
+try {
+    val result : PagedResponseLocalUserView = apiInstance.adminListUsers(limit, sort, pageCursor, bannedOnly)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling MiscellaneousApi#adminListUsers")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling MiscellaneousApi#adminListUsers")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| **limit** | **kotlin.Double**|  | [optional] |
+| **sort** | [**LocalUserSortType**](.md)|  | [optional] [enum: new, old] |
+| **pageCursor** | **kotlin.String**|  | [optional] |
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **bannedOnly** | **kotlin.Boolean**|  | [optional] |
+
+### Return type
+
+[**PagedResponseLocalUserView**](PagedResponseLocalUserView.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
 <a id="authenticateWithOAuth"></a>
 # **authenticateWithOAuth**
-> RequestStateLoginResponse authenticateWithOAuth(authenticateWithOauth)
+> LoginResponse authenticateWithOAuth(authenticateWithOauth)
 
 Authenticate with OAuth
 
@@ -31,7 +83,7 @@ Authenticate with OAuth
 val apiInstance = MiscellaneousApi()
 val authenticateWithOauth : AuthenticateWithOauth =  // AuthenticateWithOauth | 
 try {
-    val result : RequestStateLoginResponse = apiInstance.authenticateWithOAuth(authenticateWithOauth)
+    val result : LoginResponse = apiInstance.authenticateWithOAuth(authenticateWithOauth)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#authenticateWithOAuth")
@@ -49,7 +101,7 @@ try {
 
 ### Return type
 
-[**RequestStateLoginResponse**](RequestStateLoginResponse.md)
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 
@@ -64,7 +116,7 @@ Configure bearerAuth:
 
 <a id="createOAuthProvider"></a>
 # **createOAuthProvider**
-> RequestStateAdminOAuthProvider createOAuthProvider(createOAuthProvider)
+> AdminOAuthProvider createOAuthProvider(createOAuthProvider)
 
 Create a new oauth provider method
 
@@ -77,7 +129,7 @@ Create a new oauth provider method
 val apiInstance = MiscellaneousApi()
 val createOAuthProvider : CreateOAuthProvider =  // CreateOAuthProvider | 
 try {
-    val result : RequestStateAdminOAuthProvider = apiInstance.createOAuthProvider(createOAuthProvider)
+    val result : AdminOAuthProvider = apiInstance.createOAuthProvider(createOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#createOAuthProvider")
@@ -95,7 +147,7 @@ try {
 
 ### Return type
 
-[**RequestStateAdminOAuthProvider**](RequestStateAdminOAuthProvider.md)
+[**AdminOAuthProvider**](AdminOAuthProvider.md)
 
 ### Authorization
 
@@ -110,7 +162,7 @@ Configure bearerAuth:
 
 <a id="deleteOAuthProvider"></a>
 # **deleteOAuthProvider**
-> RequestStateSuccessResponse deleteOAuthProvider(deleteOAuthProvider)
+> SuccessResponse deleteOAuthProvider(deleteOAuthProvider)
 
 Delete an oauth provider method
 
@@ -123,7 +175,7 @@ Delete an oauth provider method
 val apiInstance = MiscellaneousApi()
 val deleteOAuthProvider : DeleteOAuthProvider =  // DeleteOAuthProvider | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteOAuthProvider(deleteOAuthProvider)
+    val result : SuccessResponse = apiInstance.deleteOAuthProvider(deleteOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#deleteOAuthProvider")
@@ -141,7 +193,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -156,7 +208,7 @@ Configure bearerAuth:
 
 <a id="editOAuthProvider"></a>
 # **editOAuthProvider**
-> RequestStateAdminOAuthProvider editOAuthProvider(editOAuthProvider)
+> AdminOAuthProvider editOAuthProvider(editOAuthProvider)
 
 Edit an existing oauth provider method
 
@@ -169,7 +221,7 @@ Edit an existing oauth provider method
 val apiInstance = MiscellaneousApi()
 val editOAuthProvider : EditOAuthProvider =  // EditOAuthProvider | 
 try {
-    val result : RequestStateAdminOAuthProvider = apiInstance.editOAuthProvider(editOAuthProvider)
+    val result : AdminOAuthProvider = apiInstance.editOAuthProvider(editOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#editOAuthProvider")
@@ -187,7 +239,7 @@ try {
 
 ### Return type
 
-[**RequestStateAdminOAuthProvider**](RequestStateAdminOAuthProvider.md)
+[**AdminOAuthProvider**](AdminOAuthProvider.md)
 
 ### Authorization
 
@@ -202,7 +254,7 @@ Configure bearerAuth:
 
 <a id="getFederatedInstances"></a>
 # **getFederatedInstances**
-> RequestStatePagedResponseFederatedInstanceView getFederatedInstances(kind, limit, pageCursor, domainFilter)
+> PagedResponseFederatedInstanceView getFederatedInstances(kind, limit, pageCursor, domainFilter)
 
 Fetch federated instances.
 
@@ -218,7 +270,7 @@ val limit : kotlin.Double = 1.2 // kotlin.Double |
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 val domainFilter : kotlin.String = domainFilter_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseFederatedInstanceView = apiInstance.getFederatedInstances(kind, limit, pageCursor, domainFilter)
+    val result : PagedResponseFederatedInstanceView = apiInstance.getFederatedInstances(kind, limit, pageCursor, domainFilter)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#getFederatedInstances")
@@ -239,7 +291,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseFederatedInstanceView**](RequestStatePagedResponseFederatedInstanceView.md)
+[**PagedResponseFederatedInstanceView**](PagedResponseFederatedInstanceView.md)
 
 ### Authorization
 
@@ -252,7 +304,7 @@ No authorization required
 
 <a id="getModlog"></a>
 # **getModlog**
-> RequestStatePagedResponseModlogView getModlog(limit, pageCursor, bulkActionParentId, showBulk, commentId, postId, otherPersonId, listingType, type, communityId, modPersonId)
+> PagedResponseModlogView getModlog(limit, pageCursor, bulkActionParentId, showBulk, commentId, postId, otherPersonId, listingType, type, communityId, modPersonId)
 
 Get the modlog.
 
@@ -275,7 +327,7 @@ val type : ModlogKindFilter =  // ModlogKindFilter | Filter by the modlog action
 val communityId : kotlin.Double = 1.2 // kotlin.Double | Filter by the community.
 val modPersonId : kotlin.Double = 1.2 // kotlin.Double | Filter by the moderator.
 try {
-    val result : RequestStatePagedResponseModlogView = apiInstance.getModlog(limit, pageCursor, bulkActionParentId, showBulk, commentId, postId, otherPersonId, listingType, type, communityId, modPersonId)
+    val result : PagedResponseModlogView = apiInstance.getModlog(limit, pageCursor, bulkActionParentId, showBulk, commentId, postId, otherPersonId, listingType, type, communityId, modPersonId)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#getModlog")
@@ -303,7 +355,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseModlogView**](RequestStatePagedResponseModlogView.md)
+[**PagedResponseModlogView**](PagedResponseModlogView.md)
 
 ### Authorization
 
@@ -318,7 +370,7 @@ Configure bearerAuth:
 
 <a id="getSiteMetadata"></a>
 # **getSiteMetadata**
-> RequestStateGetSiteMetadataResponse getSiteMetadata(url)
+> GetSiteMetadataResponse getSiteMetadata(url)
 
 Fetch metadata for any given site.
 
@@ -331,7 +383,7 @@ Fetch metadata for any given site.
 val apiInstance = MiscellaneousApi()
 val url : kotlin.String = url_example // kotlin.String | 
 try {
-    val result : RequestStateGetSiteMetadataResponse = apiInstance.getSiteMetadata(url)
+    val result : GetSiteMetadataResponse = apiInstance.getSiteMetadata(url)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#getSiteMetadata")
@@ -349,59 +401,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetSiteMetadataResponse**](RequestStateGetSiteMetadataResponse.md)
-
-### Authorization
-
-
-Configure bearerAuth:
-    ApiClient.accessToken = ""
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a id="listUsers"></a>
-# **listUsers**
-> RequestStatePagedResponseLocalUserView listUsers(limit, sort, pageCursor, bannedOnly)
-
-Get a list of users.
-
-### Example
-```kotlin
-// Import classes:
-//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
-//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
-
-val apiInstance = MiscellaneousApi()
-val limit : kotlin.Double = 1.2 // kotlin.Double | 
-val sort : LocalUserSortType =  // LocalUserSortType | 
-val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
-val bannedOnly : kotlin.Boolean = true // kotlin.Boolean | 
-try {
-    val result : RequestStatePagedResponseLocalUserView = apiInstance.listUsers(limit, sort, pageCursor, bannedOnly)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling MiscellaneousApi#listUsers")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling MiscellaneousApi#listUsers")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-| **limit** | **kotlin.Double**|  | [optional] |
-| **sort** | [**LocalUserSortType**](.md)|  | [optional] [enum: new, old] |
-| **pageCursor** | **kotlin.String**|  | [optional] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **bannedOnly** | **kotlin.Boolean**|  | [optional] |
-
-### Return type
-
-[**RequestStatePagedResponseLocalUserView**](RequestStatePagedResponseLocalUserView.md)
+[**GetSiteMetadataResponse**](GetSiteMetadataResponse.md)
 
 ### Authorization
 
@@ -416,7 +416,7 @@ Configure bearerAuth:
 
 <a id="resolveObject"></a>
 # **resolveObject**
-> RequestStateResolveObjectView resolveObject(q)
+> ResolveObjectView resolveObject(q)
 
 Fetch a non-local / federated object.
 
@@ -429,7 +429,7 @@ Fetch a non-local / federated object.
 val apiInstance = MiscellaneousApi()
 val q : kotlin.String = q_example // kotlin.String | Can be the full url, or a shortened version like: !fediverse@lemmy.ml
 try {
-    val result : RequestStateResolveObjectView = apiInstance.resolveObject(q)
+    val result : ResolveObjectView = apiInstance.resolveObject(q)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#resolveObject")
@@ -447,7 +447,7 @@ try {
 
 ### Return type
 
-[**RequestStateResolveObjectView**](RequestStateResolveObjectView.md)
+[**ResolveObjectView**](ResolveObjectView.md)
 
 ### Authorization
 
@@ -462,7 +462,7 @@ Configure bearerAuth:
 
 <a id="search"></a>
 # **search**
-> RequestStateSearchResponse search(searchTerm, limit, pageCursor, showNsfw, postUrlOnly, titleOnly, listingType, timeRangeSeconds, type, creatorUsername, creatorId, communityName, communityId)
+> SearchResponse search(searchTerm, limit, pageCursor, showNsfw, postUrlOnly, titleOnly, listingType, timeRangeSeconds, type, creatorUsername, creatorId, communityName, communityId)
 
 Search lemmy. If &#x60;search_term&#x60; is a url it also attempts to fetch it, just like &#x60;resolve_object&#x60;.
 
@@ -487,7 +487,7 @@ val creatorId : kotlin.Double = 1.2 // kotlin.Double |
 val communityName : kotlin.String = communityName_example // kotlin.String | 
 val communityId : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateSearchResponse = apiInstance.search(searchTerm, limit, pageCursor, showNsfw, postUrlOnly, titleOnly, listingType, timeRangeSeconds, type, creatorUsername, creatorId, communityName, communityId)
+    val result : SearchResponse = apiInstance.search(searchTerm, limit, pageCursor, showNsfw, postUrlOnly, titleOnly, listingType, timeRangeSeconds, type, creatorUsername, creatorId, communityName, communityId)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling MiscellaneousApi#search")
@@ -517,7 +517,7 @@ try {
 
 ### Return type
 
-[**RequestStateSearchResponse**](RequestStateSearchResponse.md)
+[**SearchResponse**](SearchResponse.md)
 
 ### Authorization
 

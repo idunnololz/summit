@@ -7,7 +7,6 @@
 | **publishedAt** | **kotlin.String** |  |  |
 | **resolved** | **kotlin.Boolean** |  |  |
 | **reason** | **kotlin.String** |  |  |
-| **originalCommunityTitle** | **kotlin.String** |  |  |
 | **originalCommunityName** | **kotlin.String** |  |  |
 | **communityId** | **kotlin.Double** | The community id. |  |
 | **creatorId** | **kotlin.Double** | The person id. |  |
@@ -18,6 +17,7 @@
 | **originalCommunityIcon** | **kotlin.String** |  |  [optional] |
 | **originalCommunitySidebar** | **kotlin.String** |  |  [optional] |
 | **originalCommunitySummary** | **kotlin.String** |  |  [optional] |
+| **originalCommunityTitle** | **kotlin.String** |  |  [optional] |
 
 
 

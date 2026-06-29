@@ -55,7 +55,7 @@ data class Notification (
     val recipientId: kotlin.Double,
 
     @SerializedName("id")
-    val id: kotlin.Int,
+    val id: Int,
 
     @SerializedName("modlog_id")
     val modlogId: kotlin.Double? = null,

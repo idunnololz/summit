@@ -12,7 +12,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createTagline"></a>
 # **createTagline**
-> RequestStateTaglineResponse createTagline(createTagline)
+> TaglineResponse createTagline(createTagline)
 
 Create a new tagline
 
@@ -25,7 +25,7 @@ Create a new tagline
 val apiInstance = TaglineApi()
 val createTagline : CreateTagline =  // CreateTagline | 
 try {
-    val result : RequestStateTaglineResponse = apiInstance.createTagline(createTagline)
+    val result : TaglineResponse = apiInstance.createTagline(createTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling TaglineApi#createTagline")
@@ -43,7 +43,7 @@ try {
 
 ### Return type
 
-[**RequestStateTaglineResponse**](RequestStateTaglineResponse.md)
+[**TaglineResponse**](TaglineResponse.md)
 
 ### Authorization
 
@@ -58,7 +58,7 @@ Configure bearerAuth:
 
 <a id="deleteTagline"></a>
 # **deleteTagline**
-> RequestStateSuccessResponse deleteTagline(deleteTagline)
+> SuccessResponse deleteTagline(deleteTagline)
 
 Delete a tagline
 
@@ -71,7 +71,7 @@ Delete a tagline
 val apiInstance = TaglineApi()
 val deleteTagline : DeleteTagline =  // DeleteTagline | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteTagline(deleteTagline)
+    val result : SuccessResponse = apiInstance.deleteTagline(deleteTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling TaglineApi#deleteTagline")
@@ -89,7 +89,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -104,7 +104,7 @@ Configure bearerAuth:
 
 <a id="editTagline"></a>
 # **editTagline**
-> RequestStateTaglineResponse editTagline(editTagline)
+> TaglineResponse editTagline(editTagline)
 
 Edit an existing tagline
 
@@ -117,7 +117,7 @@ Edit an existing tagline
 val apiInstance = TaglineApi()
 val editTagline : EditTagline =  // EditTagline | 
 try {
-    val result : RequestStateTaglineResponse = apiInstance.editTagline(editTagline)
+    val result : TaglineResponse = apiInstance.editTagline(editTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling TaglineApi#editTagline")
@@ -135,7 +135,7 @@ try {
 
 ### Return type
 
-[**RequestStateTaglineResponse**](RequestStateTaglineResponse.md)
+[**TaglineResponse**](TaglineResponse.md)
 
 ### Authorization
 
@@ -150,7 +150,7 @@ Configure bearerAuth:
 
 <a id="listTaglines"></a>
 # **listTaglines**
-> RequestStatePagedResponseTagline listTaglines(limit, pageCursor)
+> PagedResponseTagline listTaglines(limit, pageCursor)
 
 List taglines.
 
@@ -164,7 +164,7 @@ val apiInstance = TaglineApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseTagline = apiInstance.listTaglines(limit, pageCursor)
+    val result : PagedResponseTagline = apiInstance.listTaglines(limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling TaglineApi#listTaglines")
@@ -183,7 +183,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseTagline**](RequestStatePagedResponseTagline.md)
+[**PagedResponseTagline**](PagedResponseTagline.md)
 
 ### Authorization
 

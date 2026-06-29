@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class Community(
   val id: CommunityId,
   val name: String,
-  val title: String,
+  val title: String?,
   val description: String? = null,
   val removed: Boolean,
   val published: String,

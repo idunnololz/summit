@@ -44,7 +44,7 @@ class SinglePostsDataSource @AssistedInject constructor(
       },
       sortType = sortOrder,
       listingType = listingType ?: ListingType.All,
-      page = page.toLemmyPageIndex(),
+      page = page,
       cursor = null,
       limit = limit,
       force = force,

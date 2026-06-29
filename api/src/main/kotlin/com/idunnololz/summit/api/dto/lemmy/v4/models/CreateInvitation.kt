@@ -19,21 +19,20 @@ package com.idunnololz.summit.api.dto.lemmy.v4.models
 import com.google.gson.annotations.SerializedName
 
 /**
- * Follow / subscribe to a community.
+ * 
  *
- * @param follow 
- * @param communityId The community id.
+ * @param expiresAt 
+ * @param maxUses 
  */
 
 
-data class FollowCommunity (
+data class CreateInvitation (
 
-    @SerializedName("follow")
-    val follow: kotlin.Boolean,
+    @SerializedName("expires_at")
+    val expiresAt: kotlin.String? = null,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: Int
+    @SerializedName("max_uses")
+    val maxUses: kotlin.Double? = null
 
 ) {
 

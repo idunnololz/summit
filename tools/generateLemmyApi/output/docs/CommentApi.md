@@ -23,7 +23,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createComment"></a>
 # **createComment**
-> RequestStateCommentResponse createComment(createComment)
+> CommentResponse createComment(createComment)
 
 Create a comment.
 
@@ -36,7 +36,7 @@ Create a comment.
 val apiInstance = CommentApi()
 val createComment : CreateComment =  // CreateComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.createComment(createComment)
+    val result : CommentResponse = apiInstance.createComment(createComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#createComment")
@@ -54,7 +54,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -69,7 +69,7 @@ Configure bearerAuth:
 
 <a id="createCommentReport"></a>
 # **createCommentReport**
-> RequestStateCommentReportResponse createCommentReport(createCommentReport)
+> CommentReportResponse createCommentReport(createCommentReport)
 
 Report a comment.
 
@@ -82,7 +82,7 @@ Report a comment.
 val apiInstance = CommentApi()
 val createCommentReport : CreateCommentReport =  // CreateCommentReport | 
 try {
-    val result : RequestStateCommentReportResponse = apiInstance.createCommentReport(createCommentReport)
+    val result : CommentReportResponse = apiInstance.createCommentReport(createCommentReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#createCommentReport")
@@ -100,7 +100,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentReportResponse**](RequestStateCommentReportResponse.md)
+[**CommentReportResponse**](CommentReportResponse.md)
 
 ### Authorization
 
@@ -115,7 +115,7 @@ Configure bearerAuth:
 
 <a id="deleteComment"></a>
 # **deleteComment**
-> RequestStateCommentResponse deleteComment(deleteComment)
+> CommentResponse deleteComment(deleteComment)
 
 Delete a comment.
 
@@ -128,7 +128,7 @@ Delete a comment.
 val apiInstance = CommentApi()
 val deleteComment : DeleteComment =  // DeleteComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.deleteComment(deleteComment)
+    val result : CommentResponse = apiInstance.deleteComment(deleteComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#deleteComment")
@@ -146,7 +146,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -161,7 +161,7 @@ Configure bearerAuth:
 
 <a id="distinguishComment"></a>
 # **distinguishComment**
-> RequestStateCommentResponse distinguishComment(distinguishComment)
+> CommentResponse distinguishComment(distinguishComment)
 
 Distinguishes a comment (speak as moderator)
 
@@ -174,7 +174,7 @@ Distinguishes a comment (speak as moderator)
 val apiInstance = CommentApi()
 val distinguishComment : DistinguishComment =  // DistinguishComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.distinguishComment(distinguishComment)
+    val result : CommentResponse = apiInstance.distinguishComment(distinguishComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#distinguishComment")
@@ -192,7 +192,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -207,7 +207,7 @@ Configure bearerAuth:
 
 <a id="editComment"></a>
 # **editComment**
-> RequestStateCommentResponse editComment(editComment)
+> CommentResponse editComment(editComment)
 
 Edit a comment.
 
@@ -220,7 +220,7 @@ Edit a comment.
 val apiInstance = CommentApi()
 val editComment : EditComment =  // EditComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.editComment(editComment)
+    val result : CommentResponse = apiInstance.editComment(editComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#editComment")
@@ -238,7 +238,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -253,7 +253,7 @@ Configure bearerAuth:
 
 <a id="getComment"></a>
 # **getComment**
-> RequestStateCommentResponse getComment(id)
+> CommentResponse getComment(id)
 
 Get / fetch comment.
 
@@ -266,7 +266,7 @@ Get / fetch comment.
 val apiInstance = CommentApi()
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.getComment(id)
+    val result : CommentResponse = apiInstance.getComment(id)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#getComment")
@@ -284,7 +284,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -299,7 +299,7 @@ Configure bearerAuth:
 
 <a id="getComments"></a>
 # **getComments**
-> RequestStatePagedResponseCommentView getComments(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
+> PagedResponseCommentView getComments(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
 
 Get / fetch comments.
 
@@ -324,7 +324,7 @@ val timeRangeSeconds : kotlin.Double = 1.2 // kotlin.Double | Filter to within a
 val sort : CommentSortType =  // CommentSortType | 
 val type : ListingType =  // ListingType | 
 try {
-    val result : RequestStatePagedResponseCommentView = apiInstance.getComments(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
+    val result : PagedResponseCommentView = apiInstance.getComments(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#getComments")
@@ -354,7 +354,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseCommentView**](RequestStatePagedResponseCommentView.md)
+[**PagedResponseCommentView**](PagedResponseCommentView.md)
 
 ### Authorization
 
@@ -369,7 +369,7 @@ Configure bearerAuth:
 
 <a id="getCommentsSlim"></a>
 # **getCommentsSlim**
-> RequestStatePagedResponseCommentSlimView getCommentsSlim(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
+> PagedResponseCommentSlimView getCommentsSlim(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
 
 Get / fetch comments, but without the post or community.
 
@@ -394,7 +394,7 @@ val timeRangeSeconds : kotlin.Double = 1.2 // kotlin.Double | Filter to within a
 val sort : CommentSortType =  // CommentSortType | 
 val type : ListingType =  // ListingType | 
 try {
-    val result : RequestStatePagedResponseCommentSlimView = apiInstance.getCommentsSlim(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
+    val result : PagedResponseCommentSlimView = apiInstance.getCommentsSlim(searchTerm, parentId, postId, creatorUsername, creatorId, communityName, communityId, limit, pageCursor, maxDepth, timeRangeSeconds, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#getCommentsSlim")
@@ -424,7 +424,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseCommentSlimView**](RequestStatePagedResponseCommentSlimView.md)
+[**PagedResponseCommentSlimView**](PagedResponseCommentSlimView.md)
 
 ### Authorization
 
@@ -439,7 +439,7 @@ Configure bearerAuth:
 
 <a id="likeComment"></a>
 # **likeComment**
-> RequestStateCommentResponse likeComment(createCommentLike)
+> CommentResponse likeComment(createCommentLike)
 
 
 
@@ -452,7 +452,7 @@ Configure bearerAuth:
 val apiInstance = CommentApi()
 val createCommentLike : CreateCommentLike =  // CreateCommentLike | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.likeComment(createCommentLike)
+    val result : CommentResponse = apiInstance.likeComment(createCommentLike)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#likeComment")
@@ -470,7 +470,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -485,7 +485,7 @@ Configure bearerAuth:
 
 <a id="listCommentLikes"></a>
 # **listCommentLikes**
-> RequestStatePagedResponseVoteView listCommentLikes(commentId, limit, pageCursor)
+> PagedResponseVoteView listCommentLikes(commentId, limit, pageCursor)
 
 List a comment&#39;s likes. Admin-only.
 
@@ -500,7 +500,7 @@ val commentId : kotlin.Double = 1.2 // kotlin.Double |
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseVoteView = apiInstance.listCommentLikes(commentId, limit, pageCursor)
+    val result : PagedResponseVoteView = apiInstance.listCommentLikes(commentId, limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#listCommentLikes")
@@ -520,7 +520,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseVoteView**](RequestStatePagedResponseVoteView.md)
+[**PagedResponseVoteView**](PagedResponseVoteView.md)
 
 ### Authorization
 
@@ -535,7 +535,7 @@ Configure bearerAuth:
 
 <a id="lockComment"></a>
 # **lockComment**
-> RequestStateCommentResponse lockComment(lockComment)
+> CommentResponse lockComment(lockComment)
 
 A moderator can lock a comment (IE disable replies).
 
@@ -548,7 +548,7 @@ A moderator can lock a comment (IE disable replies).
 val apiInstance = CommentApi()
 val lockComment : LockComment =  // LockComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.lockComment(lockComment)
+    val result : CommentResponse = apiInstance.lockComment(lockComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#lockComment")
@@ -566,7 +566,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -581,7 +581,7 @@ Configure bearerAuth:
 
 <a id="removeComment"></a>
 # **removeComment**
-> RequestStateCommentResponse removeComment(removeComment)
+> CommentResponse removeComment(removeComment)
 
 A moderator remove for a comment.
 
@@ -594,7 +594,7 @@ A moderator remove for a comment.
 val apiInstance = CommentApi()
 val removeComment : RemoveComment =  // RemoveComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.removeComment(removeComment)
+    val result : CommentResponse = apiInstance.removeComment(removeComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#removeComment")
@@ -612,7 +612,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -627,7 +627,7 @@ Configure bearerAuth:
 
 <a id="resolveCommentReport"></a>
 # **resolveCommentReport**
-> RequestStateCommentReportResponse resolveCommentReport(resolveCommentReport)
+> CommentReportResponse resolveCommentReport(resolveCommentReport)
 
 Resolve a comment report. Only a mod can do this.
 
@@ -640,7 +640,7 @@ Resolve a comment report. Only a mod can do this.
 val apiInstance = CommentApi()
 val resolveCommentReport : ResolveCommentReport =  // ResolveCommentReport | 
 try {
-    val result : RequestStateCommentReportResponse = apiInstance.resolveCommentReport(resolveCommentReport)
+    val result : CommentReportResponse = apiInstance.resolveCommentReport(resolveCommentReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#resolveCommentReport")
@@ -658,7 +658,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentReportResponse**](RequestStateCommentReportResponse.md)
+[**CommentReportResponse**](CommentReportResponse.md)
 
 ### Authorization
 
@@ -673,7 +673,7 @@ Configure bearerAuth:
 
 <a id="saveComment"></a>
 # **saveComment**
-> RequestStateCommentResponse saveComment(saveComment)
+> CommentResponse saveComment(saveComment)
 
 Save a comment.
 
@@ -686,7 +686,7 @@ Save a comment.
 val apiInstance = CommentApi()
 val saveComment : SaveComment =  // SaveComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.saveComment(saveComment)
+    val result : CommentResponse = apiInstance.saveComment(saveComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#saveComment")
@@ -704,7 +704,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -719,7 +719,7 @@ Configure bearerAuth:
 
 <a id="warnComment"></a>
 # **warnComment**
-> RequestStateCommentResponse warnComment(createCommentWarning)
+> CommentResponse warnComment(createCommentWarning)
 
 Creates a warning against a comment and notifies the user.
 
@@ -732,7 +732,7 @@ Creates a warning against a comment and notifies the user.
 val apiInstance = CommentApi()
 val createCommentWarning : CreateCommentWarning =  // CreateCommentWarning | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.warnComment(createCommentWarning)
+    val result : CommentResponse = apiInstance.warnComment(createCommentWarning)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommentApi#warnComment")
@@ -750,7 +750,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 

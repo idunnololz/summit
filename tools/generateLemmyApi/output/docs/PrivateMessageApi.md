@@ -13,7 +13,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createPrivateMessage"></a>
 # **createPrivateMessage**
-> RequestStatePrivateMessageResponse createPrivateMessage(createPrivateMessage)
+> PrivateMessageResponse createPrivateMessage(createPrivateMessage)
 
 Create a private message.
 
@@ -26,7 +26,7 @@ Create a private message.
 val apiInstance = PrivateMessageApi()
 val createPrivateMessage : CreatePrivateMessage =  // CreatePrivateMessage | 
 try {
-    val result : RequestStatePrivateMessageResponse = apiInstance.createPrivateMessage(createPrivateMessage)
+    val result : PrivateMessageResponse = apiInstance.createPrivateMessage(createPrivateMessage)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PrivateMessageApi#createPrivateMessage")
@@ -44,7 +44,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageResponse**](RequestStatePrivateMessageResponse.md)
+[**PrivateMessageResponse**](PrivateMessageResponse.md)
 
 ### Authorization
 
@@ -59,7 +59,7 @@ Configure bearerAuth:
 
 <a id="createPrivateMessageReport"></a>
 # **createPrivateMessageReport**
-> RequestStatePrivateMessageReportResponse createPrivateMessageReport(createPrivateMessageReport)
+> PrivateMessageReportResponse createPrivateMessageReport(createPrivateMessageReport)
 
 Create a report for a private message.
 
@@ -72,7 +72,7 @@ Create a report for a private message.
 val apiInstance = PrivateMessageApi()
 val createPrivateMessageReport : CreatePrivateMessageReport =  // CreatePrivateMessageReport | 
 try {
-    val result : RequestStatePrivateMessageReportResponse = apiInstance.createPrivateMessageReport(createPrivateMessageReport)
+    val result : PrivateMessageReportResponse = apiInstance.createPrivateMessageReport(createPrivateMessageReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PrivateMessageApi#createPrivateMessageReport")
@@ -90,7 +90,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageReportResponse**](RequestStatePrivateMessageReportResponse.md)
+[**PrivateMessageReportResponse**](PrivateMessageReportResponse.md)
 
 ### Authorization
 
@@ -105,7 +105,7 @@ Configure bearerAuth:
 
 <a id="deletePrivateMessage"></a>
 # **deletePrivateMessage**
-> RequestStatePrivateMessageResponse deletePrivateMessage(deletePrivateMessage)
+> PrivateMessageResponse deletePrivateMessage(deletePrivateMessage)
 
 Delete a private message.
 
@@ -118,7 +118,7 @@ Delete a private message.
 val apiInstance = PrivateMessageApi()
 val deletePrivateMessage : DeletePrivateMessage =  // DeletePrivateMessage | 
 try {
-    val result : RequestStatePrivateMessageResponse = apiInstance.deletePrivateMessage(deletePrivateMessage)
+    val result : PrivateMessageResponse = apiInstance.deletePrivateMessage(deletePrivateMessage)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PrivateMessageApi#deletePrivateMessage")
@@ -136,7 +136,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageResponse**](RequestStatePrivateMessageResponse.md)
+[**PrivateMessageResponse**](PrivateMessageResponse.md)
 
 ### Authorization
 
@@ -151,7 +151,7 @@ Configure bearerAuth:
 
 <a id="editPrivateMessage"></a>
 # **editPrivateMessage**
-> RequestStatePrivateMessageResponse editPrivateMessage(editPrivateMessage)
+> PrivateMessageResponse editPrivateMessage(editPrivateMessage)
 
 Edit a private message.
 
@@ -164,7 +164,7 @@ Edit a private message.
 val apiInstance = PrivateMessageApi()
 val editPrivateMessage : EditPrivateMessage =  // EditPrivateMessage | 
 try {
-    val result : RequestStatePrivateMessageResponse = apiInstance.editPrivateMessage(editPrivateMessage)
+    val result : PrivateMessageResponse = apiInstance.editPrivateMessage(editPrivateMessage)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PrivateMessageApi#editPrivateMessage")
@@ -182,7 +182,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageResponse**](RequestStatePrivateMessageResponse.md)
+[**PrivateMessageResponse**](PrivateMessageResponse.md)
 
 ### Authorization
 
@@ -197,7 +197,7 @@ Configure bearerAuth:
 
 <a id="resolvePrivateMessageReport"></a>
 # **resolvePrivateMessageReport**
-> RequestStatePrivateMessageReportResponse resolvePrivateMessageReport(resolvePrivateMessageReport)
+> PrivateMessageReportResponse resolvePrivateMessageReport(resolvePrivateMessageReport)
 
 Resolve a report for a private message.
 
@@ -210,7 +210,7 @@ Resolve a report for a private message.
 val apiInstance = PrivateMessageApi()
 val resolvePrivateMessageReport : ResolvePrivateMessageReport =  // ResolvePrivateMessageReport | 
 try {
-    val result : RequestStatePrivateMessageReportResponse = apiInstance.resolvePrivateMessageReport(resolvePrivateMessageReport)
+    val result : PrivateMessageReportResponse = apiInstance.resolvePrivateMessageReport(resolvePrivateMessageReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PrivateMessageApi#resolvePrivateMessageReport")
@@ -228,7 +228,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageReportResponse**](RequestStatePrivateMessageReportResponse.md)
+[**PrivateMessageReportResponse**](PrivateMessageReportResponse.md)
 
 ### Authorization
 

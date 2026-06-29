@@ -19,7 +19,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="addModToCommunity"></a>
 # **addModToCommunity**
-> RequestStateAddModToCommunityResponse addModToCommunity(addModToCommunity)
+> AddModToCommunityResponse addModToCommunity(addModToCommunity)
 
 Add a moderator to your community.
 
@@ -32,7 +32,7 @@ Add a moderator to your community.
 val apiInstance = ModeratorApi()
 val addModToCommunity : AddModToCommunity =  // AddModToCommunity | 
 try {
-    val result : RequestStateAddModToCommunityResponse = apiInstance.addModToCommunity(addModToCommunity)
+    val result : AddModToCommunityResponse = apiInstance.addModToCommunity(addModToCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#addModToCommunity")
@@ -50,7 +50,7 @@ try {
 
 ### Return type
 
-[**RequestStateAddModToCommunityResponse**](RequestStateAddModToCommunityResponse.md)
+[**AddModToCommunityResponse**](AddModToCommunityResponse.md)
 
 ### Authorization
 
@@ -65,7 +65,7 @@ Configure bearerAuth:
 
 <a id="banFromCommunity"></a>
 # **banFromCommunity**
-> RequestStatePersonResponse banFromCommunity(banFromCommunity)
+> PersonResponse banFromCommunity(banFromCommunity)
 
 Ban a user from a community.
 
@@ -78,7 +78,7 @@ Ban a user from a community.
 val apiInstance = ModeratorApi()
 val banFromCommunity : BanFromCommunity =  // BanFromCommunity | 
 try {
-    val result : RequestStatePersonResponse = apiInstance.banFromCommunity(banFromCommunity)
+    val result : PersonResponse = apiInstance.banFromCommunity(banFromCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#banFromCommunity")
@@ -96,7 +96,7 @@ try {
 
 ### Return type
 
-[**RequestStatePersonResponse**](RequestStatePersonResponse.md)
+[**PersonResponse**](PersonResponse.md)
 
 ### Authorization
 
@@ -111,7 +111,7 @@ Configure bearerAuth:
 
 <a id="distinguishComment"></a>
 # **distinguishComment**
-> RequestStateCommentResponse distinguishComment(distinguishComment)
+> CommentResponse distinguishComment(distinguishComment)
 
 Distinguishes a comment (speak as moderator)
 
@@ -124,7 +124,7 @@ Distinguishes a comment (speak as moderator)
 val apiInstance = ModeratorApi()
 val distinguishComment : DistinguishComment =  // DistinguishComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.distinguishComment(distinguishComment)
+    val result : CommentResponse = apiInstance.distinguishComment(distinguishComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#distinguishComment")
@@ -142,7 +142,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -157,7 +157,7 @@ Configure bearerAuth:
 
 <a id="featurePost"></a>
 # **featurePost**
-> RequestStatePostResponse featurePost(featurePost)
+> PostResponse featurePost(featurePost)
 
 A moderator can feature a community post ( IE stick it to the top of a community ).
 
@@ -170,7 +170,7 @@ A moderator can feature a community post ( IE stick it to the top of a community
 val apiInstance = ModeratorApi()
 val featurePost : FeaturePost =  // FeaturePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.featurePost(featurePost)
+    val result : PostResponse = apiInstance.featurePost(featurePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#featurePost")
@@ -188,7 +188,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -203,7 +203,7 @@ Configure bearerAuth:
 
 <a id="lockComment"></a>
 # **lockComment**
-> RequestStateCommentResponse lockComment(lockComment)
+> CommentResponse lockComment(lockComment)
 
 A moderator can lock a comment (IE disable replies).
 
@@ -216,7 +216,7 @@ A moderator can lock a comment (IE disable replies).
 val apiInstance = ModeratorApi()
 val lockComment : LockComment =  // LockComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.lockComment(lockComment)
+    val result : CommentResponse = apiInstance.lockComment(lockComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#lockComment")
@@ -234,7 +234,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -249,7 +249,7 @@ Configure bearerAuth:
 
 <a id="removeComment"></a>
 # **removeComment**
-> RequestStateCommentResponse removeComment(removeComment)
+> CommentResponse removeComment(removeComment)
 
 A moderator remove for a comment.
 
@@ -262,7 +262,7 @@ A moderator remove for a comment.
 val apiInstance = ModeratorApi()
 val removeComment : RemoveComment =  // RemoveComment | 
 try {
-    val result : RequestStateCommentResponse = apiInstance.removeComment(removeComment)
+    val result : CommentResponse = apiInstance.removeComment(removeComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#removeComment")
@@ -280,7 +280,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentResponse**](RequestStateCommentResponse.md)
+[**CommentResponse**](CommentResponse.md)
 
 ### Authorization
 
@@ -295,7 +295,7 @@ Configure bearerAuth:
 
 <a id="removeCommunity"></a>
 # **removeCommunity**
-> RequestStateCommunityResponse removeCommunity(removeCommunity)
+> CommunityResponse removeCommunity(removeCommunity)
 
 A moderator remove for a community.
 
@@ -308,7 +308,7 @@ A moderator remove for a community.
 val apiInstance = ModeratorApi()
 val removeCommunity : RemoveCommunity =  // RemoveCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.removeCommunity(removeCommunity)
+    val result : CommunityResponse = apiInstance.removeCommunity(removeCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#removeCommunity")
@@ -326,7 +326,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -341,7 +341,7 @@ Configure bearerAuth:
 
 <a id="removePost"></a>
 # **removePost**
-> RequestStatePostResponse removePost(removePost)
+> PostResponse removePost(removePost)
 
 A moderator remove for a post.
 
@@ -354,7 +354,7 @@ A moderator remove for a post.
 val apiInstance = ModeratorApi()
 val removePost : RemovePost =  // RemovePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.removePost(removePost)
+    val result : PostResponse = apiInstance.removePost(removePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#removePost")
@@ -372,7 +372,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -387,7 +387,7 @@ Configure bearerAuth:
 
 <a id="resolveCommentReport"></a>
 # **resolveCommentReport**
-> RequestStateCommentReportResponse resolveCommentReport(resolveCommentReport)
+> CommentReportResponse resolveCommentReport(resolveCommentReport)
 
 Resolve a comment report. Only a mod can do this.
 
@@ -400,7 +400,7 @@ Resolve a comment report. Only a mod can do this.
 val apiInstance = ModeratorApi()
 val resolveCommentReport : ResolveCommentReport =  // ResolveCommentReport | 
 try {
-    val result : RequestStateCommentReportResponse = apiInstance.resolveCommentReport(resolveCommentReport)
+    val result : CommentReportResponse = apiInstance.resolveCommentReport(resolveCommentReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#resolveCommentReport")
@@ -418,7 +418,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommentReportResponse**](RequestStateCommentReportResponse.md)
+[**CommentReportResponse**](CommentReportResponse.md)
 
 ### Authorization
 
@@ -433,7 +433,7 @@ Configure bearerAuth:
 
 <a id="resolvePostReport"></a>
 # **resolvePostReport**
-> RequestStatePostReportResponse resolvePostReport(resolvePostReport)
+> PostReportResponse resolvePostReport(resolvePostReport)
 
 Resolve a post report. Only a mod can do this.
 
@@ -446,7 +446,7 @@ Resolve a post report. Only a mod can do this.
 val apiInstance = ModeratorApi()
 val resolvePostReport : ResolvePostReport =  // ResolvePostReport | 
 try {
-    val result : RequestStatePostReportResponse = apiInstance.resolvePostReport(resolvePostReport)
+    val result : PostReportResponse = apiInstance.resolvePostReport(resolvePostReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#resolvePostReport")
@@ -464,7 +464,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostReportResponse**](RequestStatePostReportResponse.md)
+[**PostReportResponse**](PostReportResponse.md)
 
 ### Authorization
 
@@ -479,7 +479,7 @@ Configure bearerAuth:
 
 <a id="transferCommunity"></a>
 # **transferCommunity**
-> RequestStateGetCommunityResponse transferCommunity(transferCommunity)
+> GetCommunityResponse transferCommunity(transferCommunity)
 
 Transfer your community to an existing moderator.
 
@@ -492,7 +492,7 @@ Transfer your community to an existing moderator.
 val apiInstance = ModeratorApi()
 val transferCommunity : TransferCommunity =  // TransferCommunity | 
 try {
-    val result : RequestStateGetCommunityResponse = apiInstance.transferCommunity(transferCommunity)
+    val result : GetCommunityResponse = apiInstance.transferCommunity(transferCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling ModeratorApi#transferCommunity")
@@ -510,7 +510,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetCommunityResponse**](RequestStateGetCommunityResponse.md)
+[**GetCommunityResponse**](GetCommunityResponse.md)
 
 ### Authorization
 

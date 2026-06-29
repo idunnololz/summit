@@ -12,7 +12,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="authenticateWithOAuth"></a>
 # **authenticateWithOAuth**
-> RequestStateLoginResponse authenticateWithOAuth(authenticateWithOauth)
+> LoginResponse authenticateWithOAuth(authenticateWithOauth)
 
 Authenticate with OAuth
 
@@ -25,7 +25,7 @@ Authenticate with OAuth
 val apiInstance = OAuthApi()
 val authenticateWithOauth : AuthenticateWithOauth =  // AuthenticateWithOauth | 
 try {
-    val result : RequestStateLoginResponse = apiInstance.authenticateWithOAuth(authenticateWithOauth)
+    val result : LoginResponse = apiInstance.authenticateWithOAuth(authenticateWithOauth)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling OAuthApi#authenticateWithOAuth")
@@ -43,7 +43,7 @@ try {
 
 ### Return type
 
-[**RequestStateLoginResponse**](RequestStateLoginResponse.md)
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 
@@ -58,7 +58,7 @@ Configure bearerAuth:
 
 <a id="createOAuthProvider"></a>
 # **createOAuthProvider**
-> RequestStateAdminOAuthProvider createOAuthProvider(createOAuthProvider)
+> AdminOAuthProvider createOAuthProvider(createOAuthProvider)
 
 Create a new oauth provider method
 
@@ -71,7 +71,7 @@ Create a new oauth provider method
 val apiInstance = OAuthApi()
 val createOAuthProvider : CreateOAuthProvider =  // CreateOAuthProvider | 
 try {
-    val result : RequestStateAdminOAuthProvider = apiInstance.createOAuthProvider(createOAuthProvider)
+    val result : AdminOAuthProvider = apiInstance.createOAuthProvider(createOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling OAuthApi#createOAuthProvider")
@@ -89,7 +89,7 @@ try {
 
 ### Return type
 
-[**RequestStateAdminOAuthProvider**](RequestStateAdminOAuthProvider.md)
+[**AdminOAuthProvider**](AdminOAuthProvider.md)
 
 ### Authorization
 
@@ -104,7 +104,7 @@ Configure bearerAuth:
 
 <a id="deleteOAuthProvider"></a>
 # **deleteOAuthProvider**
-> RequestStateSuccessResponse deleteOAuthProvider(deleteOAuthProvider)
+> SuccessResponse deleteOAuthProvider(deleteOAuthProvider)
 
 Delete an oauth provider method
 
@@ -117,7 +117,7 @@ Delete an oauth provider method
 val apiInstance = OAuthApi()
 val deleteOAuthProvider : DeleteOAuthProvider =  // DeleteOAuthProvider | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteOAuthProvider(deleteOAuthProvider)
+    val result : SuccessResponse = apiInstance.deleteOAuthProvider(deleteOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling OAuthApi#deleteOAuthProvider")
@@ -135,7 +135,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -150,7 +150,7 @@ Configure bearerAuth:
 
 <a id="editOAuthProvider"></a>
 # **editOAuthProvider**
-> RequestStateAdminOAuthProvider editOAuthProvider(editOAuthProvider)
+> AdminOAuthProvider editOAuthProvider(editOAuthProvider)
 
 Edit an existing oauth provider method
 
@@ -163,7 +163,7 @@ Edit an existing oauth provider method
 val apiInstance = OAuthApi()
 val editOAuthProvider : EditOAuthProvider =  // EditOAuthProvider | 
 try {
-    val result : RequestStateAdminOAuthProvider = apiInstance.editOAuthProvider(editOAuthProvider)
+    val result : AdminOAuthProvider = apiInstance.editOAuthProvider(editOAuthProvider)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling OAuthApi#editOAuthProvider")
@@ -181,7 +181,7 @@ try {
 
 ### Return type
 
-[**RequestStateAdminOAuthProvider**](RequestStateAdminOAuthProvider.md)
+[**AdminOAuthProvider**](AdminOAuthProvider.md)
 
 ### Authorization
 

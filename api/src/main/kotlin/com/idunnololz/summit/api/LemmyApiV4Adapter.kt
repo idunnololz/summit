@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.api.converters.getGetPostsResponse
 import com.idunnololz.summit.api.converters.toCommentReplyView
+import com.idunnololz.summit.api.converters.toCommentReportView
 import com.idunnololz.summit.api.converters.toCommentSortType
 import com.idunnololz.summit.api.converters.toCommentView
 import com.idunnololz.summit.api.converters.toCommunityModeratorView
@@ -13,8 +14,10 @@ import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toGetSiteResponse
 import com.idunnololz.summit.api.converters.toPersonMentionView
 import com.idunnololz.summit.api.converters.toPersonView
+import com.idunnololz.summit.api.converters.toPostReportView
 import com.idunnololz.summit.api.converters.toPostSortType
 import com.idunnololz.summit.api.converters.toPostView
+import com.idunnololz.summit.api.converters.toPrivateMessageReportView
 import com.idunnololz.summit.api.converters.toPrivateMessageView
 import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
@@ -76,14 +79,11 @@ import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
-import com.idunnololz.summit.api.dto.lemmy.GetReportCount
-import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSite
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
@@ -102,7 +102,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
@@ -135,14 +134,14 @@ import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
-import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
 import com.idunnololz.summit.api.local.UnreadCount
@@ -192,7 +191,6 @@ class LemmyApiV4Adapter(
         searchTerm = null,
         noCommentsOnly = null,
         markAsRead = null,
-        hideMedia = null,
         showNsfw = null,
         showRead = args.show_read,
         showHidden = null,
@@ -540,16 +538,14 @@ class LemmyApiV4Adapter(
     api.createCommunity(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommunity(
-        args.title,
-        args.name,
-        null,
-        args.discussion_languages?.map { it.toDouble() },
-        args.posting_restricted_to_mods,
-        args.nsfw,
-        args.banner,
-        args.icon,
-        args.description,
-        null,
+        name = args.name,
+        visibility = null,
+        discussionLanguages = args.discussion_languages?.map { it.toDouble() },
+        postingRestrictedToMods = args.posting_restricted_to_mods,
+        nsfw = args.nsfw,
+        summary = args.description,
+        sidebar = null,
+        title = args.title,
       ),
     )
   }.map {
@@ -790,6 +786,8 @@ class LemmyApiV4Adapter(
   }.map {
     PrivateMessagesResponse(
       private_messages = it.items.map { it.toPrivateMessageView() },
+      prev_page = it.prevPage,
+      next_page = it.nextPage,
     )
   }
 
@@ -797,8 +795,26 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Result<ListPrivateMessageReportsResponse> {
-    TODO("Not yet implemented")
+  ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
+    api.getReports(
+      generateHeaders(authorization, false),
+      ListReportsI(
+        myReportsOnly = true,
+        showCommunityRuleViolations = false,
+        limit = null,
+        pageCursor = args.cursor,
+        communityId = null,
+        postId = null,
+        type = ReportType.private_messages,
+        unresolvedOnly = args.unresolved_only,
+      ).serializeToMap(),
+    )
+  }.map {
+    ListPrivateMessageReportsResponse(
+      private_message_reports = it.items.map { it.toPrivateMessageReportView() },
+      prev_page = it.prevPage,
+      next_page = it.nextPage,
+    )
   }
 
   override suspend fun createPrivateMessageReport(
@@ -819,8 +835,26 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Result<ListPostReportsResponse> {
-    TODO("Not yet implemented")
+  ): Result<ListPostReportsResponse> = retrofitErrorHandler {
+    api.getReports(
+      generateHeaders(authorization, false),
+      ListReportsI(
+        myReportsOnly = true,
+        showCommunityRuleViolations = false,
+        limit = null,
+        pageCursor = args.cursor,
+        communityId = null,
+        postId = null,
+        type = ReportType.posts,
+        unresolvedOnly = args.unresolved_only,
+      ).serializeToMap(),
+    )
+  }.map {
+    ListPostReportsResponse(
+      post_reports = it.items.map { it.toPostReportView() },
+      prev_page = it.prevPage,
+      next_page = it.nextPage,
+    )
   }
 
   override suspend fun resolvePostReport(
@@ -834,8 +868,26 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Result<ListCommentReportsResponse> {
-    TODO("Not yet implemented")
+  ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
+    api.getReports(
+      generateHeaders(authorization, false),
+      ListReportsI(
+        myReportsOnly = true,
+        showCommunityRuleViolations = false,
+        limit = null,
+        pageCursor = args.cursor,
+        communityId = null,
+        postId = null,
+        type = ReportType.posts,
+        unresolvedOnly = args.unresolved_only,
+      ).serializeToMap(),
+    )
+  }.map {
+    ListCommentReportsResponse(
+      comment_reports = it.items.map { it.toCommentReportView() },
+      prev_page = it.prevPage,
+      next_page = it.nextPage,
+    )
   }
 
   override suspend fun resolveCommentReport(
@@ -881,8 +933,19 @@ class LemmyApiV4Adapter(
   override suspend fun followCommunity(
     authorization: String?,
     args: FollowCommunity,
-  ): Result<CommunityResponse> {
-    TODO("Not yet implemented")
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.followCommunity(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.FollowCommunity(
+        follow = args.follow,
+        communityId = args.community_id,
+      ),
+    )
+  }.map {
+    CommunityResponse(
+      community_view = it.communityView.toCommunityView(),
+      discussion_languages = it.discussionLanguages
+    )
   }
 
   override suspend fun banUserFromCommunity(

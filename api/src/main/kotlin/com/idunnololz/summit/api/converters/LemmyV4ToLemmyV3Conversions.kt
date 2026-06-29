@@ -4,6 +4,8 @@ import com.idunnololz.summit.api.dto.lemmy.Comment
 import com.idunnololz.summit.api.dto.lemmy.CommentAggregates
 import com.idunnololz.summit.api.dto.lemmy.CommentReply
 import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.CommentReport
+import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
@@ -22,8 +24,12 @@ import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.PostAggregates
+import com.idunnololz.summit.api.dto.lemmy.PostReport
+import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.RegistrationMode
 import com.idunnololz.summit.api.dto.lemmy.Site
@@ -41,6 +47,8 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Community as CommunityV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReportView as PostReportViewV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportCombinedView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.VoteView as VoteViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post as PostV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostView as PostViewV4
@@ -54,84 +62,8 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType as ListingTypeV
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalSite as LocalSiteV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SiteView as SiteViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Site as SiteV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.AddModToCommunity as AddModToCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.AddModToCommunityResponse as AddModToCommunityResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ApproveRegistrationApplication as ApproveRegistrationApplicationV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.BanFromCommunity as BanFromCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.BanPerson as BanPersonV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.BlockCommunity as BlockCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.BlockPerson as BlockPersonV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ChangePassword as ChangePasswordV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportResponse as CommentReportResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentResponse as CommentResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityResponse as CommunityResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreateComment as CreateCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommentLike as CreateCommentLikeV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommentReport as CreateCommentReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommunity as CreateCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePost as CreatePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePostLike as CreatePostLikeV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePostReport as CreatePostReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessage as CreatePrivateMessageV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessageReport as CreatePrivateMessageReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteComment as DeleteCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteCommunity as DeleteCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.DeletePost as DeletePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.DistinguishComment as DistinguishCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.EditComment as EditCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.EditCommunity as EditCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.EditPost as EditPostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.FeaturePost as FeaturePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.FollowCommunity as FollowCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCaptchaResponse as GetCaptchaResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommunityResponse as GetCommunityResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPersonDetailsResponse as GetPersonDetailsResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostResponse as GetPostResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteMetadataResponse as GetSiteMetadataResponseV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteResponse as GetSiteResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.HideCommunity as HideCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.LockPost as LockPostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.Login as LoginV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.LoginResponse as LoginResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead as MarkNotificationAsReadV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkPostAsRead as MarkPostAsReadV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseCommentView as PagedResponseCommentViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseCommunityView as PagedResponseCommunityViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseFederatedInstanceView as PagedResponseFederatedInstanceViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseLocalImageView as PagedResponseLocalImageViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseModlogView as PagedResponseModlogViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseNotificationView as PagedResponseNotificationViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView as PagedResponsePostViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseRegistrationApplicationView as PagedResponseRegistrationApplicationViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseReportCombinedView as PagedResponseReportCombinedViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseVoteView as PagedResponseVoteViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonResponse as PersonResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReportResponse as PostReportResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PostResponse as PostResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReportResponse as PrivateMessageReportResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageResponse as PrivateMessageResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PurgeComment as PurgeCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PurgeCommunity as PurgeCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PurgePerson as PurgePersonV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PurgePost as PurgePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.Register as RegisterV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplicationResponse as RegistrationApplicationResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveComment as RemoveCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveCommunity as RemoveCommunityV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RemovePost as RemovePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RequestStateCommunityResponse as RequestStateCommunityResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveCommentReport as ResolveCommentReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView as ResolveObjectViewV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePostReport as ResolvePostReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePrivateMessageReport as ResolvePrivateMessageReportV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SaveComment as SaveCommentV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SavePost as SavePostV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SaveUserSettings as SaveUserSettingsV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchResponse as SearchResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SuccessResponse as SuccessResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.UnreadCountsResponse as UnreadCountsResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.UploadImageResponse as UploadImageResponseV4
-import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams as UserBlockInstanceCommunitiesParamsV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessage as PrivateMessageV4
 
 fun GetSiteResponseV4.toGetSiteResponse(): GetSiteResponse {
   return GetSiteResponse(
@@ -229,6 +161,7 @@ fun RegistrationModeV4.toRegistrationMode(): RegistrationMode =
     RegistrationModeV4.closed -> RegistrationMode.Closed
     RegistrationModeV4.require_application -> RegistrationMode.RequireApplication
     RegistrationModeV4.open -> RegistrationMode.Open
+    RegistrationModeV4.require_invitation -> RegistrationMode.RequireInvitation
   }
 
 fun LocalSiteRateLimitV4.toLocalSiteRateLimit(): LocalSiteRateLimit {
@@ -321,18 +254,7 @@ fun NotificationView.toPersonMentionView(): PersonMentionView {
 fun NotificationView.toPrivateMessageView(): PrivateMessageView {
   val d = data
   return PrivateMessageView(
-    private_message = PrivateMessage(
-      d.privateMessage.id,
-      d.privateMessage.creatorId,
-      d.privateMessage.recipientId,
-      d.privateMessage.content,
-      d.privateMessage.deleted,
-      notification.read,
-      d.privateMessage.publishedAt,
-      d.privateMessage.updatedAt,
-      d.privateMessage.apId,
-      d.privateMessage.local,
-    ),
+    private_message = d.privateMessage.toPrivateMessage(notification.read),
     creator = d.creator.toPerson(d.creatorBanned, d.creatorBanExpiresAt, d.creatorIsAdmin),
     recipient = d.recipient.toPerson(false, null, false)
   )
@@ -460,10 +382,115 @@ fun CommunityModeratorViewV4.toCommunityModeratorView(): CommunityModeratorView 
   )
 }
 
+fun ReportCombinedView.toPrivateMessageReportView(): PrivateMessageReportView {
+  val report = this.privateMessageReport
+
+  return PrivateMessageReportView(
+    private_message_report = PrivateMessageReport(
+      id = report.id,
+      creator_id = report.creatorId,
+      private_message_id = report.privateMessageId,
+      original_pm_text = report.originalPmText,
+      reason = report.reason,
+      resolved = report.resolved,
+      resolver_id = report.resolverId,
+      published = report.publishedAt,
+      updated = report.updatedAt,
+    ),
+    private_message = privateMessage.toPrivateMessage(read = false),
+    private_message_creator = privateMessageCreator.toPerson(
+      isBanned = false, banExpires = null, isAdmin = false
+    ),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    resolver = resolver?.toPerson(
+      isBanned = false, banExpires = null, isAdmin = false
+    )
+  )
+}
+
+fun ReportCombinedView.toPostReportView(): PostReportView {
+  return PostReportView(
+    post_report = PostReport(
+      id = postReport.id,
+      creator_id = postReport.creatorId,
+      post_id = postReport.postId,
+      original_post_name = postReport.originalPostName,
+      original_post_url = postReport.originalPostUrl,
+      original_post_body = postReport.originalPostBody,
+      reason = postReport.reason,
+      resolved = postReport.resolved,
+      resolver_id = postReport.resolverId,
+      published = postReport.publishedAt,
+      updated = postReport.updatedAt,
+    ),
+    post = post.toPost(),
+    community = community.toCommunity(),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    post_creator = postCreator.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    my_vote = this.postActions?.voteIsUpvote?.toVoteInt(),
+    counts = this.post.toPostAggregates(),
+    resolver = this.resolver?.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+  )
+}
+
+fun ReportCombinedView.toCommentReportView(): CommentReportView {
+  return CommentReportView(
+    comment_report = CommentReport(
+      id = commentReport.id,
+      creator_id = commentReport.creatorId,
+      comment_id = commentReport.commentId,
+      original_comment_text = commentReport.originalCommentText,
+      reason = commentReport.reason,
+      resolved = commentReport.resolved,
+      resolver_id = commentReport.resolverId,
+      published = commentReport.publishedAt,
+      updated = commentReport.updatedAt,
+    ),
+    comment = comment.toComment(),
+    post = post.toPost(),
+    community = community.toCommunity(),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    comment_creator = commentCreator.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+    counts = comment.toCommentAggregates(),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    my_vote = commentActions?.voteIsUpvote?.toVoteInt(),
+    resolver = this.resolver?.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+  )
+}
+
 private fun CommentV4.toCommentAggregates(): CommentAggregates {
   return CommentAggregates(
-    id = id.toInt(),
-    comment_id = id.toInt(),
+    id = id,
+    comment_id = id,
     score = score.toInt(),
     upvotes = upvotes.toInt(),
     downvotes = downvotes.toInt(),
@@ -606,6 +633,20 @@ private fun CommunityV4.toCommunity(): Community = Community(
   posting_restricted_to_mods = postingRestrictedToMods,
   instance_id = instanceId.toInt(),
 )
+
+fun PrivateMessageV4.toPrivateMessage(read: Boolean): PrivateMessage =
+  PrivateMessage(
+    id = id,
+    creator_id = creatorId,
+    recipient_id = recipientId,
+    content = content,
+    deleted = deleted,
+    read = read,
+    published = publishedAt,
+    updated = updatedAt,
+    ap_id = apId,
+    local = local,
+  )
 
 private fun Boolean?.toVoteInt() =
   when (this) {

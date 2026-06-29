@@ -4,6 +4,7 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **maxInvitesPerUserAllowed** | **kotlin.Double** |  |  [optional] |
 | **imageUploadDisabled** | **kotlin.Boolean** |  |  [optional] |
 | **imageAllowVideoUploads** | **kotlin.Boolean** |  |  [optional] |
 | **imageMaxUploadSize** | **kotlin.Double** |  |  [optional] |

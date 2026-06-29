@@ -147,7 +147,8 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
 @Suppress("NOTHING_TO_INLINE")
 inline fun Int.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
-
+@Suppress("NOTHING_TO_INLINE")
+inline fun Long.toLemmyPageIndex() = this + 1 // lemmy pages are 1 indexed
 
 fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
   val headers = mutableMapOf<String, String>()

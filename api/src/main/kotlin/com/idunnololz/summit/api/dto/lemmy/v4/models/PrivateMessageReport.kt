@@ -50,22 +50,22 @@ data class PrivateMessageReport (
 
     /* The private message id. */
     @SerializedName("private_message_id")
-    val privateMessageId: kotlin.Double,
+    val privateMessageId: Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: Long,
 
     /* The private message report id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("resolver_id")
-    val resolverId: kotlin.Double? = null
+    val resolverId: Long? = null
 
 ) {
 

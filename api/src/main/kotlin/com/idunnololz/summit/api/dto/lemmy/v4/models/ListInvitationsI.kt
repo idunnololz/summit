@@ -15,7 +15,6 @@
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonContentType
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,25 +23,17 @@ import com.google.gson.annotations.SerializedName
  *
  * @param limit 
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param searchTerm 
- * @param type 
  */
 
 
-data class ListPersonSavedI (
+data class ListInvitationsI (
 
     @SerializedName("limit")
     val limit: kotlin.Double? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
-
-    @SerializedName("search_term")
-    val searchTerm: kotlin.String? = null,
-
-    @SerializedName("type_")
-    val type: PersonContentType? = null
+    val pageCursor: kotlin.String? = null
 
 ) {
 

@@ -9,13 +9,14 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**deleteSiteIcon**](SiteApi.md#deleteSiteIcon) | **DELETE** /api/v4/site/icon | Delete the site icon. |
 | [**editSite**](SiteApi.md#editSite) | **PUT** /api/v4/site | Edit your site. |
 | [**getSite**](SiteApi.md#getSite) | **GET** /api/v4/site | Gets the site, and your user data. |
+| [**nodeinfo**](SiteApi.md#nodeinfo) | **GET** /nodeinfo/2.1 | Metadata for the instance |
 | [**uploadSiteBanner**](SiteApi.md#uploadSiteBanner) | **POST** /api/v4/site/banner | Upload new site banner. |
 | [**uploadSiteIcon**](SiteApi.md#uploadSiteIcon) | **POST** /api/v4/site/icon | Upload new site icon. |
 
 
 <a id="createSite"></a>
 # **createSite**
-> RequestStateSiteResponse createSite(createSite)
+> SiteResponse createSite(createSite)
 
 Create your site.
 
@@ -28,7 +29,7 @@ Create your site.
 val apiInstance = SiteApi()
 val createSite : CreateSite =  // CreateSite | 
 try {
-    val result : RequestStateSiteResponse = apiInstance.createSite(createSite)
+    val result : SiteResponse = apiInstance.createSite(createSite)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#createSite")
@@ -46,7 +47,7 @@ try {
 
 ### Return type
 
-[**RequestStateSiteResponse**](RequestStateSiteResponse.md)
+[**SiteResponse**](SiteResponse.md)
 
 ### Authorization
 
@@ -61,7 +62,7 @@ Configure bearerAuth:
 
 <a id="deleteSiteBanner"></a>
 # **deleteSiteBanner**
-> RequestStateSuccessResponse deleteSiteBanner()
+> SuccessResponse deleteSiteBanner()
 
 Delete the site banner.
 
@@ -73,7 +74,7 @@ Delete the site banner.
 
 val apiInstance = SiteApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteSiteBanner()
+    val result : SuccessResponse = apiInstance.deleteSiteBanner()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#deleteSiteBanner")
@@ -89,7 +90,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -104,7 +105,7 @@ Configure bearerAuth:
 
 <a id="deleteSiteIcon"></a>
 # **deleteSiteIcon**
-> RequestStateSuccessResponse deleteSiteIcon()
+> SuccessResponse deleteSiteIcon()
 
 Delete the site icon.
 
@@ -116,7 +117,7 @@ Delete the site icon.
 
 val apiInstance = SiteApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteSiteIcon()
+    val result : SuccessResponse = apiInstance.deleteSiteIcon()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#deleteSiteIcon")
@@ -132,7 +133,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -147,7 +148,7 @@ Configure bearerAuth:
 
 <a id="editSite"></a>
 # **editSite**
-> RequestStateSiteResponse editSite(editSite)
+> SiteResponse editSite(editSite)
 
 Edit your site.
 
@@ -160,7 +161,7 @@ Edit your site.
 val apiInstance = SiteApi()
 val editSite : EditSite =  // EditSite | 
 try {
-    val result : RequestStateSiteResponse = apiInstance.editSite(editSite)
+    val result : SiteResponse = apiInstance.editSite(editSite)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#editSite")
@@ -178,7 +179,7 @@ try {
 
 ### Return type
 
-[**RequestStateSiteResponse**](RequestStateSiteResponse.md)
+[**SiteResponse**](SiteResponse.md)
 
 ### Authorization
 
@@ -193,7 +194,7 @@ Configure bearerAuth:
 
 <a id="getSite"></a>
 # **getSite**
-> RequestStateGetSiteResponse getSite()
+> GetSiteResponse getSite()
 
 Gets the site, and your user data.
 
@@ -205,7 +206,7 @@ Gets the site, and your user data.
 
 val apiInstance = SiteApi()
 try {
-    val result : RequestStateGetSiteResponse = apiInstance.getSite()
+    val result : GetSiteResponse = apiInstance.getSite()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#getSite")
@@ -221,7 +222,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateGetSiteResponse**](RequestStateGetSiteResponse.md)
+[**GetSiteResponse**](GetSiteResponse.md)
 
 ### Authorization
 
@@ -234,9 +235,50 @@ Configure bearerAuth:
  - **Content-Type**: Not defined
  - **Accept**: application/json
 
+<a id="nodeinfo"></a>
+# **nodeinfo**
+> NodeInfo nodeinfo()
+
+Metadata for the instance
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = SiteApi()
+try {
+    val result : NodeInfo = apiInstance.nodeinfo()
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling SiteApi#nodeinfo")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling SiteApi#nodeinfo")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**NodeInfo**](NodeInfo.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
 <a id="uploadSiteBanner"></a>
 # **uploadSiteBanner**
-> RequestStateUploadImageResponse uploadSiteBanner(image)
+> UploadImageResponse uploadSiteBanner(image)
 
 Upload new site banner.
 
@@ -249,7 +291,7 @@ Upload new site banner.
 val apiInstance = SiteApi()
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadSiteBanner(image)
+    val result : UploadImageResponse = apiInstance.uploadSiteBanner(image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#uploadSiteBanner")
@@ -267,7 +309,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 
@@ -282,7 +324,7 @@ Configure bearerAuth:
 
 <a id="uploadSiteIcon"></a>
 # **uploadSiteIcon**
-> RequestStateUploadImageResponse uploadSiteIcon(image)
+> UploadImageResponse uploadSiteIcon(image)
 
 Upload new site icon.
 
@@ -295,7 +337,7 @@ Upload new site icon.
 val apiInstance = SiteApi()
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadSiteIcon(image)
+    val result : UploadImageResponse = apiInstance.uploadSiteIcon(image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling SiteApi#uploadSiteIcon")
@@ -313,7 +355,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 

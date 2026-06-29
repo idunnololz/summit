@@ -4,6 +4,7 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **childCount** | **kotlin.Double** |  |  |
 | **publishedAt** | **kotlin.String** |  |  |
 | **isRevert** | **kotlin.Boolean** |  |  |
 | **kind** | [**ModlogKind**](ModlogKind.md) |  |  |

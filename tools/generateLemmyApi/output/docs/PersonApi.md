@@ -13,7 +13,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="getPersonDetails"></a>
 # **getPersonDetails**
-> RequestStateGetPersonDetailsResponse getPersonDetails(username, personId)
+> GetPersonDetailsResponse getPersonDetails(username, personId)
 
 Get the details for a person.
 
@@ -27,7 +27,7 @@ val apiInstance = PersonApi()
 val username : kotlin.String = username_example // kotlin.String | Example: dessalines , or dessalines@xyz.tld
 val personId : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateGetPersonDetailsResponse = apiInstance.getPersonDetails(username, personId)
+    val result : GetPersonDetailsResponse = apiInstance.getPersonDetails(username, personId)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PersonApi#getPersonDetails")
@@ -46,7 +46,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetPersonDetailsResponse**](RequestStateGetPersonDetailsResponse.md)
+[**GetPersonDetailsResponse**](GetPersonDetailsResponse.md)
 
 ### Authorization
 
@@ -61,7 +61,7 @@ Configure bearerAuth:
 
 <a id="listPersonContent"></a>
 # **listPersonContent**
-> RequestStatePagedResponsePostCommentCombinedView listPersonContent(limit, pageCursor, communityName, communityId, username, personId, type)
+> PagedResponsePostCommentCombinedView listPersonContent(limit, pageCursor, communityName, communityId, username, personId, type)
 
 List the content for a person.
 
@@ -80,7 +80,7 @@ val username : kotlin.String = username_example // kotlin.String | Example: dess
 val personId : kotlin.Double = 1.2 // kotlin.Double | 
 val type : PersonContentType =  // PersonContentType | 
 try {
-    val result : RequestStatePagedResponsePostCommentCombinedView = apiInstance.listPersonContent(limit, pageCursor, communityName, communityId, username, personId, type)
+    val result : PagedResponsePostCommentCombinedView = apiInstance.listPersonContent(limit, pageCursor, communityName, communityId, username, personId, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PersonApi#listPersonContent")
@@ -104,7 +104,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePostCommentCombinedView**](RequestStatePagedResponsePostCommentCombinedView.md)
+[**PagedResponsePostCommentCombinedView**](PagedResponsePostCommentCombinedView.md)
 
 ### Authorization
 
@@ -119,7 +119,7 @@ Configure bearerAuth:
 
 <a id="listPersons"></a>
 # **listPersons**
-> RequestStatePagedResponsePersonView listPersons(limit, pageCursor, searchTitleOnly, searchTerm, sort, type)
+> PagedResponsePersonView listPersons(limit, pageCursor, searchTitleOnly, searchTerm, sort, type)
 
 List persons.
 
@@ -137,7 +137,7 @@ val searchTerm : kotlin.String = searchTerm_example // kotlin.String |
 val sort : PersonSortType =  // PersonSortType | 
 val type : PersonListingType =  // PersonListingType | 
 try {
-    val result : RequestStatePagedResponsePersonView = apiInstance.listPersons(limit, pageCursor, searchTitleOnly, searchTerm, sort, type)
+    val result : PagedResponsePersonView = apiInstance.listPersons(limit, pageCursor, searchTitleOnly, searchTerm, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PersonApi#listPersons")
@@ -160,7 +160,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePersonView**](RequestStatePagedResponsePersonView.md)
+[**PagedResponsePersonView**](PagedResponsePersonView.md)
 
 ### Authorization
 
@@ -175,7 +175,7 @@ Configure bearerAuth:
 
 <a id="notePerson"></a>
 # **notePerson**
-> RequestStateSuccessResponse notePerson(notePerson)
+> SuccessResponse notePerson(notePerson)
 
 Make a note for a person.
 
@@ -188,7 +188,7 @@ Make a note for a person.
 val apiInstance = PersonApi()
 val notePerson : NotePerson =  // NotePerson | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.notePerson(notePerson)
+    val result : SuccessResponse = apiInstance.notePerson(notePerson)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PersonApi#notePerson")
@@ -206,7 +206,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -221,7 +221,7 @@ Configure bearerAuth:
 
 <a id="userBlockInstancePersons"></a>
 # **userBlockInstancePersons**
-> RequestStateSuccessResponse userBlockInstancePersons(userBlockInstancePersonsParams)
+> SuccessResponse userBlockInstancePersons(userBlockInstancePersonsParams)
 
 Block an instance&#39;s persons as a user.
 
@@ -234,7 +234,7 @@ Block an instance&#39;s persons as a user.
 val apiInstance = PersonApi()
 val userBlockInstancePersonsParams : UserBlockInstancePersonsParams =  // UserBlockInstancePersonsParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.userBlockInstancePersons(userBlockInstancePersonsParams)
+    val result : SuccessResponse = apiInstance.userBlockInstancePersons(userBlockInstancePersonsParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PersonApi#userBlockInstancePersons")
@@ -252,7 +252,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 

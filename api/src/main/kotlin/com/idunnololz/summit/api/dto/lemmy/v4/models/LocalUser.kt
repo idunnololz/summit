@@ -26,13 +26,14 @@ import com.google.gson.annotations.SerializedName
 /**
  * A local user.
  *
+ * @param showMedia Whether to show media in the UI.
  * @param defaultItemsPerPage 
  * @param showPersonVotes 
  * @param showUpvotePercentage 
  * @param showDownvotes 
  * @param showUpvotes 
  * @param showScore 
- * @param hideMedia Whether to hide posts containing images/videos
+ * @param hidePostsWithMedia Whether to hide posts containing images/videos. Often labeled hide_memes.
  * @param autoMarkFetchedPostsAsRead Whether to automatically mark fetched posts as read.
  * @param defaultCommentSortType 
  * @param privateMessagesEnabled Whether a user can send / receive private messages
@@ -58,12 +59,17 @@ import com.google.gson.annotations.SerializedName
  * @param showNsfw Whether to show NSFW content.
  * @param personId The person id.
  * @param id The local user id.
+ * @param invitedByLocalUserId The local user id.
  * @param defaultPostTimeRangeSeconds A default time range limit to apply to post sorts, in seconds.
  * @param email 
  */
 
 
 data class LocalUser (
+
+    /* Whether to show media in the UI. */
+    @SerializedName("show_media")
+    val showMedia: kotlin.Boolean,
 
     @SerializedName("default_items_per_page")
     val defaultItemsPerPage: kotlin.Double,
@@ -83,9 +89,9 @@ data class LocalUser (
     @SerializedName("show_score")
     val showScore: kotlin.Boolean,
 
-    /* Whether to hide posts containing images/videos */
-    @SerializedName("hide_media")
-    val hideMedia: kotlin.Boolean,
+    /* Whether to hide posts containing images/videos. Often labeled hide_memes. */
+    @SerializedName("hide_posts_with_media")
+    val hidePostsWithMedia: kotlin.Boolean,
 
     /* Whether to automatically mark fetched posts as read. */
     @SerializedName("auto_mark_fetched_posts_as_read")
@@ -177,6 +183,10 @@ data class LocalUser (
     /* The local user id. */
     @SerializedName("id")
     val id: kotlin.Double,
+
+    /* The local user id. */
+    @SerializedName("invited_by_local_user_id")
+    val invitedByLocalUserId: kotlin.Double? = null,
 
     /* A default time range limit to apply to post sorts, in seconds. */
     @SerializedName("default_post_time_range_seconds")

@@ -17,10 +17,9 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**likePost**](PostApi.md#likePost) | **POST** /api/v4/post/like | Like / vote on a post. |
 | [**listPostLikes**](PostApi.md#listPostLikes) | **GET** /api/v4/post/like/list | List a post&#39;s likes. Admin-only. |
 | [**lockPost**](PostApi.md#lockPost) | **POST** /api/v4/post/lock | A moderator can lock a post ( IE disable new comments ). |
-| [**markManyPostAsRead**](PostApi.md#markManyPostAsRead) | **POST** /api/v4/post/mark_as_read/many | Mark multiple posts as read. |
+| [**markManyPostsAsRead**](PostApi.md#markManyPostsAsRead) | **POST** /api/v4/post/mark_as_read/many | Mark multiple posts as read. |
 | [**markPostAsRead**](PostApi.md#markPostAsRead) | **POST** /api/v4/post/mark_as_read | Mark a post as read. |
 | [**modEditPost**](PostApi.md#modEditPost) | **PUT** /api/v4/post/mod_edit | Mods can change nsfw flag and tags for a post |
-| [**nodeinfo**](PostApi.md#nodeinfo) | **GET** /nodeinfo/2.1 | Metadata for the instance |
 | [**removePost**](PostApi.md#removePost) | **POST** /api/v4/post/remove | A moderator remove for a post. |
 | [**resolvePostReport**](PostApi.md#resolvePostReport) | **PUT** /api/v4/post/report/resolve | Resolve a post report. Only a mod can do this. |
 | [**savePost**](PostApi.md#savePost) | **PUT** /api/v4/post/save | Save a post. |
@@ -29,7 +28,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createPost"></a>
 # **createPost**
-> RequestStatePostResponse createPost(createPost)
+> PostResponse createPost(createPost)
 
 Create a post.
 
@@ -42,7 +41,7 @@ Create a post.
 val apiInstance = PostApi()
 val createPost : CreatePost =  // CreatePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.createPost(createPost)
+    val result : PostResponse = apiInstance.createPost(createPost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#createPost")
@@ -60,7 +59,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -75,7 +74,7 @@ Configure bearerAuth:
 
 <a id="createPostReport"></a>
 # **createPostReport**
-> RequestStatePostReportResponse createPostReport(createPostReport)
+> PostReportResponse createPostReport(createPostReport)
 
 Report a post.
 
@@ -88,7 +87,7 @@ Report a post.
 val apiInstance = PostApi()
 val createPostReport : CreatePostReport =  // CreatePostReport | 
 try {
-    val result : RequestStatePostReportResponse = apiInstance.createPostReport(createPostReport)
+    val result : PostReportResponse = apiInstance.createPostReport(createPostReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#createPostReport")
@@ -106,7 +105,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostReportResponse**](RequestStatePostReportResponse.md)
+[**PostReportResponse**](PostReportResponse.md)
 
 ### Authorization
 
@@ -121,7 +120,7 @@ Configure bearerAuth:
 
 <a id="deletePost"></a>
 # **deletePost**
-> RequestStatePostResponse deletePost(deletePost)
+> PostResponse deletePost(deletePost)
 
 Delete a post.
 
@@ -134,7 +133,7 @@ Delete a post.
 val apiInstance = PostApi()
 val deletePost : DeletePost =  // DeletePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.deletePost(deletePost)
+    val result : PostResponse = apiInstance.deletePost(deletePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#deletePost")
@@ -152,7 +151,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -167,7 +166,7 @@ Configure bearerAuth:
 
 <a id="editPost"></a>
 # **editPost**
-> RequestStatePostResponse editPost(editPost)
+> PostResponse editPost(editPost)
 
 Edit a post.
 
@@ -180,7 +179,7 @@ Edit a post.
 val apiInstance = PostApi()
 val editPost : EditPost =  // EditPost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.editPost(editPost)
+    val result : PostResponse = apiInstance.editPost(editPost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#editPost")
@@ -198,7 +197,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -213,7 +212,7 @@ Configure bearerAuth:
 
 <a id="editPostNotifications"></a>
 # **editPostNotifications**
-> RequestStateSuccessResponse editPostNotifications(editPostNotifications)
+> SuccessResponse editPostNotifications(editPostNotifications)
 
 Change notification settings for a post
 
@@ -226,7 +225,7 @@ Change notification settings for a post
 val apiInstance = PostApi()
 val editPostNotifications : EditPostNotifications =  // EditPostNotifications | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.editPostNotifications(editPostNotifications)
+    val result : SuccessResponse = apiInstance.editPostNotifications(editPostNotifications)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#editPostNotifications")
@@ -244,7 +243,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -259,7 +258,7 @@ Configure bearerAuth:
 
 <a id="featurePost"></a>
 # **featurePost**
-> RequestStatePostResponse featurePost(featurePost)
+> PostResponse featurePost(featurePost)
 
 A moderator can feature a community post ( IE stick it to the top of a community ).
 
@@ -272,7 +271,7 @@ A moderator can feature a community post ( IE stick it to the top of a community
 val apiInstance = PostApi()
 val featurePost : FeaturePost =  // FeaturePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.featurePost(featurePost)
+    val result : PostResponse = apiInstance.featurePost(featurePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#featurePost")
@@ -290,7 +289,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -305,7 +304,7 @@ Configure bearerAuth:
 
 <a id="getPost"></a>
 # **getPost**
-> RequestStateGetPostResponse getPost(commentId, id)
+> GetPostResponse getPost(commentId, id)
 
 Get / fetch a post.
 
@@ -319,7 +318,7 @@ val apiInstance = PostApi()
 val commentId : kotlin.Double = 1.2 // kotlin.Double | 
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateGetPostResponse = apiInstance.getPost(commentId, id)
+    val result : GetPostResponse = apiInstance.getPost(commentId, id)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#getPost")
@@ -338,7 +337,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetPostResponse**](RequestStateGetPostResponse.md)
+[**GetPostResponse**](GetPostResponse.md)
 
 ### Authorization
 
@@ -353,7 +352,7 @@ Configure bearerAuth:
 
 <a id="getPosts"></a>
 # **getPosts**
-> RequestStatePagedResponsePostView getPosts(limit, pageCursor, searchUrlOnly, searchTitleOnly, searchTerm, noCommentsOnly, markAsRead, hideMedia, showNsfw, showRead, showHidden, multiCommunityName, multiCommunityId, creatorUsername, creatorId, communityName, communityId, timeRangeSeconds, sort, type)
+> PagedResponsePostView getPosts(limit, pageCursor, tagId, searchUrlOnly, searchTitleOnly, searchTerm, noCommentsOnly, markAsRead, hidePostsWithMedia, showNsfw, showRead, showHidden, multiCommunityName, multiCommunityId, creatorUsername, creatorId, communityName, communityId, timeRangeSeconds, sort, type)
 
 Get / fetch posts, with various filters.
 
@@ -366,12 +365,13 @@ Get / fetch posts, with various filters.
 val apiInstance = PostApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+val tagId : kotlin.Double = 1.2 // kotlin.Double | Only show posts which have this tag
 val searchUrlOnly : kotlin.Boolean = true // kotlin.Boolean | 
 val searchTitleOnly : kotlin.Boolean = true // kotlin.Boolean | 
 val searchTerm : kotlin.String = searchTerm_example // kotlin.String | 
 val noCommentsOnly : kotlin.Boolean = true // kotlin.Boolean | If true, then only show posts with no comments
 val markAsRead : kotlin.Boolean = true // kotlin.Boolean | Whether to automatically mark fetched posts as read.
-val hideMedia : kotlin.Boolean = true // kotlin.Boolean | If false, then show posts with media attached (even if your user setting is to hide them)
+val hidePostsWithMedia : kotlin.Boolean = true // kotlin.Boolean | If false, then show posts with media attached (even if your user setting is to hide them)
 val showNsfw : kotlin.Boolean = true // kotlin.Boolean | If true, then show the nsfw posts (even if your user setting is to hide them)
 val showRead : kotlin.Boolean = true // kotlin.Boolean | If true, then show the read posts (even if your user setting is to hide them)
 val showHidden : kotlin.Boolean = true // kotlin.Boolean | 
@@ -385,7 +385,7 @@ val timeRangeSeconds : kotlin.Double = 1.2 // kotlin.Double | Filter to within a
 val sort : PostSortType =  // PostSortType | 
 val type : ListingType =  // ListingType | 
 try {
-    val result : RequestStatePagedResponsePostView = apiInstance.getPosts(limit, pageCursor, searchUrlOnly, searchTitleOnly, searchTerm, noCommentsOnly, markAsRead, hideMedia, showNsfw, showRead, showHidden, multiCommunityName, multiCommunityId, creatorUsername, creatorId, communityName, communityId, timeRangeSeconds, sort, type)
+    val result : PagedResponsePostView = apiInstance.getPosts(limit, pageCursor, tagId, searchUrlOnly, searchTitleOnly, searchTerm, noCommentsOnly, markAsRead, hidePostsWithMedia, showNsfw, showRead, showHidden, multiCommunityName, multiCommunityId, creatorUsername, creatorId, communityName, communityId, timeRangeSeconds, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#getPosts")
@@ -399,12 +399,13 @@ try {
 ### Parameters
 | **limit** | **kotlin.Double**|  | [optional] |
 | **pageCursor** | **kotlin.String**|  | [optional] |
+| **tagId** | **kotlin.Double**| Only show posts which have this tag | [optional] |
 | **searchUrlOnly** | **kotlin.Boolean**|  | [optional] |
 | **searchTitleOnly** | **kotlin.Boolean**|  | [optional] |
 | **searchTerm** | **kotlin.String**|  | [optional] |
 | **noCommentsOnly** | **kotlin.Boolean**| If true, then only show posts with no comments | [optional] |
 | **markAsRead** | **kotlin.Boolean**| Whether to automatically mark fetched posts as read. | [optional] |
-| **hideMedia** | **kotlin.Boolean**| If false, then show posts with media attached (even if your user setting is to hide them) | [optional] |
+| **hidePostsWithMedia** | **kotlin.Boolean**| If false, then show posts with media attached (even if your user setting is to hide them) | [optional] |
 | **showNsfw** | **kotlin.Boolean**| If true, then show the nsfw posts (even if your user setting is to hide them) | [optional] |
 | **showRead** | **kotlin.Boolean**| If true, then show the read posts (even if your user setting is to hide them) | [optional] |
 | **showHidden** | **kotlin.Boolean**|  | [optional] |
@@ -422,7 +423,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePostView**](RequestStatePagedResponsePostView.md)
+[**PagedResponsePostView**](PagedResponsePostView.md)
 
 ### Authorization
 
@@ -437,7 +438,7 @@ Configure bearerAuth:
 
 <a id="getSiteMetadata"></a>
 # **getSiteMetadata**
-> RequestStateGetSiteMetadataResponse getSiteMetadata(url)
+> GetSiteMetadataResponse getSiteMetadata(url)
 
 Fetch metadata for any given site.
 
@@ -450,7 +451,7 @@ Fetch metadata for any given site.
 val apiInstance = PostApi()
 val url : kotlin.String = url_example // kotlin.String | 
 try {
-    val result : RequestStateGetSiteMetadataResponse = apiInstance.getSiteMetadata(url)
+    val result : GetSiteMetadataResponse = apiInstance.getSiteMetadata(url)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#getSiteMetadata")
@@ -468,7 +469,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetSiteMetadataResponse**](RequestStateGetSiteMetadataResponse.md)
+[**GetSiteMetadataResponse**](GetSiteMetadataResponse.md)
 
 ### Authorization
 
@@ -483,7 +484,7 @@ Configure bearerAuth:
 
 <a id="hidePost"></a>
 # **hidePost**
-> RequestStatePostResponse hidePost(hidePost)
+> PostResponse hidePost(hidePost)
 
 Hide a post from list views.
 
@@ -496,7 +497,7 @@ Hide a post from list views.
 val apiInstance = PostApi()
 val hidePost : HidePost =  // HidePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.hidePost(hidePost)
+    val result : PostResponse = apiInstance.hidePost(hidePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#hidePost")
@@ -514,7 +515,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -529,7 +530,7 @@ Configure bearerAuth:
 
 <a id="likePost"></a>
 # **likePost**
-> RequestStatePostResponse likePost(createPostLike)
+> PostResponse likePost(createPostLike)
 
 Like / vote on a post.
 
@@ -542,7 +543,7 @@ Like / vote on a post.
 val apiInstance = PostApi()
 val createPostLike : CreatePostLike =  // CreatePostLike | 
 try {
-    val result : RequestStatePostResponse = apiInstance.likePost(createPostLike)
+    val result : PostResponse = apiInstance.likePost(createPostLike)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#likePost")
@@ -560,7 +561,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -575,7 +576,7 @@ Configure bearerAuth:
 
 <a id="listPostLikes"></a>
 # **listPostLikes**
-> RequestStatePagedResponseVoteView listPostLikes(postId, limit, pageCursor)
+> PagedResponseVoteView listPostLikes(postId, limit, pageCursor)
 
 List a post&#39;s likes. Admin-only.
 
@@ -590,7 +591,7 @@ val postId : kotlin.Double = 1.2 // kotlin.Double |
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseVoteView = apiInstance.listPostLikes(postId, limit, pageCursor)
+    val result : PagedResponseVoteView = apiInstance.listPostLikes(postId, limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#listPostLikes")
@@ -610,7 +611,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseVoteView**](RequestStatePagedResponseVoteView.md)
+[**PagedResponseVoteView**](PagedResponseVoteView.md)
 
 ### Authorization
 
@@ -625,7 +626,7 @@ Configure bearerAuth:
 
 <a id="lockPost"></a>
 # **lockPost**
-> RequestStatePostResponse lockPost(lockPost)
+> PostResponse lockPost(lockPost)
 
 A moderator can lock a post ( IE disable new comments ).
 
@@ -638,7 +639,7 @@ A moderator can lock a post ( IE disable new comments ).
 val apiInstance = PostApi()
 val lockPost : LockPost =  // LockPost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.lockPost(lockPost)
+    val result : PostResponse = apiInstance.lockPost(lockPost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#lockPost")
@@ -656,7 +657,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -669,9 +670,9 @@ Configure bearerAuth:
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a id="markManyPostAsRead"></a>
-# **markManyPostAsRead**
-> RequestStateSuccessResponse markManyPostAsRead(markManyPostsAsRead)
+<a id="markManyPostsAsRead"></a>
+# **markManyPostsAsRead**
+> SuccessResponse markManyPostsAsRead(markManyPostsAsRead)
 
 Mark multiple posts as read.
 
@@ -684,13 +685,13 @@ Mark multiple posts as read.
 val apiInstance = PostApi()
 val markManyPostsAsRead : MarkManyPostsAsRead =  // MarkManyPostsAsRead | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.markManyPostAsRead(markManyPostsAsRead)
+    val result : SuccessResponse = apiInstance.markManyPostsAsRead(markManyPostsAsRead)
     println(result)
 } catch (e: ClientException) {
-    println("4xx response calling PostApi#markManyPostAsRead")
+    println("4xx response calling PostApi#markManyPostsAsRead")
     e.printStackTrace()
 } catch (e: ServerException) {
-    println("5xx response calling PostApi#markManyPostAsRead")
+    println("5xx response calling PostApi#markManyPostsAsRead")
     e.printStackTrace()
 }
 ```
@@ -702,7 +703,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -717,7 +718,7 @@ Configure bearerAuth:
 
 <a id="markPostAsRead"></a>
 # **markPostAsRead**
-> RequestStatePostResponse markPostAsRead(markPostAsRead)
+> PostResponse markPostAsRead(markPostAsRead)
 
 Mark a post as read.
 
@@ -730,7 +731,7 @@ Mark a post as read.
 val apiInstance = PostApi()
 val markPostAsRead : MarkPostAsRead =  // MarkPostAsRead | 
 try {
-    val result : RequestStatePostResponse = apiInstance.markPostAsRead(markPostAsRead)
+    val result : PostResponse = apiInstance.markPostAsRead(markPostAsRead)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#markPostAsRead")
@@ -748,7 +749,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -763,7 +764,7 @@ Configure bearerAuth:
 
 <a id="modEditPost"></a>
 # **modEditPost**
-> RequestStatePostResponse modEditPost(modEditPost)
+> PostResponse modEditPost(modEditPost)
 
 Mods can change nsfw flag and tags for a post
 
@@ -776,7 +777,7 @@ Mods can change nsfw flag and tags for a post
 val apiInstance = PostApi()
 val modEditPost : ModEditPost =  // ModEditPost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.modEditPost(modEditPost)
+    val result : PostResponse = apiInstance.modEditPost(modEditPost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#modEditPost")
@@ -794,7 +795,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -807,50 +808,9 @@ Configure bearerAuth:
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a id="nodeinfo"></a>
-# **nodeinfo**
-> RequestStateNodeInfo nodeinfo()
-
-Metadata for the instance
-
-### Example
-```kotlin
-// Import classes:
-//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
-//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
-
-val apiInstance = PostApi()
-try {
-    val result : RequestStateNodeInfo = apiInstance.nodeinfo()
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling PostApi#nodeinfo")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling PostApi#nodeinfo")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**RequestStateNodeInfo**](RequestStateNodeInfo.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
 <a id="removePost"></a>
 # **removePost**
-> RequestStatePostResponse removePost(removePost)
+> PostResponse removePost(removePost)
 
 A moderator remove for a post.
 
@@ -863,7 +823,7 @@ A moderator remove for a post.
 val apiInstance = PostApi()
 val removePost : RemovePost =  // RemovePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.removePost(removePost)
+    val result : PostResponse = apiInstance.removePost(removePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#removePost")
@@ -881,7 +841,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -896,7 +856,7 @@ Configure bearerAuth:
 
 <a id="resolvePostReport"></a>
 # **resolvePostReport**
-> RequestStatePostReportResponse resolvePostReport(resolvePostReport)
+> PostReportResponse resolvePostReport(resolvePostReport)
 
 Resolve a post report. Only a mod can do this.
 
@@ -909,7 +869,7 @@ Resolve a post report. Only a mod can do this.
 val apiInstance = PostApi()
 val resolvePostReport : ResolvePostReport =  // ResolvePostReport | 
 try {
-    val result : RequestStatePostReportResponse = apiInstance.resolvePostReport(resolvePostReport)
+    val result : PostReportResponse = apiInstance.resolvePostReport(resolvePostReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#resolvePostReport")
@@ -927,7 +887,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostReportResponse**](RequestStatePostReportResponse.md)
+[**PostReportResponse**](PostReportResponse.md)
 
 ### Authorization
 
@@ -942,7 +902,7 @@ Configure bearerAuth:
 
 <a id="savePost"></a>
 # **savePost**
-> RequestStatePostResponse savePost(savePost)
+> PostResponse savePost(savePost)
 
 Save a post.
 
@@ -955,7 +915,7 @@ Save a post.
 val apiInstance = PostApi()
 val savePost : SavePost =  // SavePost | 
 try {
-    val result : RequestStatePostResponse = apiInstance.savePost(savePost)
+    val result : PostResponse = apiInstance.savePost(savePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#savePost")
@@ -973,7 +933,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 
@@ -988,7 +948,7 @@ Configure bearerAuth:
 
 <a id="warnPost"></a>
 # **warnPost**
-> RequestStatePostResponse warnPost(createPostWarning)
+> PostResponse warnPost(createPostWarning)
 
 Creates a warning against a post and notifies the user.
 
@@ -1001,7 +961,7 @@ Creates a warning against a post and notifies the user.
 val apiInstance = PostApi()
 val createPostWarning : CreatePostWarning =  // CreatePostWarning | 
 try {
-    val result : RequestStatePostResponse = apiInstance.warnPost(createPostWarning)
+    val result : PostResponse = apiInstance.warnPost(createPostWarning)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PostApi#warnPost")
@@ -1019,7 +979,7 @@ try {
 
 ### Return type
 
-[**RequestStatePostResponse**](RequestStatePostResponse.md)
+[**PostResponse**](PostResponse.md)
 
 ### Authorization
 

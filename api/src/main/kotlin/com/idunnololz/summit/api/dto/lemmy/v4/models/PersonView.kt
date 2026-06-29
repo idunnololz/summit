@@ -19,7 +19,6 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonActions
 
 import com.google.gson.annotations.SerializedName
-import com.idunnololz.summit.api.dto.lemmy.PersonAggregates
 
 /**
  * A person view.
@@ -53,3 +52,4 @@ data class PersonView (
 
 
 }
+

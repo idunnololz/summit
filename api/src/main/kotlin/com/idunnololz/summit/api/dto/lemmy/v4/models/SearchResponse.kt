@@ -32,8 +32,8 @@ import com.google.gson.annotations.SerializedName
  * @param communities 
  * @param posts 
  * @param comments 
- * @param nextPage 
- * @param prevPage 
+ * @param nextPage To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
+ * @param prevPage To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
  * @param resolve 
  */
 
@@ -55,9 +55,11 @@ data class SearchResponse (
     @SerializedName("comments")
     val comments: kotlin.collections.List<CommentView>,
 
+    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("next_page")
     val nextPage: kotlin.String? = null,
 
+    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("prev_page")
     val prevPage: kotlin.String? = null,
 

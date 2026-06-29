@@ -19,24 +19,21 @@ package com.idunnololz.summit.api.dto.lemmy.v4.models
 import com.google.gson.annotations.SerializedName
 
 /**
- * The registration mode for your site. Determines what happens after a user signs up.
+ * The Report sort type.
  *
- * Values: closed,require_application,require_invitation,`open`
+ * Values: default,new,old
  */
 
-enum class RegistrationMode(val value: kotlin.String) {
+enum class ReportSortType(val value: kotlin.String) {
 
-    @SerializedName(value = "closed")
-    closed("closed"),
+    @SerializedName(value = "default")
+    default("default"),
 
-    @SerializedName(value = "require_application")
-    require_application("require_application"),
+    @SerializedName(value = "new")
+    new("new"),
 
-    @SerializedName(value = "require_invitation")
-    require_invitation("require_invitation"),
-
-    @SerializedName(value = "open")
-    `open`("open");
+    @SerializedName(value = "old")
+    old("old");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -51,12 +48,12 @@ enum class RegistrationMode(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is RegistrationMode) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is ReportSortType) "$data" else null
 
         /**
-         * Returns a valid [RegistrationMode] for [data], null otherwise.
+         * Returns a valid [ReportSortType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): RegistrationMode? = data?.let {
+        fun decode(data: kotlin.Any?): ReportSortType? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

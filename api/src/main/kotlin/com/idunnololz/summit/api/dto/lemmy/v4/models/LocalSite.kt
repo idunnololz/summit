@@ -28,6 +28,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * The local site.
  *
+ * @param maxInvitesPerUserAllowed How many active invite links a user can have
  * @param imageUploadDisabled 
  * @param imageAllowVideoUploads This affects post and comment images, but not avatars and banners.
  * @param imageMaxUploadSize This affects post and comment images, but not avatar and banner sizes.
@@ -80,6 +81,10 @@ import com.google.gson.annotations.SerializedName
 
 
 data class LocalSite (
+
+    /* How many active invite links a user can have */
+    @SerializedName("max_invites_per_user_allowed")
+    val maxInvitesPerUserAllowed: kotlin.Double,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean,

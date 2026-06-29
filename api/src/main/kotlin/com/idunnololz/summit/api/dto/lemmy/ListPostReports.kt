@@ -5,4 +5,5 @@ data class ListPostReports(
   val limit: Int? = null,
   val unresolved_only: Boolean? = null,
   val community_id: CommunityId? = null,
+  val cursor: String? = null,
 )

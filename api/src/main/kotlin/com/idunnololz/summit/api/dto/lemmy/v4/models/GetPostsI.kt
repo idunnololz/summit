@@ -25,12 +25,13 @@ import com.google.gson.annotations.SerializedName
  *
  * @param limit 
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
+ * @param tagId The community tag id
  * @param searchUrlOnly 
  * @param searchTitleOnly 
  * @param searchTerm 
  * @param noCommentsOnly If true, then only show posts with no comments
  * @param markAsRead Whether to automatically mark fetched posts as read.
- * @param hideMedia If false, then show posts with media attached (even if your user setting is to hide them)
+ * @param hidePostsWithMedia If false, then show posts with media attached (even if your user setting is to hide them)
  * @param showNsfw If true, then show the nsfw posts (even if your user setting is to hide them)
  * @param showRead If true, then show the read posts (even if your user setting is to hide them)
  * @param showHidden 
@@ -49,11 +50,15 @@ import com.google.gson.annotations.SerializedName
 data class GetPostsI (
 
     @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+    val limit: Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
     val pageCursor: kotlin.String? = null,
+
+    /* The community tag id */
+    @SerializedName("tag_id")
+    val tagId: kotlin.Double? = null,
 
     @SerializedName("search_url_only")
     val searchUrlOnly: kotlin.Boolean? = null,
@@ -73,8 +78,8 @@ data class GetPostsI (
     val markAsRead: kotlin.Boolean? = null,
 
     /* If false, then show posts with media attached (even if your user setting is to hide them) */
-    @SerializedName("hide_media")
-    val hideMedia: kotlin.Boolean? = null,
+    @SerializedName("hide_posts_with_media")
+    val hidePostsWithMedia: kotlin.Boolean? = null,
 
     /* If true, then show the nsfw posts (even if your user setting is to hide them) */
     @SerializedName("show_nsfw")
@@ -91,25 +96,25 @@ data class GetPostsI (
     val multiCommunityName: kotlin.String? = null,
 
     @SerializedName("multi_community_id")
-    val multiCommunityId: kotlin.Int? = null,
+    val multiCommunityId: kotlin.Double? = null,
 
     @SerializedName("creator_username")
     val creatorUsername: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Int? = null,
+    val creatorId: kotlin.Double? = null,
 
     @SerializedName("community_name")
     val communityName: kotlin.String? = null,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+    val communityId: Int? = null,
 
     /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. Use Zero to override the local_site and local_user time_range. */
     @SerializedName("time_range_seconds")
-    val timeRangeSeconds: kotlin.Int? = null,
+    val timeRangeSeconds: Int? = null,
 
     @SerializedName("sort")
     val sort: PostSortType? = null,

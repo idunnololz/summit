@@ -34,7 +34,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="addModToCommunity"></a>
 # **addModToCommunity**
-> RequestStateAddModToCommunityResponse addModToCommunity(addModToCommunity)
+> AddModToCommunityResponse addModToCommunity(addModToCommunity)
 
 Add a moderator to your community.
 
@@ -47,7 +47,7 @@ Add a moderator to your community.
 val apiInstance = CommunityApi()
 val addModToCommunity : AddModToCommunity =  // AddModToCommunity | 
 try {
-    val result : RequestStateAddModToCommunityResponse = apiInstance.addModToCommunity(addModToCommunity)
+    val result : AddModToCommunityResponse = apiInstance.addModToCommunity(addModToCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#addModToCommunity")
@@ -65,7 +65,7 @@ try {
 
 ### Return type
 
-[**RequestStateAddModToCommunityResponse**](RequestStateAddModToCommunityResponse.md)
+[**AddModToCommunityResponse**](AddModToCommunityResponse.md)
 
 ### Authorization
 
@@ -80,7 +80,7 @@ Configure bearerAuth:
 
 <a id="approveCommunityPendingFollow"></a>
 # **approveCommunityPendingFollow**
-> RequestStateSuccessResponse approveCommunityPendingFollow(approveCommunityPendingFollower)
+> SuccessResponse approveCommunityPendingFollow(approveCommunityPendingFollower)
 
 Approve a community pending follow request.
 
@@ -93,7 +93,7 @@ Approve a community pending follow request.
 val apiInstance = CommunityApi()
 val approveCommunityPendingFollower : ApproveCommunityPendingFollower =  // ApproveCommunityPendingFollower | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.approveCommunityPendingFollow(approveCommunityPendingFollower)
+    val result : SuccessResponse = apiInstance.approveCommunityPendingFollow(approveCommunityPendingFollower)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#approveCommunityPendingFollow")
@@ -111,7 +111,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -126,7 +126,7 @@ Configure bearerAuth:
 
 <a id="banFromCommunity"></a>
 # **banFromCommunity**
-> RequestStatePersonResponse banFromCommunity(banFromCommunity)
+> PersonResponse banFromCommunity(banFromCommunity)
 
 Ban a user from a community.
 
@@ -139,7 +139,7 @@ Ban a user from a community.
 val apiInstance = CommunityApi()
 val banFromCommunity : BanFromCommunity =  // BanFromCommunity | 
 try {
-    val result : RequestStatePersonResponse = apiInstance.banFromCommunity(banFromCommunity)
+    val result : PersonResponse = apiInstance.banFromCommunity(banFromCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#banFromCommunity")
@@ -157,7 +157,7 @@ try {
 
 ### Return type
 
-[**RequestStatePersonResponse**](RequestStatePersonResponse.md)
+[**PersonResponse**](PersonResponse.md)
 
 ### Authorization
 
@@ -172,7 +172,7 @@ Configure bearerAuth:
 
 <a id="blockCommunity"></a>
 # **blockCommunity**
-> RequestStateCommunityResponse blockCommunity(blockCommunity)
+> CommunityResponse blockCommunity(blockCommunity)
 
 Block a community.
 
@@ -185,7 +185,7 @@ Block a community.
 val apiInstance = CommunityApi()
 val blockCommunity : BlockCommunity =  // BlockCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.blockCommunity(blockCommunity)
+    val result : CommunityResponse = apiInstance.blockCommunity(blockCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#blockCommunity")
@@ -203,7 +203,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -218,7 +218,7 @@ Configure bearerAuth:
 
 <a id="createCommunity"></a>
 # **createCommunity**
-> RequestStateCommunityResponse createCommunity(createCommunity)
+> CommunityResponse createCommunity(createCommunity)
 
 Create a new community.
 
@@ -231,7 +231,7 @@ Create a new community.
 val apiInstance = CommunityApi()
 val createCommunity : CreateCommunity =  // CreateCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.createCommunity(createCommunity)
+    val result : CommunityResponse = apiInstance.createCommunity(createCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#createCommunity")
@@ -249,7 +249,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -264,7 +264,7 @@ Configure bearerAuth:
 
 <a id="createCommunityReport"></a>
 # **createCommunityReport**
-> RequestStateCommunityReportResponse createCommunityReport(createCommunityReport)
+> CommunityReportResponse createCommunityReport(createCommunityReport)
 
 Create a report for a community.
 
@@ -277,7 +277,7 @@ Create a report for a community.
 val apiInstance = CommunityApi()
 val createCommunityReport : CreateCommunityReport =  // CreateCommunityReport | 
 try {
-    val result : RequestStateCommunityReportResponse = apiInstance.createCommunityReport(createCommunityReport)
+    val result : CommunityReportResponse = apiInstance.createCommunityReport(createCommunityReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#createCommunityReport")
@@ -295,7 +295,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityReportResponse**](RequestStateCommunityReportResponse.md)
+[**CommunityReportResponse**](CommunityReportResponse.md)
 
 ### Authorization
 
@@ -310,7 +310,7 @@ Configure bearerAuth:
 
 <a id="createCommunityTag"></a>
 # **createCommunityTag**
-> RequestStateCommunityTag createCommunityTag(createCommunityTag)
+> CommunityTag createCommunityTag(createCommunityTag)
 
 Create a community post tag.
 
@@ -323,7 +323,7 @@ Create a community post tag.
 val apiInstance = CommunityApi()
 val createCommunityTag : CreateCommunityTag =  // CreateCommunityTag | 
 try {
-    val result : RequestStateCommunityTag = apiInstance.createCommunityTag(createCommunityTag)
+    val result : CommunityTag = apiInstance.createCommunityTag(createCommunityTag)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#createCommunityTag")
@@ -341,7 +341,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityTag**](RequestStateCommunityTag.md)
+[**CommunityTag**](CommunityTag.md)
 
 ### Authorization
 
@@ -356,7 +356,7 @@ Configure bearerAuth:
 
 <a id="deleteCommunity"></a>
 # **deleteCommunity**
-> RequestStateCommunityResponse deleteCommunity(deleteCommunity)
+> CommunityResponse deleteCommunity(deleteCommunity)
 
 Delete a community.
 
@@ -369,7 +369,7 @@ Delete a community.
 val apiInstance = CommunityApi()
 val deleteCommunity : DeleteCommunity =  // DeleteCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.deleteCommunity(deleteCommunity)
+    val result : CommunityResponse = apiInstance.deleteCommunity(deleteCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#deleteCommunity")
@@ -387,7 +387,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -402,7 +402,7 @@ Configure bearerAuth:
 
 <a id="deleteCommunityBanner"></a>
 # **deleteCommunityBanner**
-> RequestStateSuccessResponse deleteCommunityBanner(communityIdQuery)
+> SuccessResponse deleteCommunityBanner(communityIdQuery)
 
 Delete the community banner.
 
@@ -415,7 +415,7 @@ Delete the community banner.
 val apiInstance = CommunityApi()
 val communityIdQuery : CommunityIdQuery =  // CommunityIdQuery | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteCommunityBanner(communityIdQuery)
+    val result : SuccessResponse = apiInstance.deleteCommunityBanner(communityIdQuery)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#deleteCommunityBanner")
@@ -433,7 +433,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -448,7 +448,7 @@ Configure bearerAuth:
 
 <a id="deleteCommunityIcon"></a>
 # **deleteCommunityIcon**
-> RequestStateSuccessResponse deleteCommunityIcon(communityIdQuery)
+> SuccessResponse deleteCommunityIcon(communityIdQuery)
 
 Delete the community icon.
 
@@ -461,7 +461,7 @@ Delete the community icon.
 val apiInstance = CommunityApi()
 val communityIdQuery : CommunityIdQuery =  // CommunityIdQuery | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteCommunityIcon(communityIdQuery)
+    val result : SuccessResponse = apiInstance.deleteCommunityIcon(communityIdQuery)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#deleteCommunityIcon")
@@ -479,7 +479,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -494,7 +494,7 @@ Configure bearerAuth:
 
 <a id="deleteCommunityTag"></a>
 # **deleteCommunityTag**
-> RequestStateCommunityTag deleteCommunityTag(deleteCommunityTag)
+> CommunityTag deleteCommunityTag(deleteCommunityTag)
 
 Delete a post tag in a community.
 
@@ -507,7 +507,7 @@ Delete a post tag in a community.
 val apiInstance = CommunityApi()
 val deleteCommunityTag : DeleteCommunityTag =  // DeleteCommunityTag | 
 try {
-    val result : RequestStateCommunityTag = apiInstance.deleteCommunityTag(deleteCommunityTag)
+    val result : CommunityTag = apiInstance.deleteCommunityTag(deleteCommunityTag)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#deleteCommunityTag")
@@ -525,7 +525,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityTag**](RequestStateCommunityTag.md)
+[**CommunityTag**](CommunityTag.md)
 
 ### Authorization
 
@@ -540,7 +540,7 @@ Configure bearerAuth:
 
 <a id="editCommunity"></a>
 # **editCommunity**
-> RequestStateCommunityResponse editCommunity(editCommunity)
+> CommunityResponse editCommunity(editCommunity)
 
 Edit a community.
 
@@ -553,7 +553,7 @@ Edit a community.
 val apiInstance = CommunityApi()
 val editCommunity : EditCommunity =  // EditCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.editCommunity(editCommunity)
+    val result : CommunityResponse = apiInstance.editCommunity(editCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#editCommunity")
@@ -571,7 +571,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -586,7 +586,7 @@ Configure bearerAuth:
 
 <a id="editCommunityNotifications"></a>
 # **editCommunityNotifications**
-> RequestStateSuccessResponse editCommunityNotifications(editCommunityNotifications)
+> SuccessResponse editCommunityNotifications(editCommunityNotifications)
 
 Change notification settings for a community
 
@@ -599,7 +599,7 @@ Change notification settings for a community
 val apiInstance = CommunityApi()
 val editCommunityNotifications : EditCommunityNotifications =  // EditCommunityNotifications | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.editCommunityNotifications(editCommunityNotifications)
+    val result : SuccessResponse = apiInstance.editCommunityNotifications(editCommunityNotifications)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#editCommunityNotifications")
@@ -617,7 +617,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -632,7 +632,7 @@ Configure bearerAuth:
 
 <a id="editCommunityTag"></a>
 # **editCommunityTag**
-> RequestStateCommunityTag editCommunityTag(editCommunityTag)
+> CommunityTag editCommunityTag(editCommunityTag)
 
 Edit a community post tag.
 
@@ -645,7 +645,7 @@ Edit a community post tag.
 val apiInstance = CommunityApi()
 val editCommunityTag : EditCommunityTag =  // EditCommunityTag | 
 try {
-    val result : RequestStateCommunityTag = apiInstance.editCommunityTag(editCommunityTag)
+    val result : CommunityTag = apiInstance.editCommunityTag(editCommunityTag)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#editCommunityTag")
@@ -663,7 +663,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityTag**](RequestStateCommunityTag.md)
+[**CommunityTag**](CommunityTag.md)
 
 ### Authorization
 
@@ -678,7 +678,7 @@ Configure bearerAuth:
 
 <a id="followCommunity"></a>
 # **followCommunity**
-> RequestStateCommunityResponse followCommunity(followCommunity)
+> CommunityResponse followCommunity(followCommunity)
 
 Follow / subscribe to a community.
 
@@ -691,7 +691,7 @@ Follow / subscribe to a community.
 val apiInstance = CommunityApi()
 val followCommunity : FollowCommunity =  // FollowCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.followCommunity(followCommunity)
+    val result : CommunityResponse = apiInstance.followCommunity(followCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#followCommunity")
@@ -709,7 +709,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -724,7 +724,7 @@ Configure bearerAuth:
 
 <a id="getCommunity"></a>
 # **getCommunity**
-> RequestStateGetCommunityResponse getCommunity(name, id)
+> GetCommunityResponse getCommunity(name, id)
 
 Get / fetch a community.
 
@@ -738,7 +738,7 @@ val apiInstance = CommunityApi()
 val name : kotlin.String = name_example // kotlin.String | Example: star_trek , or star_trek@xyz.tld
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateGetCommunityResponse = apiInstance.getCommunity(name, id)
+    val result : GetCommunityResponse = apiInstance.getCommunity(name, id)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#getCommunity")
@@ -757,7 +757,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetCommunityResponse**](RequestStateGetCommunityResponse.md)
+[**GetCommunityResponse**](GetCommunityResponse.md)
 
 ### Authorization
 
@@ -772,7 +772,7 @@ Configure bearerAuth:
 
 <a id="getRandomCommunity"></a>
 # **getRandomCommunity**
-> RequestStateCommunityResponse getRandomCommunity(showNsfw, type)
+> CommunityResponse getRandomCommunity(showNsfw, type)
 
 Get a random community.
 
@@ -786,7 +786,7 @@ val apiInstance = CommunityApi()
 val showNsfw : kotlin.Boolean = true // kotlin.Boolean | 
 val type : ListingType =  // ListingType | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.getRandomCommunity(showNsfw, type)
+    val result : CommunityResponse = apiInstance.getRandomCommunity(showNsfw, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#getRandomCommunity")
@@ -805,7 +805,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -820,7 +820,7 @@ Configure bearerAuth:
 
 <a id="hideCommunity"></a>
 # **hideCommunity**
-> RequestStateSuccessResponse hideCommunity(hideCommunity)
+> SuccessResponse hideCommunity(hideCommunity)
 
 Hide a community from public / \&quot;All\&quot; view. Admins only.
 
@@ -833,7 +833,7 @@ Hide a community from public / \&quot;All\&quot; view. Admins only.
 val apiInstance = CommunityApi()
 val hideCommunity : HideCommunity =  // HideCommunity | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.hideCommunity(hideCommunity)
+    val result : SuccessResponse = apiInstance.hideCommunity(hideCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#hideCommunity")
@@ -851,7 +851,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -866,7 +866,7 @@ Configure bearerAuth:
 
 <a id="listCommunities"></a>
 # **listCommunities**
-> RequestStatePagedResponseCommunityView listCommunities(limit, pageCursor, searchTitleOnly, searchTerm, multiCommunityId, showNsfw, timeRangeSeconds, sort, type)
+> PagedResponseCommunityView listCommunities(limit, pageCursor, searchTitleOnly, searchTerm, multiCommunityId, showNsfw, timeRangeSeconds, sort, type)
 
 List communities, with various filters.
 
@@ -887,7 +887,7 @@ val timeRangeSeconds : kotlin.Double = 1.2 // kotlin.Double | Filter to within a
 val sort : CommunitySortType =  // CommunitySortType | 
 val type : ListingType =  // ListingType | 
 try {
-    val result : RequestStatePagedResponseCommunityView = apiInstance.listCommunities(limit, pageCursor, searchTitleOnly, searchTerm, multiCommunityId, showNsfw, timeRangeSeconds, sort, type)
+    val result : PagedResponseCommunityView = apiInstance.listCommunities(limit, pageCursor, searchTitleOnly, searchTerm, multiCommunityId, showNsfw, timeRangeSeconds, sort, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#listCommunities")
@@ -913,7 +913,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseCommunityView**](RequestStatePagedResponseCommunityView.md)
+[**PagedResponseCommunityView**](PagedResponseCommunityView.md)
 
 ### Authorization
 
@@ -928,7 +928,7 @@ Configure bearerAuth:
 
 <a id="listCommunityPendingFollows"></a>
 # **listCommunityPendingFollows**
-> RequestStatePagedResponsePendingFollowerView listCommunityPendingFollows(limit, pageCursor, allCommunities, unreadOnly)
+> PagedResponsePendingFollowerView listCommunityPendingFollows(limit, pageCursor, allCommunities, unreadOnly)
 
 Get a community&#39;s pending followers.
 
@@ -944,7 +944,7 @@ val pageCursor : kotlin.String = pageCursor_example // kotlin.String |
 val allCommunities : kotlin.Boolean = true // kotlin.Boolean | 
 val unreadOnly : kotlin.Boolean = true // kotlin.Boolean | Only shows the unapproved applications
 try {
-    val result : RequestStatePagedResponsePendingFollowerView = apiInstance.listCommunityPendingFollows(limit, pageCursor, allCommunities, unreadOnly)
+    val result : PagedResponsePendingFollowerView = apiInstance.listCommunityPendingFollows(limit, pageCursor, allCommunities, unreadOnly)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#listCommunityPendingFollows")
@@ -965,7 +965,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePendingFollowerView**](RequestStatePagedResponsePendingFollowerView.md)
+[**PagedResponsePendingFollowerView**](PagedResponsePendingFollowerView.md)
 
 ### Authorization
 
@@ -980,7 +980,7 @@ Configure bearerAuth:
 
 <a id="removeCommunity"></a>
 # **removeCommunity**
-> RequestStateCommunityResponse removeCommunity(removeCommunity)
+> CommunityResponse removeCommunity(removeCommunity)
 
 A moderator remove for a community.
 
@@ -993,7 +993,7 @@ A moderator remove for a community.
 val apiInstance = CommunityApi()
 val removeCommunity : RemoveCommunity =  // RemoveCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.removeCommunity(removeCommunity)
+    val result : CommunityResponse = apiInstance.removeCommunity(removeCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#removeCommunity")
@@ -1011,7 +1011,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -1026,7 +1026,7 @@ Configure bearerAuth:
 
 <a id="resolveCommunityReport"></a>
 # **resolveCommunityReport**
-> RequestStateCommunityReportResponse resolveCommunityReport(resolveCommunityReport)
+> CommunityReportResponse resolveCommunityReport(resolveCommunityReport)
 
 Resolve a report for a private message.
 
@@ -1039,7 +1039,7 @@ Resolve a report for a private message.
 val apiInstance = CommunityApi()
 val resolveCommunityReport : ResolveCommunityReport =  // ResolveCommunityReport | 
 try {
-    val result : RequestStateCommunityReportResponse = apiInstance.resolveCommunityReport(resolveCommunityReport)
+    val result : CommunityReportResponse = apiInstance.resolveCommunityReport(resolveCommunityReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#resolveCommunityReport")
@@ -1057,7 +1057,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityReportResponse**](RequestStateCommunityReportResponse.md)
+[**CommunityReportResponse**](CommunityReportResponse.md)
 
 ### Authorization
 
@@ -1072,7 +1072,7 @@ Configure bearerAuth:
 
 <a id="transferCommunity"></a>
 # **transferCommunity**
-> RequestStateGetCommunityResponse transferCommunity(transferCommunity)
+> GetCommunityResponse transferCommunity(transferCommunity)
 
 Transfer your community to an existing moderator.
 
@@ -1085,7 +1085,7 @@ Transfer your community to an existing moderator.
 val apiInstance = CommunityApi()
 val transferCommunity : TransferCommunity =  // TransferCommunity | 
 try {
-    val result : RequestStateGetCommunityResponse = apiInstance.transferCommunity(transferCommunity)
+    val result : GetCommunityResponse = apiInstance.transferCommunity(transferCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#transferCommunity")
@@ -1103,7 +1103,7 @@ try {
 
 ### Return type
 
-[**RequestStateGetCommunityResponse**](RequestStateGetCommunityResponse.md)
+[**GetCommunityResponse**](GetCommunityResponse.md)
 
 ### Authorization
 
@@ -1118,7 +1118,7 @@ Configure bearerAuth:
 
 <a id="uploadCommunityBanner"></a>
 # **uploadCommunityBanner**
-> RequestStateUploadImageResponse uploadCommunityBanner(id, image)
+> UploadImageResponse uploadCommunityBanner(id, image)
 
 Upload new community banner.
 
@@ -1132,7 +1132,7 @@ val apiInstance = CommunityApi()
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadCommunityBanner(id, image)
+    val result : UploadImageResponse = apiInstance.uploadCommunityBanner(id, image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#uploadCommunityBanner")
@@ -1151,7 +1151,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 
@@ -1166,7 +1166,7 @@ Configure bearerAuth:
 
 <a id="uploadCommunityIcon"></a>
 # **uploadCommunityIcon**
-> RequestStateUploadImageResponse uploadCommunityIcon(id, image)
+> UploadImageResponse uploadCommunityIcon(id, image)
 
 Upload new community icon.
 
@@ -1180,7 +1180,7 @@ val apiInstance = CommunityApi()
 val id : kotlin.Double = 1.2 // kotlin.Double | 
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadCommunityIcon(id, image)
+    val result : UploadImageResponse = apiInstance.uploadCommunityIcon(id, image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#uploadCommunityIcon")
@@ -1199,7 +1199,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 
@@ -1214,7 +1214,7 @@ Configure bearerAuth:
 
 <a id="userBlockInstanceCommunities"></a>
 # **userBlockInstanceCommunities**
-> RequestStateSuccessResponse userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
+> SuccessResponse userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
 
 Block an instance&#39;s communities as a user.
 
@@ -1227,7 +1227,7 @@ Block an instance&#39;s communities as a user.
 val apiInstance = CommunityApi()
 val userBlockInstanceCommunitiesParams : UserBlockInstanceCommunitiesParams =  // UserBlockInstanceCommunitiesParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
+    val result : SuccessResponse = apiInstance.userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CommunityApi#userBlockInstanceCommunities")
@@ -1245,7 +1245,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 

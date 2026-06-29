@@ -44,7 +44,7 @@ open class LemmyListSource<T, O, Key>(
   private val seenObjects = mutableSetOf<Key>()
   private val invalidatedPages = mutableSetOf<Int>()
 
-  private var currentPageInternal = 1
+  private var currentPageInternal = 0
   private var currentItemIndex = 0
 
   private var endReached = false
@@ -176,7 +176,7 @@ open class LemmyListSource<T, O, Key>(
   }
 
   fun reset() {
-    currentPageInternal = 1
+    currentPageInternal = 0
     currentItemIndex = 0
 
     allObjects.clear()

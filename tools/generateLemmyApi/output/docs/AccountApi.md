@@ -8,6 +8,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**blockPerson**](AccountApi.md#blockPerson) | **POST** /api/v4/account/block/person | Block a person. |
 | [**changePassword**](AccountApi.md#changePassword) | **PUT** /api/v4/account/auth/change_password | Change your user password. |
 | [**changePasswordAfterReset**](AccountApi.md#changePasswordAfterReset) | **POST** /api/v4/account/auth/password_change | Change your password from an email / token based reset. |
+| [**createRegistrationInvitation**](AccountApi.md#createRegistrationInvitation) | **POST** /api/v4/account/invite | Create a new registration invitation |
 | [**deleteAccount**](AccountApi.md#deleteAccount) | **DELETE** /api/v4/account | Delete your account. |
 | [**deleteMedia**](AccountApi.md#deleteMedia) | **DELETE** /api/v4/account/media | Delete media for your account. |
 | [**deleteUserAvatar**](AccountApi.md#deleteUserAvatar) | **DELETE** /api/v4/account/avatar | Delete the user avatar. |
@@ -26,6 +27,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**listPersonLiked**](AccountApi.md#listPersonLiked) | **GET** /api/v4/account/liked | List your liked content. |
 | [**listPersonRead**](AccountApi.md#listPersonRead) | **GET** /api/v4/account/read | List your read content. |
 | [**listPersonSaved**](AccountApi.md#listPersonSaved) | **GET** /api/v4/account/saved | List your saved content. |
+| [**listRegistrationInvitations**](AccountApi.md#listRegistrationInvitations) | **GET** /api/v4/account/invite/list | Revoke a previously created registration invitation |
 | [**login**](AccountApi.md#login) | **POST** /api/v4/account/auth/login | Log into lemmy. |
 | [**logout**](AccountApi.md#logout) | **POST** /api/v4/account/auth/logout | Invalidate the currently used auth token. |
 | [**markAllNotificationsAsRead**](AccountApi.md#markAllNotificationsAsRead) | **POST** /api/v4/account/notification/mark_as_read/all | Mark all notifications as read. |
@@ -34,6 +36,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**register**](AccountApi.md#register) | **POST** /api/v4/account/auth/register | Register a new user. |
 | [**resendVerificationEmail**](AccountApi.md#resendVerificationEmail) | **POST** /api/v4/account/auth/resend_verification_email | Resend a verification email. |
 | [**resetPassword**](AccountApi.md#resetPassword) | **POST** /api/v4/account/auth/password_reset | Reset your password. |
+| [**revokeRegistrationInvitation**](AccountApi.md#revokeRegistrationInvitation) | **DELETE** /api/v4/account/invite | Revoke a previously created registration invitation |
 | [**saveUserSettings**](AccountApi.md#saveUserSettings) | **PUT** /api/v4/account/settings/save | Save your user settings. |
 | [**uploadUserAvatar**](AccountApi.md#uploadUserAvatar) | **POST** /api/v4/account/avatar | Upload new user avatar. |
 | [**uploadUserBanner**](AccountApi.md#uploadUserBanner) | **POST** /api/v4/account/banner | Upload new user banner. |
@@ -45,7 +48,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="blockCommunity"></a>
 # **blockCommunity**
-> RequestStateCommunityResponse blockCommunity(blockCommunity)
+> CommunityResponse blockCommunity(blockCommunity)
 
 Block a community.
 
@@ -58,7 +61,7 @@ Block a community.
 val apiInstance = AccountApi()
 val blockCommunity : BlockCommunity =  // BlockCommunity | 
 try {
-    val result : RequestStateCommunityResponse = apiInstance.blockCommunity(blockCommunity)
+    val result : CommunityResponse = apiInstance.blockCommunity(blockCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#blockCommunity")
@@ -76,7 +79,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityResponse**](RequestStateCommunityResponse.md)
+[**CommunityResponse**](CommunityResponse.md)
 
 ### Authorization
 
@@ -91,7 +94,7 @@ Configure bearerAuth:
 
 <a id="blockPerson"></a>
 # **blockPerson**
-> RequestStatePersonResponse blockPerson(blockPerson)
+> PersonResponse blockPerson(blockPerson)
 
 Block a person.
 
@@ -104,7 +107,7 @@ Block a person.
 val apiInstance = AccountApi()
 val blockPerson : BlockPerson =  // BlockPerson | 
 try {
-    val result : RequestStatePersonResponse = apiInstance.blockPerson(blockPerson)
+    val result : PersonResponse = apiInstance.blockPerson(blockPerson)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#blockPerson")
@@ -122,7 +125,7 @@ try {
 
 ### Return type
 
-[**RequestStatePersonResponse**](RequestStatePersonResponse.md)
+[**PersonResponse**](PersonResponse.md)
 
 ### Authorization
 
@@ -137,7 +140,7 @@ Configure bearerAuth:
 
 <a id="changePassword"></a>
 # **changePassword**
-> RequestStateLoginResponse changePassword(changePassword)
+> LoginResponse changePassword(changePassword)
 
 Change your user password.
 
@@ -150,7 +153,7 @@ Change your user password.
 val apiInstance = AccountApi()
 val changePassword : ChangePassword =  // ChangePassword | 
 try {
-    val result : RequestStateLoginResponse = apiInstance.changePassword(changePassword)
+    val result : LoginResponse = apiInstance.changePassword(changePassword)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#changePassword")
@@ -168,7 +171,7 @@ try {
 
 ### Return type
 
-[**RequestStateLoginResponse**](RequestStateLoginResponse.md)
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 
@@ -183,7 +186,7 @@ Configure bearerAuth:
 
 <a id="changePasswordAfterReset"></a>
 # **changePasswordAfterReset**
-> RequestStateSuccessResponse changePasswordAfterReset(changePasswordAfterReset)
+> SuccessResponse changePasswordAfterReset(changePasswordAfterReset)
 
 Change your password from an email / token based reset.
 
@@ -196,7 +199,7 @@ Change your password from an email / token based reset.
 val apiInstance = AccountApi()
 val changePasswordAfterReset : ChangePasswordAfterReset =  // ChangePasswordAfterReset | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.changePasswordAfterReset(changePasswordAfterReset)
+    val result : SuccessResponse = apiInstance.changePasswordAfterReset(changePasswordAfterReset)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#changePasswordAfterReset")
@@ -214,7 +217,53 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a id="createRegistrationInvitation"></a>
+# **createRegistrationInvitation**
+> CreateInvitationResponse createRegistrationInvitation(createInvitation)
+
+Create a new registration invitation
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AccountApi()
+val createInvitation : CreateInvitation =  // CreateInvitation | 
+try {
+    val result : CreateInvitationResponse = apiInstance.createRegistrationInvitation(createInvitation)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AccountApi#createRegistrationInvitation")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AccountApi#createRegistrationInvitation")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **createInvitation** | [**CreateInvitation**](CreateInvitation.md)|  | |
+
+### Return type
+
+[**CreateInvitationResponse**](CreateInvitationResponse.md)
 
 ### Authorization
 
@@ -229,7 +278,7 @@ Configure bearerAuth:
 
 <a id="deleteAccount"></a>
 # **deleteAccount**
-> RequestStateSuccessResponse deleteAccount(deleteAccount)
+> SuccessResponse deleteAccount(deleteAccount)
 
 Delete your account.
 
@@ -242,7 +291,7 @@ Delete your account.
 val apiInstance = AccountApi()
 val deleteAccount : DeleteAccount =  // DeleteAccount | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteAccount(deleteAccount)
+    val result : SuccessResponse = apiInstance.deleteAccount(deleteAccount)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#deleteAccount")
@@ -260,7 +309,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -275,7 +324,7 @@ Configure bearerAuth:
 
 <a id="deleteMedia"></a>
 # **deleteMedia**
-> RequestStateSuccessResponse deleteMedia(deleteImageParamsI)
+> SuccessResponse deleteMedia(deleteImageParamsI)
 
 Delete media for your account.
 
@@ -288,7 +337,7 @@ Delete media for your account.
 val apiInstance = AccountApi()
 val deleteImageParamsI : DeleteImageParamsI =  // DeleteImageParamsI | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteMedia(deleteImageParamsI)
+    val result : SuccessResponse = apiInstance.deleteMedia(deleteImageParamsI)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#deleteMedia")
@@ -306,7 +355,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -321,7 +370,7 @@ Configure bearerAuth:
 
 <a id="deleteUserAvatar"></a>
 # **deleteUserAvatar**
-> RequestStateSuccessResponse deleteUserAvatar()
+> SuccessResponse deleteUserAvatar()
 
 Delete the user avatar.
 
@@ -333,7 +382,7 @@ Delete the user avatar.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteUserAvatar()
+    val result : SuccessResponse = apiInstance.deleteUserAvatar()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#deleteUserAvatar")
@@ -349,7 +398,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -364,7 +413,7 @@ Configure bearerAuth:
 
 <a id="deleteUserBanner"></a>
 # **deleteUserBanner**
-> RequestStateSuccessResponse deleteUserBanner()
+> SuccessResponse deleteUserBanner()
 
 Delete the user banner.
 
@@ -376,7 +425,7 @@ Delete the user banner.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteUserBanner()
+    val result : SuccessResponse = apiInstance.deleteUserBanner()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#deleteUserBanner")
@@ -392,7 +441,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -407,7 +456,7 @@ Configure bearerAuth:
 
 <a id="editTotp"></a>
 # **editTotp**
-> RequestStateEditTotpResponse editTotp(editTotp)
+> EditTotpResponse editTotp(editTotp)
 
 Enable / Disable TOTP / two-factor authentication.  To enable, you need to first call &#x60;/account/auth/totp/generate&#x60; and then pass a valid token to this.  Disabling is only possible if 2FA was previously enabled. Again it is necessary to pass a valid token.
 
@@ -420,7 +469,7 @@ Enable / Disable TOTP / two-factor authentication.  To enable, you need to first
 val apiInstance = AccountApi()
 val editTotp : EditTotp =  // EditTotp | 
 try {
-    val result : RequestStateEditTotpResponse = apiInstance.editTotp(editTotp)
+    val result : EditTotpResponse = apiInstance.editTotp(editTotp)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#editTotp")
@@ -438,7 +487,7 @@ try {
 
 ### Return type
 
-[**RequestStateEditTotpResponse**](RequestStateEditTotpResponse.md)
+[**EditTotpResponse**](EditTotpResponse.md)
 
 ### Authorization
 
@@ -453,7 +502,7 @@ Configure bearerAuth:
 
 <a id="exportUserSettings"></a>
 # **exportUserSettings**
-> RequestStateString exportUserSettings()
+> kotlin.String exportUserSettings()
 
 Export a backup of your user settings.  Export a backup of your user settings, including your saved content, followed communities, and blocks.
 
@@ -465,7 +514,7 @@ Export a backup of your user settings.  Export a backup of your user settings, i
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateString = apiInstance.exportUserSettings()
+    val result : kotlin.String = apiInstance.exportUserSettings()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#exportUserSettings")
@@ -481,7 +530,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateString**](RequestStateString.md)
+**kotlin.String**
 
 ### Authorization
 
@@ -496,7 +545,7 @@ Configure bearerAuth:
 
 <a id="generateTotpSecret"></a>
 # **generateTotpSecret**
-> RequestStateGenerateTotpSecretResponse generateTotpSecret()
+> GenerateTotpSecretResponse generateTotpSecret()
 
 Generate a TOTP / two-factor secret.  Generate a TOTP / two-factor secret. Afterwards you need to call &#x60;/account/auth/totp/edit&#x60; with a valid token to enable it.
 
@@ -508,7 +557,7 @@ Generate a TOTP / two-factor secret.  Generate a TOTP / two-factor secret. After
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateGenerateTotpSecretResponse = apiInstance.generateTotpSecret()
+    val result : GenerateTotpSecretResponse = apiInstance.generateTotpSecret()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#generateTotpSecret")
@@ -524,7 +573,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateGenerateTotpSecretResponse**](RequestStateGenerateTotpSecretResponse.md)
+[**GenerateTotpSecretResponse**](GenerateTotpSecretResponse.md)
 
 ### Authorization
 
@@ -539,7 +588,7 @@ Configure bearerAuth:
 
 <a id="getCaptcha"></a>
 # **getCaptcha**
-> RequestStateGetCaptchaResponse getCaptcha()
+> GetCaptchaResponse getCaptcha()
 
 Fetch a Captcha.
 
@@ -551,7 +600,7 @@ Fetch a Captcha.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateGetCaptchaResponse = apiInstance.getCaptcha()
+    val result : GetCaptchaResponse = apiInstance.getCaptcha()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#getCaptcha")
@@ -567,7 +616,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateGetCaptchaResponse**](RequestStateGetCaptchaResponse.md)
+[**GetCaptchaResponse**](GetCaptchaResponse.md)
 
 ### Authorization
 
@@ -580,7 +629,7 @@ No authorization required
 
 <a id="getMyUser"></a>
 # **getMyUser**
-> RequestStateMyUserInfo getMyUser()
+> MyUserInfo getMyUser()
 
 Get data of current user.
 
@@ -592,7 +641,7 @@ Get data of current user.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateMyUserInfo = apiInstance.getMyUser()
+    val result : MyUserInfo = apiInstance.getMyUser()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#getMyUser")
@@ -608,7 +657,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateMyUserInfo**](RequestStateMyUserInfo.md)
+[**MyUserInfo**](MyUserInfo.md)
 
 ### Authorization
 
@@ -623,7 +672,7 @@ Configure bearerAuth:
 
 <a id="getUnreadCounts"></a>
 # **getUnreadCounts**
-> RequestStateUnreadCountsResponse getUnreadCounts()
+> UnreadCountsResponse getUnreadCounts()
 
 Returns the amount of unread items of various types. For normal users this means * the number of unread notifications, mods and admins get additional unread counts for reports, registration applications and pending follows to private communities.
 
@@ -635,7 +684,7 @@ Returns the amount of unread items of various types. For normal users this means
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateUnreadCountsResponse = apiInstance.getUnreadCounts()
+    val result : UnreadCountsResponse = apiInstance.getUnreadCounts()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#getUnreadCounts")
@@ -651,7 +700,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateUnreadCountsResponse**](RequestStateUnreadCountsResponse.md)
+[**UnreadCountsResponse**](UnreadCountsResponse.md)
 
 ### Authorization
 
@@ -666,7 +715,7 @@ Configure bearerAuth:
 
 <a id="importUserSettings"></a>
 # **importUserSettings**
-> RequestStateSuccessResponse importUserSettings(userSettingsBackup)
+> SuccessResponse importUserSettings(userSettingsBackup)
 
 Import a backup of your user settings.
 
@@ -679,7 +728,7 @@ Import a backup of your user settings.
 val apiInstance = AccountApi()
 val userSettingsBackup : UserSettingsBackup =  // UserSettingsBackup | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.importUserSettings(userSettingsBackup)
+    val result : SuccessResponse = apiInstance.importUserSettings(userSettingsBackup)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#importUserSettings")
@@ -697,7 +746,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -712,7 +761,7 @@ Configure bearerAuth:
 
 <a id="listLogins"></a>
 # **listLogins**
-> RequestStateListLoginsResponse listLogins()
+> ListLoginsResponse listLogins()
 
 List login tokens for your user
 
@@ -724,7 +773,7 @@ List login tokens for your user
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateListLoginsResponse = apiInstance.listLogins()
+    val result : ListLoginsResponse = apiInstance.listLogins()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listLogins")
@@ -740,7 +789,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateListLoginsResponse**](RequestStateListLoginsResponse.md)
+[**ListLoginsResponse**](ListLoginsResponse.md)
 
 ### Authorization
 
@@ -755,7 +804,7 @@ Configure bearerAuth:
 
 <a id="listMedia"></a>
 # **listMedia**
-> RequestStatePagedResponseLocalImageView listMedia(limit, pageCursor)
+> PagedResponseLocalImageView listMedia(limit, pageCursor)
 
 List all the media for your account.
 
@@ -769,7 +818,7 @@ val apiInstance = AccountApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseLocalImageView = apiInstance.listMedia(limit, pageCursor)
+    val result : PagedResponseLocalImageView = apiInstance.listMedia(limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listMedia")
@@ -788,7 +837,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseLocalImageView**](RequestStatePagedResponseLocalImageView.md)
+[**PagedResponseLocalImageView**](PagedResponseLocalImageView.md)
 
 ### Authorization
 
@@ -803,7 +852,7 @@ Configure bearerAuth:
 
 <a id="listNotifications"></a>
 # **listNotifications**
-> RequestStatePagedResponseNotificationView listNotifications(limit, pageCursor, creatorId, unreadOnly, type)
+> PagedResponseNotificationView listNotifications(limit, pageCursor, creatorId, unreadOnly, type)
 
 Get your inbox (replies, comment mentions, post mentions, and messages)
 
@@ -820,7 +869,7 @@ val creatorId : kotlin.Double = 1.2 // kotlin.Double |
 val unreadOnly : kotlin.Boolean = true // kotlin.Boolean | 
 val type : NotificationTypeFilter =  // NotificationTypeFilter | 
 try {
-    val result : RequestStatePagedResponseNotificationView = apiInstance.listNotifications(limit, pageCursor, creatorId, unreadOnly, type)
+    val result : PagedResponseNotificationView = apiInstance.listNotifications(limit, pageCursor, creatorId, unreadOnly, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listNotifications")
@@ -842,7 +891,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseNotificationView**](RequestStatePagedResponseNotificationView.md)
+[**PagedResponseNotificationView**](PagedResponseNotificationView.md)
 
 ### Authorization
 
@@ -857,7 +906,7 @@ Configure bearerAuth:
 
 <a id="listPersonHidden"></a>
 # **listPersonHidden**
-> RequestStatePagedResponsePostView listPersonHidden(limit, pageCursor)
+> PagedResponsePostView listPersonHidden(limit, pageCursor)
 
 List your hidden content.
 
@@ -871,7 +920,7 @@ val apiInstance = AccountApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponsePostView = apiInstance.listPersonHidden(limit, pageCursor)
+    val result : PagedResponsePostView = apiInstance.listPersonHidden(limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listPersonHidden")
@@ -890,7 +939,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePostView**](RequestStatePagedResponsePostView.md)
+[**PagedResponsePostView**](PagedResponsePostView.md)
 
 ### Authorization
 
@@ -905,7 +954,7 @@ Configure bearerAuth:
 
 <a id="listPersonLiked"></a>
 # **listPersonLiked**
-> RequestStatePagedResponsePostCommentCombinedView listPersonLiked(limit, pageCursor, likeType, type)
+> PagedResponsePostCommentCombinedView listPersonLiked(limit, pageCursor, likeType, type)
 
 List your liked content.
 
@@ -921,7 +970,7 @@ val pageCursor : kotlin.String = pageCursor_example // kotlin.String |
 val likeType : LikeType =  // LikeType | 
 val type : PersonContentType =  // PersonContentType | 
 try {
-    val result : RequestStatePagedResponsePostCommentCombinedView = apiInstance.listPersonLiked(limit, pageCursor, likeType, type)
+    val result : PagedResponsePostCommentCombinedView = apiInstance.listPersonLiked(limit, pageCursor, likeType, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listPersonLiked")
@@ -942,7 +991,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePostCommentCombinedView**](RequestStatePagedResponsePostCommentCombinedView.md)
+[**PagedResponsePostCommentCombinedView**](PagedResponsePostCommentCombinedView.md)
 
 ### Authorization
 
@@ -957,7 +1006,7 @@ Configure bearerAuth:
 
 <a id="listPersonRead"></a>
 # **listPersonRead**
-> RequestStatePagedResponsePostView listPersonRead(limit, pageCursor)
+> PagedResponsePostView listPersonRead(limit, pageCursor)
 
 List your read content.
 
@@ -971,7 +1020,7 @@ val apiInstance = AccountApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponsePostView = apiInstance.listPersonRead(limit, pageCursor)
+    val result : PagedResponsePostView = apiInstance.listPersonRead(limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listPersonRead")
@@ -990,7 +1039,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponsePostView**](RequestStatePagedResponsePostView.md)
+[**PagedResponsePostView**](PagedResponsePostView.md)
 
 ### Authorization
 
@@ -1005,7 +1054,7 @@ Configure bearerAuth:
 
 <a id="listPersonSaved"></a>
 # **listPersonSaved**
-> RequestStatePagedResponsePostCommentCombinedView listPersonSaved(limit, pageCursor, type)
+> PagedResponsePostCommentCombinedView listPersonSaved(limit, pageCursor, searchTerm, type)
 
 List your saved content.
 
@@ -1018,9 +1067,10 @@ List your saved content.
 val apiInstance = AccountApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+val searchTerm : kotlin.String = searchTerm_example // kotlin.String | 
 val type : PersonContentType =  // PersonContentType | 
 try {
-    val result : RequestStatePagedResponsePostCommentCombinedView = apiInstance.listPersonSaved(limit, pageCursor, type)
+    val result : PagedResponsePostCommentCombinedView = apiInstance.listPersonSaved(limit, pageCursor, searchTerm, type)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#listPersonSaved")
@@ -1034,13 +1084,62 @@ try {
 ### Parameters
 | **limit** | **kotlin.Double**|  | [optional] |
 | **pageCursor** | **kotlin.String**|  | [optional] |
+| **searchTerm** | **kotlin.String**|  | [optional] |
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
 | **type** | [**PersonContentType**](.md)|  | [optional] [enum: all, comments, posts] |
 
 ### Return type
 
-[**RequestStatePagedResponsePostCommentCombinedView**](RequestStatePagedResponsePostCommentCombinedView.md)
+[**PagedResponsePostCommentCombinedView**](PagedResponsePostCommentCombinedView.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+<a id="listRegistrationInvitations"></a>
+# **listRegistrationInvitations**
+> PagedResponseLocalUserInvite listRegistrationInvitations(limit, pageCursor)
+
+Revoke a previously created registration invitation
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AccountApi()
+val limit : kotlin.Double = 1.2 // kotlin.Double | 
+val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+try {
+    val result : PagedResponseLocalUserInvite = apiInstance.listRegistrationInvitations(limit, pageCursor)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AccountApi#listRegistrationInvitations")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AccountApi#listRegistrationInvitations")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| **limit** | **kotlin.Double**|  | [optional] |
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **pageCursor** | **kotlin.String**|  | [optional] |
+
+### Return type
+
+[**PagedResponseLocalUserInvite**](PagedResponseLocalUserInvite.md)
 
 ### Authorization
 
@@ -1055,7 +1154,7 @@ Configure bearerAuth:
 
 <a id="login"></a>
 # **login**
-> RequestStateLoginResponse login(login)
+> LoginResponse login(login)
 
 Log into lemmy.
 
@@ -1068,7 +1167,7 @@ Log into lemmy.
 val apiInstance = AccountApi()
 val login : Login =  // Login | 
 try {
-    val result : RequestStateLoginResponse = apiInstance.login(login)
+    val result : LoginResponse = apiInstance.login(login)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#login")
@@ -1086,7 +1185,7 @@ try {
 
 ### Return type
 
-[**RequestStateLoginResponse**](RequestStateLoginResponse.md)
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 
@@ -1099,7 +1198,7 @@ No authorization required
 
 <a id="logout"></a>
 # **logout**
-> RequestStateSuccessResponse logout()
+> SuccessResponse logout()
 
 Invalidate the currently used auth token.
 
@@ -1111,7 +1210,7 @@ Invalidate the currently used auth token.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.logout()
+    val result : SuccessResponse = apiInstance.logout()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#logout")
@@ -1127,7 +1226,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1142,7 +1241,7 @@ Configure bearerAuth:
 
 <a id="markAllNotificationsAsRead"></a>
 # **markAllNotificationsAsRead**
-> RequestStateSuccessResponse markAllNotificationsAsRead()
+> SuccessResponse markAllNotificationsAsRead()
 
 Mark all notifications as read.
 
@@ -1154,7 +1253,7 @@ Mark all notifications as read.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.markAllNotificationsAsRead()
+    val result : SuccessResponse = apiInstance.markAllNotificationsAsRead()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#markAllNotificationsAsRead")
@@ -1170,7 +1269,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1185,7 +1284,7 @@ Configure bearerAuth:
 
 <a id="markDonationDialogShown"></a>
 # **markDonationDialogShown**
-> RequestStateSuccessResponse markDonationDialogShown()
+> SuccessResponse markDonationDialogShown()
 
 
 
@@ -1199,7 +1298,7 @@ Mark the donation dialog as shown, so it isn&#39;t displayed anymore.
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.markDonationDialogShown()
+    val result : SuccessResponse = apiInstance.markDonationDialogShown()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#markDonationDialogShown")
@@ -1215,7 +1314,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1230,7 +1329,7 @@ Configure bearerAuth:
 
 <a id="markNotificationAsRead"></a>
 # **markNotificationAsRead**
-> RequestStateSuccessResponse markNotificationAsRead(markNotificationAsRead)
+> SuccessResponse markNotificationAsRead(markNotificationAsRead)
 
 Mark a notification as read.
 
@@ -1243,7 +1342,7 @@ Mark a notification as read.
 val apiInstance = AccountApi()
 val markNotificationAsRead : MarkNotificationAsRead =  // MarkNotificationAsRead | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.markNotificationAsRead(markNotificationAsRead)
+    val result : SuccessResponse = apiInstance.markNotificationAsRead(markNotificationAsRead)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#markNotificationAsRead")
@@ -1261,7 +1360,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1276,7 +1375,7 @@ Configure bearerAuth:
 
 <a id="register"></a>
 # **register**
-> RequestStateLoginResponse register(register)
+> LoginResponse register(register)
 
 Register a new user.
 
@@ -1289,7 +1388,7 @@ Register a new user.
 val apiInstance = AccountApi()
 val register : Register =  // Register | 
 try {
-    val result : RequestStateLoginResponse = apiInstance.register(register)
+    val result : LoginResponse = apiInstance.register(register)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#register")
@@ -1307,7 +1406,7 @@ try {
 
 ### Return type
 
-[**RequestStateLoginResponse**](RequestStateLoginResponse.md)
+[**LoginResponse**](LoginResponse.md)
 
 ### Authorization
 
@@ -1320,7 +1419,7 @@ No authorization required
 
 <a id="resendVerificationEmail"></a>
 # **resendVerificationEmail**
-> RequestStateSuccessResponse resendVerificationEmail(resendVerificationEmail)
+> SuccessResponse resendVerificationEmail(resendVerificationEmail)
 
 Resend a verification email.
 
@@ -1333,7 +1432,7 @@ Resend a verification email.
 val apiInstance = AccountApi()
 val resendVerificationEmail : ResendVerificationEmail =  // ResendVerificationEmail | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.resendVerificationEmail(resendVerificationEmail)
+    val result : SuccessResponse = apiInstance.resendVerificationEmail(resendVerificationEmail)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#resendVerificationEmail")
@@ -1351,7 +1450,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1364,7 +1463,7 @@ No authorization required
 
 <a id="resetPassword"></a>
 # **resetPassword**
-> RequestStateSuccessResponse resetPassword(resetPassword)
+> SuccessResponse resetPassword(resetPassword)
 
 Reset your password.
 
@@ -1377,7 +1476,7 @@ Reset your password.
 val apiInstance = AccountApi()
 val resetPassword : ResetPassword =  // ResetPassword | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.resetPassword(resetPassword)
+    val result : SuccessResponse = apiInstance.resetPassword(resetPassword)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#resetPassword")
@@ -1395,7 +1494,53 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a id="revokeRegistrationInvitation"></a>
+# **revokeRegistrationInvitation**
+> SuccessResponse revokeRegistrationInvitation(revokeInvitation)
+
+Revoke a previously created registration invitation
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AccountApi()
+val revokeInvitation : RevokeInvitation =  // RevokeInvitation | 
+try {
+    val result : SuccessResponse = apiInstance.revokeRegistrationInvitation(revokeInvitation)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AccountApi#revokeRegistrationInvitation")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AccountApi#revokeRegistrationInvitation")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **revokeInvitation** | [**RevokeInvitation**](RevokeInvitation.md)|  | |
+
+### Return type
+
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1410,7 +1555,7 @@ Configure bearerAuth:
 
 <a id="saveUserSettings"></a>
 # **saveUserSettings**
-> RequestStateSuccessResponse saveUserSettings(saveUserSettings)
+> SuccessResponse saveUserSettings(saveUserSettings)
 
 Save your user settings.
 
@@ -1423,7 +1568,7 @@ Save your user settings.
 val apiInstance = AccountApi()
 val saveUserSettings : SaveUserSettings =  // SaveUserSettings | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.saveUserSettings(saveUserSettings)
+    val result : SuccessResponse = apiInstance.saveUserSettings(saveUserSettings)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#saveUserSettings")
@@ -1441,7 +1586,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1456,7 +1601,7 @@ Configure bearerAuth:
 
 <a id="uploadUserAvatar"></a>
 # **uploadUserAvatar**
-> RequestStateUploadImageResponse uploadUserAvatar(image)
+> UploadImageResponse uploadUserAvatar(image)
 
 Upload new user avatar.
 
@@ -1469,7 +1614,7 @@ Upload new user avatar.
 val apiInstance = AccountApi()
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadUserAvatar(image)
+    val result : UploadImageResponse = apiInstance.uploadUserAvatar(image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#uploadUserAvatar")
@@ -1487,7 +1632,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 
@@ -1502,7 +1647,7 @@ Configure bearerAuth:
 
 <a id="uploadUserBanner"></a>
 # **uploadUserBanner**
-> RequestStateUploadImageResponse uploadUserBanner(image)
+> UploadImageResponse uploadUserBanner(image)
 
 Upload new user banner.
 
@@ -1515,7 +1660,7 @@ Upload new user banner.
 val apiInstance = AccountApi()
 val image : java.io.File = BINARY_DATA_HERE // java.io.File | 
 try {
-    val result : RequestStateUploadImageResponse = apiInstance.uploadUserBanner(image)
+    val result : UploadImageResponse = apiInstance.uploadUserBanner(image)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#uploadUserBanner")
@@ -1533,7 +1678,7 @@ try {
 
 ### Return type
 
-[**RequestStateUploadImageResponse**](RequestStateUploadImageResponse.md)
+[**UploadImageResponse**](UploadImageResponse.md)
 
 ### Authorization
 
@@ -1548,7 +1693,7 @@ Configure bearerAuth:
 
 <a id="userBlockInstanceCommunities"></a>
 # **userBlockInstanceCommunities**
-> RequestStateSuccessResponse userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
+> SuccessResponse userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
 
 Block an instance&#39;s communities as a user.
 
@@ -1561,7 +1706,7 @@ Block an instance&#39;s communities as a user.
 val apiInstance = AccountApi()
 val userBlockInstanceCommunitiesParams : UserBlockInstanceCommunitiesParams =  // UserBlockInstanceCommunitiesParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
+    val result : SuccessResponse = apiInstance.userBlockInstanceCommunities(userBlockInstanceCommunitiesParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#userBlockInstanceCommunities")
@@ -1579,7 +1724,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1594,7 +1739,7 @@ Configure bearerAuth:
 
 <a id="userBlockInstancePersons"></a>
 # **userBlockInstancePersons**
-> RequestStateSuccessResponse userBlockInstancePersons(userBlockInstancePersonsParams)
+> SuccessResponse userBlockInstancePersons(userBlockInstancePersonsParams)
 
 Block an instance&#39;s persons as a user.
 
@@ -1607,7 +1752,7 @@ Block an instance&#39;s persons as a user.
 val apiInstance = AccountApi()
 val userBlockInstancePersonsParams : UserBlockInstancePersonsParams =  // UserBlockInstancePersonsParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.userBlockInstancePersons(userBlockInstancePersonsParams)
+    val result : SuccessResponse = apiInstance.userBlockInstancePersons(userBlockInstancePersonsParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#userBlockInstancePersons")
@@ -1625,7 +1770,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1640,7 +1785,7 @@ Configure bearerAuth:
 
 <a id="validateAuth"></a>
 # **validateAuth**
-> RequestStateSuccessResponse validateAuth()
+> SuccessResponse validateAuth()
 
 Returns an error message if your auth token is invalid
 
@@ -1652,7 +1797,7 @@ Returns an error message if your auth token is invalid
 
 val apiInstance = AccountApi()
 try {
-    val result : RequestStateSuccessResponse = apiInstance.validateAuth()
+    val result : SuccessResponse = apiInstance.validateAuth()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#validateAuth")
@@ -1668,7 +1813,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1683,7 +1828,7 @@ Configure bearerAuth:
 
 <a id="verifyEmail"></a>
 # **verifyEmail**
-> RequestStateSuccessResponse verifyEmail(verifyEmail)
+> SuccessResponse verifyEmail(verifyEmail)
 
 Verify your email
 
@@ -1696,7 +1841,7 @@ Verify your email
 val apiInstance = AccountApi()
 val verifyEmail : VerifyEmail =  // VerifyEmail | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.verifyEmail(verifyEmail)
+    val result : SuccessResponse = apiInstance.verifyEmail(verifyEmail)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AccountApi#verifyEmail")
@@ -1714,7 +1859,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 

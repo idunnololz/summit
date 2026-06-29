@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName
  * @param passwordVerify 
  * @param password 
  * @param username 
+ * @param token Invitation token
  * @param stayLoggedIn If this is true the login is valid forever, otherwise it expires after one week.
  * @param answer An answer is mandatory if require application is enabled on the server
  * @param honeypot A form field to trick signup bots. Should be None.
@@ -44,6 +45,10 @@ data class Register (
 
     @SerializedName("username")
     val username: kotlin.String,
+
+    /* Invitation token */
+    @SerializedName("token")
+    val token: kotlin.String? = null,
 
     /* If this is true the login is valid forever, otherwise it expires after one week. */
     @SerializedName("stay_logged_in")

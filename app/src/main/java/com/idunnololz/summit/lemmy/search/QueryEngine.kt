@@ -486,9 +486,7 @@ class QueryEngine(
           val result: QueryResultsPage? = when (type) {
             SearchType.All ->
               AllResultsPage(
-                it.items.also {
-                  Log.d("HAHA", "items: ${it.size}")
-                },
+                it.items,
                 pageIndex,
                 it.hasMore,
               )

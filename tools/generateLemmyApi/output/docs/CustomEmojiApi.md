@@ -12,7 +12,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="createCustomEmoji"></a>
 # **createCustomEmoji**
-> RequestStateCustomEmojiResponse createCustomEmoji(createCustomEmoji)
+> CustomEmojiResponse createCustomEmoji(createCustomEmoji)
 
 Create a new custom emoji.
 
@@ -25,7 +25,7 @@ Create a new custom emoji.
 val apiInstance = CustomEmojiApi()
 val createCustomEmoji : CreateCustomEmoji =  // CreateCustomEmoji | 
 try {
-    val result : RequestStateCustomEmojiResponse = apiInstance.createCustomEmoji(createCustomEmoji)
+    val result : CustomEmojiResponse = apiInstance.createCustomEmoji(createCustomEmoji)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CustomEmojiApi#createCustomEmoji")
@@ -43,7 +43,7 @@ try {
 
 ### Return type
 
-[**RequestStateCustomEmojiResponse**](RequestStateCustomEmojiResponse.md)
+[**CustomEmojiResponse**](CustomEmojiResponse.md)
 
 ### Authorization
 
@@ -58,7 +58,7 @@ Configure bearerAuth:
 
 <a id="deleteCustomEmoji"></a>
 # **deleteCustomEmoji**
-> RequestStateSuccessResponse deleteCustomEmoji(deleteCustomEmoji)
+> SuccessResponse deleteCustomEmoji(deleteCustomEmoji)
 
 Delete a custom emoji.
 
@@ -71,7 +71,7 @@ Delete a custom emoji.
 val apiInstance = CustomEmojiApi()
 val deleteCustomEmoji : DeleteCustomEmoji =  // DeleteCustomEmoji | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteCustomEmoji(deleteCustomEmoji)
+    val result : SuccessResponse = apiInstance.deleteCustomEmoji(deleteCustomEmoji)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CustomEmojiApi#deleteCustomEmoji")
@@ -89,7 +89,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -104,7 +104,7 @@ Configure bearerAuth:
 
 <a id="editCustomEmoji"></a>
 # **editCustomEmoji**
-> RequestStateCustomEmojiResponse editCustomEmoji(editCustomEmoji)
+> CustomEmojiResponse editCustomEmoji(editCustomEmoji)
 
 Edit an existing custom emoji.
 
@@ -117,7 +117,7 @@ Edit an existing custom emoji.
 val apiInstance = CustomEmojiApi()
 val editCustomEmoji : EditCustomEmoji =  // EditCustomEmoji | 
 try {
-    val result : RequestStateCustomEmojiResponse = apiInstance.editCustomEmoji(editCustomEmoji)
+    val result : CustomEmojiResponse = apiInstance.editCustomEmoji(editCustomEmoji)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CustomEmojiApi#editCustomEmoji")
@@ -135,7 +135,7 @@ try {
 
 ### Return type
 
-[**RequestStateCustomEmojiResponse**](RequestStateCustomEmojiResponse.md)
+[**CustomEmojiResponse**](CustomEmojiResponse.md)
 
 ### Authorization
 
@@ -150,7 +150,7 @@ Configure bearerAuth:
 
 <a id="listCustomEmojis"></a>
 # **listCustomEmojis**
-> RequestStateListCustomEmojisResponse listCustomEmojis(category)
+> ListCustomEmojisResponse listCustomEmojis(category)
 
 List custom emojis
 
@@ -163,7 +163,7 @@ List custom emojis
 val apiInstance = CustomEmojiApi()
 val category : kotlin.String = category_example // kotlin.String | 
 try {
-    val result : RequestStateListCustomEmojisResponse = apiInstance.listCustomEmojis(category)
+    val result : ListCustomEmojisResponse = apiInstance.listCustomEmojis(category)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CustomEmojiApi#listCustomEmojis")
@@ -181,7 +181,7 @@ try {
 
 ### Return type
 
-[**RequestStateListCustomEmojisResponse**](RequestStateListCustomEmojisResponse.md)
+[**ListCustomEmojisResponse**](ListCustomEmojisResponse.md)
 
 ### Authorization
 

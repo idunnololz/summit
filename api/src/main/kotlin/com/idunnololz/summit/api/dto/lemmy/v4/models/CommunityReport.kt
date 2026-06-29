@@ -24,7 +24,6 @@ import com.google.gson.annotations.SerializedName
  * @param publishedAt 
  * @param resolved 
  * @param reason 
- * @param originalCommunityTitle 
  * @param originalCommunityName 
  * @param communityId The community id.
  * @param creatorId The person id.
@@ -35,6 +34,7 @@ import com.google.gson.annotations.SerializedName
  * @param originalCommunityIcon 
  * @param originalCommunitySidebar 
  * @param originalCommunitySummary 
+ * @param originalCommunityTitle 
  */
 
 
@@ -48,9 +48,6 @@ data class CommunityReport (
 
     @SerializedName("reason")
     val reason: kotlin.String,
-
-    @SerializedName("original_community_title")
-    val originalCommunityTitle: kotlin.String,
 
     @SerializedName("original_community_name")
     val originalCommunityName: kotlin.String,
@@ -84,7 +81,10 @@ data class CommunityReport (
     val originalCommunitySidebar: kotlin.String? = null,
 
     @SerializedName("original_community_summary")
-    val originalCommunitySummary: kotlin.String? = null
+    val originalCommunitySummary: kotlin.String? = null,
+
+    @SerializedName("original_community_title")
+    val originalCommunityTitle: kotlin.String? = null
 
 ) {
 

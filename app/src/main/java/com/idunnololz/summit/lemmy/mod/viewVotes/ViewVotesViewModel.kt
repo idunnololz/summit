@@ -73,13 +73,13 @@ class ViewVotesViewModel @Inject constructor(
     loadPage(nextPage)
   }
 
-  fun loadPage(page: Int) {
+  fun loadPage(page: Int, force: Boolean = false) {
     val votesRepository = votesRepository ?: return
 
     votesModel.setIsLoading()
 
     loadingJob = viewModelScope.launch {
-      val result = votesRepository.getPage(page, force = false)
+      val result = votesRepository.getPage(page, force = force)
 
       ensureActive()
 
@@ -99,8 +99,8 @@ class ViewVotesViewModel @Inject constructor(
     }
   }
 
-  fun resetAndLoad() {
+  fun resetAndLoad(force: Boolean) {
     reset()
-    loadPage(0)
+    loadPage(0, force = force)
   }
 }

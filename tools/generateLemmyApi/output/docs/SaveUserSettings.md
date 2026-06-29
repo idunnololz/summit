@@ -5,7 +5,7 @@
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
 | **showPersonVotes** | **kotlin.Boolean** | Whether to show vote totals given to others. |  [optional] |
-| **hideMedia** | **kotlin.Boolean** | Whether to hide posts containing images/videos. |  [optional] |
+| **hidePostsWithMedia** | **kotlin.Boolean** | Whether to hide posts containing images/videos. Often labeled hide_memes. |  [optional] |
 | **autoMarkFetchedPostsAsRead** | **kotlin.Boolean** | Whether to automatically mark fetched posts as read. |  [optional] |
 | **showUpvotePercentage** | **kotlin.Boolean** |  |  [optional] |
 | **showDownvotes** | [**VoteShow**](VoteShow.md) |  |  [optional] |
@@ -22,6 +22,7 @@
 | **showBotAccounts** | **kotlin.Boolean** | Whether to show bot accounts. |  [optional] |
 | **botAccount** | **kotlin.Boolean** | Whether this account is a bot account. Users can hide these accounts easily if they wish. |  [optional] |
 | **sendNotificationsToEmail** | **kotlin.Boolean** | Sends notifications to your email. |  [optional] |
+| **showMedia** | **kotlin.Boolean** | Whether to show media in the UI. |  [optional] |
 | **showAvatars** | **kotlin.Boolean** | Whether to show or hide avatars. |  [optional] |
 | **matrixUserId** | **kotlin.String** | Your matrix user id. Ex: |  [optional] |
 | **bio** | **kotlin.String** | Your bio / info, in markdown. |  [optional] |

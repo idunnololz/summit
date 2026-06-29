@@ -53,22 +53,22 @@ data class CommentReport (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double,
+    val commentId: Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: Long,
 
     /* The comment report id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("resolver_id")
-    val resolverId: kotlin.Double? = null
+    val resolverId: Long? = null
 
 ) {
 

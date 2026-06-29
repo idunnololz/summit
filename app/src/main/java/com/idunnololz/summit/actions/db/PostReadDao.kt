@@ -8,7 +8,7 @@ import com.idunnololz.summit.actions.PostReadManager.Companion.MAX_READ_POST_LIM
 
 @Dao
 interface PostReadDao {
-  @Query("SELECT * FROM read_posts LIMIT $MAX_READ_POST_LIMIT")
+  @Query("SELECT * FROM read_posts ORDER BY read_ts DESC LIMIT $MAX_READ_POST_LIMIT")
   suspend fun getAll(): List<ReadPostEntry>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE, entity = ReadPostEntry::class)

@@ -6,12 +6,13 @@
 | ------------ | ------------- | ------------- | ------------- |
 | **limit** | **kotlin.Double** |  |  [optional] |
 | **pageCursor** | **kotlin.String** | To get the next or previous page, pass this string unchanged as &#x60;page_cursor&#x60; in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. |  [optional] |
+| **tagId** | **kotlin.Double** | The community tag id |  [optional] |
 | **searchUrlOnly** | **kotlin.Boolean** |  |  [optional] |
 | **searchTitleOnly** | **kotlin.Boolean** |  |  [optional] |
 | **searchTerm** | **kotlin.String** |  |  [optional] |
 | **noCommentsOnly** | **kotlin.Boolean** | If true, then only show posts with no comments |  [optional] |
 | **markAsRead** | **kotlin.Boolean** | Whether to automatically mark fetched posts as read. |  [optional] |
-| **hideMedia** | **kotlin.Boolean** | If false, then show posts with media attached (even if your user setting is to hide them) |  [optional] |
+| **hidePostsWithMedia** | **kotlin.Boolean** | If false, then show posts with media attached (even if your user setting is to hide them) |  [optional] |
 | **showNsfw** | **kotlin.Boolean** | If true, then show the nsfw posts (even if your user setting is to hide them) |  [optional] |
 | **showRead** | **kotlin.Boolean** | If true, then show the read posts (even if your user setting is to hide them) |  [optional] |
 | **showHidden** | **kotlin.Boolean** |  |  [optional] |

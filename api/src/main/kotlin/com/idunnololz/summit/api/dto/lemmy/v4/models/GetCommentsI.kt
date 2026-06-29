@@ -46,39 +46,39 @@ data class GetCommentsI (
 
     /* The comment id. */
     @SerializedName("parent_id")
-    val parentId: kotlin.Int? = null,
+    val parentId: Int? = null,
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+    val postId: Int? = null,
 
     @SerializedName("creator_username")
     val creatorUsername: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Int? = null,
+    val creatorId: Int? = null,
 
     @SerializedName("community_name")
     val communityName: kotlin.String? = null,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+    val communityId: Int? = null,
 
     @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+    val limit: Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
     val pageCursor: kotlin.String? = null,
 
     @SerializedName("max_depth")
-    val maxDepth: kotlin.Int? = null,
+    val maxDepth: Int? = null,
 
     /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
     @SerializedName("time_range_seconds")
-    val timeRangeSeconds: kotlin.Int? = null,
+    val timeRangeSeconds: Int? = null,
 
     @SerializedName("sort")
     val sort: CommentSortType? = null,

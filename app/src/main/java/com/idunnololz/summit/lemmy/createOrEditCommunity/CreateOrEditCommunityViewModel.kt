@@ -190,7 +190,7 @@ class CreateOrEditCommunityViewModel @Inject constructor(
       val result = apiClient.createCommunity(
         CreateCommunity(
           name = curCommunity.name,
-          title = curCommunity.title,
+          title = curCommunity.title ?: "",
           description = curCommunity.description,
           icon = curCommunity.icon,
           banner = curCommunity.banner,

@@ -30,7 +30,7 @@ import com.google.gson.annotations.SerializedName
 data class CommunityResponse (
 
     @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>,
+    val discussionLanguages: kotlin.collections.List<Int>,
 
     @SerializedName("community_view")
     val communityView: CommunityView

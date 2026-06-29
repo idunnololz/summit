@@ -17,6 +17,7 @@ package com.idunnololz.summit.api.dto.lemmy.v4.models
 
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityActions
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityTag
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post
@@ -28,6 +29,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * A post report view.
  *
+ * @param tags We wrap this in a struct so we can implement FromSqlRow<Json> for it
  * @param creatorBannedFromCommunity 
  * @param creatorBanned 
  * @param creatorIsModerator 
@@ -47,6 +49,10 @@ import com.google.gson.annotations.SerializedName
 
 
 data class PostReportView (
+
+    /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
+    @SerializedName("tags")
+    val tags: kotlin.collections.List<CommunityTag>,
 
     @SerializedName("creator_banned_from_community")
     val creatorBannedFromCommunity: kotlin.Boolean,

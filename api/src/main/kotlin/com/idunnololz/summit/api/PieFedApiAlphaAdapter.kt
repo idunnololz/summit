@@ -258,7 +258,7 @@ class PieFedApiAlphaAdapter(
   ): Result<GetPostsResponse> = retrofitErrorHandler {
     api.getPosts(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
     .map {
@@ -339,7 +339,11 @@ class PieFedApiAlphaAdapter(
     args: ListCommentLikes,
     force: Boolean,
   ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
-    api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap())
+    api.listCommentVotes(
+      headers = generateHeaders(authorization, force),
+      // piefed is copying lemmy's page index scheme
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun listPostVotes(
@@ -347,7 +351,11 @@ class PieFedApiAlphaAdapter(
     args: ListPostLikes,
     force: Boolean,
   ): Result<ListPostLikesResponse> = retrofitErrorHandler {
-    api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap())
+    api.listPostVotes(
+      headers = generateHeaders(authorization, force),
+      // piefed is copying lemmy's page index scheme
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }
 
   override suspend fun createComment(
@@ -1025,7 +1033,10 @@ class PieFedApiAlphaAdapter(
     args: GetModlog,
     force: Boolean,
   ): Result<GetModlogResponse> = retrofitErrorHandler {
-    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+    api.getModLogs(
+      generateHeaders(authorization, force),
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
   }.map {
     GetModlogResponse(
       removed_posts = it.removedPosts.mapNotNull { it.toModRemovePostView() },
@@ -1065,7 +1076,7 @@ class PieFedApiAlphaAdapter(
   ): Result<ListMediaResponse> = retrofitErrorHandler {
     api.listMedia(
       generateHeaders(authorization, force),
-      args.serializeToMap(),
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 

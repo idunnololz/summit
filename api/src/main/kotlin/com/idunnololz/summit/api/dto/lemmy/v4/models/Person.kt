@@ -79,7 +79,7 @@ data class Person (
 
     /* The person id. */
     @SerializedName("id")
-    val id: kotlin.Long,
+    val id: Long,
 
     /* A matrix id, usually given an */
     @SerializedName("matrix_user_id")

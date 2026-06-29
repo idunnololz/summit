@@ -564,7 +564,7 @@ class LemmyApiClient @Inject constructor(
 
   suspend fun listCommentVotesWithRetry(
     commentId: Int,
-    page: Long = 1,
+    page: Long = 0,
     limit: Long = 20,
     force: Boolean = false,
     account: Account,
@@ -582,7 +582,7 @@ class LemmyApiClient @Inject constructor(
 
   suspend fun listPostVotesWithRetry(
     postId: Int,
-    page: Long = 1,
+    page: Long = 0,
     limit: Long = 20,
     force: Boolean = false,
     account: Account,
@@ -1411,7 +1411,6 @@ class LemmyApiClient @Inject constructor(
       other_person_id = otherPersonId,
       post_id = post_id,
       comment_id = comment_id,
-
     )
 
     return onApiClient {

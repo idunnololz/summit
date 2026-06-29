@@ -4,6 +4,7 @@
 ## Properties
 | Name | Type | Description | Notes |
 | ------------ | ------------- | ------------- | ------------- |
+| **tags** | [**kotlin.collections.List&lt;CommunityTag&gt;**](CommunityTag.md) | We wrap this in a struct so we can implement FromSqlRow&lt;Json&gt; for it |  |
 | **creatorBannedFromCommunity** | **kotlin.Boolean** |  |  |
 | **creatorBanned** | **kotlin.Boolean** |  |  |
 | **creatorIsModerator** | **kotlin.Boolean** |  |  |

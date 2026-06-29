@@ -43,7 +43,6 @@ import com.google.gson.annotations.SerializedName
  * @param deleted Whether the community has been deleted by its creator.
  * @param publishedAt 
  * @param removed Whether the community is removed by a mod.
- * @param title A longer title, that can contain other characters, and doesn't have to be unique.
  * @param name 
  * @param id The community id.
  * @param summary A shorter, one-line summary.
@@ -51,6 +50,7 @@ import com.google.gson.annotations.SerializedName
  * @param icon 
  * @param updatedAt 
  * @param sidebar A sidebar for the community in markdown.
+ * @param title A longer title, that can contain other characters, and doesn't have to be unique.
  */
 
 
@@ -129,10 +129,6 @@ data class Community (
     @SerializedName("removed")
     val removed: kotlin.Boolean,
 
-    /* A longer title, that can contain other characters, and doesn't have to be unique. */
-    @SerializedName("title")
-    val title: kotlin.String,
-
     @SerializedName("name")
     val name: kotlin.String,
 
@@ -155,7 +151,11 @@ data class Community (
 
     /* A sidebar for the community in markdown. */
     @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null
+    val sidebar: kotlin.String? = null,
+
+    /* A longer title, that can contain other characters, and doesn't have to be unique. */
+    @SerializedName("title")
+    val title: kotlin.String? = null
 
 ) {
 

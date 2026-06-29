@@ -29,6 +29,7 @@ import com.google.gson.annotations.SerializedName
  * Creates a site. Should be done after first running lemmy.
  *
  * @param name 
+ * @param maxInvitesPerUserAllowed 
  * @param imageUploadDisabled 
  * @param imageAllowVideoUploads 
  * @param imageMaxUploadSize 
@@ -89,6 +90,9 @@ data class CreateSite (
 
     @SerializedName("name")
     val name: kotlin.String,
+
+    @SerializedName("max_invites_per_user_allowed")
+    val maxInvitesPerUserAllowed: kotlin.Double? = null,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean? = null,

@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.forEach
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
@@ -39,6 +40,7 @@ import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
+import com.idunnololz.summit.util.CustomBottomNavigationView
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
@@ -161,7 +163,7 @@ class NavBarController(
         labelVisibilityMode = LABEL_VISIBILITY_LABELED
       }
     } else {
-      BottomNavigationView(context).apply {
+      CustomBottomNavigationView(context).apply {
         setBackgroundColor(
           context.getColorFromAttribute(
             com.google.android.material.R.attr.colorSurface,
@@ -240,6 +242,8 @@ class NavBarController(
       newLeftInset = leftInset
       newRightInset = rightInset
     }
+
+    Log.d(TAG, "onInsetsChanged: b: ${bottomInset} navBarh: ${navBar.height} mh: ${navBar.measuredHeight}")
   }
 
   fun showBottomNav() {
@@ -267,7 +271,13 @@ class NavBarController(
       }
     }
 
-    if (currentPercentShown + 0.01f > percentShown && currentPercentShown - 0.01f < percentShown) {
+    val visibilityShouldChange = percentShown == 0f && navBarContainer.isVisible
+
+    if (currentPercentShown + 0.01f > percentShown &&
+      currentPercentShown - 0.01f < percentShown &&
+      !visibilityShouldChange) {
+
+      Log.d(TAG, "close enough. ignoring request")
       return
     }
 
@@ -290,16 +300,29 @@ class NavBarController(
     if (useNavigationRail) {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         if (percentShown != 0f) {
-          navBarContainer.visibility = View.VISIBLE
-          navBarContainer.translationX = navigationBarOffset
-          navBarContainer.alpha = 0f
+          Log.d(TAG, "unhiding nav bar...")
+          if (animate) {
+            navBarContainer.visibility = View.VISIBLE
+            navBarContainer.translationX = navigationBarOffset
+            navBarContainer.alpha = 0f
 
-          navBarContainer.animate().cancel()
-          navBarContainer.animate()
-            .alpha(1f)
-            .apply {
-              duration = 250
-            }
+            navBarContainer.animate().cancel()
+            navBarContainer.animate()
+              .alpha(1f)
+              .apply {
+                duration = 250
+
+                if (percentShown == 0f) {
+                  withEndAction {
+                    navBarContainer.visibility = View.INVISIBLE
+                  }
+                }
+              }
+          } else {
+            navBarContainer.visibility = View.VISIBLE
+            navBarContainer.translationX = navigationBarOffset
+            navBarContainer.alpha = 1f
+          }
         }
       } else if (animate) {
         navBarContainer.animate().cancel()
@@ -309,20 +332,30 @@ class NavBarController(
       } else {
         navBarContainer.animate().cancel()
         navBarContainer.translationX = navigationBarOffset
+
+        if (percentShown == 0f) {
+          navBarContainer.visibility = View.INVISIBLE
+        }
       }
     } else {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         if (percentShown != 0f) {
-          navBarContainer.visibility = View.VISIBLE
-          navBarContainer.translationY = navigationBarOffset
-          navBarContainer.alpha = 0f
+          if (animate) {
+            navBarContainer.visibility = View.VISIBLE
+            navBarContainer.translationY = navigationBarOffset
+            navBarContainer.alpha = 0f
 
-          navBarContainer.animate().cancel()
-          navBarContainer.animate()
-            .alpha(1f)
-            .apply {
-              duration = 250
-            }
+            navBarContainer.animate().cancel()
+            navBarContainer.animate()
+              .alpha(1f)
+              .apply {
+                duration = 250
+              }
+          } else {
+            navBarContainer.visibility = View.VISIBLE
+            navBarContainer.translationY = navigationBarOffset
+            navBarContainer.alpha = 1f
+          }
         }
       } else if (animate) {
         navBarContainer.animate().cancel()
@@ -331,10 +364,20 @@ class NavBarController(
           .translationY(navigationBarOffset)
           .apply {
             duration = 250
+
+            if (percentShown == 0f) {
+              withEndAction {
+                navBarContainer.visibility = View.INVISIBLE
+              }
+            }
           }
       } else {
         navBarContainer.animate().cancel()
         navBarContainer.translationY = navigationBarOffset
+
+        if (percentShown == 0f) {
+          navBarContainer.visibility = View.INVISIBLE
+        }
       }
     }
   }

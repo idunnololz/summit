@@ -7,22 +7,22 @@ All URIs are relative to *https://voyager.lemmy.ml*
 | [**addAdmin**](AdminApi.md#addAdmin) | **POST** /api/v4/admin/add | Add an admin to your site. |
 | [**adminAllowInstance**](AdminApi.md#adminAllowInstance) | **POST** /api/v4/admin/instance/allow | Globally allow an instance as admin. |
 | [**adminBlockInstance**](AdminApi.md#adminBlockInstance) | **POST** /api/v4/admin/instance/block | Globally block an instance as admin. |
+| [**adminDeleteMedia**](AdminApi.md#adminDeleteMedia) | **DELETE** /api/v4/image | Delete any media. (Admin only) |
+| [**adminListMedia**](AdminApi.md#adminListMedia) | **GET** /api/v4/image/list | List all the media known to your instance. |
+| [**adminListUsers**](AdminApi.md#adminListUsers) | **GET** /api/v4/admin/users | Get a list of users. |
 | [**approveRegistrationApplication**](AdminApi.md#approveRegistrationApplication) | **PUT** /api/v4/admin/registration_application/approve | Approve a registration application |
 | [**banPerson**](AdminApi.md#banPerson) | **POST** /api/v4/admin/ban | Ban a person from your site. |
 | [**createTagline**](AdminApi.md#createTagline) | **POST** /api/v4/admin/tagline | Create a new tagline |
-| [**deleteMediaAdmin**](AdminApi.md#deleteMediaAdmin) | **DELETE** /api/v4/image | Delete any media. (Admin only) |
 | [**deleteTagline**](AdminApi.md#deleteTagline) | **DELETE** /api/v4/admin/tagline | Delete a tagline |
 | [**editTagline**](AdminApi.md#editTagline) | **PUT** /api/v4/admin/tagline | Edit an existing tagline |
 | [**getRegistrationApplication**](AdminApi.md#getRegistrationApplication) | **GET** /api/v4/admin/registration_application | Get the application a user submitted when they first registered their account |
 | [**hideCommunity**](AdminApi.md#hideCommunity) | **PUT** /api/v4/community/hide | Hide a community from public / \&quot;All\&quot; view. Admins only. |
 | [**leaveAdmin**](AdminApi.md#leaveAdmin) | **POST** /api/v4/admin/leave | Leave the Site admins. |
 | [**listCommentLikes**](AdminApi.md#listCommentLikes) | **GET** /api/v4/comment/like/list | List a comment&#39;s likes. Admin-only. |
-| [**listMediaAdmin**](AdminApi.md#listMediaAdmin) | **GET** /api/v4/image/list | List all the media known to your instance. |
 | [**listPostLikes**](AdminApi.md#listPostLikes) | **GET** /api/v4/post/like/list | List a post&#39;s likes. Admin-only. |
 | [**listRegistrationApplications**](AdminApi.md#listRegistrationApplications) | **GET** /api/v4/admin/registration_application/list | List the registration applications. |
 | [**listReports**](AdminApi.md#listReports) | **GET** /api/v4/report/list | List user reports. |
 | [**listTaglines**](AdminApi.md#listTaglines) | **GET** /api/v4/admin/tagline/list | List taglines. |
-| [**listUsers**](AdminApi.md#listUsers) | **GET** /api/v4/admin/users | Get a list of users. |
 | [**purgeComment**](AdminApi.md#purgeComment) | **POST** /api/v4/admin/purge/comment | Purge / Delete a comment from the database. |
 | [**purgeCommunity**](AdminApi.md#purgeCommunity) | **POST** /api/v4/admin/purge/community | Purge / Delete a community from the database. |
 | [**purgePerson**](AdminApi.md#purgePerson) | **POST** /api/v4/admin/purge/person | Purge / Delete a person from the database. |
@@ -33,7 +33,7 @@ All URIs are relative to *https://voyager.lemmy.ml*
 
 <a id="addAdmin"></a>
 # **addAdmin**
-> RequestStateAddAdminResponse addAdmin(addAdmin)
+> AddAdminResponse addAdmin(addAdmin)
 
 Add an admin to your site.
 
@@ -46,7 +46,7 @@ Add an admin to your site.
 val apiInstance = AdminApi()
 val addAdmin : AddAdmin =  // AddAdmin | 
 try {
-    val result : RequestStateAddAdminResponse = apiInstance.addAdmin(addAdmin)
+    val result : AddAdminResponse = apiInstance.addAdmin(addAdmin)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#addAdmin")
@@ -64,7 +64,7 @@ try {
 
 ### Return type
 
-[**RequestStateAddAdminResponse**](RequestStateAddAdminResponse.md)
+[**AddAdminResponse**](AddAdminResponse.md)
 
 ### Authorization
 
@@ -79,7 +79,7 @@ Configure bearerAuth:
 
 <a id="adminAllowInstance"></a>
 # **adminAllowInstance**
-> RequestStateSuccessResponse adminAllowInstance(adminAllowInstanceParams)
+> SuccessResponse adminAllowInstance(adminAllowInstanceParams)
 
 Globally allow an instance as admin.
 
@@ -92,7 +92,7 @@ Globally allow an instance as admin.
 val apiInstance = AdminApi()
 val adminAllowInstanceParams : AdminAllowInstanceParams =  // AdminAllowInstanceParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.adminAllowInstance(adminAllowInstanceParams)
+    val result : SuccessResponse = apiInstance.adminAllowInstance(adminAllowInstanceParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#adminAllowInstance")
@@ -110,7 +110,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -125,7 +125,7 @@ Configure bearerAuth:
 
 <a id="adminBlockInstance"></a>
 # **adminBlockInstance**
-> RequestStateSuccessResponse adminBlockInstance(adminBlockInstanceParams)
+> SuccessResponse adminBlockInstance(adminBlockInstanceParams)
 
 Globally block an instance as admin.
 
@@ -138,7 +138,7 @@ Globally block an instance as admin.
 val apiInstance = AdminApi()
 val adminBlockInstanceParams : AdminBlockInstanceParams =  // AdminBlockInstanceParams | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.adminBlockInstance(adminBlockInstanceParams)
+    val result : SuccessResponse = apiInstance.adminBlockInstance(adminBlockInstanceParams)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#adminBlockInstance")
@@ -156,7 +156,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -169,9 +169,155 @@ Configure bearerAuth:
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+<a id="adminDeleteMedia"></a>
+# **adminDeleteMedia**
+> SuccessResponse adminDeleteMedia(deleteImageParamsI)
+
+Delete any media. (Admin only)
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AdminApi()
+val deleteImageParamsI : DeleteImageParamsI =  // DeleteImageParamsI | 
+try {
+    val result : SuccessResponse = apiInstance.adminDeleteMedia(deleteImageParamsI)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AdminApi#adminDeleteMedia")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AdminApi#adminDeleteMedia")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **deleteImageParamsI** | [**DeleteImageParamsI**](DeleteImageParamsI.md)|  | |
+
+### Return type
+
+[**SuccessResponse**](SuccessResponse.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a id="adminListMedia"></a>
+# **adminListMedia**
+> PagedResponseLocalImageView adminListMedia(limit, pageCursor)
+
+List all the media known to your instance.
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AdminApi()
+val limit : kotlin.Double = 1.2 // kotlin.Double | 
+val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+try {
+    val result : PagedResponseLocalImageView = apiInstance.adminListMedia(limit, pageCursor)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AdminApi#adminListMedia")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AdminApi#adminListMedia")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| **limit** | **kotlin.Double**|  | [optional] |
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **pageCursor** | **kotlin.String**|  | [optional] |
+
+### Return type
+
+[**PagedResponseLocalImageView**](PagedResponseLocalImageView.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+<a id="adminListUsers"></a>
+# **adminListUsers**
+> PagedResponseLocalUserView adminListUsers(limit, sort, pageCursor, bannedOnly)
+
+Get a list of users.
+
+### Example
+```kotlin
+// Import classes:
+//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
+//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
+
+val apiInstance = AdminApi()
+val limit : kotlin.Double = 1.2 // kotlin.Double | 
+val sort : LocalUserSortType =  // LocalUserSortType | 
+val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+val bannedOnly : kotlin.Boolean = true // kotlin.Boolean | 
+try {
+    val result : PagedResponseLocalUserView = apiInstance.adminListUsers(limit, sort, pageCursor, bannedOnly)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling AdminApi#adminListUsers")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling AdminApi#adminListUsers")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+| **limit** | **kotlin.Double**|  | [optional] |
+| **sort** | [**LocalUserSortType**](.md)|  | [optional] [enum: new, old] |
+| **pageCursor** | **kotlin.String**|  | [optional] |
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **bannedOnly** | **kotlin.Boolean**|  | [optional] |
+
+### Return type
+
+[**PagedResponseLocalUserView**](PagedResponseLocalUserView.md)
+
+### Authorization
+
+
+Configure bearerAuth:
+    ApiClient.accessToken = ""
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
 <a id="approveRegistrationApplication"></a>
 # **approveRegistrationApplication**
-> RequestStateRegistrationApplicationResponse approveRegistrationApplication(approveRegistrationApplication)
+> RegistrationApplicationResponse approveRegistrationApplication(approveRegistrationApplication)
 
 Approve a registration application
 
@@ -184,7 +330,7 @@ Approve a registration application
 val apiInstance = AdminApi()
 val approveRegistrationApplication : ApproveRegistrationApplication =  // ApproveRegistrationApplication | 
 try {
-    val result : RequestStateRegistrationApplicationResponse = apiInstance.approveRegistrationApplication(approveRegistrationApplication)
+    val result : RegistrationApplicationResponse = apiInstance.approveRegistrationApplication(approveRegistrationApplication)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#approveRegistrationApplication")
@@ -202,7 +348,7 @@ try {
 
 ### Return type
 
-[**RequestStateRegistrationApplicationResponse**](RequestStateRegistrationApplicationResponse.md)
+[**RegistrationApplicationResponse**](RegistrationApplicationResponse.md)
 
 ### Authorization
 
@@ -217,7 +363,7 @@ Configure bearerAuth:
 
 <a id="banPerson"></a>
 # **banPerson**
-> RequestStatePersonResponse banPerson(banPerson)
+> PersonResponse banPerson(banPerson)
 
 Ban a person from your site.
 
@@ -230,7 +376,7 @@ Ban a person from your site.
 val apiInstance = AdminApi()
 val banPerson : BanPerson =  // BanPerson | 
 try {
-    val result : RequestStatePersonResponse = apiInstance.banPerson(banPerson)
+    val result : PersonResponse = apiInstance.banPerson(banPerson)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#banPerson")
@@ -248,7 +394,7 @@ try {
 
 ### Return type
 
-[**RequestStatePersonResponse**](RequestStatePersonResponse.md)
+[**PersonResponse**](PersonResponse.md)
 
 ### Authorization
 
@@ -263,7 +409,7 @@ Configure bearerAuth:
 
 <a id="createTagline"></a>
 # **createTagline**
-> RequestStateTaglineResponse createTagline(createTagline)
+> TaglineResponse createTagline(createTagline)
 
 Create a new tagline
 
@@ -276,7 +422,7 @@ Create a new tagline
 val apiInstance = AdminApi()
 val createTagline : CreateTagline =  // CreateTagline | 
 try {
-    val result : RequestStateTaglineResponse = apiInstance.createTagline(createTagline)
+    val result : TaglineResponse = apiInstance.createTagline(createTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#createTagline")
@@ -294,53 +440,7 @@ try {
 
 ### Return type
 
-[**RequestStateTaglineResponse**](RequestStateTaglineResponse.md)
-
-### Authorization
-
-
-Configure bearerAuth:
-    ApiClient.accessToken = ""
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a id="deleteMediaAdmin"></a>
-# **deleteMediaAdmin**
-> RequestStateSuccessResponse deleteMediaAdmin(deleteImageParamsI)
-
-Delete any media. (Admin only)
-
-### Example
-```kotlin
-// Import classes:
-//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
-//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
-
-val apiInstance = AdminApi()
-val deleteImageParamsI : DeleteImageParamsI =  // DeleteImageParamsI | 
-try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteMediaAdmin(deleteImageParamsI)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling AdminApi#deleteMediaAdmin")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling AdminApi#deleteMediaAdmin")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **deleteImageParamsI** | [**DeleteImageParamsI**](DeleteImageParamsI.md)|  | |
-
-### Return type
-
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**TaglineResponse**](TaglineResponse.md)
 
 ### Authorization
 
@@ -355,7 +455,7 @@ Configure bearerAuth:
 
 <a id="deleteTagline"></a>
 # **deleteTagline**
-> RequestStateSuccessResponse deleteTagline(deleteTagline)
+> SuccessResponse deleteTagline(deleteTagline)
 
 Delete a tagline
 
@@ -368,7 +468,7 @@ Delete a tagline
 val apiInstance = AdminApi()
 val deleteTagline : DeleteTagline =  // DeleteTagline | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.deleteTagline(deleteTagline)
+    val result : SuccessResponse = apiInstance.deleteTagline(deleteTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#deleteTagline")
@@ -386,7 +486,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -401,7 +501,7 @@ Configure bearerAuth:
 
 <a id="editTagline"></a>
 # **editTagline**
-> RequestStateTaglineResponse editTagline(editTagline)
+> TaglineResponse editTagline(editTagline)
 
 Edit an existing tagline
 
@@ -414,7 +514,7 @@ Edit an existing tagline
 val apiInstance = AdminApi()
 val editTagline : EditTagline =  // EditTagline | 
 try {
-    val result : RequestStateTaglineResponse = apiInstance.editTagline(editTagline)
+    val result : TaglineResponse = apiInstance.editTagline(editTagline)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#editTagline")
@@ -432,7 +532,7 @@ try {
 
 ### Return type
 
-[**RequestStateTaglineResponse**](RequestStateTaglineResponse.md)
+[**TaglineResponse**](TaglineResponse.md)
 
 ### Authorization
 
@@ -447,7 +547,7 @@ Configure bearerAuth:
 
 <a id="getRegistrationApplication"></a>
 # **getRegistrationApplication**
-> RequestStateRegistrationApplicationResponse getRegistrationApplication(personId)
+> RegistrationApplicationResponse getRegistrationApplication(personId)
 
 Get the application a user submitted when they first registered their account
 
@@ -460,7 +560,7 @@ Get the application a user submitted when they first registered their account
 val apiInstance = AdminApi()
 val personId : kotlin.Double = 1.2 // kotlin.Double | 
 try {
-    val result : RequestStateRegistrationApplicationResponse = apiInstance.getRegistrationApplication(personId)
+    val result : RegistrationApplicationResponse = apiInstance.getRegistrationApplication(personId)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#getRegistrationApplication")
@@ -478,7 +578,7 @@ try {
 
 ### Return type
 
-[**RequestStateRegistrationApplicationResponse**](RequestStateRegistrationApplicationResponse.md)
+[**RegistrationApplicationResponse**](RegistrationApplicationResponse.md)
 
 ### Authorization
 
@@ -493,7 +593,7 @@ Configure bearerAuth:
 
 <a id="hideCommunity"></a>
 # **hideCommunity**
-> RequestStateSuccessResponse hideCommunity(hideCommunity)
+> SuccessResponse hideCommunity(hideCommunity)
 
 Hide a community from public / \&quot;All\&quot; view. Admins only.
 
@@ -506,7 +606,7 @@ Hide a community from public / \&quot;All\&quot; view. Admins only.
 val apiInstance = AdminApi()
 val hideCommunity : HideCommunity =  // HideCommunity | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.hideCommunity(hideCommunity)
+    val result : SuccessResponse = apiInstance.hideCommunity(hideCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#hideCommunity")
@@ -524,7 +624,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -539,7 +639,7 @@ Configure bearerAuth:
 
 <a id="leaveAdmin"></a>
 # **leaveAdmin**
-> RequestStateGetSiteResponse leaveAdmin()
+> GetSiteResponse leaveAdmin()
 
 Leave the Site admins.
 
@@ -551,7 +651,7 @@ Leave the Site admins.
 
 val apiInstance = AdminApi()
 try {
-    val result : RequestStateGetSiteResponse = apiInstance.leaveAdmin()
+    val result : GetSiteResponse = apiInstance.leaveAdmin()
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#leaveAdmin")
@@ -567,7 +667,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**RequestStateGetSiteResponse**](RequestStateGetSiteResponse.md)
+[**GetSiteResponse**](GetSiteResponse.md)
 
 ### Authorization
 
@@ -582,7 +682,7 @@ Configure bearerAuth:
 
 <a id="listCommentLikes"></a>
 # **listCommentLikes**
-> RequestStatePagedResponseVoteView listCommentLikes(commentId, limit, pageCursor)
+> PagedResponseVoteView listCommentLikes(commentId, limit, pageCursor)
 
 List a comment&#39;s likes. Admin-only.
 
@@ -597,7 +697,7 @@ val commentId : kotlin.Double = 1.2 // kotlin.Double |
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseVoteView = apiInstance.listCommentLikes(commentId, limit, pageCursor)
+    val result : PagedResponseVoteView = apiInstance.listCommentLikes(commentId, limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#listCommentLikes")
@@ -617,55 +717,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseVoteView**](RequestStatePagedResponseVoteView.md)
-
-### Authorization
-
-
-Configure bearerAuth:
-    ApiClient.accessToken = ""
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a id="listMediaAdmin"></a>
-# **listMediaAdmin**
-> RequestStatePagedResponseLocalImageView listMediaAdmin(limit, pageCursor)
-
-List all the media known to your instance.
-
-### Example
-```kotlin
-// Import classes:
-//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
-//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
-
-val apiInstance = AdminApi()
-val limit : kotlin.Double = 1.2 // kotlin.Double | 
-val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
-try {
-    val result : RequestStatePagedResponseLocalImageView = apiInstance.listMediaAdmin(limit, pageCursor)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling AdminApi#listMediaAdmin")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling AdminApi#listMediaAdmin")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-| **limit** | **kotlin.Double**|  | [optional] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **pageCursor** | **kotlin.String**|  | [optional] |
-
-### Return type
-
-[**RequestStatePagedResponseLocalImageView**](RequestStatePagedResponseLocalImageView.md)
+[**PagedResponseVoteView**](PagedResponseVoteView.md)
 
 ### Authorization
 
@@ -680,7 +732,7 @@ Configure bearerAuth:
 
 <a id="listPostLikes"></a>
 # **listPostLikes**
-> RequestStatePagedResponseVoteView listPostLikes(postId, limit, pageCursor)
+> PagedResponseVoteView listPostLikes(postId, limit, pageCursor)
 
 List a post&#39;s likes. Admin-only.
 
@@ -695,7 +747,7 @@ val postId : kotlin.Double = 1.2 // kotlin.Double |
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseVoteView = apiInstance.listPostLikes(postId, limit, pageCursor)
+    val result : PagedResponseVoteView = apiInstance.listPostLikes(postId, limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#listPostLikes")
@@ -715,7 +767,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseVoteView**](RequestStatePagedResponseVoteView.md)
+[**PagedResponseVoteView**](PagedResponseVoteView.md)
 
 ### Authorization
 
@@ -730,7 +782,7 @@ Configure bearerAuth:
 
 <a id="listRegistrationApplications"></a>
 # **listRegistrationApplications**
-> RequestStatePagedResponseRegistrationApplicationView listRegistrationApplications(limit, pageCursor, unreadOnly)
+> PagedResponseRegistrationApplicationView listRegistrationApplications(limit, pageCursor, unreadOnly)
 
 List the registration applications.
 
@@ -745,7 +797,7 @@ val limit : kotlin.Double = 1.2 // kotlin.Double |
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 val unreadOnly : kotlin.Boolean = true // kotlin.Boolean | Only shows the unread applications (IE those without an admin actor)
 try {
-    val result : RequestStatePagedResponseRegistrationApplicationView = apiInstance.listRegistrationApplications(limit, pageCursor, unreadOnly)
+    val result : PagedResponseRegistrationApplicationView = apiInstance.listRegistrationApplications(limit, pageCursor, unreadOnly)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#listRegistrationApplications")
@@ -765,7 +817,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseRegistrationApplicationView**](RequestStatePagedResponseRegistrationApplicationView.md)
+[**PagedResponseRegistrationApplicationView**](PagedResponseRegistrationApplicationView.md)
 
 ### Authorization
 
@@ -780,7 +832,7 @@ Configure bearerAuth:
 
 <a id="listReports"></a>
 # **listReports**
-> RequestStatePagedResponseReportCombinedView listReports(myReportsOnly, showCommunityRuleViolations, limit, pageCursor, communityId, postId, type, unresolvedOnly)
+> PagedResponseReportCombinedView listReports(myReportsOnly, showCommunityRuleViolations, limit, pageCursor, sort, communityId, postId, type, unresolvedOnly)
 
 List user reports.
 
@@ -795,12 +847,13 @@ val myReportsOnly : kotlin.Boolean = true // kotlin.Boolean | If true, view all 
 val showCommunityRuleViolations : kotlin.Boolean = true // kotlin.Boolean | Only for admins: also show reports with `violates_instance_rules=false`
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
+val sort : ReportSortType =  // ReportSortType | If this is None, then the default sort is Old / First In First Out if viewing unresolved reports, but new if viewing all reports. Setting this overrides the default.
 val communityId : kotlin.Double = 1.2 // kotlin.Double | if no community is given, it returns reports for all communities moderated by the auth user
 val postId : kotlin.Double = 1.2 // kotlin.Double | Filter by the post id. Can return either comment or post reports.
 val type : ReportType =  // ReportType | Filter the type of report.
 val unresolvedOnly : kotlin.Boolean = true // kotlin.Boolean | Only shows the unresolved reports
 try {
-    val result : RequestStatePagedResponseReportCombinedView = apiInstance.listReports(myReportsOnly, showCommunityRuleViolations, limit, pageCursor, communityId, postId, type, unresolvedOnly)
+    val result : PagedResponseReportCombinedView = apiInstance.listReports(myReportsOnly, showCommunityRuleViolations, limit, pageCursor, sort, communityId, postId, type, unresolvedOnly)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#listReports")
@@ -816,6 +869,7 @@ try {
 | **showCommunityRuleViolations** | **kotlin.Boolean**| Only for admins: also show reports with &#x60;violates_instance_rules&#x3D;false&#x60; | [optional] |
 | **limit** | **kotlin.Double**|  | [optional] |
 | **pageCursor** | **kotlin.String**|  | [optional] |
+| **sort** | [**ReportSortType**](.md)| If this is None, then the default sort is Old / First In First Out if viewing unresolved reports, but new if viewing all reports. Setting this overrides the default. | [optional] [enum: default, new, old] |
 | **communityId** | **kotlin.Double**| if no community is given, it returns reports for all communities moderated by the auth user | [optional] |
 | **postId** | **kotlin.Double**| Filter by the post id. Can return either comment or post reports. | [optional] |
 | **type** | [**ReportType**](.md)| Filter the type of report. | [optional] [enum: all, posts, comments, private_messages, communities] |
@@ -825,7 +879,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseReportCombinedView**](RequestStatePagedResponseReportCombinedView.md)
+[**PagedResponseReportCombinedView**](PagedResponseReportCombinedView.md)
 
 ### Authorization
 
@@ -840,7 +894,7 @@ Configure bearerAuth:
 
 <a id="listTaglines"></a>
 # **listTaglines**
-> RequestStatePagedResponseTagline listTaglines(limit, pageCursor)
+> PagedResponseTagline listTaglines(limit, pageCursor)
 
 List taglines.
 
@@ -854,7 +908,7 @@ val apiInstance = AdminApi()
 val limit : kotlin.Double = 1.2 // kotlin.Double | 
 val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
 try {
-    val result : RequestStatePagedResponseTagline = apiInstance.listTaglines(limit, pageCursor)
+    val result : PagedResponseTagline = apiInstance.listTaglines(limit, pageCursor)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#listTaglines")
@@ -873,59 +927,7 @@ try {
 
 ### Return type
 
-[**RequestStatePagedResponseTagline**](RequestStatePagedResponseTagline.md)
-
-### Authorization
-
-
-Configure bearerAuth:
-    ApiClient.accessToken = ""
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a id="listUsers"></a>
-# **listUsers**
-> RequestStatePagedResponseLocalUserView listUsers(limit, sort, pageCursor, bannedOnly)
-
-Get a list of users.
-
-### Example
-```kotlin
-// Import classes:
-//import com.idunnololz.summit.api.dto.lemmy.v4.infrastructure.*
-//import com.idunnololz.summit.api.dto.lemmy.v4.models.*
-
-val apiInstance = AdminApi()
-val limit : kotlin.Double = 1.2 // kotlin.Double | 
-val sort : LocalUserSortType =  // LocalUserSortType | 
-val pageCursor : kotlin.String = pageCursor_example // kotlin.String | 
-val bannedOnly : kotlin.Boolean = true // kotlin.Boolean | 
-try {
-    val result : RequestStatePagedResponseLocalUserView = apiInstance.listUsers(limit, sort, pageCursor, bannedOnly)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling AdminApi#listUsers")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling AdminApi#listUsers")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-| **limit** | **kotlin.Double**|  | [optional] |
-| **sort** | [**LocalUserSortType**](.md)|  | [optional] [enum: new, old] |
-| **pageCursor** | **kotlin.String**|  | [optional] |
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **bannedOnly** | **kotlin.Boolean**|  | [optional] |
-
-### Return type
-
-[**RequestStatePagedResponseLocalUserView**](RequestStatePagedResponseLocalUserView.md)
+[**PagedResponseTagline**](PagedResponseTagline.md)
 
 ### Authorization
 
@@ -940,7 +942,7 @@ Configure bearerAuth:
 
 <a id="purgeComment"></a>
 # **purgeComment**
-> RequestStateSuccessResponse purgeComment(purgeComment)
+> SuccessResponse purgeComment(purgeComment)
 
 Purge / Delete a comment from the database.
 
@@ -953,7 +955,7 @@ Purge / Delete a comment from the database.
 val apiInstance = AdminApi()
 val purgeComment : PurgeComment =  // PurgeComment | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.purgeComment(purgeComment)
+    val result : SuccessResponse = apiInstance.purgeComment(purgeComment)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#purgeComment")
@@ -971,7 +973,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -986,7 +988,7 @@ Configure bearerAuth:
 
 <a id="purgeCommunity"></a>
 # **purgeCommunity**
-> RequestStateSuccessResponse purgeCommunity(purgeCommunity)
+> SuccessResponse purgeCommunity(purgeCommunity)
 
 Purge / Delete a community from the database.
 
@@ -999,7 +1001,7 @@ Purge / Delete a community from the database.
 val apiInstance = AdminApi()
 val purgeCommunity : PurgeCommunity =  // PurgeCommunity | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.purgeCommunity(purgeCommunity)
+    val result : SuccessResponse = apiInstance.purgeCommunity(purgeCommunity)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#purgeCommunity")
@@ -1017,7 +1019,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1032,7 +1034,7 @@ Configure bearerAuth:
 
 <a id="purgePerson"></a>
 # **purgePerson**
-> RequestStateSuccessResponse purgePerson(purgePerson)
+> SuccessResponse purgePerson(purgePerson)
 
 Purge / Delete a person from the database.
 
@@ -1045,7 +1047,7 @@ Purge / Delete a person from the database.
 val apiInstance = AdminApi()
 val purgePerson : PurgePerson =  // PurgePerson | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.purgePerson(purgePerson)
+    val result : SuccessResponse = apiInstance.purgePerson(purgePerson)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#purgePerson")
@@ -1063,7 +1065,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1078,7 +1080,7 @@ Configure bearerAuth:
 
 <a id="purgePost"></a>
 # **purgePost**
-> RequestStateSuccessResponse purgePost(purgePost)
+> SuccessResponse purgePost(purgePost)
 
 Purge / Delete a post from the database.
 
@@ -1091,7 +1093,7 @@ Purge / Delete a post from the database.
 val apiInstance = AdminApi()
 val purgePost : PurgePost =  // PurgePost | 
 try {
-    val result : RequestStateSuccessResponse = apiInstance.purgePost(purgePost)
+    val result : SuccessResponse = apiInstance.purgePost(purgePost)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#purgePost")
@@ -1109,7 +1111,7 @@ try {
 
 ### Return type
 
-[**RequestStateSuccessResponse**](RequestStateSuccessResponse.md)
+[**SuccessResponse**](SuccessResponse.md)
 
 ### Authorization
 
@@ -1124,7 +1126,7 @@ Configure bearerAuth:
 
 <a id="resolveCommunityReport"></a>
 # **resolveCommunityReport**
-> RequestStateCommunityReportResponse resolveCommunityReport(resolveCommunityReport)
+> CommunityReportResponse resolveCommunityReport(resolveCommunityReport)
 
 Resolve a report for a private message.
 
@@ -1137,7 +1139,7 @@ Resolve a report for a private message.
 val apiInstance = AdminApi()
 val resolveCommunityReport : ResolveCommunityReport =  // ResolveCommunityReport | 
 try {
-    val result : RequestStateCommunityReportResponse = apiInstance.resolveCommunityReport(resolveCommunityReport)
+    val result : CommunityReportResponse = apiInstance.resolveCommunityReport(resolveCommunityReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#resolveCommunityReport")
@@ -1155,7 +1157,7 @@ try {
 
 ### Return type
 
-[**RequestStateCommunityReportResponse**](RequestStateCommunityReportResponse.md)
+[**CommunityReportResponse**](CommunityReportResponse.md)
 
 ### Authorization
 
@@ -1170,7 +1172,7 @@ Configure bearerAuth:
 
 <a id="resolvePrivateMessageReport"></a>
 # **resolvePrivateMessageReport**
-> RequestStatePrivateMessageReportResponse resolvePrivateMessageReport(resolvePrivateMessageReport)
+> PrivateMessageReportResponse resolvePrivateMessageReport(resolvePrivateMessageReport)
 
 Resolve a report for a private message.
 
@@ -1183,7 +1185,7 @@ Resolve a report for a private message.
 val apiInstance = AdminApi()
 val resolvePrivateMessageReport : ResolvePrivateMessageReport =  // ResolvePrivateMessageReport | 
 try {
-    val result : RequestStatePrivateMessageReportResponse = apiInstance.resolvePrivateMessageReport(resolvePrivateMessageReport)
+    val result : PrivateMessageReportResponse = apiInstance.resolvePrivateMessageReport(resolvePrivateMessageReport)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling AdminApi#resolvePrivateMessageReport")
@@ -1201,7 +1203,7 @@ try {
 
 ### Return type
 
-[**RequestStatePrivateMessageReportResponse**](RequestStatePrivateMessageReportResponse.md)
+[**PrivateMessageReportResponse**](PrivateMessageReportResponse.md)
 
 ### Authorization
 
