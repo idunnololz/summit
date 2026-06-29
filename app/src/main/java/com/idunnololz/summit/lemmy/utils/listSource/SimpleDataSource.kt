@@ -127,7 +127,7 @@ abstract class CursorBackedSingleDataSource<T, O>(
     }
 
     val pageIndex = if (page == 0) {
-      page.toLemmyPageIndex()
+      page
     } else {
       null
     }
