@@ -33,7 +33,7 @@ data class ResolvePrivateMessageReport (
 
     /* The private message report id. */
     @SerializedName("report_id")
-    val reportId: kotlin.Double
+    val reportId: Int
 
 ) {
 

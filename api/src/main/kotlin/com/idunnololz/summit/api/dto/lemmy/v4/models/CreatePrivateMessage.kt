@@ -30,7 +30,7 @@ data class CreatePrivateMessage (
 
     /* The person id. */
     @SerializedName("recipient_id")
-    val recipientId: kotlin.Double,
+    val recipientId: kotlin.Long,
 
     @SerializedName("content")
     val content: kotlin.String

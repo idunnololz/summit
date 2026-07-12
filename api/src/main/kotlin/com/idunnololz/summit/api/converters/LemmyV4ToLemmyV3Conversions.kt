@@ -56,6 +56,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Tagline as TaglineV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Language as LanguageV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person as PersonV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView as PersonViewV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageView as PrivateMessageViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalSiteRateLimit as LocalSiteRateLimitV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationMode as RegistrationModeV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType as ListingTypeV4
@@ -382,21 +383,84 @@ fun CommunityModeratorViewV4.toCommunityModeratorView(): CommunityModeratorView 
   )
 }
 
+fun com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReportView.toPrivateMessageReportView(): PrivateMessageReportView {
+  return PrivateMessageReportView(
+    private_message_report = privateMessageReport.toPrivateMessageReport(),
+    private_message = privateMessage.toPrivateMessage(read = false),
+    private_message_creator = privateMessageCreator.toPerson(
+      isBanned = false, banExpires = null, isAdmin = false
+    ),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    resolver = resolver?.toPerson(
+      isBanned = false, banExpires = null, isAdmin = false
+    )
+  )
+}
+
+fun com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReport.toPrivateMessageReport() =
+  PrivateMessageReport(
+    id = id,
+    creator_id = creatorId,
+    private_message_id = privateMessageId,
+    original_pm_text = originalPmText,
+    reason = reason,
+    resolved = resolved,
+    resolver_id = resolverId,
+    published = publishedAt,
+    updated = updatedAt,
+  )
+
+fun PostReportViewV4.toPostReportView(): PostReportView {
+  return PostReportView(
+    post_report = postReport.toPostReport(),
+    post = post.toPost(),
+    community = community.toCommunity(),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    post_creator = postCreator.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    my_vote = this.postActions?.voteIsUpvote?.toVoteInt(),
+    counts = this.post.toPostAggregates(),
+    resolver = this.resolver?.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+  )
+}
+
+fun com.idunnololz.summit.api.dto.lemmy.v4.models.PostReport.toPostReport(): PostReport {
+  return PostReport(
+    id = id,
+    creator_id = creatorId,
+    post_id = postId,
+    original_post_name = originalPostName,
+    original_post_url = originalPostUrl,
+    original_post_body = originalPostBody,
+    reason = reason,
+    resolved = resolved,
+    resolver_id = resolverId,
+    published = publishedAt,
+    updated = updatedAt,
+  )
+}
+
 fun ReportCombinedView.toPrivateMessageReportView(): PrivateMessageReportView {
   val report = this.privateMessageReport
 
   return PrivateMessageReportView(
-    private_message_report = PrivateMessageReport(
-      id = report.id,
-      creator_id = report.creatorId,
-      private_message_id = report.privateMessageId,
-      original_pm_text = report.originalPmText,
-      reason = report.reason,
-      resolved = report.resolved,
-      resolver_id = report.resolverId,
-      published = report.publishedAt,
-      updated = report.updatedAt,
-    ),
+    private_message_report = report.toPrivateMessageReport(),
     private_message = privateMessage.toPrivateMessage(read = false),
     private_message_creator = privateMessageCreator.toPerson(
       isBanned = false, banExpires = null, isAdmin = false
@@ -414,19 +478,7 @@ fun ReportCombinedView.toPrivateMessageReportView(): PrivateMessageReportView {
 
 fun ReportCombinedView.toPostReportView(): PostReportView {
   return PostReportView(
-    post_report = PostReport(
-      id = postReport.id,
-      creator_id = postReport.creatorId,
-      post_id = postReport.postId,
-      original_post_name = postReport.originalPostName,
-      original_post_url = postReport.originalPostUrl,
-      original_post_body = postReport.originalPostBody,
-      reason = postReport.reason,
-      resolved = postReport.resolved,
-      resolver_id = postReport.resolverId,
-      published = postReport.publishedAt,
-      updated = postReport.updatedAt,
-    ),
+    post_report = postReport.toPostReport(),
     post = post.toPost(),
     community = community.toCommunity(),
     creator = creator.toPerson(
@@ -647,6 +699,14 @@ fun PrivateMessageV4.toPrivateMessage(read: Boolean): PrivateMessage =
     ap_id = apId,
     local = local,
   )
+
+fun PrivateMessageViewV4.toPrivateMessageView(): PrivateMessageView {
+  return PrivateMessageView(
+    private_message = privateMessage.toPrivateMessage(read = false),
+    creator = creator.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    recipient = recipient.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+  )
+}
 
 private fun Boolean?.toVoteInt() =
   when (this) {

@@ -820,15 +820,35 @@ class LemmyApiV4Adapter(
   override suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.createPrivateMessageReport(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessageReport(
+        reason = args.reason,
+        privateMessageId = args.private_message_id,
+      )
+    )
+  }.map {
+    PrivateMessageReportResponse(
+      it.privateMessageReportView.toPrivateMessageReportView()
+    )
   }
 
   override suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.resolvePrivateMessageReport(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePrivateMessageReport(
+        resolved = args.resolved,
+        reportId = args.report_id,
+      )
+    )
+  }.map {
+    PrivateMessageReportResponse(
+      it.privateMessageReportView.toPrivateMessageReportView()
+    )
   }
 
   override suspend fun getPostReports(
@@ -860,8 +880,18 @@ class LemmyApiV4Adapter(
   override suspend fun resolvePostReport(
     authorization: String?,
     args: ResolvePostReport,
-  ): Result<PostReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostReportResponse> = retrofitErrorHandler {
+    api.resolvePostReport(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePostReport(
+        resolved = args.resolved,
+        reportId = args.report_id,
+      )
+    )
+  }.map {
+    PostReportResponse(
+      it.postReportView.toPostReportView()
+    )
   }
 
   override suspend fun getCommentReports(
@@ -900,8 +930,18 @@ class LemmyApiV4Adapter(
   override suspend fun createPrivateMessage(
     authorization: String?,
     args: CreatePrivateMessage,
-  ): Result<PrivateMessageResponse> {
-    TODO("Not yet implemented")
+  ): Result<PrivateMessageResponse> = retrofitErrorHandler {
+    api.createPrivateMessage(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessage(
+        args.recipient_id,
+        args.content,
+      )
+    )
+  }.map {
+    PrivateMessageResponse(
+      private_message_view = it.privateMessageView.toPrivateMessageView()
+    )
   }
 
   override suspend fun getUnreadCount(

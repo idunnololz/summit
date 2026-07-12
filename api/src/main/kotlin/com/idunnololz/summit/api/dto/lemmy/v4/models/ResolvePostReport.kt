@@ -33,7 +33,7 @@ data class ResolvePostReport (
 
     /* The post report id. */
     @SerializedName("report_id")
-    val reportId: kotlin.Double
+    val reportId: Int,
 
 ) {
 
