@@ -20,6 +20,8 @@ import com.idunnololz.summit.api.converters.toEditPost
 import com.idunnololz.summit.api.converters.toGetPersonMentionsResponse
 import com.idunnololz.summit.api.converters.toGetRepliesResponse
 import com.idunnololz.summit.api.converters.toInstance
+import com.idunnololz.summit.api.converters.toListCommentLikesResponse
+import com.idunnololz.summit.api.converters.toListPostLikesResponse
 import com.idunnololz.summit.api.converters.toLoginResponse
 import com.idunnololz.summit.api.converters.toModAddCommunityView
 import com.idunnololz.summit.api.converters.toModAddView
@@ -344,7 +346,7 @@ class PieFedApiAlphaAdapter(
       // piefed is copying lemmy's page index scheme
       form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
     )
-  }
+  }.map { it.toListCommentLikesResponse() }
 
   override suspend fun listPostVotes(
     authorization: String?,
@@ -356,7 +358,7 @@ class PieFedApiAlphaAdapter(
       // piefed is copying lemmy's page index scheme
       form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
     )
-  }
+  }.map { it.toListPostLikesResponse() }
 
   override suspend fun createComment(
     authorization: String?,

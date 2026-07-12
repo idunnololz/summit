@@ -54,8 +54,10 @@ import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
+import com.idunnololz.summit.api.dto.lemmy.VoteView
 import com.idunnololz.summit.api.dto.piefed.models.Comment
 import com.idunnololz.summit.api.dto.piefed.models.CommentAggregates
+import com.idunnololz.summit.api.dto.piefed.models.CommentLikeView
 import com.idunnololz.summit.api.dto.piefed.models.CommentReply
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.CommunityBlockView
@@ -64,6 +66,8 @@ import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 import com.idunnololz.summit.api.dto.piefed.models.Instance
 import com.idunnololz.summit.api.dto.piefed.models.InstanceBlockView
 import com.idunnololz.summit.api.dto.piefed.models.InstanceWithoutFederationState
+import com.idunnololz.summit.api.dto.piefed.models.ListCommentLikesResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.piefed.models.LocalUser
 import com.idunnololz.summit.api.dto.piefed.models.LocalUserView
 import com.idunnololz.summit.api.dto.piefed.models.MyUserInfo
@@ -72,6 +76,7 @@ import com.idunnololz.summit.api.dto.piefed.models.PersonAggregates
 import com.idunnololz.summit.api.dto.piefed.models.PersonBlockView
 import com.idunnololz.summit.api.dto.piefed.models.Post
 import com.idunnololz.summit.api.dto.piefed.models.PostAggregates
+import com.idunnololz.summit.api.dto.piefed.models.PostLikeView
 import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.models.Site
 import com.idunnololz.summit.api.dto.piefed.models.UserRegistration
@@ -922,6 +927,34 @@ internal fun InstanceWithoutFederationState.toInstance() =
     updated = updated,
     software = software,
     version = version,
+  )
+
+internal fun ListCommentLikesResponse.toListCommentLikesResponse() =
+  com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse(
+    comment_likes = commentLikes.map { it.toVoteView() },
+    next_page = nextPage,
+    prev_page = null,
+  )
+
+internal fun CommentLikeView.toVoteView() =
+  VoteView(
+    creator = creator.toPerson(),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    score = score.toLong(),
+  )
+
+internal fun ListPostLikesResponse.toListPostLikesResponse() =
+  com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse(
+    post_likes = postLikes.map { it.toVoteView() },
+    next_page = nextPage,
+    prev_page = null,
+  )
+
+internal fun PostLikeView.toVoteView() =
+  VoteView(
+    creator = creator.toPerson(),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    score = score.toLong(),
   )
 
 // internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =

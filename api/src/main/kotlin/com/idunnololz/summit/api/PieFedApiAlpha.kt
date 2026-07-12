@@ -28,9 +28,7 @@ import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
-import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
-import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
@@ -72,8 +70,10 @@ import com.idunnololz.summit.api.dto.piefed.models.GetRegistrationListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetSiteResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetUserResponse
 import com.idunnololz.summit.api.dto.piefed.models.ImageUploadResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.piefed.models.ListPostsResponse
 import com.idunnololz.summit.api.dto.piefed.models.ListPrivateMessagesResponse
 import com.idunnololz.summit.api.dto.piefed.models.ModCommunityResponse
