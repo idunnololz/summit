@@ -39,11 +39,11 @@ data class BanPerson (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double,
+    val personId: kotlin.Long,
 
     /* A time that the ban will expire, in unix epoch seconds.  An i64 unix timestamp is used for a simpler API client implementation. */
     @SerializedName("expires_at")
-    val expiresAt: kotlin.Double? = null,
+    val expiresAt: kotlin.Long? = null,
 
     /* Optionally remove or restore all their data. Useful for new troll accounts. If ban is true, then this means remove. If ban is false, it means restore. */
     @SerializedName("remove_or_restore_data")

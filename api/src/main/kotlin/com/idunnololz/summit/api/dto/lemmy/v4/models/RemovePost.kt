@@ -38,7 +38,7 @@ data class RemovePost (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the post itself. */
     @SerializedName("remove_children")

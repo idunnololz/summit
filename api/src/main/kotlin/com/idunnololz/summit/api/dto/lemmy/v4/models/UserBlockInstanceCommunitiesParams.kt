@@ -33,7 +33,7 @@ data class UserBlockInstanceCommunitiesParams (
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double
+    val instanceId: kotlin.Int
 
 ) {
 

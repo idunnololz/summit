@@ -34,7 +34,7 @@ data class CreateCommentReport (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double,
+    val commentId: kotlin.Int,
 
     /* The comment violates rules of the local instance. This report will only be shown to local admins, not to community mods and will not be federated. */
     @SerializedName("violates_instance_rules")

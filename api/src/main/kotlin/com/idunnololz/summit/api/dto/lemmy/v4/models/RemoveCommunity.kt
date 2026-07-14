@@ -37,7 +37,7 @@ data class RemoveCommunity (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double
+    val communityId: kotlin.Int
 
 ) {
 

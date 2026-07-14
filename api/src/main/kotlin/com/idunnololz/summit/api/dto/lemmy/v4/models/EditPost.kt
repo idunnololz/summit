@@ -38,14 +38,14 @@ data class EditPost (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     @SerializedName("tags")
-    val tags: kotlin.collections.List<kotlin.Double>? = null,
+    val tags: kotlin.collections.List<kotlin.Int>? = null,
 
     /* Time when this post should be scheduled. Null means publish immediately. */
     @SerializedName("scheduled_publish_time_at")
-    val scheduledPublishTimeAt: kotlin.Double? = null,
+    val scheduledPublishTimeAt: kotlin.Long? = null,
 
     /* Instead of fetching a thumbnail, use a custom one. */
     @SerializedName("custom_thumbnail")
@@ -53,7 +53,7 @@ data class EditPost (
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double? = null,
+    val languageId: kotlin.Int? = null,
 
     @SerializedName("nsfw")
     val nsfw: kotlin.Boolean? = null,

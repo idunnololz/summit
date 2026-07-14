@@ -37,7 +37,7 @@ data class LockPost (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double
+    val postId: kotlin.Int
 
 ) {
 

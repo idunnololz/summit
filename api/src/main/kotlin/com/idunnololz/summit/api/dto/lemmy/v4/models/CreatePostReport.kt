@@ -34,7 +34,7 @@ data class CreatePostReport (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     /* The post violates rules of the local instance. This report will only be shown to local admins, not to community mods and will not be federated. */
     @SerializedName("violates_instance_rules")

@@ -115,7 +115,7 @@ data class SaveUserSettings (
 
     /* A list of languages you are able to see discussion in. */
     @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>? = null,
+    val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
 
     /* Whether to show read posts. */
     @SerializedName("show_read_posts")

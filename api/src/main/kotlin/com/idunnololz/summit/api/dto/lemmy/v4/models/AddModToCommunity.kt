@@ -34,11 +34,11 @@ data class AddModToCommunity (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double,
+    val personId: kotlin.Long,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double
+    val communityId: kotlin.Int,
 
 ) {
 

@@ -39,17 +39,17 @@ data class CreatePost (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double,
+    val communityId: kotlin.Int,
 
     @SerializedName("name")
     val name: kotlin.String,
 
     /* Time when this post should be scheduled. Null means publish immediately. */
     @SerializedName("scheduled_publish_time_at")
-    val scheduledPublishTimeAt: kotlin.Double? = null,
+    val scheduledPublishTimeAt: kotlin.Int? = null,
 
     @SerializedName("tags")
-    val tags: kotlin.collections.List<kotlin.Double>? = null,
+    val tags: kotlin.collections.List<kotlin.Int>? = null,
 
     /* Instead of fetching a thumbnail, use a custom one. */
     @SerializedName("custom_thumbnail")
@@ -57,7 +57,7 @@ data class CreatePost (
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double? = null,
+    val languageId: kotlin.Int? = null,
 
     @SerializedName("nsfw")
     val nsfw: kotlin.Boolean? = null,

@@ -70,35 +70,35 @@ data class Community (
 
     /* The number of users with any activity in the last year. */
     @SerializedName("users_active_half_year")
-    val usersActiveHalfYear: kotlin.Double,
+    val usersActiveHalfYear: kotlin.Int,
 
     /* The number of users with any activity in the last month. */
     @SerializedName("users_active_month")
-    val usersActiveMonth: kotlin.Double,
+    val usersActiveMonth: kotlin.Int,
 
     /* The number of users with any activity in the last week. */
     @SerializedName("users_active_week")
-    val usersActiveWeek: kotlin.Double,
+    val usersActiveWeek: kotlin.Int,
 
     /* The number of users with any activity in the last day. */
     @SerializedName("users_active_day")
-    val usersActiveDay: kotlin.Double,
+    val usersActiveDay: kotlin.Int,
 
     @SerializedName("comments")
-    val comments: kotlin.Double,
+    val comments: kotlin.Int,
 
     @SerializedName("posts")
-    val posts: kotlin.Double,
+    val posts: kotlin.Int,
 
     @SerializedName("subscribers")
-    val subscribers: kotlin.Double,
+    val subscribers: kotlin.Int,
 
     @SerializedName("visibility")
     val visibility: CommunityVisibility,
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double,
+    val instanceId: kotlin.Int,
 
     /* Whether posting is restricted to mods only. */
     @SerializedName("posting_restricted_to_mods")
@@ -134,7 +134,7 @@ data class Community (
 
     /* The community id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     /* A shorter, one-line summary. */
     @SerializedName("summary")

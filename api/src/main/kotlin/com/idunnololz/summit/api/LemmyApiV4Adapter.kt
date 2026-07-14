@@ -19,8 +19,10 @@ import com.idunnololz.summit.api.converters.toPostSortType
 import com.idunnololz.summit.api.converters.toPostView
 import com.idunnololz.summit.api.converters.toPrivateMessageReportView
 import com.idunnololz.summit.api.converters.toPrivateMessageView
+import com.idunnololz.summit.api.converters.toResolveObjectResponse
 import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
+import com.idunnololz.summit.api.converters.toSiteMetadata
 import com.idunnololz.summit.api.converters.toTimeInSeconds
 import com.idunnololz.summit.api.converters.toType
 import com.idunnololz.summit.api.converters.toVoteView
@@ -111,6 +113,7 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
+import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
@@ -137,15 +140,22 @@ import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteMetadataI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
 
 class LemmyApiV4Adapter(
@@ -923,8 +933,18 @@ class LemmyApiV4Adapter(
   override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Result<CommentReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<CommentReportResponse> = retrofitErrorHandler {
+    api.resolveCommentReport(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveCommentReport(
+        resolved = args.resolved,
+        reportId = args.report_id,
+      )
+    )
+  }.map {
+    CommentReportResponse(
+      comment_report_view = it.commentReportView.toCommentReportView()
+    )
   }
 
   override suspend fun createPrivateMessage(
@@ -991,57 +1011,157 @@ class LemmyApiV4Adapter(
   override suspend fun banUserFromCommunity(
     authorization: String?,
     args: BanFromCommunity,
-  ): Result<BanFromCommunityResponse> {
-    TODO("Not yet implemented")
+  ): Result<BanFromCommunityResponse> = retrofitErrorHandler {
+    api.banUserFromCommunity(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.BanFromCommunity(
+        reason = args.reason ?: "",
+        ban = args.ban,
+        personId = args.person_id,
+        communityId = args.community_id,
+        expiresAt = args.expires,
+        removeOrRestoreData = args.remove_data,
+      ),
+    )
+  }.map {
+    BanFromCommunityResponse(
+      person_view = it.personView.toPersonView(),
+      banned = it.personView.banned,
+    )
   }
 
   override suspend fun modUser(
     authorization: String?,
     args: AddModToCommunity,
-  ): Result<AddModToCommunityResponse> {
-    TODO("Not yet implemented")
+  ): Result<AddModToCommunityResponse> = retrofitErrorHandler {
+    api.modUser(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.AddModToCommunity(
+        added = args.added,
+        personId = args.person_id,
+        communityId = args.community_id,
+      )
+    )
+  }.map {
+    AddModToCommunityResponse(
+      moderators = it.moderators.map { it.toCommunityModeratorView() }
+    )
   }
 
   override suspend fun createPost(
     authorization: String?,
     args: CreatePost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.createPost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePost(
+        communityId = args.community_id,
+        name = args.name,
+        scheduledPublishTimeAt = null,
+        tags = null,
+        customThumbnail = args.custom_thumbnail,
+        languageId = args.language_id,
+        nsfw = args.nsfw,
+        honeypot = args.honeypot,
+        altText = args.alt_text,
+        body = args.body,
+        url = args.url,
+      )
+    )
+  }.map {
+    PostResponse(
+      post_view = it.postView.toPostView()
+    )
   }
 
   override suspend fun editPost(
     authorization: String?,
     args: EditPost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.editPost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.EditPost(
+        postId = args.post_id,
+        tags = null,
+        scheduledPublishTimeAt = null,
+        customThumbnail = args.custom_thumbnail,
+        languageId = args.language_id,
+        nsfw = args.nsfw,
+        altText = args.alt_text,
+        body = args.body,
+        url = args.url,
+        name = args.name,
+      )
+    )
+  }.map {
+    PostResponse(post_view = it.postView.toPostView())
   }
 
   override suspend fun deletePost(
     authorization: String?,
     args: DeletePost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.deletePost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.DeletePost(
+        deleted = args.deleted,
+        postId = args.post_id,
+      ),
+    )
+  }.map {
+    PostResponse(post_view = it.postView.toPostView())
   }
 
   override suspend fun featurePost(
     authorization: String?,
     args: FeaturePost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.featurePost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.FeaturePost(
+        featureType = when (args.feature_type) {
+          PostFeatureType.Local -> com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType.local
+          PostFeatureType.Community -> com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType.community
+        },
+        featured = args.featured,
+        postId = args.post_id,
+      )
+    )
+  }.map {
+    PostResponse(post_view = it.postView.toPostView())
   }
 
   override suspend fun lockPost(
     authorization: String?,
     args: LockPost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.lockPost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.LockPost(
+        reason = "",
+        locked = args.locked,
+        postId = args.post_id,
+      )
+    )
+  }.map {
+    PostResponse(post_view = it.postView.toPostView())
   }
 
   override suspend fun removePost(
     authorization: String?,
     args: RemovePost,
-  ): Result<PostResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostResponse> = retrofitErrorHandler {
+    api.removePost(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.RemovePost(
+        reason = args.reason ?: "",
+        removed = args.removed,
+        postId = args.post_id,
+        removeChildren = null,
+      )
+    )
+  }.map {
+    PostResponse(post_view = it.postView.toPostView())
   }
 
   override suspend fun search(
@@ -1083,50 +1203,166 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Result<GetSiteMetadataResponse> {
-    TODO("Not yet implemented")
+  ): Result<GetSiteMetadataResponse> = retrofitErrorHandler {
+    api.getSiteMetadata(
+      generateHeaders(authorization, force),
+      GetSiteMetadataI(
+        args.url
+      ).serializeToMap(),
+    )
+  }.map {
+    GetSiteMetadataResponse(
+      it.metadata.toSiteMetadata()
+    )
   }
 
   override suspend fun createCommentReport(
     authorization: String?,
     args: CreateCommentReport,
-  ): Result<CommentReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<CommentReportResponse> = retrofitErrorHandler {
+    api.createCommentReport(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommentReport(
+        reason = args.reason,
+        commentId = args.comment_id,
+        violatesInstanceRules = null,
+      )
+    )
+  }.map {
+    CommentReportResponse(
+      comment_report_view = it.commentReportView.toCommentReportView(),
+    )
   }
 
   override suspend fun createPostReport(
     authorization: String?,
     args: CreatePostReport,
-  ): Result<PostReportResponse> {
-    TODO("Not yet implemented")
+  ): Result<PostReportResponse> = retrofitErrorHandler {
+    api.createPostReport(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePostReport(
+        reason = args.reason,
+        postId = args.post_id,
+        violatesInstanceRules = null,
+      )
+    )
+  }.map {
+    PostReportResponse(
+      it.postReportView.toPostReportView(),
+    )
   }
 
   override suspend fun blockPerson(
     authorization: String?,
     args: BlockPerson,
-  ): Result<BlockPersonResponse> {
-    TODO("Not yet implemented")
+  ): Result<BlockPersonResponse> = retrofitErrorHandler {
+    api.blockPerson(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.BlockPerson(
+        args.block,
+        args.person_id,
+      )
+    )
+  }.map {
+    BlockPersonResponse(
+      person_view = it.personView.toPersonView(),
+      blocked = it.personView.personActions?.blockedAt != null,
+    )
   }
 
   override suspend fun blockCommunity(
     authorization: String?,
     args: BlockCommunity,
-  ): Result<BlockCommunityResponse> {
-    TODO("Not yet implemented")
+  ): Result<BlockCommunityResponse> = retrofitErrorHandler {
+    api.blockCommunity(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.BlockCommunity(
+        args.block,
+        args.community_id,
+      )
+    )
+  }.map {
+    BlockCommunityResponse(
+      community_view = it.data.communityView.toCommunityView(),
+      blocked = it.data.communityView.communityActions?.blockedAt != null
+    )
   }
 
   override suspend fun blockInstance(
     authorization: String?,
     args: BlockInstance,
-  ): Result<BlockInstanceResponse> {
-    TODO("Not yet implemented")
+  ): Result<BlockInstanceResponse> = retrofitErrorHandler {
+    api.blockInstance(
+      generateHeaders(authorization, force = false),
+      UserBlockInstanceCommunitiesParams(
+        block = args.block,
+        instanceId = args.instance_id,
+      )
+    )
+  }.map {
+    BlockInstanceResponse(
+      blocked = args.block,
+    )
   }
 
   override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<Unit> {
-    TODO("Not yet implemented")
+  ): Result<Unit> = retrofitErrorHandler {
+
+    /*
+  val default_sort_type: SortType? /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" */ =
+    null,
+  val default_listing_type: ListingType? /* "All" | "Local" | "Subscribed" */ = null,
+  val interface_language: String? = null,
+  val avatar: String? = null,
+  val banner: String? = null,
+  val : Boolean? = null,
+  val show_new_post_notifs: Boolean? = null,
+  val generate_totp_2fa: Boolean? = null,
+     */
+
+    api.saveUserSettings(
+      generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.SaveUserSettings(
+        showPersonVotes = null,
+        hidePostsWithMedia = null,
+        autoMarkFetchedPostsAsRead = null,
+        showUpvotePercentage = null,
+        showDownvotes = null,
+        showUpvotes = null,
+        showScore = args.show_scores,
+        collapseBotComments = TODO(),
+        privateMessagesEnabled = TODO(),
+        animatedImagesEnabled = TODO(),
+        infiniteScrollEnabled = TODO(),
+        openLinksInNewTab = TODO(),
+        blockingKeywords = TODO(),
+        discussionLanguages = args.discussion_languages,
+        showReadPosts = args.show_read_posts,
+        showBotAccounts = args.show_bot_accounts,
+        botAccount = args.bot_account,
+        sendNotificationsToEmail = args.send_notifications_to_email,
+        showMedia = TODO(),
+        showAvatars = args.show_avatars,
+        matrixUserId = args.matrix_user_id,
+        bio = args.bio,
+        email = args.email,
+        displayName = args.display_name,
+        interfaceLanguage = TODO(),
+        defaultCommentSortType = TODO(),
+        defaultItemsPerPage = TODO(),
+        defaultPostTimeRangeSeconds = TODO(),
+        defaultPostSortType = TODO(),
+        postListingMode = TODO(),
+        defaultListingType = TODO(),
+        theme = args.theme,
+        blurNsfw = TODO(),
+        showNsfw = args.show_nsfw,
+      ),
+    )
+  }.map {
+
   }
 
   override suspend fun uploadImage(
@@ -1135,30 +1371,73 @@ class LemmyApiV4Adapter(
     fileName: String,
     imageIs: InputStream,
     mimeType: String?,
-  ): Result<UploadImageResult> {
-    TODO("Not yet implemented")
+  ): Result<UploadImageResult> = retrofitErrorHandler {
+    api.uploadImage(
+      headers = generateHeaders(authorization, force = false),
+      token = "jwt=$authorization",
+      url = url,
+      filePart = MultipartBody.Part.createFormData(
+        name = "images[]",
+        filename = fileName,
+        body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
+      ),
+    )
+  }.map {
+    UploadImageResult(
+      it.imageUrl,
+    )
   }
 
   override suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Result<ResolveObjectResponse> {
-    TODO("Not yet implemented")
+  ): Result<ResolveObjectResponse> = retrofitErrorHandler {
+    api.resolveObject(
+      headers = generateHeaders(authorization, force = force),
+      form = ResolveObjectI(
+        args.q,
+      ).serializeToMap(),
+    )
+  }.map {
+    it.toResolveObjectResponse()
   }
 
   override suspend fun banUserFromSite(
     authorization: String?,
     args: BanPerson,
-  ): Result<BanPersonResponse> {
-    TODO("Not yet implemented")
+  ): Result<BanPersonResponse> = retrofitErrorHandler {
+    api.banUserFromSite(
+      headers = generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.BanPerson(
+        reason = args.reason ?: "",
+        ban = args.ban,
+        personId = args.person_id,
+        expiresAt = args.expires,
+        removeOrRestoreData = null,
+      )
+    )
+  }.map {
+    BanPersonResponse(
+      person_view = it.personView.toPersonView(),
+      banned = it.personView.banned,
+    )
   }
 
   override suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
-  ): Result<CommunityResponse> {
-    TODO("Not yet implemented")
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.removeCommunity(
+      headers = generateHeaders(authorization, force = false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveCommunity(
+        reason = args.reason ?: "",
+        removed = args.removed,
+        communityId = args.community_id,
+      )
+    )
+  }.map {
+
   }
 
   override suspend fun hideCommunity(

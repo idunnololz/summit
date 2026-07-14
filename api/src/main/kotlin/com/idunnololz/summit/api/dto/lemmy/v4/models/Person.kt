@@ -44,14 +44,14 @@ import com.google.gson.annotations.SerializedName
 data class Person (
 
     @SerializedName("comment_count")
-    val commentCount: kotlin.Double,
+    val commentCount: kotlin.Int,
 
     @SerializedName("post_count")
-    val postCount: kotlin.Double,
+    val postCount: kotlin.Int,
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double,
+    val instanceId: kotlin.Int,
 
     /* Whether the person is a bot account. */
     @SerializedName("bot_account")

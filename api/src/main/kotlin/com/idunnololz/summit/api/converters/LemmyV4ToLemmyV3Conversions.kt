@@ -1,5 +1,6 @@
 package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.converters.toPersonAggregates
 import com.idunnololz.summit.api.dto.lemmy.Comment
 import com.idunnololz.summit.api.dto.lemmy.CommentAggregates
 import com.idunnololz.summit.api.dto.lemmy.CommentReply
@@ -32,12 +33,16 @@ import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.RegistrationMode
+import com.idunnololz.summit.api.dto.lemmy.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.lemmy.Site
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
+import com.idunnololz.summit.api.dto.lemmy.SiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.dto.lemmy.Tagline
 import com.idunnololz.summit.api.dto.lemmy.VoteView
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportResponse as CommentReportResponseV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportView as CommentReportViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Comment as CommentV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentView as CommentViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerState
@@ -45,10 +50,12 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView as C
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView as CommunityViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community as CommunityV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
+import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReportView as PostReportViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportCombinedView
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.VoteView as VoteViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post as PostV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostView as PostViewV4
@@ -203,13 +210,13 @@ fun LocalSiteV4.toSiteAggregates(): SiteAggregates {
 
 fun PersonViewV4.toPersonView(): PersonView =
   PersonView(
-    this.toPerson(),
-    this.toPersonAggregates(),
+    person = this.toPerson(),
+    counts = this.toPersonAggregates(),
   )
 
 fun PersonViewV4.toPerson(): Person =
   Person(
-    id = person.id.toLong(),
+    id = person.id,
     name = person.name,
     display_name = person.displayName,
     avatar = person.avatar,
@@ -232,7 +239,7 @@ fun NotificationView.toPersonMentionView(): PersonMentionView {
   val d = data
   return PersonMentionView(
     person_mention = PersonMention(
-      this.notification.id.toInt(),
+      this.notification.id,
       notification.recipientId.toLong(),
       notification.commentId?.toInt(),
       notification.read,
@@ -502,19 +509,59 @@ fun ReportCombinedView.toPostReportView(): PostReportView {
   )
 }
 
+fun CommentReportViewV4.toCommentReportView(): CommentReportView {
+  return CommentReportView(
+    comment_report = commentReport.toCommentReport(),
+    comment = comment.toComment(),
+    post = post.toPost(),
+    community = community.toCommunity(),
+    creator = creator.toPerson(
+      isBanned = creatorBanned,
+      banExpires = creatorBanExpiresAt,
+      isAdmin = creatorIsAdmin,
+    ),
+    comment_creator = commentCreator.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+    counts = comment.toCommentAggregates(),
+    creator_banned_from_community = creatorBannedFromCommunity,
+    my_vote = commentActions?.voteIsUpvote?.toVoteInt(),
+    resolver = this.resolver?.toPerson(
+      isBanned = false,
+      banExpires = null,
+      isAdmin = false,
+    ),
+  )
+}
+
+fun LinkMetadata.toSiteMetadata(): SiteMetadata {
+  return SiteMetadata(
+    title = title,
+    description = description,
+    image = image,
+    embed_video_url = embedVideoUrl,
+  )
+}
+
+fun com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReport.toCommentReport(): CommentReport {
+  return CommentReport(
+    id = id,
+    creator_id = creatorId,
+    comment_id = commentId,
+    original_comment_text = originalCommentText,
+    reason = reason,
+    resolved = resolved,
+    resolver_id = resolverId,
+    published = publishedAt,
+    updated = updatedAt,
+  )
+}
+
 fun ReportCombinedView.toCommentReportView(): CommentReportView {
   return CommentReportView(
-    comment_report = CommentReport(
-      id = commentReport.id,
-      creator_id = commentReport.creatorId,
-      comment_id = commentReport.commentId,
-      original_comment_text = commentReport.originalCommentText,
-      reason = commentReport.reason,
-      resolved = commentReport.resolved,
-      resolver_id = commentReport.resolverId,
-      published = commentReport.publishedAt,
-      updated = commentReport.updatedAt,
-    ),
+    comment_report = commentReport.toCommentReport(),
     comment = comment.toComment(),
     post = post.toPost(),
     community = community.toCommunity(),
@@ -705,6 +752,74 @@ fun PrivateMessageViewV4.toPrivateMessageView(): PrivateMessageView {
     private_message = privateMessage.toPrivateMessage(read = false),
     creator = creator.toPerson(isBanned = false, banExpires = null, isAdmin = false),
     recipient = recipient.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+  )
+}
+
+fun ResolveObjectView.toResolveObjectResponse(): ResolveObjectResponse {
+  return ResolveObjectResponse(
+    comment = CommentView(
+      comment = comment.toComment(),
+      creator = creator.toPerson(creatorBanned, creatorBanExpiresAt, creatorIsAdmin),
+      post = post.toPost(),
+      community = community.toCommunity(),
+      counts = comment.toCommentAggregates(),
+      creator_banned_from_community = creatorBannedFromCommunity,
+      creator_is_moderator = creatorIsModerator,
+      creator_is_admin = creatorIsAdmin,
+      subscribed = SubscribedType.NotSubscribed,
+      saved = commentActions?.savedAt != null,
+      creator_blocked = personActions?.blockedAt != null,
+      my_vote = commentActions?.voteIsUpvote?.toVoteInt(),
+    ),
+    post = PostView(
+      post = post.toPost(),
+      creator = creator.toPerson(creatorBanned, creatorBanExpiresAt, creatorIsAdmin),
+      community = community.toCommunity(),
+      creator_banned_from_community = creatorBannedFromCommunity,
+      creator_is_moderator = creatorIsModerator,
+      creator_is_admin = creatorIsAdmin,
+      counts = post.toPostAggregates(),
+      subscribed = SubscribedType.NotSubscribed,
+      saved = postActions?.savedAt != null,
+      read = postActions?.readAt != null,
+      creator_blocked = personActions?.blockedAt != null,
+      my_vote = postActions?.voteIsUpvote?.toVoteInt(),
+      unread_comments = post.comments.toInt() - (postActions?.readCommentsAmount?.toInt() ?: 0),
+    ),
+    community = CommunityView(
+      community = community.toCommunity(),
+      subscribed = communityActions?.followState?.toSubscribedType() ?: SubscribedType.NotSubscribed,
+      blocked = communityActions?.blockedAt != null,
+      counts = community.toCommunityAggregates(),
+    ),
+    person = PersonView(
+      person = creator.toPerson(creatorBanned, creatorBanExpiresAt, creatorIsAdmin),
+      counts = person.toPersonAggregates(),
+    )
+  )
+}
+
+fun PersonV4.toPersonAggregates(): PersonAggregates {
+  return PersonAggregates(
+    id = id.toInt(),
+    person_id = id,
+    post_count = this.postCount,
+    comment_count = this.commentCount,
+  )
+}
+
+fun CommunityV4.toCommunityAggregates(): CommunityAggregates {
+  return CommunityAggregates(
+    id = id,
+    community_id = this.id,
+    subscribers = this.subscribers,
+    posts = this.posts,
+    comments = this.comments,
+    published = this.publishedAt,
+    users_active_day = this.usersActiveDay,
+    users_active_week = this.usersActiveWeek,
+    users_active_month = this.usersActiveMonth,
+    users_active_half_year = this.usersActiveHalfYear,
   )
 }
 
