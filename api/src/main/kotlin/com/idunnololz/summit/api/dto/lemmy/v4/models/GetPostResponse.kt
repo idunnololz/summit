@@ -31,6 +31,9 @@ import com.google.gson.annotations.SerializedName
 
 data class GetPostResponse (
 
+    @SerializedName("moderators")
+    val moderators: kotlin.collections.List<CommunityModeratorView>,
+
     /* A list of cross-posts, or other times / communities this link has been posted to. */
     @SerializedName("cross_posts")
     val crossPosts: kotlin.collections.List<PostView>,

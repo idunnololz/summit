@@ -4081,6 +4081,12 @@
       },
       "GetPostResponse": {
         "properties": {
+          "moderators": {
+            "items": {
+              "$ref": "#/components/schemas/CommunityModeratorView"
+            },
+            "type": "array"
+          },
           "cross_posts": {
             "items": {
               "$ref": "#/components/schemas/PostView"
@@ -4096,6 +4102,7 @@
           }
         },
         "required": [
+          "moderators",
           "cross_posts",
           "community_view",
           "post_view"
@@ -8136,7 +8143,7 @@
   },
   "info": {
     "title": "lemmy-js-client",
-    "version": "1.0.0-tag-id.3",
+    "version": "1.0.0-beta.1",
     "description": "A javascript / typescript client for Lemmy",
     "license": {
       "name": "AGPL-3.0"

@@ -232,7 +232,7 @@ class LemmyApiV4Adapter(
     GetPostResponse(
       post_view = it.postView.toPostView(),
       community_view = it.communityView.toCommunityView(),
-      moderators = listOf(),
+      moderators = it.moderators.map { it.toCommunityModeratorView() },
       cross_posts = it.crossPosts.map { it.toPostView() },
       online = 0,
     )
@@ -1259,8 +1259,8 @@ class LemmyApiV4Adapter(
     api.blockPerson(
       generateHeaders(authorization, force = false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.BlockPerson(
-        args.block,
-        args.person_id,
+        block = args.block,
+        personId = args.person_id,
       )
     )
   }.map {
@@ -1437,7 +1437,10 @@ class LemmyApiV4Adapter(
       )
     )
   }.map {
-
+    CommunityResponse(
+      community_view = it.communityView.toCommunityView(),
+      discussion_languages = it.discussionLanguages,
+    )
   }
 
   override suspend fun hideCommunity(
