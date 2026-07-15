@@ -33,7 +33,7 @@ data class PurgeComment (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double
+    val commentId: kotlin.Int
 
 ) {
 

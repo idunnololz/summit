@@ -125,6 +125,7 @@ import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -1417,24 +1418,13 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun getUnreadRegistrationApplicationsCount(
-    account: Account,
-    force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> {
-    val form = GetUnreadRegistrationApplicationCount()
-
-    return onApiClient {
-      getApi().getRegistrationApplicationsCount(authorization = account.bearer, form, force = force)
-    }
-  }
-
   suspend fun getRegistrationApplications(
     page: Int? = null,
     limit: Int? = null,
     unreadOnly: Boolean? = null,
     account: Account,
     force: Boolean,
-  ): Result<List<UserRegistrationApplication>> {
+  ): Result<PagedResponseRegistrationApplicationView> {
     val form = ListRegistrationApplications(
       page = page,
       limit = limit,

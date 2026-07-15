@@ -114,6 +114,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
@@ -519,17 +520,11 @@ interface LemmyLikeApi : ApiCompat {
 
   suspend fun purgeComment(authorization: String?, args: PurgeComment): Result<SuccessResponse>
 
-  suspend fun getRegistrationApplicationsCount(
-    authorization: String?,
-    args: GetUnreadRegistrationApplicationCount,
-    force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse>
-
   suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<List<UserRegistrationApplication>>
+  ): Result<PagedResponseRegistrationApplicationView>
 
   suspend fun approveRegistrationApplication(
     authorization: String?,

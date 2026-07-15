@@ -120,6 +120,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import kotlinx.coroutines.Dispatchers
@@ -728,25 +729,18 @@ class LemmyApiV3Adapter(
   ): Result<SuccessResponse> =
     retrofitErrorHandler { api.purgeComment(generateHeaders(authorization, false), args) }
 
-  override suspend fun getRegistrationApplicationsCount(
-    authorization: String?,
-    args: GetUnreadRegistrationApplicationCount,
-    force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> = retrofitErrorHandler {
-    api.getRegistrationApplicationsCount(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
-    )
-  }
-
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<List<UserRegistrationApplication>> = retrofitErrorHandler {
+  ): Result<PagedResponseRegistrationApplicationView> = retrofitErrorHandler {
     api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
   }.map {
-    it.registration_applications.map { it.toUserRegistrationApplication(instance) }
+    PagedResponseRegistrationApplicationView(
+      items = it.registration_applications.map { it.toUserRegistrationApplication(instance) },
+      prevPage = null,
+      nextPage = null,
+    )
   }
 
   override suspend fun approveRegistrationApplication(

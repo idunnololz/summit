@@ -416,7 +416,7 @@ class InboxRepository @Inject constructor(
     ).fold(
       onSuccess = {
         Result.success(
-          it.map { InboxItem.RegistrationApplicationInboxItem(it) },
+          it.items.map { InboxItem.RegistrationApplicationInboxItem(it) },
         )
       },
       onFailure = {

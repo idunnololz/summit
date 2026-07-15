@@ -53,9 +53,11 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView
+import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplicationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReportView as PostReportViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportCombinedView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.v4.models.VoteView as VoteViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post as PostV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostView as PostViewV4
@@ -820,6 +822,35 @@ fun CommunityV4.toCommunityAggregates(): CommunityAggregates {
     users_active_week = this.usersActiveWeek,
     users_active_month = this.usersActiveMonth,
     users_active_half_year = this.usersActiveHalfYear,
+  )
+}
+
+fun RegistrationApplicationView.toUserRegistrationApplication(instance: String): UserRegistrationApplication {
+  return UserRegistrationApplication(
+    id = registrationApplication.id,
+    answer = registrationApplication.answer,
+    email = creatorLocalUser.email,
+    ipAddress = null,
+    userId = creator.id,
+    userName = creator.name,
+    instance = instance,
+    isRead = this.registrationApplication.denyReason != null || admin != null,
+    status = if (this.admin != null) {
+      if (this.creatorLocalUser.acceptedApplication) {
+            UserRegistrationApplication.Status.Approved
+      } else {
+            UserRegistrationApplication.Status.Declined
+      }
+    } else {
+      UserRegistrationApplication.Status.NoDecision
+    },
+    appliedAt = this.registrationApplication.publishedAt,
+    countryCode = null,
+    throwawayEmail = null,
+    approvedBy = this.admin?.toPerson(isBanned = false, banExpires = null, isAdmin = true),
+    approvedAt = null,
+    referrer = null,
+    denyReason = this.registrationApplication.denyReason,
   )
 }
 

@@ -22,6 +22,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteImageParamsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DistinguishComment
 import com.idunnololz.summit.api.dto.lemmy.v4.models.EditComment
@@ -81,6 +82,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitie
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.HeaderMap
@@ -597,6 +599,6 @@ interface LemmyApiV4 {
     @HeaderMap headers: Map<String, String>,
   ): Call<PagedResponseFederatedInstanceView>
 
-  @GET
-  fun deleteMedia(@Url url: String, @HeaderMap headers: Map<String, String>): Call<Unit>
+  @DELETE("account/media")
+  fun deleteMedia(@HeaderMap headers: Map<String, String>, @Body body: DeleteImageParamsI): Call<Unit>
 }

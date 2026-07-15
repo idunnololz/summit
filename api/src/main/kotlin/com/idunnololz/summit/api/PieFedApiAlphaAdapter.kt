@@ -167,6 +167,7 @@ import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
+import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import kotlinx.coroutines.Dispatchers
@@ -1011,25 +1012,18 @@ class PieFedApiAlphaAdapter(
   ): Result<SuccessResponse> =
     retrofitErrorHandler { api.purgeComment(generateHeaders(authorization, false), args) }
 
-  override suspend fun getRegistrationApplicationsCount(
-    authorization: String?,
-    args: GetUnreadRegistrationApplicationCount,
-    force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> = retrofitErrorHandler {
-    api.getRegistrationApplicationsCount(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
-    )
-  }
-
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<List<UserRegistrationApplication>> = retrofitErrorHandler {
+  ): Result<PagedResponseRegistrationApplicationView> = retrofitErrorHandler {
     api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
   }.map {
-    it.registrations.map { it.toUserRegistration(instance) }
+    PagedResponseRegistrationApplicationView(
+      items = it.registrations.map { it.toUserRegistration(instance) },
+      prevPage = null,
+      nextPage = null,
+    )
   }
 
   override suspend fun approveRegistrationApplication(

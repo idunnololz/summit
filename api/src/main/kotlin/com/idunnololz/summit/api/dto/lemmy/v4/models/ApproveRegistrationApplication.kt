@@ -34,7 +34,7 @@ data class ApproveRegistrationApplication (
 
     /* The registration application id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("deny_reason")
     val denyReason: kotlin.String? = null

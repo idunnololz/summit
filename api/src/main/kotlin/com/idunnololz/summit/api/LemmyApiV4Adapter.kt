@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.converters.toSite
 import com.idunnololz.summit.api.converters.toSiteMetadata
 import com.idunnololz.summit.api.converters.toTimeInSeconds
 import com.idunnololz.summit.api.converters.toType
+import com.idunnololz.summit.api.converters.toUserRegistrationApplication
 import com.idunnololz.summit.api.converters.toVoteView
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
@@ -138,10 +139,12 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteImageParamsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteMetadataI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ListRegistrationApplicationsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
@@ -151,6 +154,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
+import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import okhttp3.MediaType.Companion.toMediaType
@@ -1430,7 +1434,7 @@ class LemmyApiV4Adapter(
   ): Result<CommunityResponse> = retrofitErrorHandler {
     api.removeCommunity(
       headers = generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveCommunity(
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveCommunity(
         reason = args.reason ?: "",
         removed = args.removed,
         communityId = args.community_id,
@@ -1446,59 +1450,114 @@ class LemmyApiV4Adapter(
   override suspend fun hideCommunity(
     authorization: String?,
     args: HideCommunity,
-  ): Result<SuccessResponse> {
-    TODO("Not yet implemented")
+  ): Result<SuccessResponse> = retrofitErrorHandler {
+    api.hideCommunity(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.HideCommunity(
+        reason = args.reason ?: "",
+        hidden = args.hidden,
+        communityId = args.community_id,
+      ),
+    )
+  }.map {
+    SuccessResponse(it.success)
   }
 
   override suspend fun purgePerson(
     authorization: String?,
     args: PurgePerson,
-  ): Result<SuccessResponse> {
-    TODO("Not yet implemented")
+  ): Result<SuccessResponse> = retrofitErrorHandler {
+    api.purgePerson(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.PurgePerson(
+        reason = args.reason ?: "",
+        personId = args.person_id,
+      ),
+    )
+  }.map {
+    SuccessResponse(it.success)
   }
 
   override suspend fun purgeCommunity(
     authorization: String?,
     args: PurgeCommunity,
-  ): Result<SuccessResponse> {
-    TODO("Not yet implemented")
+  ): Result<SuccessResponse> = retrofitErrorHandler {
+    api.purgeCommunity(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.PurgeCommunity(
+        reason = args.reason ?: "",
+        communityId = args.community_id,
+      ),
+    )
+  }.map {
+    SuccessResponse(it.success)
   }
 
   override suspend fun purgePost(
     authorization: String?,
     args: PurgePost,
-  ): Result<SuccessResponse> {
-    TODO("Not yet implemented")
+  ): Result<SuccessResponse> = retrofitErrorHandler {
+    api.purgePost(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.PurgePost(
+        reason = args.reason ?: "",
+        postId = args.post_id,
+      ),
+    )
+  }.map {
+    SuccessResponse(it.success)
   }
 
   override suspend fun purgeComment(
     authorization: String?,
     args: PurgeComment,
-  ): Result<SuccessResponse> {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun getRegistrationApplicationsCount(
-    authorization: String?,
-    args: GetUnreadRegistrationApplicationCount,
-    force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> {
-    TODO("Not yet implemented")
+  ): Result<SuccessResponse> = retrofitErrorHandler {
+    api.purgeComment(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.PurgeComment(
+        reason = args.reason ?: "",
+        commentId = args.comment_id
+      ),
+    )
+  }.map {
+    SuccessResponse(it.success)
   }
 
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<List<UserRegistrationApplication>> {
-    TODO("Not yet implemented")
+  ): Result<PagedResponseRegistrationApplicationView> = retrofitErrorHandler {
+    api.listRegistrationApplications(
+      headers = generateHeaders(authorization, force = false),
+      form = ListRegistrationApplicationsI(
+        limit = args.limit,
+        pageCursor = args.pageCursor,
+        unreadOnly = args.unread_only,
+      ).serializeToMap()
+    )
+  }.map {
+    PagedResponseRegistrationApplicationView(
+      items = it.items.map { it.toUserRegistrationApplication(instance) },
+      prevPage = it.prevPage,
+      nextPage = it.nextPage,
+    )
   }
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<Unit> {
-    TODO("Not yet implemented")
+  ): Result<Unit> = retrofitErrorHandler {
+    api.approveRegistrationApplication(
+      headers = generateHeaders(authorization, force = false),
+      form = com.idunnololz.summit.api.dto.lemmy.v4.models.ApproveRegistrationApplication(
+        approve = args.approve,
+        id = args.id,
+        denyReason = args.deny_reason,
+      )
+    )
+  }.map {
+    
   }
 
   override suspend fun getModLogs(
@@ -1535,8 +1594,13 @@ class LemmyApiV4Adapter(
   override suspend fun deleteMedia(
     authorization: String?,
     args: DeleteImage,
-  ): Result<Unit> {
-    TODO("Not yet implemented")
+  ): Result<Unit> = retrofitErrorHandler {
+    api.deleteMedia(
+      headers = generateHeaders(authorization, force = false),
+      body = DeleteImageParamsI(
+        filename = args.filename
+      ),
+    )
   }
 
 
