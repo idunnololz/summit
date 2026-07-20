@@ -42,7 +42,7 @@ data class LocalImage (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double? = null
+    val personId: kotlin.Int? = null
 
 ) {
 

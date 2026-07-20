@@ -12,7 +12,9 @@ import com.idunnololz.summit.api.converters.toCommunityModeratorView
 import com.idunnololz.summit.api.converters.toCommunitySortType
 import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toGetSiteResponse
+import com.idunnololz.summit.api.converters.toInstance
 import com.idunnololz.summit.api.converters.toModlogKindFilter
+import com.idunnololz.summit.api.converters.toPerson
 import com.idunnololz.summit.api.converters.toPersonMentionView
 import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostReportView
@@ -41,6 +43,7 @@ import com.idunnololz.summit.api.dto.lemmy.BlockInstance
 import com.idunnololz.summit.api.dto.lemmy.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.lemmy.BlockPerson
 import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.CaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
@@ -90,6 +93,7 @@ import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
+import com.idunnololz.summit.api.dto.lemmy.Instance
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListCommentReports
@@ -105,6 +109,8 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.lemmy.LocalImage
+import com.idunnololz.summit.api.dto.lemmy.LocalImageView
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
@@ -146,6 +152,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.GetModlogI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteMetadataI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ListMediaI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListRegistrationApplicationsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
@@ -1598,23 +1605,77 @@ class LemmyApiV4Adapter(
     TODO("Not yet implemented")
   }
 
-  override suspend fun getCaptcha(): Result<GetCaptchaResponse> {
-    TODO("Not yet implemented")
+  override suspend fun getCaptcha(): Result<GetCaptchaResponse> = retrofitErrorHandler {
+    api.getCaptcha(
+      headers = generateHeaders(authorization = null, force = false),
+    )
+  }.map {
+    GetCaptchaResponse(
+      ok = it.ok?.let {
+        CaptchaResponse(
+          png = it.png,
+          wav = it.wav,
+          uuid = it.uuid,
+        )
+      }
+    )
   }
 
   override suspend fun listMedia(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Result<ListMediaResponse> {
-    TODO("Not yet implemented")
+  ): Result<ListMediaResponse> = retrofitErrorHandler {
+    api.listMedia(
+      headers = generateHeaders(authorization, force),
+      form = ListMediaI(
+        args.limit?.toInt(),
+        args.pageCursor,
+      ).serializeToMap()
+    )
+  }.map {
+    ListMediaResponse(
+      images = it.items.map {
+        LocalImageView(
+          LocalImage(
+            local_user_id = it.localImage.personId,
+            pictrs_alias = it.localImage.pictrsAlias,
+            pictrs_delete_token = null,
+            published = it.localImage.publishedAt,
+          ),
+          person = it.person.toPerson(false, null, false)
+        )
+      },
+      nextPage = it.nextPage,
+      prevPage = it.prevPage,
+    )
   }
 
   override suspend fun federatedInstances(
     authorization: String?,
     force: Boolean,
-  ): Result<FederatedInstances> {
-    TODO("Not yet implemented")
+  ): Result<FederatedInstances> = retrofitErrorHandler {
+    api.federatedInstances(generateHeaders(authorization, force))
+  }.map {
+    val linked = mutableListOf<Instance>()
+    val allowed = mutableListOf<Instance>()
+    val blocked = mutableListOf<Instance>()
+
+    for (instanceView in it.items) {
+      if (instanceView.allowed != null) {
+        allowed.add(instanceView.instance.toInstance())
+      } else if (instanceView.blocked != null) {
+        blocked.add(instanceView.instance.toInstance())
+      } else {
+        linked.add(instanceView.instance.toInstance())
+      }
+    }
+
+    FederatedInstances(
+      linked = linked,
+      allowed = allowed,
+      blocked = blocked,
+    )
   }
 
   override suspend fun deleteMedia(
