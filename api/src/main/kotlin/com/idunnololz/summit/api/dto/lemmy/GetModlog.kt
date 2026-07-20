@@ -10,4 +10,5 @@ data class GetModlog(
   val other_person_id: PersonId? = null,
   val post_id: PostId? = null,
   val comment_id: CommentId? = null,
+  val page_cursor: String? = null,
 )

@@ -25,8 +25,6 @@ import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
-import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
@@ -44,6 +42,7 @@ import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.models.GetPersonDetailsResponse

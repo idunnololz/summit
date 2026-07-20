@@ -48,7 +48,7 @@ data class Modlog (
     val kind: ModlogKind,
 
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("bulk_action_parent_id")
     val bulkActionParentId: kotlin.Double? = null,

@@ -12,6 +12,7 @@ import com.idunnololz.summit.api.converters.toCommunityModeratorView
 import com.idunnololz.summit.api.converters.toCommunitySortType
 import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toGetSiteResponse
+import com.idunnololz.summit.api.converters.toModlogKindFilter
 import com.idunnololz.summit.api.converters.toPersonMentionView
 import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostReportView
@@ -70,7 +71,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlog
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
@@ -113,6 +113,7 @@ import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
 import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
@@ -141,12 +142,14 @@ import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteImageParamsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
+import com.idunnololz.summit.api.dto.lemmy.v4.models.GetModlogI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetPostsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetSiteMetadataI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListCommunitiesI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListRegistrationApplicationsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKindFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectI
@@ -154,9 +157,11 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
+import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import com.idunnololz.summit.api.local.toModEvent
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -1557,15 +1562,36 @@ class LemmyApiV4Adapter(
       )
     )
   }.map {
-    
+
   }
 
   override suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> {
-    TODO("Not yet implemented")
+  ): Result<GetModlogResponse> = retrofitErrorHandler {
+    api.getModLogs(
+      headers = generateHeaders(authorization, force = false),
+      form = GetModlogI(
+        limit = args.limit,
+        pageCursor = args.page_cursor,
+        bulkActionParentId = null,
+        showBulk = null,
+        commentId = args.comment_id,
+        postId = args.post_id,
+        otherPersonId = args.other_person_id,
+        listingType = null,
+        type = args.type_.toModlogKindFilter(),
+        communityId = args.community_id,
+        modPersonId = args.mod_person_id,
+      ).serializeToMap()
+    )
+  }.map {
+    GetModlogResponse(
+      modEvents = it.items.map { it.toModEvent() },
+      nextPage = it.nextPage,
+      prevPage = it.prevPage,
+    )
   }
 
   override suspend fun register(args: Register): Result<LoginResponse> {

@@ -25,10 +25,71 @@ import com.google.gson.annotations.SerializedName
  */
 
 
-class ModlogKindFilter (
+enum class ModlogKindFilter {
 
-) {
+  @SerializedName(value = "all")
+  All,
 
+  @SerializedName(value = "admin_add")
+  AdminAdd,
 
+  @SerializedName(value = "admin_ban")
+  AdminBan,
+
+  @SerializedName(value = "admin_allow_instance")
+  AdminAllowInstance,
+
+  @SerializedName(value = "admin_block_instance")
+  AdminBlockInstance,
+
+  @SerializedName(value = "admin_purge_comment")
+  AdminPurgeComment,
+
+  @SerializedName(value = "admin_purge_community")
+  AdminPurgeCommunity,
+
+  @SerializedName(value = "admin_purge_person")
+  AdminPurgePerson,
+
+  @SerializedName(value = "admin_purge_post")
+  AdminPurgePost,
+
+  @SerializedName(value = "mod_add_to_community")
+  ModAddToCommunity,
+
+  @SerializedName(value = "mod_ban_from_community")
+  ModBanFromCommunity,
+
+  @SerializedName(value = "admin_feature_post_site")
+  AdminFeaturePostSite,
+
+  @SerializedName(value = "mod_feature_post_community")
+  ModFeaturePostCommunity,
+
+  @SerializedName(value = "mod_change_community_visibility")
+  ModChangeCommunityVisibility,
+
+  @SerializedName(value = "mod_lock_post")
+  ModLockPost,
+
+  @SerializedName(value = "mod_remove_comment")
+  ModRemoveComment,
+
+  @SerializedName(value = "admin_remove_community")
+  AdminRemoveCommunity,
+
+  @SerializedName(value = "mod_remove_post")
+  ModRemovePost,
+
+  @SerializedName(value = "mod_transfer_community")
+  ModTransferCommunity,
+
+  @SerializedName(value = "mod_lock_comment")
+  ModLockComment,
+
+  @SerializedName(value = "mod_warn_comment")
+  ModWarnComment,
+
+  @SerializedName(value = "mod_warn_post")
+  ModWarnPost;
 }
-

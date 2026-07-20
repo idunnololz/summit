@@ -14,6 +14,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.Instance
 import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.LocalSite
@@ -50,6 +51,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView as C
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView as CommunityViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community as CommunityV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
+import com.idunnololz.summit.api.dto.lemmy.v4.models.Instance as InstanceV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView
@@ -600,7 +602,7 @@ private fun CommentV4.toCommentAggregates(): CommentAggregates {
   )
 }
 
-private fun CommentV4.toComment(): Comment {
+internal fun CommentV4.toComment(): Comment {
   return Comment(
     id = id.toInt(),
     creator_id = creatorId.toLong(),
@@ -662,7 +664,7 @@ private fun PostV4.toPostAggregates(): PostAggregates {
   )
 }
 
-private fun PostV4.toPost(): Post {
+internal fun PostV4.toPost(): Post {
   return Post(
     id = id.toInt(),
     name = name,
@@ -690,7 +692,7 @@ private fun PostV4.toPost(): Post {
   )
 }
 
-private fun PersonV4.toPerson(
+internal fun PersonV4.toPerson(
   isBanned: Boolean,
   banExpires: String?,
   isAdmin: Boolean,
@@ -716,7 +718,7 @@ private fun PersonV4.toPerson(
   )
 }
 
-private fun CommunityV4.toCommunity(): Community = Community(
+internal fun CommunityV4.toCommunity(): Community = Community(
   id = id.toInt(),
   name = name,
   title = title,
@@ -851,6 +853,17 @@ fun RegistrationApplicationView.toUserRegistrationApplication(instance: String):
     approvedAt = null,
     referrer = null,
     denyReason = this.registrationApplication.denyReason,
+  )
+}
+
+internal fun InstanceV4.toInstance(): Instance {
+  return Instance(
+    id = id,
+    domain = domain,
+    published = publishedAt,
+    updated = updatedAt,
+    software = software,
+    version = version,
   )
 }
 

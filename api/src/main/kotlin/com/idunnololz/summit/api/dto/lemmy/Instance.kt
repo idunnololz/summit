@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto.lemmy
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Instance(
   val id: InstanceId,
   val domain: String,

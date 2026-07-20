@@ -87,7 +87,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlog
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
@@ -167,9 +166,11 @@ import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
+import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import com.idunnololz.summit.api.local.toModEvents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -1049,7 +1050,7 @@ class PieFedApiAlphaAdapter(
       args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
     )
   }.map {
-    GetModlogResponse(
+    val events = com.idunnololz.summit.api.dto.lemmy.GetModlogResponse(
       removed_posts = it.removedPosts.mapNotNull { it.toModRemovePostView() },
       locked_posts = it.lockedPosts.mapNotNull { it.toModLockPostView() },
       featured_posts = it.featuredPosts.mapNotNull { it.toModFeaturePostView() },
@@ -1069,6 +1070,12 @@ class PieFedApiAlphaAdapter(
       admin_purged_posts = it.adminPurgedPosts.mapNotNull { it.toAdminPurgePostView() },
       admin_purged_comments = it.adminPurgedComments.mapNotNull { it.toAdminPurgeCommentView() },
       hidden_communities = it.hiddenCommunities.mapNotNull { it.toModHideCommunityView() },
+    ).toModEvents()
+
+    GetModlogResponse(
+      modEvents = events,
+      nextPage = null,
+      prevPage = null,
     )
   }
 

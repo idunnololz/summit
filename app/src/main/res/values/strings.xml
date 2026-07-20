@@ -1492,6 +1492,10 @@
     <!-- Description of a mod action taken. -->
     <string name="unfeatured_post_in_community_format">Unfeatured post %1$s in community %2$s.</string>
     <!-- Description of a mod action taken. -->
+    <string name="featured_post_on_instance_format">Featured post %1$s on instance.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="unfeatured_post_on_instance_format">Unfeatured post %1$s on instance.</string>
+    <!-- Description of a mod action taken. -->
     <string name="hidden_community_format">Hidden community %1$s.</string>
     <!-- Description of a mod action taken. -->
     <string name="unhidden_community_format">Unhide community %1$s.</string>
@@ -1499,6 +1503,10 @@
     <string name="locked_post_format">Locked post %1$s in community %2$s.</string>
     <!-- Description of a mod action taken. -->
     <string name="unlocked_post_format">Unlocked post %1$s in community %2$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="locked_comment_format">Locked comment %1$s on post %2$s in community %3$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="unlocked_comment_format">Unlocked comment %1$s on post %2$s in community %3$s.</string>
     <!-- Description of a mod action taken. -->
     <string name="removed_comment_format">Removed comment %1$s from post %2$s.</string>
     <!-- Description of a mod action taken. -->
@@ -1513,6 +1521,14 @@
     <string name="unremoved_post_format">Undo remove post %1$s from community %2$s.</string>
     <!-- Description of a mod action taken. -->
     <string name="transferred_ownership_of_community_format">Transferred ownership of the community %1$s to %2$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="issued_warning_on_comment_format">Issued warning on comment %1$s on post %2$s in community %3$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="unissued_warning_on_comment_format">Withdrew warning on comment %1$s on post %2$s in community %3$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="issued_warning_on_post_format">Issued warning on post %1$s in community %2$s.</string>
+    <!-- Description of a mod action taken. -->
+    <string name="unissued_warning_on_post_format">Withdrew warning on post %1$s in community %2$s.</string>
     <!-- Description of a mod action taken. Shows the mod/admin reason given for the action. -->
     <string name="reason_format">Reason: %1$s</string>
     <!-- Error text. -->
@@ -2406,6 +2422,8 @@
     <string name="change_feed">Change feed</string>
     <string name="warn_match_whole_word_enabled">"Match whole word" only works if the filter is a single word. Uncheck \"Match whole word\" to fix.</string>
     <string name="no_description">*No description.*</string>
+    <string name="blocked_instance">Blocked instance %1$s.</string>
+    <string name="unblocked_instance">Unblocked instance %1$s.</string>
 
 
     <!-- uCrop string resource end -->

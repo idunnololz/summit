@@ -2,10 +2,12 @@ package com.idunnololz.summit.api.converters
 
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType as CommentSortTypeV3
 import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.SearchType as SearchTypeV3
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunitySortType
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKindFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchType
 import kotlin.time.Duration
@@ -111,4 +113,25 @@ fun SearchTypeV3.toSearchType(): SearchType? =
     SearchTypeV3.Communities -> SearchType.communities
     SearchTypeV3.Users -> SearchType.users
     SearchTypeV3.Url -> null
+  }
+
+fun ModlogActionType?.toModlogKindFilter(): ModlogKindFilter? =
+  when (this) {
+    ModlogActionType.All -> ModlogKindFilter.All
+    ModlogActionType.ModRemovePost -> ModlogKindFilter.ModRemovePost
+    ModlogActionType.ModLockPost -> ModlogKindFilter.ModLockPost
+    ModlogActionType.ModFeaturePost -> ModlogKindFilter.ModFeaturePostCommunity
+    ModlogActionType.ModRemoveComment -> ModlogKindFilter.ModRemoveComment
+    ModlogActionType.ModRemoveCommunity -> ModlogKindFilter.AdminRemoveCommunity
+    ModlogActionType.ModBanFromCommunity -> ModlogKindFilter.ModBanFromCommunity
+    ModlogActionType.ModAddCommunity -> null
+    ModlogActionType.ModTransferCommunity -> ModlogKindFilter.ModTransferCommunity
+    ModlogActionType.ModAdd -> ModlogKindFilter.ModAddToCommunity
+    ModlogActionType.ModBan -> ModlogKindFilter.ModBanFromCommunity
+    ModlogActionType.ModHideCommunity -> ModlogKindFilter.ModChangeCommunityVisibility
+    ModlogActionType.AdminPurgePerson -> ModlogKindFilter.AdminPurgePerson
+    ModlogActionType.AdminPurgeCommunity -> ModlogKindFilter.AdminPurgeCommunity
+    ModlogActionType.AdminPurgePost -> ModlogKindFilter.AdminPurgePost
+    ModlogActionType.AdminPurgeComment -> ModlogKindFilter.AdminPurgeComment
+    null -> null
   }

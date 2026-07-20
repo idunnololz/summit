@@ -12,7 +12,9 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
+import com.idunnololz.summit.api.local.ActionType
+import com.idunnololz.summit.api.local.GetModlogResponse
+import com.idunnololz.summit.api.local.ModEvent
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toPersonRef
@@ -130,169 +132,49 @@ class ModLogsViewModel @Inject constructor(
       val modSource = modSource ?: MultiLemmyListSource<ModEvent, Unit, Long>(
         listOf(
           newSource(communityId, ModEvent.ModRemovePostViewEvent::class) {
-            it.removed_posts.map {
-              ModEvent.ModRemovePostViewEvent(
-                it.mod_remove_post.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_remove_post.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModRemovePostViewEvent>()
           },
           newSource(communityId, ModEvent.ModLockPostViewEvent::class) {
-            it.locked_posts.map {
-              ModEvent.ModLockPostViewEvent(
-                it.mod_lock_post.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_lock_post.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModLockPostViewEvent>()
           },
           newSource(communityId, ModEvent.ModFeaturePostViewEvent::class) {
-            it.featured_posts.map {
-              ModEvent.ModFeaturePostViewEvent(
-                it.mod_feature_post.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_feature_post.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModFeaturePostViewEvent>()
           },
           newSource(communityId, ModEvent.ModRemoveCommentViewEvent::class) {
-            it.removed_comments.map {
-              ModEvent.ModRemoveCommentViewEvent(
-                it.mod_remove_comment.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_remove_comment.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModRemoveCommentViewEvent>()
           },
           newSource(communityId, ModEvent.ModRemoveCommunityViewEvent::class) {
-            it.removed_communities.map {
-              ModEvent.ModRemoveCommunityViewEvent(
-                it.mod_remove_community.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_remove_community.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModRemoveCommunityViewEvent>()
           },
           newSource(communityId, ModEvent.ModBanFromCommunityViewEvent::class) {
-            it.banned_from_community.map {
-              ModEvent.ModBanFromCommunityViewEvent(
-                it.mod_ban_from_community.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_ban_from_community.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModBanFromCommunityViewEvent>()
           },
           newSource(communityId, ModEvent.ModBanViewEvent::class) {
-            it.banned.map {
-              ModEvent.ModBanViewEvent(
-                it.mod_ban.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_ban.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModBanViewEvent>()
           },
           newSource(communityId, ModEvent.ModAddCommunityViewEvent::class) {
-            it.added_to_community.map {
-              ModEvent.ModAddCommunityViewEvent(
-                it.mod_add_community.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_add_community.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModAddCommunityViewEvent>()
           },
           newSource(communityId, ModEvent.ModTransferCommunityViewEvent::class) {
-            it.transferred_to_community.map {
-              ModEvent.ModTransferCommunityViewEvent(
-                it.mod_transfer_community.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_transfer_community.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModTransferCommunityViewEvent>()
           },
           newSource(communityId, ModEvent.ModAddViewEvent::class) {
-            it.added.map {
-              ModEvent.ModAddViewEvent(
-                it.mod_add.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_add.when_),
-                it.moderator,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModAddViewEvent>()
           },
           newSource(communityId, ModEvent.AdminPurgePersonViewEvent::class) {
-            it.admin_purged_persons.map {
-              ModEvent.AdminPurgePersonViewEvent(
-                it.admin_purge_person.id,
-                ActionType.Admin,
-                dateStringToTs(it.admin_purge_person.when_),
-                it.admin,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.AdminPurgePersonViewEvent>()
           },
           newSource(communityId, ModEvent.AdminPurgeCommunityViewEvent::class) {
-            it.admin_purged_communities.map {
-              ModEvent.AdminPurgeCommunityViewEvent(
-                it.admin_purge_community.id,
-                ActionType.Admin,
-                dateStringToTs(it.admin_purge_community.when_),
-                it.admin,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.AdminPurgeCommunityViewEvent>()
           },
           newSource(communityId, ModEvent.AdminPurgePostViewEvent::class) {
-            it.admin_purged_posts.map {
-              ModEvent.AdminPurgePostViewEvent(
-                it.admin_purge_post.id,
-                ActionType.Admin,
-                dateStringToTs(it.admin_purge_post.when_),
-                it.admin,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.AdminPurgePostViewEvent>()
           },
           newSource(communityId, ModEvent.AdminPurgeCommentViewEvent::class) {
-            it.admin_purged_comments.map {
-              ModEvent.AdminPurgeCommentViewEvent(
-                it.admin_purge_comment.id,
-                ActionType.Admin,
-                dateStringToTs(it.admin_purge_comment.when_),
-                it.admin,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.AdminPurgeCommentViewEvent>()
           },
           newSource(communityId, ModEvent.ModHideCommunityViewEvent::class) {
-            it.hidden_communities.map {
-              ModEvent.ModHideCommunityViewEvent(
-                it.mod_hide_community.id,
-                ActionType.Mod,
-                dateStringToTs(it.mod_hide_community.when_),
-                it.admin,
-                it,
-              )
-            }
+            it.modEvents.filterIsInstance<ModEvent.ModHideCommunityViewEvent>()
           },
         ),
         sortValue = { it.ts },

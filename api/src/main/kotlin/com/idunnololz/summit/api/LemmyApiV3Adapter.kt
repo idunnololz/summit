@@ -123,6 +123,7 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
+import com.idunnololz.summit.api.local.toModEvents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -756,10 +757,16 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> = retrofitErrorHandler {
+  ): Result<com.idunnololz.summit.api.local.GetModlogResponse> = retrofitErrorHandler {
     api.getModLogs(
       headers = generateHeaders(authorization, force),
       form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+    )
+  }.map {
+    com.idunnololz.summit.api.local.GetModlogResponse(
+      modEvents = it.toModEvents(),
+      nextPage = null,
+      prevPage = null,
     )
   }
 

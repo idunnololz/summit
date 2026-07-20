@@ -5,6 +5,8 @@ import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.api.local.ModEvent
+import com.idunnololz.summit.api.local.toModEvents
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +64,7 @@ class MultiModEventDataSource(
               force = force,
             ).fold(
               {
-                Result.success(it.toModEvents().sortedByDescending { it.ts })
+                Result.success(it.modEvents.sortedByDescending { it.ts })
               },
               {
                 Result.failure(it)

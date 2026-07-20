@@ -43,7 +43,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlog
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
@@ -114,6 +113,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication

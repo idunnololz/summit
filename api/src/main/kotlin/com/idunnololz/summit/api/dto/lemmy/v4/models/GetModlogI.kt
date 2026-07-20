@@ -40,7 +40,7 @@ import com.google.gson.annotations.SerializedName
 data class GetModlogI (
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
@@ -55,15 +55,15 @@ data class GetModlogI (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double? = null,
+    val commentId: kotlin.Int? = null,
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double? = null,
+    val postId: kotlin.Int? = null,
 
     /* The person id. */
     @SerializedName("other_person_id")
-    val otherPersonId: kotlin.Double? = null,
+    val otherPersonId: kotlin.Long? = null,
 
     @SerializedName("listing_type")
     val listingType: ListingType? = null,
@@ -73,11 +73,11 @@ data class GetModlogI (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double? = null,
+    val communityId: kotlin.Int? = null,
 
     /* The person id. */
     @SerializedName("mod_person_id")
-    val modPersonId: kotlin.Double? = null
+    val modPersonId: kotlin.Long? = null
 
 ) {
 

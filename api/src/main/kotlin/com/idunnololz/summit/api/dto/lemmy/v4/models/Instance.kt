@@ -40,7 +40,7 @@ data class Instance (
 
     /* The instance id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     /* The version of the instance's software. */
     @SerializedName("version")

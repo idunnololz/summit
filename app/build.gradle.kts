@@ -196,8 +196,7 @@ dependencies {
   implementation(libs.viewpump)
 
   implementation(libs.hilt.android)
-  // Tried to switch to KSP + Dagger/Hilt but the build performance was terrible. Specifically
-  // for incremental builds. Make sure to test this when switching to KSP again in the future.
+
   ksp(libs.hilt.android.compiler)
   ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
 
