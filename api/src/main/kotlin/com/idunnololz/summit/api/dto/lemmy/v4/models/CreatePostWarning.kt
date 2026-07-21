@@ -33,7 +33,7 @@ data class CreatePostWarning (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double
+    val postId: kotlin.Int
 
 ) {
 

@@ -50,7 +50,7 @@ data class CustomEmoji (
 
     /* The custom emoji id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null

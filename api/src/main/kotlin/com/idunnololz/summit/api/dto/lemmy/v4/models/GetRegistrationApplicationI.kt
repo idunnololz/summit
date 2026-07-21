@@ -29,7 +29,7 @@ data class GetRegistrationApplicationI (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double
+    val personId: kotlin.Long
 
 ) {
 

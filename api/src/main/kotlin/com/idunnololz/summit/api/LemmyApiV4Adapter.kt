@@ -278,7 +278,7 @@ class LemmyApiV4Adapter(
     api.likePost(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePostLike(
-        postId = args.post_id.toDouble(),
+        postId = args.post_id,
         isUpvote = if (args.score > 0) {
           true
         } else if (args.score < 0) {
@@ -301,7 +301,7 @@ class LemmyApiV4Adapter(
     api.likeComment(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreateCommentLike(
-        commentId = args.comment_id.toDouble(),
+        commentId = args.comment_id,
         isUpvote = if (args.score > 0) {
           true
         } else if (args.score < 0) {
@@ -360,10 +360,10 @@ class LemmyApiV4Adapter(
     api.createComment(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreateComment(
-        postId = args.post_id.toDouble(),
+        postId = args.post_id,
         content = args.content,
-        languageId = args.language_id?.toDouble(),
-        parentId = args.parent_id?.toDouble(),
+        languageId = args.language_id,
+        parentId = args.parent_id,
       )
     )
   }.map {
@@ -381,8 +381,8 @@ class LemmyApiV4Adapter(
     api.editComment(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.EditComment(
-        commentId = args.comment_id.toDouble(),
-        languageId = args.language_id?.toDouble(),
+        commentId = args.comment_id,
+        languageId = args.language_id,
         content = args.content,
       )
     )
@@ -402,7 +402,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteComment(
         deleted = args.deleted,
-        commentId = args.comment_id.toDouble(),
+        commentId = args.comment_id,
       )
     )
   }.map {
@@ -421,7 +421,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.SavePost(
         args.save,
-        args.post_id.toDouble(),
+        args.post_id,
       )
     )
   }.map {
@@ -438,7 +438,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.MarkPostAsRead(
         args.read,
-        args.post_id.toDouble(),
+        args.post_id,
       )
     )
   }.map {
@@ -455,7 +455,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.SaveComment(
         args.save,
-        args.comment_id.toDouble(),
+        args.comment_id,
       )
     )
   }.map {
@@ -506,7 +506,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.DistinguishComment(
         distinguished = args.distinguished,
-        commentId = args.comment_id.toDouble(),
+        commentId = args.comment_id,
       ),
     )
   }.map {
@@ -526,7 +526,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.RemoveComment(
         args.reason ?: "",
         args.removed,
-        args.comment_id.toDouble(),
+        args.comment_id,
       ),
     )
   }.map {
@@ -577,7 +577,7 @@ class LemmyApiV4Adapter(
   }.map {
     CommunityResponse(
       it.communityView.toCommunityView(),
-      it.discussionLanguages.map { it.toInt() },
+      it.discussionLanguages.map { it },
     )
   }
 
@@ -588,7 +588,7 @@ class LemmyApiV4Adapter(
     api.updateCommunity(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.EditCommunity(
-        args.community_id.toDouble(),
+        args.community_id,
         null,
         args.discussion_languages?.map { it.toDouble() },
         args.posting_restricted_to_mods,
@@ -601,7 +601,7 @@ class LemmyApiV4Adapter(
   }.map {
     CommunityResponse(
       it.communityView.toCommunityView(),
-      it.discussionLanguages.map { it.toInt() },
+      it.discussionLanguages.map { it },
     )
   }
 
@@ -613,13 +613,13 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteCommunity(
         args.deleted,
-        args.community_id.toDouble(),
+        args.community_id,
       ),
     )
   }.map {
     CommunityResponse(
       it.communityView.toCommunityView(),
-      it.discussionLanguages.map { it.toInt() },
+      it.discussionLanguages.map { it },
     )
   }
 
@@ -696,7 +696,7 @@ class LemmyApiV4Adapter(
     api.listInbox(
       generateHeaders(authorization, false),
       ListInboxArgs(
-        limit = args.limit?.toDouble(),
+        limit = args.limit,
         page_cursor = args.page_cursor,
         creator_id = null,
         unread_only = args.unread_only,
@@ -717,7 +717,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       MarkNotificationAsRead(
         args.read,
-        args.comment_reply_id.toDouble(),
+        args.comment_reply_id,
       ),
     )
   }.map {
@@ -734,7 +734,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       MarkNotificationAsRead(
         args.read,
-        args.person_mention_id.toDouble(),
+        args.person_mention_id,
       ),
     )
   }.map {
@@ -751,7 +751,7 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, false),
       MarkNotificationAsRead(
         args.read,
-        args.private_message_id.toDouble(),
+        args.private_message_id,
       ),
     )
   }.map {
@@ -781,7 +781,7 @@ class LemmyApiV4Adapter(
     api.listInbox(
       generateHeaders(authorization, false),
       ListInboxArgs(
-        limit = args.limit?.toDouble(),
+        limit = args.limit,
         page_cursor = args.page_cursor,
         creator_id = null,
         unread_only = args.unread_only,
@@ -802,7 +802,7 @@ class LemmyApiV4Adapter(
     api.listInbox(
       generateHeaders(authorization, false),
       ListInboxArgs(
-        limit = args.limit?.toDouble(),
+        limit = args.limit,
         page_cursor = args.page_cursor,
         creator_id = null,
         unread_only = args.unread_only,
@@ -1348,32 +1348,32 @@ class LemmyApiV4Adapter(
         showDownvotes = null,
         showUpvotes = null,
         showScore = args.show_scores,
-        collapseBotComments = TODO(),
-        privateMessagesEnabled = TODO(),
-        animatedImagesEnabled = TODO(),
-        infiniteScrollEnabled = TODO(),
-        openLinksInNewTab = TODO(),
-        blockingKeywords = TODO(),
+        collapseBotComments = null,
+        privateMessagesEnabled = null,
+        animatedImagesEnabled = null,
+        infiniteScrollEnabled = null,
+        openLinksInNewTab = null,
+        blockingKeywords = null,
         discussionLanguages = args.discussion_languages,
         showReadPosts = args.show_read_posts,
         showBotAccounts = args.show_bot_accounts,
         botAccount = args.bot_account,
         sendNotificationsToEmail = args.send_notifications_to_email,
-        showMedia = TODO(),
+        showMedia = null,
         showAvatars = args.show_avatars,
         matrixUserId = args.matrix_user_id,
         bio = args.bio,
         email = args.email,
         displayName = args.display_name,
-        interfaceLanguage = TODO(),
-        defaultCommentSortType = TODO(),
-        defaultItemsPerPage = TODO(),
-        defaultPostTimeRangeSeconds = TODO(),
-        defaultPostSortType = TODO(),
-        postListingMode = TODO(),
-        defaultListingType = TODO(),
+        interfaceLanguage = null,
+        defaultCommentSortType = null,
+        defaultItemsPerPage = null,
+        defaultPostTimeRangeSeconds = null,
+        defaultPostSortType = null,
+        postListingMode = null,
+        defaultListingType = null,
         theme = args.theme,
-        blurNsfw = TODO(),
+        blurNsfw = null,
         showNsfw = args.show_nsfw,
       ),
     )
@@ -1601,8 +1601,29 @@ class LemmyApiV4Adapter(
     )
   }
 
-  override suspend fun register(args: Register): Result<LoginResponse> {
-    TODO("Not yet implemented")
+  override suspend fun register(args: Register): Result<LoginResponse> = retrofitErrorHandler {
+    api.register(
+      generateHeaders(null, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.Register(
+        passwordVerify = args.password_verify,
+        password = args.password,
+        username = args.username,
+        token = null,
+        stayLoggedIn = null,
+        answer = args.answer,
+        honeypot = args.honeypot,
+        captchaAnswer = args.captcha_answer,
+        captchaUuid = args.captcha_uuid,
+        email = args.email,
+        showNsfw = args.show_nsfw
+      )
+    )
+  }.map {
+    LoginResponse(
+      jwt = it.jwt,
+      registration_created = it.registrationCreated,
+      verify_email_sent = it.verifyEmailSent,
+    )
   }
 
   override suspend fun getCaptcha(): Result<GetCaptchaResponse> = retrofitErrorHandler {

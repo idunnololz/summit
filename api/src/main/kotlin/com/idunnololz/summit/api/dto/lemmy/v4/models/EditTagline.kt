@@ -33,7 +33,7 @@ data class EditTagline (
 
     /* The tagline id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

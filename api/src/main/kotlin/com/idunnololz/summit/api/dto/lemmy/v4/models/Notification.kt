@@ -39,7 +39,7 @@ data class Notification (
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Long,
 
     @SerializedName("kind")
     val kind: NotificationType,
@@ -52,25 +52,25 @@ data class Notification (
 
     /* The person id. */
     @SerializedName("recipient_id")
-    val recipientId: kotlin.Double,
+    val recipientId: kotlin.Long,
 
     @SerializedName("id")
     val id: Int,
 
     @SerializedName("modlog_id")
-    val modlogId: kotlin.Double? = null,
+    val modlogId: kotlin.Int? = null,
 
     /* The private message id. */
     @SerializedName("private_message_id")
-    val privateMessageId: kotlin.Double? = null,
+    val privateMessageId: kotlin.Int? = null,
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double? = null,
+    val postId: kotlin.Int? = null,
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double? = null
+    val commentId: kotlin.Int? = null
 
 ) {
 

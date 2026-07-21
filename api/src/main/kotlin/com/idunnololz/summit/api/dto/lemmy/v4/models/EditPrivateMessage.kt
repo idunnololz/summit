@@ -33,7 +33,7 @@ data class EditPrivateMessage (
 
     /* The private message id. */
     @SerializedName("private_message_id")
-    val privateMessageId: kotlin.Double
+    val privateMessageId: kotlin.Int
 
 ) {
 

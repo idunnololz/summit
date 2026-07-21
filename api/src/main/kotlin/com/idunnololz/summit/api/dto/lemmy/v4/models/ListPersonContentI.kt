@@ -35,7 +35,7 @@ import com.google.gson.annotations.SerializedName
 data class ListPersonContentI (
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")
@@ -46,7 +46,7 @@ data class ListPersonContentI (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double? = null,
+    val communityId: kotlin.Int? = null,
 
     /* Example: dessalines , or dessalines@xyz.tld */
     @SerializedName("username")
@@ -54,7 +54,7 @@ data class ListPersonContentI (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double? = null,
+    val personId: kotlin.Long? = null,
 
     @SerializedName("type_")
     val type: PersonContentType? = null

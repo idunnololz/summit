@@ -56,27 +56,27 @@ data class Comment (
     val federationPending: kotlin.Boolean,
 
     @SerializedName("unresolved_report_count")
-    val unresolvedReportCount: kotlin.Double,
+    val unresolvedReportCount: kotlin.Int,
 
     @SerializedName("report_count")
-    val reportCount: kotlin.Double,
+    val reportCount: kotlin.Int,
 
     /* The total number of children in this comment branch. */
     @SerializedName("child_count")
-    val childCount: kotlin.Double,
+    val childCount: kotlin.Int,
 
     @SerializedName("downvotes")
-    val downvotes: kotlin.Double,
+    val downvotes: kotlin.Int,
 
     @SerializedName("upvotes")
-    val upvotes: kotlin.Double,
+    val upvotes: kotlin.Int,
 
     @SerializedName("score")
-    val score: kotlin.Double,
+    val score: kotlin.Int,
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double,
+    val languageId: kotlin.Int,
 
     /* Whether the comment has been distinguished(speaking officially) by a mod. */
     @SerializedName("distinguished")
@@ -109,11 +109,11 @@ data class Comment (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Int,
 
     /* The comment id. */
     @SerializedName("id")

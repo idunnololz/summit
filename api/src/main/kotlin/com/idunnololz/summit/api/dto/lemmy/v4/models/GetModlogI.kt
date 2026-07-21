@@ -47,7 +47,7 @@ data class GetModlogI (
     val pageCursor: kotlin.String? = null,
 
     @SerializedName("bulk_action_parent_id")
-    val bulkActionParentId: kotlin.Double? = null,
+    val bulkActionParentId: kotlin.Int? = null,
 
     /* When `true` show all. When `false` or `None`, hide bulk actions (default). */
     @SerializedName("show_bulk")

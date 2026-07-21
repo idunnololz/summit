@@ -32,7 +32,7 @@ import com.google.gson.annotations.SerializedName
 data class EditMultiCommunity (
 
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("deleted")
     val deleted: kotlin.Boolean? = null,

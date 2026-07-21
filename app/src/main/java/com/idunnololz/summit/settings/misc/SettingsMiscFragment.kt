@@ -320,6 +320,10 @@ class SettingsMiscFragment :
         { preferences.showPerUserScores },
         { preferences.showPerUserScores = it },
       ),
+      settings.useLemmyV4.asOnOffSwitch(
+        { preferences.useLemmyV4 },
+        { preferences.useLemmyV4 = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

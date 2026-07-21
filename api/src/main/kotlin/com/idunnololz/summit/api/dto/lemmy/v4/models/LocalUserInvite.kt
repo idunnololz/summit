@@ -37,24 +37,24 @@ data class LocalUserInvite (
     val publishedAt: kotlin.String,
 
     @SerializedName("uses_count")
-    val usesCount: kotlin.Double,
+    val usesCount: kotlin.Int,
 
     /* The local user id. */
     @SerializedName("local_user_id")
-    val localUserId: kotlin.Double,
+    val localUserId: kotlin.Long,
 
     @SerializedName("token")
     val token: kotlin.String,
 
     /* The invitation id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("expires_at")
     val expiresAt: kotlin.String? = null,
 
     @SerializedName("max_uses")
-    val maxUses: kotlin.Double? = null
+    val maxUses: kotlin.Int? = null
 
 ) {
 

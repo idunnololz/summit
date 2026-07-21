@@ -32,7 +32,7 @@ data class FollowMultiCommunity (
     val follow: kotlin.Boolean,
 
     @SerializedName("multi_community_id")
-    val multiCommunityId: kotlin.Double
+    val multiCommunityId: kotlin.Int
 
 ) {
 

@@ -32,7 +32,7 @@ import com.google.gson.annotations.SerializedName
 data class AdminListUsersI (
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     @SerializedName("sort")
     val sort: LocalUserSortType? = null,

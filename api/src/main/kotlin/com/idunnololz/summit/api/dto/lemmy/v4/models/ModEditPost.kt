@@ -31,7 +31,7 @@ data class ModEditPost (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     @SerializedName("tags")
     val tags: kotlin.collections.List<kotlin.Double>? = null,

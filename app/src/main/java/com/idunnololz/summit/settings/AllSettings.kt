@@ -156,6 +156,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_FIREBASE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_LEMMY_V4
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MATERIAL_YOU
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MULTILINE_POST_HEADERS
@@ -2224,6 +2225,11 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.show_per_user_scores),
     description = context.getString(R.string.show_per_user_scores_desc),
     relatedKeys = listOf(KEY_SHOW_PER_USER_SCORES),
+  )
+  val useLemmyV4 = OnOffSettingItem(
+    title = context.getString(R.string.use_lemmy_api_v4),
+    description = context.getString(R.string.use_lemmy_api_v4_desc),
+    relatedKeys = listOf(KEY_USE_LEMMY_V4),
   )
 }
 

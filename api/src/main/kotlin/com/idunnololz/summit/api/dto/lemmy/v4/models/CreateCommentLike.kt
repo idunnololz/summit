@@ -30,7 +30,7 @@ data class CreateCommentLike (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double,
+    val commentId: kotlin.Int,
 
     /* True means Upvote, False means Downvote, and None means remove vote. */
     @SerializedName("is_upvote")

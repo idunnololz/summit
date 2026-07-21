@@ -38,7 +38,7 @@ data class LocalImage (
 
     /* The post id. */
     @SerializedName("thumbnail_for_post_id")
-    val thumbnailForPostId: kotlin.Double? = null,
+    val thumbnailForPostId: kotlin.Int? = null,
 
     /* The person id. */
     @SerializedName("person_id")

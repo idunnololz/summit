@@ -33,7 +33,7 @@ data class EditCommunityTag (
 
     /* The community tag id */
     @SerializedName("tag_id")
-    val tagId: kotlin.Double,
+    val tagId: kotlin.Int,
 
     @SerializedName("color")
     val color: TagColor? = null,

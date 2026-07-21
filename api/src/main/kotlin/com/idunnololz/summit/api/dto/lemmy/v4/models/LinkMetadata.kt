@@ -36,19 +36,19 @@ import com.google.gson.annotations.SerializedName
 data class LinkMetadata (
 
     @SerializedName("video_height")
-    val videoHeight: kotlin.Double? = null,
+    val videoHeight: kotlin.Int? = null,
 
     @SerializedName("video_width")
-    val videoWidth: kotlin.Double? = null,
+    val videoWidth: kotlin.Int? = null,
 
     @SerializedName("embed_video_url")
     val embedVideoUrl: kotlin.String? = null,
 
     @SerializedName("image_height")
-    val imageHeight: kotlin.Double? = null,
+    val imageHeight: kotlin.Int? = null,
 
     @SerializedName("image_width")
-    val imageWidth: kotlin.Double? = null,
+    val imageWidth: kotlin.Int? = null,
 
     @SerializedName("image")
     val image: kotlin.String? = null,

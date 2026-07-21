@@ -30,13 +30,13 @@ import com.google.gson.annotations.SerializedName
 data class NodeInfoUsers (
 
     @SerializedName("activeMonth")
-    val activeMonth: kotlin.Double? = null,
+    val activeMonth: kotlin.Int? = null,
 
     @SerializedName("activeHalfyear")
-    val activeHalfyear: kotlin.Double? = null,
+    val activeHalfyear: kotlin.Int? = null,
 
     @SerializedName("total")
-    val total: kotlin.Double? = null
+    val total: kotlin.Int? = null
 
 ) {
 

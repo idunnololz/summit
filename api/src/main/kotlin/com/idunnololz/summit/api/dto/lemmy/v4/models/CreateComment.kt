@@ -32,18 +32,18 @@ data class CreateComment (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     @SerializedName("content")
     val content: kotlin.String,
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double? = null,
+    val languageId: kotlin.Int? = null,
 
     /* The comment id. */
     @SerializedName("parent_id")
-    val parentId: kotlin.Double? = null
+    val parentId: kotlin.Int? = null
 
 ) {
 

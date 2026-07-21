@@ -34,11 +34,11 @@ data class ApproveCommunityPendingFollower (
 
     /* The person id. */
     @SerializedName("follower_id")
-    val followerId: kotlin.Double,
+    val followerId: kotlin.Int,
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double
+    val communityId: kotlin.Int
 
 ) {
 

@@ -29,7 +29,7 @@ data class DeleteOAuthProvider (
 
     /* The oauth provider id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

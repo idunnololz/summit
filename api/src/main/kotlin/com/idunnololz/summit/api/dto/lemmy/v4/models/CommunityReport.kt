@@ -54,22 +54,22 @@ data class CommunityReport (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double,
+    val communityId: kotlin.Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Int,
 
     /* The community report id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("resolver_id")
-    val resolverId: kotlin.Double? = null,
+    val resolverId: kotlin.Long? = null,
 
     @SerializedName("original_community_banner")
     val originalCommunityBanner: kotlin.String? = null,

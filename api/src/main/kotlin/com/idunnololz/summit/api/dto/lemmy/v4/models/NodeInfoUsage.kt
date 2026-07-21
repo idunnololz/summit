@@ -31,10 +31,10 @@ import com.google.gson.annotations.SerializedName
 data class NodeInfoUsage (
 
     @SerializedName("localComments")
-    val localComments: kotlin.Double? = null,
+    val localComments: kotlin.Int? = null,
 
     @SerializedName("localPosts")
-    val localPosts: kotlin.Double? = null,
+    val localPosts: kotlin.Int? = null,
 
     @SerializedName("users")
     val users: NodeInfoUsers? = null

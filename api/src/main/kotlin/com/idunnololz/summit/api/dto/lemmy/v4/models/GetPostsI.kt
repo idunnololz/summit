@@ -58,7 +58,7 @@ data class GetPostsI (
 
     /* The community tag id */
     @SerializedName("tag_id")
-    val tagId: kotlin.Double? = null,
+    val tagId: kotlin.Int? = null,
 
     @SerializedName("search_url_only")
     val searchUrlOnly: kotlin.Boolean? = null,
@@ -96,14 +96,14 @@ data class GetPostsI (
     val multiCommunityName: kotlin.String? = null,
 
     @SerializedName("multi_community_id")
-    val multiCommunityId: kotlin.Double? = null,
+    val multiCommunityId: kotlin.Int? = null,
 
     @SerializedName("creator_username")
     val creatorUsername: kotlin.String? = null,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double? = null,
+    val creatorId: kotlin.Long? = null,
 
     @SerializedName("community_name")
     val communityName: kotlin.String? = null,

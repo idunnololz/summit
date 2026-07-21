@@ -48,7 +48,7 @@ data class CommunityTag (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double,
+    val communityId: kotlin.Int,
 
     @SerializedName("name")
     val name: kotlin.String,
@@ -58,7 +58,7 @@ data class CommunityTag (
 
     /* The community tag id */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,

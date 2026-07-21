@@ -34,11 +34,11 @@ data class PersonActions (
 
     /* A total of downvotes given to this person */
     @SerializedName("downvotes")
-    val downvotes: kotlin.Double? = null,
+    val downvotes: kotlin.Int? = null,
 
     /* A total of upvotes given to this person */
     @SerializedName("upvotes")
-    val upvotes: kotlin.Double? = null,
+    val upvotes: kotlin.Int? = null,
 
     /* When the person was voted on. */
     @SerializedName("voted_at")

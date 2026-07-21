@@ -92,7 +92,7 @@ data class CreateSite (
     val name: kotlin.String,
 
     @SerializedName("max_invites_per_user_allowed")
-    val maxInvitesPerUserAllowed: kotlin.Double? = null,
+    val maxInvitesPerUserAllowed: kotlin.Int? = null,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean? = null,
@@ -101,16 +101,16 @@ data class CreateSite (
     val imageAllowVideoUploads: kotlin.Boolean? = null,
 
     @SerializedName("image_max_upload_size")
-    val imageMaxUploadSize: kotlin.Double? = null,
+    val imageMaxUploadSize: kotlin.Int? = null,
 
     @SerializedName("image_max_banner_size")
-    val imageMaxBannerSize: kotlin.Double? = null,
+    val imageMaxBannerSize: kotlin.Int? = null,
 
     @SerializedName("image_max_avatar_size")
-    val imageMaxAvatarSize: kotlin.Double? = null,
+    val imageMaxAvatarSize: kotlin.Int? = null,
 
     @SerializedName("image_max_thumbnail_size")
-    val imageMaxThumbnailSize: kotlin.Double? = null,
+    val imageMaxThumbnailSize: kotlin.Int? = null,
 
     @SerializedName("image_upload_timeout_seconds")
     val imageUploadTimeoutSeconds: kotlin.Double? = null,

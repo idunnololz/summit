@@ -39,7 +39,7 @@ data class AuthenticateWithOauth (
 
     /* The oauth provider id. */
     @SerializedName("oauth_provider_id")
-    val oauthProviderId: kotlin.Double,
+    val oauthProviderId: kotlin.Int,
 
     @SerializedName("code")
     val code: kotlin.String,

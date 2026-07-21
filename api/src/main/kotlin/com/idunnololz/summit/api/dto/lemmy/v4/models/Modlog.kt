@@ -36,7 +36,7 @@ import com.google.gson.annotations.SerializedName
 data class Modlog (
 
     @SerializedName("child_count")
-    val childCount: kotlin.Double,
+    val childCount: kotlin.Int,
 
     @SerializedName("published_at")
     val publishedAt: kotlin.String,
@@ -51,7 +51,7 @@ data class Modlog (
     val id: kotlin.Int,
 
     @SerializedName("bulk_action_parent_id")
-    val bulkActionParentId: kotlin.Double? = null,
+    val bulkActionParentId: kotlin.Int? = null,
 
     @SerializedName("expires_at")
     val expiresAt: kotlin.String? = null,

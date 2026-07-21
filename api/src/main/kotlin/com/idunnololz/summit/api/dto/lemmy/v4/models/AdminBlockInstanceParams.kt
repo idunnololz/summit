@@ -41,7 +41,7 @@ data class AdminBlockInstanceParams (
 
     /* A time that the block will expire, in unix epoch seconds.  An i64 unix timestamp is used for a simpler API client implementation. */
     @SerializedName("expires_at")
-    val expiresAt: kotlin.Double? = null
+    val expiresAt: kotlin.Int? = null
 
 ) {
 

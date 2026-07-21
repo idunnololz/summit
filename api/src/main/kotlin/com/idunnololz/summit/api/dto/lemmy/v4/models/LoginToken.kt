@@ -36,7 +36,7 @@ data class LoginToken (
 
     /* The local user id. */
     @SerializedName("user_id")
-    val userId: kotlin.Double,
+    val userId: kotlin.Long,
 
     @SerializedName("user_agent")
     val userAgent: kotlin.String? = null,

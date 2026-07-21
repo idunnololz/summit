@@ -2424,6 +2424,8 @@
     <string name="no_description">*No description.*</string>
     <string name="blocked_instance">Blocked instance %1$s.</string>
     <string name="unblocked_instance">Unblocked instance %1$s.</string>
+    <string name="use_lemmy_api_v4">Use Lemmy API V4</string>
+    <string name="use_lemmy_api_v4_desc">When enabled, Lemmy V4 will be preferred over Lemmy V3. **This feature is experimental**.</string>
 
 
     <!-- uCrop string resource end -->

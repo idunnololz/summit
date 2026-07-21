@@ -90,7 +90,7 @@ import com.google.gson.annotations.SerializedName
 data class EditSite (
 
     @SerializedName("max_invites_per_user_allowed")
-    val maxInvitesPerUserAllowed: kotlin.Double? = null,
+    val maxInvitesPerUserAllowed: kotlin.Int? = null,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean? = null,
@@ -99,19 +99,19 @@ data class EditSite (
     val imageAllowVideoUploads: kotlin.Boolean? = null,
 
     @SerializedName("image_max_upload_size")
-    val imageMaxUploadSize: kotlin.Double? = null,
+    val imageMaxUploadSize: kotlin.Int? = null,
 
     @SerializedName("image_max_banner_size")
-    val imageMaxBannerSize: kotlin.Double? = null,
+    val imageMaxBannerSize: kotlin.Int? = null,
 
     @SerializedName("image_max_avatar_size")
-    val imageMaxAvatarSize: kotlin.Double? = null,
+    val imageMaxAvatarSize: kotlin.Int? = null,
 
     @SerializedName("image_max_thumbnail_size")
-    val imageMaxThumbnailSize: kotlin.Double? = null,
+    val imageMaxThumbnailSize: kotlin.Int? = null,
 
     @SerializedName("image_upload_timeout_seconds")
-    val imageUploadTimeoutSeconds: kotlin.Double? = null,
+    val imageUploadTimeoutSeconds: kotlin.Int? = null,
 
     /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
     @SerializedName("image_proxy_bypass_domains")
@@ -121,7 +121,7 @@ data class EditSite (
     val imageMode: ImageMode? = null,
 
     @SerializedName("suggested_multi_community_id")
-    val suggestedMultiCommunityId: kotlin.Double? = null,
+    val suggestedMultiCommunityId: kotlin.Int? = null,
 
     /* Dont send email notifications to users for new replies, mentions etc */
     @SerializedName("email_notifications_disabled")
@@ -167,53 +167,53 @@ data class EditSite (
     val federationEnabled: kotlin.Boolean? = null,
 
     @SerializedName("rate_limit_import_user_settings_interval_seconds")
-    val rateLimitImportUserSettingsIntervalSeconds: kotlin.Double? = null,
+    val rateLimitImportUserSettingsIntervalSeconds: kotlin.Int? = null,
 
     /* The number of settings imports or exports allowed in a given time frame. */
     @SerializedName("rate_limit_import_user_settings_max_requests")
-    val rateLimitImportUserSettingsMaxRequests: kotlin.Double? = null,
+    val rateLimitImportUserSettingsMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_search_interval_seconds")
-    val rateLimitSearchIntervalSeconds: kotlin.Double? = null,
+    val rateLimitSearchIntervalSeconds: kotlin.Int? = null,
 
     /* The number of searches allowed in a given time frame. */
     @SerializedName("rate_limit_search_max_requests")
-    val rateLimitSearchMaxRequests: kotlin.Double? = null,
+    val rateLimitSearchMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_comment_interval_seconds")
-    val rateLimitCommentIntervalSeconds: kotlin.Double? = null,
+    val rateLimitCommentIntervalSeconds: kotlin.Int? = null,
 
     /* The number of comments allowed in a given time frame. */
     @SerializedName("rate_limit_comment_max_requests")
-    val rateLimitCommentMaxRequests: kotlin.Double? = null,
+    val rateLimitCommentMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_image_interval_seconds")
-    val rateLimitImageIntervalSeconds: kotlin.Double? = null,
+    val rateLimitImageIntervalSeconds: kotlin.Int? = null,
 
     /* The number of image uploads allowed in a given time frame. */
     @SerializedName("rate_limit_image_max_requests")
-    val rateLimitImageMaxRequests: kotlin.Double? = null,
+    val rateLimitImageMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_register_interval_seconds")
-    val rateLimitRegisterIntervalSeconds: kotlin.Double? = null,
+    val rateLimitRegisterIntervalSeconds: kotlin.Int? = null,
 
     /* The number of registrations allowed in a given time frame. */
     @SerializedName("rate_limit_register_max_requests")
-    val rateLimitRegisterMaxRequests: kotlin.Double? = null,
+    val rateLimitRegisterMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_post_interval_seconds")
-    val rateLimitPostIntervalSeconds: kotlin.Double? = null,
+    val rateLimitPostIntervalSeconds: kotlin.Int? = null,
 
     /* The number of posts allowed in a given time frame. */
     @SerializedName("rate_limit_post_max_requests")
-    val rateLimitPostMaxRequests: kotlin.Double? = null,
+    val rateLimitPostMaxRequests: kotlin.Int? = null,
 
     @SerializedName("rate_limit_message_interval_seconds")
-    val rateLimitMessageIntervalSeconds: kotlin.Double? = null,
+    val rateLimitMessageIntervalSeconds: kotlin.Int? = null,
 
     /* The number of messages allowed in a given time frame. */
     @SerializedName("rate_limit_message_max_requests")
-    val rateLimitMessageMaxRequests: kotlin.Double? = null,
+    val rateLimitMessageMaxRequests: kotlin.Int? = null,
 
     /* A regex string of items to filter. */
     @SerializedName("slur_filter_regex")
@@ -221,7 +221,7 @@ data class EditSite (
 
     /* A list of allowed discussion languages. */
     @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>? = null,
+    val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
 
     /* Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this. */
     @SerializedName("federation_signed_fetch")
@@ -240,11 +240,11 @@ data class EditSite (
 
     /* A default fetch limit for number of items returned. */
     @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Double? = null,
+    val defaultItemsPerPage: kotlin.Int? = null,
 
     /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
     @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Double? = null,
+    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
     @SerializedName("default_post_sort_type")
     val defaultPostSortType: PostSortType? = null,

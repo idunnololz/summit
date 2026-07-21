@@ -79,7 +79,7 @@ data class GetSiteResponse (
 
     /* The number of seconds between the last application published, and approved / denied time.  Useful for estimating when your application will be approved. */
     @SerializedName("last_application_duration_seconds")
-    val lastApplicationDurationSeconds: kotlin.Double? = null,
+    val lastApplicationDurationSeconds: kotlin.Int? = null,
 
     @SerializedName("tagline")
     val tagline: Tagline? = null

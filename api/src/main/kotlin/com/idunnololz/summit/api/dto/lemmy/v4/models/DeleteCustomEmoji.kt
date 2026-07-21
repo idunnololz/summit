@@ -29,7 +29,7 @@ data class DeleteCustomEmoji (
 
     /* The custom emoji id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

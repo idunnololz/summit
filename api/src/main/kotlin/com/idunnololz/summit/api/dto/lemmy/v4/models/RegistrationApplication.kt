@@ -41,7 +41,7 @@ data class RegistrationApplication (
 
     /* The local user id. */
     @SerializedName("local_user_id")
-    val localUserId: kotlin.Double,
+    val localUserId: kotlin.Int,
 
     /* The registration application id. */
     @SerializedName("id")
@@ -55,7 +55,7 @@ data class RegistrationApplication (
 
     /* The person id. */
     @SerializedName("admin_id")
-    val adminId: kotlin.Double? = null
+    val adminId: kotlin.Long? = null
 
 ) {
 

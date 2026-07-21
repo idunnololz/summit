@@ -44,7 +44,7 @@ data class PostActions (
 
     /* The number of comments you read last. Subtract this from total comments to get an unread count. */
     @SerializedName("read_comments_amount")
-    val readCommentsAmount: kotlin.Double? = null,
+    val readCommentsAmount: kotlin.Int? = null,
 
     /* When the post was hidden. */
     @SerializedName("hidden_at")

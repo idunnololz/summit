@@ -35,10 +35,10 @@ data class ImageDetails (
     val contentType: kotlin.String,
 
     @SerializedName("height")
-    val height: kotlin.Double,
+    val height: kotlin.Int,
 
     @SerializedName("width")
-    val width: kotlin.Double,
+    val width: kotlin.Int,
 
     @SerializedName("link")
     val link: kotlin.String,

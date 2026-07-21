@@ -44,53 +44,53 @@ import com.google.gson.annotations.SerializedName
 data class LocalSiteRateLimit (
 
     @SerializedName("import_user_settings_interval_seconds")
-    val importUserSettingsIntervalSeconds: kotlin.Double,
+    val importUserSettingsIntervalSeconds: kotlin.Int,
 
     @SerializedName("import_user_settings_max_requests")
-    val importUserSettingsMaxRequests: kotlin.Double,
+    val importUserSettingsMaxRequests: kotlin.Int,
 
     @SerializedName("published_at")
     val publishedAt: kotlin.String,
 
     @SerializedName("search_interval_seconds")
-    val searchIntervalSeconds: kotlin.Double,
+    val searchIntervalSeconds: kotlin.Int,
 
     @SerializedName("search_max_requests")
-    val searchMaxRequests: kotlin.Double,
+    val searchMaxRequests: kotlin.Int,
 
     @SerializedName("comment_interval_seconds")
-    val commentIntervalSeconds: kotlin.Double,
+    val commentIntervalSeconds: kotlin.Int,
 
     @SerializedName("comment_max_requests")
-    val commentMaxRequests: kotlin.Double,
+    val commentMaxRequests: kotlin.Int,
 
     @SerializedName("image_interval_seconds")
-    val imageIntervalSeconds: kotlin.Double,
+    val imageIntervalSeconds: kotlin.Int,
 
     @SerializedName("image_max_requests")
-    val imageMaxRequests: kotlin.Double,
+    val imageMaxRequests: kotlin.Int,
 
     @SerializedName("register_interval_seconds")
-    val registerIntervalSeconds: kotlin.Double,
+    val registerIntervalSeconds: kotlin.Int,
 
     @SerializedName("register_max_requests")
-    val registerMaxRequests: kotlin.Double,
+    val registerMaxRequests: kotlin.Int,
 
     @SerializedName("post_interval_seconds")
-    val postIntervalSeconds: kotlin.Double,
+    val postIntervalSeconds: kotlin.Int,
 
     @SerializedName("post_max_requests")
-    val postMaxRequests: kotlin.Double,
+    val postMaxRequests: kotlin.Int,
 
     @SerializedName("message_interval_seconds")
-    val messageIntervalSeconds: kotlin.Double,
+    val messageIntervalSeconds: kotlin.Int,
 
     @SerializedName("message_max_requests")
-    val messageMaxRequests: kotlin.Double,
+    val messageMaxRequests: kotlin.Int,
 
     /* The local site id. */
     @SerializedName("local_site_id")
-    val localSiteId: kotlin.Double,
+    val localSiteId: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null

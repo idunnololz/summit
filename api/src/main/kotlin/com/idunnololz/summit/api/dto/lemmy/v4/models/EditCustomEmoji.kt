@@ -34,7 +34,7 @@ data class EditCustomEmoji (
 
     /* The custom emoji id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("keywords")
     val keywords: kotlin.collections.List<kotlin.String>? = null,

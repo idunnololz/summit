@@ -84,7 +84,7 @@ data class LocalSite (
 
     /* How many active invite links a user can have */
     @SerializedName("max_invites_per_user_allowed")
-    val maxInvitesPerUserAllowed: kotlin.Double,
+    val maxInvitesPerUserAllowed: kotlin.Int,
 
     @SerializedName("image_upload_disabled")
     val imageUploadDisabled: kotlin.Boolean,
@@ -95,26 +95,26 @@ data class LocalSite (
 
     /* This affects post and comment images, but not avatar and banner sizes. */
     @SerializedName("image_max_upload_size")
-    val imageMaxUploadSize: kotlin.Double,
+    val imageMaxUploadSize: kotlin.Int,
 
     @SerializedName("image_max_banner_size")
-    val imageMaxBannerSize: kotlin.Double,
+    val imageMaxBannerSize: kotlin.Int,
 
     @SerializedName("image_max_avatar_size")
-    val imageMaxAvatarSize: kotlin.Double,
+    val imageMaxAvatarSize: kotlin.Int,
 
     /* These are pixel sizes. Larger images are automatically downscaled. */
     @SerializedName("image_max_thumbnail_size")
-    val imageMaxThumbnailSize: kotlin.Double,
+    val imageMaxThumbnailSize: kotlin.Int,
 
     @SerializedName("image_upload_timeout_seconds")
-    val imageUploadTimeoutSeconds: kotlin.Double,
+    val imageUploadTimeoutSeconds: kotlin.Int,
 
     @SerializedName("image_mode")
     val imageMode: ImageMode,
 
     @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Double,
+    val defaultItemsPerPage: kotlin.Int,
 
     /* Dont send email notifications to users for new replies, mentions etc */
     @SerializedName("email_notifications_disabled")
@@ -122,31 +122,31 @@ data class LocalSite (
 
     /* The number of users with any activity in the last half year. */
     @SerializedName("users_active_half_year")
-    val usersActiveHalfYear: kotlin.Double,
+    val usersActiveHalfYear: kotlin.Int,
 
     /* The number of users with any activity in the last month. */
     @SerializedName("users_active_month")
-    val usersActiveMonth: kotlin.Double,
+    val usersActiveMonth: kotlin.Int,
 
     /* The number of users with any activity in the last week. */
     @SerializedName("users_active_week")
-    val usersActiveWeek: kotlin.Double,
+    val usersActiveWeek: kotlin.Int,
 
     /* The number of users with any activity in the last day. */
     @SerializedName("users_active_day")
-    val usersActiveDay: kotlin.Double,
+    val usersActiveDay: kotlin.Int,
 
     @SerializedName("communities")
-    val communities: kotlin.Double,
+    val communities: kotlin.Int,
 
     @SerializedName("comments")
-    val comments: kotlin.Double,
+    val comments: kotlin.Int,
 
     @SerializedName("posts")
-    val posts: kotlin.Double,
+    val posts: kotlin.Int,
 
     @SerializedName("users")
-    val users: kotlin.Double,
+    val users: kotlin.Int,
 
     /* Block NSFW content being created */
     @SerializedName("nsfw_content_disallowed")
@@ -224,22 +224,22 @@ data class LocalSite (
 
     /* The site id. */
     @SerializedName("site_id")
-    val siteId: kotlin.Double,
+    val siteId: kotlin.Int,
 
     /* The local site id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
     @SerializedName("image_proxy_bypass_domains")
     val imageProxyBypassDomains: kotlin.String? = null,
 
     @SerializedName("suggested_multi_community_id")
-    val suggestedMultiCommunityId: kotlin.Double? = null,
+    val suggestedMultiCommunityId: kotlin.Int? = null,
 
     /* A default time range limit to apply to post sorts, in seconds. */
     @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Double? = null,
+    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null,

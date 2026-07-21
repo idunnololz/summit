@@ -32,7 +32,7 @@ data class MarkNotificationAsRead (
     val read: kotlin.Boolean,
 
     @SerializedName("notification_id")
-    val notificationId: kotlin.Double
+    val notificationId: kotlin.Int
 
 ) {
 

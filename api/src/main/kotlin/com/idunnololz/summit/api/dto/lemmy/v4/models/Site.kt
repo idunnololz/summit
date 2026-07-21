@@ -41,7 +41,7 @@ data class Site (
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double,
+    val instanceId: kotlin.Int,
 
     @SerializedName("inbox_url")
     val inboxUrl: kotlin.String,
@@ -61,7 +61,7 @@ data class Site (
 
     /* The site id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     /* If present, nsfw content is visible by default. Should be displayed by frontends/clients when the site is first opened by a user. */
     @SerializedName("content_warning")

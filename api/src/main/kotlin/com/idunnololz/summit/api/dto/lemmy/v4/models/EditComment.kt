@@ -31,11 +31,11 @@ data class EditComment (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double,
+    val commentId: kotlin.Int,
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double? = null,
+    val languageId: kotlin.Int? = null,
 
     @SerializedName("content")
     val content: kotlin.String? = null

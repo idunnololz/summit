@@ -34,7 +34,7 @@ data class GetCommunityI (
 
     /* The community id. */
     @SerializedName("id")
-    val id: kotlin.Double? = null
+    val id: kotlin.Int? = null
 
 ) {
 

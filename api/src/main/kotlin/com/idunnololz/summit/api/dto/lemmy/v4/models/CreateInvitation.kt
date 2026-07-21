@@ -32,7 +32,7 @@ data class CreateInvitation (
     val expiresAt: kotlin.String? = null,
 
     @SerializedName("max_uses")
-    val maxUses: kotlin.Double? = null
+    val maxUses: kotlin.Int? = null
 
 ) {
 

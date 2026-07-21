@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.network.BrowserLikeUnauthed
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.LinkFetcher
 import com.idunnololz.summit.util.retry
 import java.io.InterruptedIOException
@@ -28,6 +29,7 @@ import okhttp3.OkHttpClient
 class SiteBackendHelper @Inject constructor(
   private val linkFetcher: LinkFetcher,
   @BrowserLikeUnauthed private val okHttpClient: OkHttpClient,
+  private val preferences: Preferences,
 ) {
 
   companion object {
@@ -141,7 +143,7 @@ class SiteBackendHelper @Inject constructor(
                 ApiInfo(
                   instance = instance,
                   // LemmyV4 should be backwards compatible with V3. Use V3 until we support V4.
-                  backendType = if (BuildConfig.DEBUG) {
+                  backendType = if (preferences.useLemmyV4) {
                     ApiType.LemmyV4
                   } else {
                     ApiType.LemmyV3

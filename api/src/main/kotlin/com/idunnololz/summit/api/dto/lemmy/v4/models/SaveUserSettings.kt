@@ -165,11 +165,11 @@ data class SaveUserSettings (
 
     /* A default fetch limit for number of items returned. */
     @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Double? = null,
+    val defaultItemsPerPage: kotlin.Int? = null,
 
     /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
     @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Double? = null,
+    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
     @SerializedName("default_post_sort_type")
     val defaultPostSortType: PostSortType? = null,

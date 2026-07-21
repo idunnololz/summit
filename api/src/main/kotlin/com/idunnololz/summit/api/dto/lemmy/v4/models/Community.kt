@@ -60,13 +60,13 @@ data class Community (
     val localRemoved: kotlin.Boolean,
 
     @SerializedName("unresolved_report_count")
-    val unresolvedReportCount: kotlin.Double,
+    val unresolvedReportCount: kotlin.Int,
 
     @SerializedName("report_count")
-    val reportCount: kotlin.Double,
+    val reportCount: kotlin.Int,
 
     @SerializedName("subscribers_local")
-    val subscribersLocal: kotlin.Double,
+    val subscribersLocal: kotlin.Int,
 
     /* The number of users with any activity in the last year. */
     @SerializedName("users_active_half_year")

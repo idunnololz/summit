@@ -30,11 +30,11 @@ data class GetPostI (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double? = null,
+    val commentId: kotlin.Int? = null,
 
     /* The post id. */
     @SerializedName("id")
-    val id: kotlin.Double? = null
+    val id: kotlin.Int? = null
 
 ) {
 

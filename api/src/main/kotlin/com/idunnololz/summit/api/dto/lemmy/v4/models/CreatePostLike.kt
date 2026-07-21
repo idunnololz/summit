@@ -30,7 +30,7 @@ data class CreatePostLike (
 
     /* The post id. */
     @SerializedName("post_id")
-    val postId: kotlin.Double,
+    val postId: kotlin.Int,
 
     /* True means Upvote, False means Downvote, and None means remove vote. */
     @SerializedName("is_upvote")

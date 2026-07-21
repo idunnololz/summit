@@ -38,7 +38,7 @@ data class RemoveComment (
 
     /* The comment id. */
     @SerializedName("comment_id")
-    val commentId: kotlin.Double,
+    val commentId: kotlin.Int,
 
     /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the comment itself. */
     @SerializedName("remove_children")

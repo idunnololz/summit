@@ -65,22 +65,22 @@ data class Post (
     val federationPending: kotlin.Boolean,
 
     @SerializedName("unresolved_report_count")
-    val unresolvedReportCount: kotlin.Double,
+    val unresolvedReportCount: kotlin.Int,
 
     @SerializedName("report_count")
-    val reportCount: kotlin.Double,
+    val reportCount: kotlin.Int,
 
     @SerializedName("downvotes")
-    val downvotes: kotlin.Double,
+    val downvotes: kotlin.Int,
 
     @SerializedName("upvotes")
-    val upvotes: kotlin.Double,
+    val upvotes: kotlin.Int,
 
     @SerializedName("score")
-    val score: kotlin.Double,
+    val score: kotlin.Int,
 
     @SerializedName("comments")
-    val comments: kotlin.Double,
+    val comments: kotlin.Int,
 
     /* Whether the post is featured to its site. */
     @SerializedName("featured_local")
@@ -92,7 +92,7 @@ data class Post (
 
     /* The language id. */
     @SerializedName("language_id")
-    val languageId: kotlin.Double,
+    val languageId: kotlin.Int,
 
     /* Whether the post is local. */
     @SerializedName("local")
@@ -122,24 +122,24 @@ data class Post (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double,
+    val communityId: kotlin.Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Int,
 
     @SerializedName("name")
     val name: kotlin.String,
 
     /* The post id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("embed_video_height")
-    val embedVideoHeight: kotlin.Double? = null,
+    val embedVideoHeight: kotlin.Int? = null,
 
     @SerializedName("embed_video_width")
-    val embedVideoWidth: kotlin.Double? = null,
+    val embedVideoWidth: kotlin.Int? = null,
 
     /* The time of the newest comment in the post, if the post has any comments. */
     @SerializedName("newest_comment_time_at")

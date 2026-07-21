@@ -176,6 +176,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_FIREBASE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_GESTURE_ACTIONS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_LEMMY_V4
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MATERIAL_YOU
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MULTILINE_POST_HEADERS
@@ -762,6 +763,8 @@ class Preferences(
     by intPreference(KEY_POSTS_FEED_HEADER_VERSION, PostsFeedHeaderVersions.V2)
   var showPerUserScores: Boolean
     by booleanPreference(KEY_SHOW_PER_USER_SCORES, false)
+  var useLemmyV4: Boolean
+    by booleanPreference(KEY_USE_LEMMY_V4, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

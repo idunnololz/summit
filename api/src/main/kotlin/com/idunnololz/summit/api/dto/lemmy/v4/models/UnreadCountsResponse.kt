@@ -31,16 +31,16 @@ import com.google.gson.annotations.SerializedName
 data class UnreadCountsResponse (
 
     @SerializedName("notification_count")
-    val notificationCount: kotlin.Double,
+    val notificationCount: kotlin.Int,
 
     @SerializedName("registration_application_count")
-    val registrationApplicationCount: kotlin.Double? = null,
+    val registrationApplicationCount: kotlin.Int? = null,
 
     @SerializedName("pending_follow_count")
-    val pendingFollowCount: kotlin.Double? = null,
+    val pendingFollowCount: kotlin.Int? = null,
 
     @SerializedName("report_count")
-    val reportCount: kotlin.Double? = null
+    val reportCount: kotlin.Int? = null
 
 ) {
 

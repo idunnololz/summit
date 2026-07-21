@@ -38,7 +38,7 @@ data class Tagline (
 
     /* The tagline id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     @SerializedName("updated_at")
     val updatedAt: kotlin.String? = null

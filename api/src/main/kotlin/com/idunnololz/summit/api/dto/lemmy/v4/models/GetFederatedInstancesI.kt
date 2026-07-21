@@ -35,7 +35,7 @@ data class GetFederatedInstancesI (
     val kind: GetFederatedInstancesKind,
 
     @SerializedName("limit")
-    val limit: kotlin.Double? = null,
+    val limit: kotlin.Int? = null,
 
     /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
     @SerializedName("page_cursor")

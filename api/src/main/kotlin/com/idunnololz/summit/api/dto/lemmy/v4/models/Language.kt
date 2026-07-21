@@ -37,7 +37,7 @@ data class Language (
 
     /* The language id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

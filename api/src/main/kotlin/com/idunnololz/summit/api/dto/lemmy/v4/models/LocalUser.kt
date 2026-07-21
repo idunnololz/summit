@@ -72,7 +72,7 @@ data class LocalUser (
     val showMedia: kotlin.Boolean,
 
     @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Double,
+    val defaultItemsPerPage: kotlin.Int,
 
     @SerializedName("show_person_votes")
     val showPersonVotes: kotlin.Boolean,
@@ -178,19 +178,19 @@ data class LocalUser (
 
     /* The person id. */
     @SerializedName("person_id")
-    val personId: kotlin.Double,
+    val personId: kotlin.Long,
 
     /* The local user id. */
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Long,
 
     /* The local user id. */
     @SerializedName("invited_by_local_user_id")
-    val invitedByLocalUserId: kotlin.Double? = null,
+    val invitedByLocalUserId: kotlin.Long? = null,
 
     /* A default time range limit to apply to post sorts, in seconds. */
     @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Double? = null,
+    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
     @SerializedName("email")
     val email: kotlin.String? = null

@@ -29,7 +29,7 @@ data class DeleteTagline (
 
     /* The tagline id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

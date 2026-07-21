@@ -30,10 +30,10 @@ data class CreateOrDeleteMultiCommunityEntry (
 
     /* The community id. */
     @SerializedName("community_id")
-    val communityId: kotlin.Double,
+    val communityId: kotlin.Int,
 
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

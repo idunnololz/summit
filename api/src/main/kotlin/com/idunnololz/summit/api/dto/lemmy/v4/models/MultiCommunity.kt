@@ -43,13 +43,13 @@ import com.google.gson.annotations.SerializedName
 data class MultiCommunity (
 
     @SerializedName("communities")
-    val communities: kotlin.Double,
+    val communities: kotlin.Int,
 
     @SerializedName("subscribers_local")
-    val subscribersLocal: kotlin.Double,
+    val subscribersLocal: kotlin.Int,
 
     @SerializedName("subscribers")
-    val subscribers: kotlin.Double,
+    val subscribers: kotlin.Int,
 
     @SerializedName("published_at")
     val publishedAt: kotlin.String,
@@ -71,14 +71,14 @@ data class MultiCommunity (
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double,
+    val instanceId: kotlin.Int,
 
     /* The person id. */
     @SerializedName("creator_id")
-    val creatorId: kotlin.Double,
+    val creatorId: kotlin.Int,
 
     @SerializedName("id")
-    val id: kotlin.Double,
+    val id: kotlin.Int,
 
     /* A sidebar in markdown. */
     @SerializedName("sidebar")

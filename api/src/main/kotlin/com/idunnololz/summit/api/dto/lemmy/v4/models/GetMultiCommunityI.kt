@@ -32,7 +32,7 @@ data class GetMultiCommunityI (
     val name: kotlin.String? = null,
 
     @SerializedName("id")
-    val id: kotlin.Double? = null
+    val id: kotlin.Int? = null
 
 ) {
 

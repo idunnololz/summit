@@ -33,7 +33,7 @@ data class CustomEmojiKeyword (
 
     /* The custom emoji id. */
     @SerializedName("custom_emoji_id")
-    val customEmojiId: kotlin.Double
+    val customEmojiId: kotlin.Int
 
 ) {
 

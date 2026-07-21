@@ -33,7 +33,7 @@ data class DeleteCommunityTag (
 
     /* The community tag id */
     @SerializedName("tag_id")
-    val tagId: kotlin.Double
+    val tagId: kotlin.Int
 
 ) {
 

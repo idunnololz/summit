@@ -29,7 +29,7 @@ data class CommunityIdQuery (
 
     /* The community id. */
     @SerializedName("id")
-    val id: kotlin.Double
+    val id: kotlin.Int
 
 ) {
 

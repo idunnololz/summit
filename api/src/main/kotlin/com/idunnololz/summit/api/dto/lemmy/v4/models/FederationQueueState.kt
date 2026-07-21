@@ -33,11 +33,11 @@ data class FederationQueueState (
 
     /* how many failed attempts have been made to send the next activity */
     @SerializedName("fail_count")
-    val failCount: kotlin.Double,
+    val failCount: kotlin.Int,
 
     /* The instance id. */
     @SerializedName("instance_id")
-    val instanceId: kotlin.Double,
+    val instanceId: kotlin.Int,
 
     /* timestamp of the last retry attempt (when the last failing activity was resent) */
     @SerializedName("last_retry_at")
@@ -47,7 +47,7 @@ data class FederationQueueState (
     val lastSuccessfulPublishedTimeAt: kotlin.String? = null,
 
     @SerializedName("last_successful_id")
-    val lastSuccessfulId: kotlin.Double? = null
+    val lastSuccessfulId: kotlin.Int? = null
 
 ) {
 
