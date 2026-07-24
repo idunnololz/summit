@@ -1,15 +1,25 @@
 [
   {
-    "Chinese (Simplified)": [
+    "Chinese (Simplified)":[
       [
         "noreply-mt-google-translate-api-v3@weblate.org",
         "Google Cloud Translation Advanced",
-        1078
+        1514
+      ],
+      [
+        "garyguo9@gmail.com",
+        "Weblate Admin",
+        9
+      ],
+      [
+        "noreply-mt-weblate@weblate.org",
+        "Weblate",
+        5
       ]
     ]
   },
   {
-    "Czech": [
+    "Czech":[
       [
         "itrytohelp.panorama511@passinbox.com",
         "Ziixe",
@@ -28,7 +38,7 @@
     ]
   },
   {
-    "German": [
+    "German":[
       [
         "noreply-mt-google-translate-api-v3@weblate.org",
         "Google Cloud Translation Advanced",
@@ -37,7 +47,7 @@
       [
         "asudox+83bw0x2@posteo.com",
         "asudox",
-        516
+        618
       ],
       [
         "idunnololz.cahoots016@passmail.net",
@@ -52,7 +62,7 @@
     ]
   },
   {
-    "Greek": [
+    "Greek":[
       [
         "lefteris592@gmail.com",
         "Lefteris T.",
@@ -66,7 +76,7 @@
     ]
   },
   {
-    "Hindi": [
+    "Hindi":[
       [
         "weblate.scrambled777@simplelogin.com",
         "Scrambled777",
@@ -85,7 +95,7 @@
     ]
   },
   {
-    "Italian": [
+    "Italian":[
       [
         "diego.beraldin@gmail.com",
         "Diego Beraldin",
@@ -97,6 +107,11 @@
         163
       ],
       [
+        "garyguo9@gmail.com",
+        "Weblate Admin",
+        7
+      ],
+      [
         "noreply-mt-weblate@weblate.org",
         "Weblate",
         2
@@ -104,7 +119,7 @@
     ]
   },
   {
-    "Portuguese": [
+    "Portuguese":[
       [
         "noreply-mt-google-translate-api-v3@weblate.org",
         "Google Cloud Translation Advanced",
@@ -119,11 +134,16 @@
         "noreply-mt-weblate@weblate.org",
         "Weblate",
         3
+      ],
+      [
+        "garyguo9@gmail.com",
+        "Weblate Admin",
+        1
       ]
     ]
   },
   {
-    "Swedish": [
+    "Swedish":[
       [
         "noreply-mt-google-translate-api-v3@weblate.org",
         "Google Cloud Translation Advanced",
@@ -138,11 +158,16 @@
         "noreply-mt-weblate@weblate.org",
         "Weblate",
         2
+      ],
+      [
+        "garyguo9@gmail.com",
+        "Weblate Admin",
+        1
       ]
     ]
   },
   {
-    "Turkish": [
+    "Turkish":[
       [
         "noreply-mt-google-translate-api-v3@weblate.org",
         "Google Cloud Translation Advanced",
