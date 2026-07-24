@@ -3,6 +3,7 @@ package com.idunnololz.summit.video
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.media3.common.MimeTypes
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor
@@ -19,18 +20,17 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.UrlUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
-import java.lang.Exception
-import java.util.concurrent.Executor
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.concurrent.Executor
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.resume
 
 private typealias DownloadId = String
 
@@ -137,10 +137,12 @@ class VideoDownloadManager @Inject constructor(
 
       val mediaItem = exoDownloadRequest.toMediaItem()
       val transformer = Transformer.Builder(context)
+        .setVideoMimeType(MimeTypes.VIDEO_H264)
+        .setAudioMimeType(MimeTypes.AUDIO_AAC)
         .build()
       val outputFile = File(directoryHelper.videosDir, downloadRequest.finalFileName)
 
-      withContext(Dispatchers.Main) {
+      val result = withContext(Dispatchers.Main) {
         suspendCancellableCoroutine<Result<File>> { continuation ->
           transformer.addListener(
             object : Transformer.Listener {
@@ -161,7 +163,7 @@ class VideoDownloadManager @Inject constructor(
         }
       }
 
-      downloadRequest.resultFlow.emit(Result.success(outputFile))
+      downloadRequest.resultFlow.emit(result)
     }
   }
 

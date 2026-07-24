@@ -42,6 +42,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Login
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LoginResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkPostAsRead
+import com.idunnololz.summit.api.dto.lemmy.v4.models.MyUserInfo
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseCommentView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseCommunityView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseFederatedInstanceView
@@ -122,7 +123,7 @@ interface LemmyApiV4 {
   /**
    * Log into lemmy.
    */
-  @POST("user/login")
+  @POST("account/auth/login")
   fun login(@HeaderMap headers: Map<String, String>, @Body form: Login): Call<LoginResponse>
 
   /**
@@ -268,6 +269,16 @@ interface LemmyApiV4 {
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
   ): Call<PagedResponseCommunityView>
+
+
+  /**
+   * Get the details for a person.
+   */
+  @GET("account")
+  fun getCurrentUser(
+    @HeaderMap headers: Map<String, String>,
+    @QueryMap form: Map<String, String>,
+  ): Call<MyUserInfo>
 
   /**
    * Get the details for a person.

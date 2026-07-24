@@ -44,7 +44,7 @@ import com.google.gson.annotations.SerializedName
 data class MyUserInfo (
 
     @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>,
+    val discussionLanguages: kotlin.collections.List<kotlin.Int>,
 
     @SerializedName("keyword_blocks")
     val keywordBlocks: kotlin.collections.List<kotlin.String>,

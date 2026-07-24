@@ -94,10 +94,13 @@ class AccountAwareLemmyClient @Inject constructor(
   init {
     accountManager.addOnAccountChangedListener(
       object : AccountManager.OnAccountChangedListener {
-        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
+        override suspend fun onPreAccountChanged(newAccount: GuestOrUserAccount?) {
           if (forcedAccountId == null) {
             setAccount(newAccount, accountChanged = true)
           }
+        }
+
+        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
         }
       },
     )

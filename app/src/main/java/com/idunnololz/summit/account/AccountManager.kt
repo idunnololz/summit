@@ -40,6 +40,7 @@ class AccountManager @Inject constructor(
 
   interface OnAccountChangedListener {
     suspend fun onAccountSigningOut(account: Account) {}
+    suspend fun onPreAccountChanged(newAccount: GuestOrUserAccount?) {}
     suspend fun onAccountChanged(newAccount: GuestOrUserAccount?)
   }
 
@@ -205,6 +206,9 @@ class AccountManager @Inject constructor(
 
     val listeners = withContext(Dispatchers.Main) {
       onAccountChangeListeners.toList()
+    }
+    listeners.forEach {
+      it.onPreAccountChanged(newAccount)
     }
     listeners.forEach {
       it.onAccountChanged(newAccount)

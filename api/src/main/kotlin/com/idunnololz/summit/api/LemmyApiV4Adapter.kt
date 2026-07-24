@@ -14,6 +14,7 @@ import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toGetSiteResponse
 import com.idunnololz.summit.api.converters.toInstance
 import com.idunnololz.summit.api.converters.toModlogKindFilter
+import com.idunnololz.summit.api.converters.toMyUserInfo
 import com.idunnololz.summit.api.converters.toPerson
 import com.idunnololz.summit.api.converters.toPersonMentionView
 import com.idunnololz.summit.api.converters.toPersonView
@@ -169,6 +170,9 @@ import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.local.toModEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -193,13 +197,34 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Result<GetSiteResponse> = retrofitErrorHandler {
-    api.getSite(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
-    )
-  }.map {
-    it.toGetSiteResponse()
+  ): Result<GetSiteResponse> = withContext(Dispatchers.IO) {
+    val j1 = async {
+      retrofitErrorHandler {
+        api.getSite(
+          headers = generateHeaders(authorization, force),
+          form = args.serializeToMap(),
+        )
+      }.map {
+        it.toGetSiteResponse()
+      }
+    }
+    val j2 = async {
+      retrofitErrorHandler {
+        api.getCurrentUser(
+          headers = generateHeaders(authorization, force),
+          form = mapOf()
+        )
+      }.map {
+        it.toMyUserInfo()
+      }
+    }
+
+    j1.await()
+      .map {
+        val myUser = j2.await().getOrNull()
+
+        it.copy(my_user = myUser)
+      }
   }
 
   override suspend fun getPosts(
@@ -261,6 +286,7 @@ class LemmyApiV4Adapter(
         password = args.password,
         usernameOrEmail = args.username_or_email,
         totp2faToken = args.totp_2fa_token,
+        stayLoggedIn = true,
       ),
     )
   }.map {

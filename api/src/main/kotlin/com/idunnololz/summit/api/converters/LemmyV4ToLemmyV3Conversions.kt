@@ -10,17 +10,24 @@ import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
+import com.idunnololz.summit.api.dto.lemmy.CommunityBlockView
+import com.idunnololz.summit.api.dto.lemmy.CommunityFollowerView
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.Instance
+import com.idunnololz.summit.api.dto.lemmy.InstanceBlockView
 import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.LocalSite
 import com.idunnololz.summit.api.dto.lemmy.LocalSiteRateLimit
+import com.idunnololz.summit.api.dto.lemmy.LocalUser
+import com.idunnololz.summit.api.dto.lemmy.LocalUserView
+import com.idunnololz.summit.api.dto.lemmy.MyUserInfo
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.PersonAggregates
+import com.idunnololz.summit.api.dto.lemmy.PersonBlockView
 import com.idunnololz.summit.api.dto.lemmy.PersonMention
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
@@ -39,6 +46,7 @@ import com.idunnololz.summit.api.dto.lemmy.Site
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.SiteView
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.dto.lemmy.Tagline
 import com.idunnololz.summit.api.dto.lemmy.VoteView
@@ -47,14 +55,19 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportView as Commen
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Comment as CommentV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentView as CommentViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerState
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerView as CommunityFollowerViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView as CommunityModeratorViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView as CommunityViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community as CommunityV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Instance as InstanceV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
+import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUser as LocalUserV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUserView as LocalUserViewV4
+import com.idunnololz.summit.api.dto.lemmy.v4.models.MyUserInfo as MyUserInfoV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponsePostView
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplicationView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReportView as PostReportViewV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportCombinedView
@@ -92,6 +105,78 @@ fun GetSiteResponseV4.toGetSiteResponse(): GetSiteResponse {
       listOf(tagline.toTagline())
     },
     custom_emojis = listOf(),
+  )
+}
+
+fun MyUserInfoV4.toMyUserInfo(): MyUserInfo {
+  val localUserView = localUserView.toLocalUserView()
+  return MyUserInfo(
+    local_user_view = localUserView,
+    follows = follows.map { it.toCommunityFollowerView() },
+    moderates = moderates.map { it.toCommunityModeratorView() },
+    community_blocks = communityBlocks.map { it.toCommunityBlockView(localUserView.person) },
+    person_blocks = personBlocks.map { it.toPersonBlockView(localUserView.person) },
+    instance_blocks = instanceCommunitiesBlocks.map { it.toInstanceBlockView(localUserView.person) },
+    discussion_languages = discussionLanguages,
+  )
+}
+
+fun InstanceV4.toInstanceBlockView(person: Person): InstanceBlockView {
+  return InstanceBlockView(
+    person = person,
+    instance = this.toInstance(),
+  )
+}
+
+fun PersonV4.toPersonBlockView(person: Person): PersonBlockView {
+  return PersonBlockView(
+    person = person,
+    target = this.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+  )
+}
+
+fun CommunityV4.toCommunityBlockView(person: Person): CommunityBlockView {
+  return CommunityBlockView(
+    person = person,
+    community = this.toCommunity()
+  )
+}
+
+fun CommunityFollowerViewV4.toCommunityFollowerView(): CommunityFollowerView {
+  return CommunityFollowerView(
+    community = community.toCommunity(),
+    follower = follower.toPerson(false, null, false)
+  )
+}
+
+fun LocalUserViewV4.toLocalUserView(): LocalUserView {
+  return LocalUserView(
+    localUser.toLocalUser(),
+    person.toPerson(this.banned, banExpiresAt, false),
+    counts = person.toPersonAggregates(),
+  )
+}
+
+fun LocalUserV4.toLocalUser(): LocalUser {
+  return LocalUser(
+    id = id.toInt(),
+    person_id = personId,
+    email = email,
+    show_nsfw = this.showNsfw,
+    theme = theme,
+    default_sort_type = this.defaultPostSortType.toSortType(defaultPostTimeRangeSeconds),
+    default_listing_type = this.defaultListingType.toListingType(),
+    interface_language = interfaceLanguage,
+    show_avatars = showAvatars,
+    send_notifications_to_email = sendNotificationsToEmail,
+    validator_time = "",
+    show_scores = showScore,
+    show_bot_accounts = this.showBotAccounts,
+    show_read_posts = this.showReadPosts,
+    show_new_post_notifs = false,
+    email_verified = emailVerified,
+    accepted_application = acceptedApplication,
+    totp_2fa_url = null,
   )
 }
 
@@ -594,7 +679,7 @@ private fun CommentV4.toCommentAggregates(): CommentAggregates {
   return CommentAggregates(
     id = id,
     comment_id = id,
-    score = score.toInt(),
+    score = score,
     upvotes = upvotes.toInt(),
     downvotes = downvotes.toInt(),
     published = publishedAt,
@@ -873,3 +958,42 @@ private fun Boolean?.toVoteInt() =
     false -> -1
     null -> 0
   }
+
+
+
+private fun PostSortType.toSortType(timeRangeSeconds: Int?): SortType? {
+  return when (this) {
+    PostSortType.active -> SortType.Active
+    PostSortType.hot -> SortType.Hot
+    PostSortType.new -> SortType.New
+    PostSortType.old -> SortType.Old
+    PostSortType.top -> timeRangeSeconds.toTopSortType()
+    PostSortType.most_comments -> SortType.MostComments
+    PostSortType.new_comments -> SortType.NewComments
+    PostSortType.controversial -> SortType.Controversial
+    PostSortType.scaled -> SortType.Scaled
+  }
+}
+
+private fun Int?.toTopSortType(): SortType? {
+  if (this == null || this == 0) return SortType.TopAll
+
+  val closest = listOf(
+    60 * 60 to SortType.TopHour,
+    6 * 60 * 60 to SortType.TopSixHour,
+    12 * 60 * 60 to SortType.TopTwelveHour,
+    24 * 60 * 60 to SortType.TopDay,
+    7 * 24 * 60 * 60 to SortType.TopWeek,
+    30 * 24 * 60 * 60 to SortType.TopMonth,
+    3 * 30 * 24 * 60 * 60 to SortType.TopThreeMonths,
+    6 * 30 * 24 * 60 * 60 to SortType.TopSixMonths,
+    9 * 30 * 24 * 60 * 60 to SortType.TopNineMonths,
+    365 * 24 * 60 * 60 to SortType.TopYear,
+  ).minBy { (seconds) -> kotlin.math.abs(toLong() - seconds) }
+
+  val (expectedSeconds, sortType) = closest
+  val toleranceSeconds = maxOf(60L, expectedSeconds.toLong() / 20)
+  return sortType.takeIf {
+    kotlin.math.abs(toLong() - expectedSeconds) <= toleranceSeconds
+  }
+}

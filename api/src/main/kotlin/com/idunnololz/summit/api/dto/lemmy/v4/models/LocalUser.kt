@@ -22,6 +22,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.VoteShow
 
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.SortType
 
 /**
  * A local user.
@@ -199,4 +200,3 @@ data class LocalUser (
 
 
 }
-
