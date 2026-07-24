@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,41 +23,43 @@ import com.google.gson.annotations.SerializedName
  * Values: show,show_for_others,hide
  */
 
-enum class VoteShow(val value: kotlin.String) {
+enum class VoteShow(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "show")
-    show("show"),
+  @SerializedName(value = "show")
+  show("show"),
 
-    @SerializedName(value = "show_for_others")
-    show_for_others("show_for_others"),
+  @SerializedName(value = "show_for_others")
+  show_for_others("show_for_others"),
 
-    @SerializedName(value = "hide")
-    hide("hide");
+  @SerializedName(value = "hide")
+  hide("hide"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? = if (data is VoteShow) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [VoteShow] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is VoteShow) "$data" else null
-
-        /**
-         * Returns a valid [VoteShow] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): VoteShow? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): VoteShow? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

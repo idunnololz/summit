@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param expiresAt 
- * @param maxUses 
+ *
+ * @param expiresAt
+ * @param maxUses
  */
 
+data class CreateInvitation(
 
-data class CreateInvitation (
+  @SerializedName("expires_at")
+  val expiresAt: kotlin.String? = null,
 
-    @SerializedName("expires_at")
-    val expiresAt: kotlin.String? = null,
+  @SerializedName("max_uses")
+  val maxUses: kotlin.Int? = null,
 
-    @SerializedName("max_uses")
-    val maxUses: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

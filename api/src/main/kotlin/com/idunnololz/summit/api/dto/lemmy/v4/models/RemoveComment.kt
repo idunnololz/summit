@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Remove a comment (only doable by mods).
  *
- * @param reason 
- * @param removed 
+ * @param reason
+ * @param removed
  * @param commentId The comment id.
  * @param removeChildren Setting this will override whatever `removed` was set to, leave as null or unset to act just on the comment itself.
  */
 
+data class RemoveComment(
 
-data class RemoveComment (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the comment itself. */
+  @SerializedName("remove_children")
+  val removeChildren: kotlin.Boolean? = null,
 
-    /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the comment itself. */
-    @SerializedName("remove_children")
-    val removeChildren: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

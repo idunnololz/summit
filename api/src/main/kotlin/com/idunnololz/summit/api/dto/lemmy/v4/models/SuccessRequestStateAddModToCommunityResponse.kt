@@ -7,44 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.AddModToCommunityResponse
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param `data` 
- * @param state 
+ *
+ * @param `data`
+ * @param state
  */
 
+data class SuccessRequestStateAddModToCommunityResponse(
 
-data class SuccessRequestStateAddModToCommunityResponse (
+  @SerializedName("data")
+  val `data`: AddModToCommunityResponse,
 
-    @SerializedName("data")
-    val `data`: AddModToCommunityResponse,
-
-    @SerializedName("state")
-    val state: SuccessRequestStateAddModToCommunityResponse.State
+  @SerializedName("state")
+  val state: SuccessRequestStateAddModToCommunityResponse.State,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: success
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "success") success("success");
-    }
-
+  /**
+   *
+   *
+   * Values: success
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "success")
+    success("success"),
+  }
 }
-

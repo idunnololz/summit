@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUserSortType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param limit 
- * @param sort 
+ *
+ * @param limit
+ * @param sort
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param bannedOnly 
+ * @param bannedOnly
  */
 
+data class AdminListUsersI(
 
-data class AdminListUsersI (
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  @SerializedName("sort")
+  val sort: LocalUserSortType? = null,
 
-    @SerializedName("sort")
-    val sort: LocalUserSortType? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  @SerializedName("banned_only")
+  val bannedOnly: kotlin.Boolean? = null,
 
-    @SerializedName("banned_only")
-    val bannedOnly: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

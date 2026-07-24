@@ -7,40 +7,34 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Hide a community from the main view.
  *
- * @param reason 
- * @param hidden 
+ * @param reason
+ * @param hidden
  * @param communityId The community id.
  */
 
+data class HideCommunity(
 
-data class HideCommunity (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("hidden")
+  val hidden: kotlin.Boolean,
 
-    @SerializedName("hidden")
-    val hidden: kotlin.Boolean,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int
-
-) {
-
-
-}
-
+)

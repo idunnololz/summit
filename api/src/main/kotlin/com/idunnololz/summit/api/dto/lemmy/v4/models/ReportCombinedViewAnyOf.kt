@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityTag
@@ -24,95 +25,93 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Post
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostReport
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param tags We wrap this in a struct so we can implement FromSqlRow<Json> for it
- * @param creatorBannedFromCommunity 
- * @param creatorBanned 
- * @param creatorIsModerator 
- * @param creatorIsAdmin 
- * @param postCreator 
- * @param creator 
- * @param community 
- * @param post 
- * @param postReport 
- * @param type 
- * @param creatorCommunityBanExpiresAt 
- * @param creatorBanExpiresAt 
- * @param resolver 
- * @param personActions 
- * @param postActions 
- * @param communityActions 
+ * @param creatorBannedFromCommunity
+ * @param creatorBanned
+ * @param creatorIsModerator
+ * @param creatorIsAdmin
+ * @param postCreator
+ * @param creator
+ * @param community
+ * @param post
+ * @param postReport
+ * @param type
+ * @param creatorCommunityBanExpiresAt
+ * @param creatorBanExpiresAt
+ * @param resolver
+ * @param personActions
+ * @param postActions
+ * @param communityActions
  */
 
+data class ReportCombinedViewAnyOf(
 
-data class ReportCombinedViewAnyOf (
+  /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<CommunityTag>,
 
-    /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<CommunityTag>,
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("creator_is_moderator")
+  val creatorIsModerator: kotlin.Boolean,
 
-    @SerializedName("creator_is_moderator")
-    val creatorIsModerator: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("post_creator")
+  val postCreator: Person,
 
-    @SerializedName("post_creator")
-    val postCreator: Person,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("post")
+  val post: Post,
 
-    @SerializedName("post")
-    val post: Post,
+  @SerializedName("post_report")
+  val postReport: PostReport,
 
-    @SerializedName("post_report")
-    val postReport: PostReport,
+  @SerializedName("type_")
+  val type: ReportCombinedViewAnyOf.Type,
 
-    @SerializedName("type_")
-    val type: ReportCombinedViewAnyOf.Type,
+  @SerializedName("creator_community_ban_expires_at")
+  val creatorCommunityBanExpiresAt: kotlin.String? = null,
 
-    @SerializedName("creator_community_ban_expires_at")
-    val creatorCommunityBanExpiresAt: kotlin.String? = null,
+  @SerializedName("creator_ban_expires_at")
+  val creatorBanExpiresAt: kotlin.String? = null,
 
-    @SerializedName("creator_ban_expires_at")
-    val creatorBanExpiresAt: kotlin.String? = null,
+  @SerializedName("resolver")
+  val resolver: Person? = null,
 
-    @SerializedName("resolver")
-    val resolver: Person? = null,
+  @SerializedName("person_actions")
+  val personActions: PersonActions? = null,
 
-    @SerializedName("person_actions")
-    val personActions: PersonActions? = null,
+  @SerializedName("post_actions")
+  val postActions: PostActions? = null,
 
-    @SerializedName("post_actions")
-    val postActions: PostActions? = null,
-
-    @SerializedName("community_actions")
-    val communityActions: CommunityActions? = null
+  @SerializedName("community_actions")
+  val communityActions: CommunityActions? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: post
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "post") post("post");
-    }
-
+  /**
+   *
+   *
+   * Values: post
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "post")
+    post("post"),
+  }
 }
-

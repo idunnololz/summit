@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ImageMode
@@ -23,46 +24,44 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.PostListingMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationMode
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * The local site.
  *
  * @param maxInvitesPerUserAllowed How many active invite links a user can have
- * @param imageUploadDisabled 
+ * @param imageUploadDisabled
  * @param imageAllowVideoUploads This affects post and comment images, but not avatars and banners.
  * @param imageMaxUploadSize This affects post and comment images, but not avatar and banner sizes.
- * @param imageMaxBannerSize 
- * @param imageMaxAvatarSize 
+ * @param imageMaxBannerSize
+ * @param imageMaxAvatarSize
  * @param imageMaxThumbnailSize These are pixel sizes. Larger images are automatically downscaled.
- * @param imageUploadTimeoutSeconds 
- * @param imageMode 
- * @param defaultItemsPerPage 
+ * @param imageUploadTimeoutSeconds
+ * @param imageMode
+ * @param defaultItemsPerPage
  * @param emailNotificationsDisabled Dont send email notifications to users for new replies, mentions etc
  * @param usersActiveHalfYear The number of users with any activity in the last half year.
  * @param usersActiveMonth The number of users with any activity in the last month.
  * @param usersActiveWeek The number of users with any activity in the last week.
  * @param usersActiveDay The number of users with any activity in the last day.
- * @param communities 
- * @param comments 
- * @param posts 
- * @param users 
+ * @param communities
+ * @param comments
+ * @param posts
+ * @param users
  * @param nsfwContentDisallowed Block NSFW content being created
- * @param commentDownvotes 
- * @param commentUpvotes 
- * @param postDownvotes 
- * @param postUpvotes 
+ * @param commentDownvotes
+ * @param commentUpvotes
+ * @param postDownvotes
+ * @param postUpvotes
  * @param oauthRegistration Whether or not external auth methods can auto-register users.
- * @param defaultCommentSortType 
- * @param defaultPostSortType 
- * @param defaultPostListingMode 
+ * @param defaultCommentSortType
+ * @param defaultPostSortType
+ * @param defaultPostListingMode
  * @param federationSignedFetch Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this.
  * @param reportsEmailAdmins Whether to email admins on new reports.
- * @param registrationMode 
- * @param publishedAt 
+ * @param registrationMode
+ * @param publishedAt
  * @param federationEnabled Whether federation is enabled.
  * @param applicationEmailAdmins Whether new applications email admins.
- * @param defaultPostListingType 
+ * @param defaultPostListingType
  * @param defaultTheme The default front-end theme.
  * @param privateInstance Whether the instance is private or public.
  * @param emailVerificationRequired Whether emails are required.
@@ -71,193 +70,188 @@ import com.google.gson.annotations.SerializedName
  * @param siteId The site id.
  * @param id The local site id.
  * @param imageProxyBypassDomains Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc
- * @param suggestedMultiCommunityId 
+ * @param suggestedMultiCommunityId
  * @param defaultPostTimeRangeSeconds A default time range limit to apply to post sorts, in seconds.
- * @param updatedAt 
+ * @param updatedAt
  * @param slurFilterRegex An optional regex to filter words.
  * @param legalInformation An optional legal disclaimer page.
  * @param applicationQuestion An optional registration application questionnaire in markdown.
  */
 
+data class LocalSite(
 
-data class LocalSite (
+  /* How many active invite links a user can have */
+  @SerializedName("max_invites_per_user_allowed")
+  val maxInvitesPerUserAllowed: kotlin.Int,
 
-    /* How many active invite links a user can have */
-    @SerializedName("max_invites_per_user_allowed")
-    val maxInvitesPerUserAllowed: kotlin.Int,
+  @SerializedName("image_upload_disabled")
+  val imageUploadDisabled: kotlin.Boolean,
 
-    @SerializedName("image_upload_disabled")
-    val imageUploadDisabled: kotlin.Boolean,
+  /* This affects post and comment images, but not avatars and banners. */
+  @SerializedName("image_allow_video_uploads")
+  val imageAllowVideoUploads: kotlin.Boolean,
 
-    /* This affects post and comment images, but not avatars and banners. */
-    @SerializedName("image_allow_video_uploads")
-    val imageAllowVideoUploads: kotlin.Boolean,
+  /* This affects post and comment images, but not avatar and banner sizes. */
+  @SerializedName("image_max_upload_size")
+  val imageMaxUploadSize: kotlin.Int,
 
-    /* This affects post and comment images, but not avatar and banner sizes. */
-    @SerializedName("image_max_upload_size")
-    val imageMaxUploadSize: kotlin.Int,
+  @SerializedName("image_max_banner_size")
+  val imageMaxBannerSize: kotlin.Int,
 
-    @SerializedName("image_max_banner_size")
-    val imageMaxBannerSize: kotlin.Int,
+  @SerializedName("image_max_avatar_size")
+  val imageMaxAvatarSize: kotlin.Int,
 
-    @SerializedName("image_max_avatar_size")
-    val imageMaxAvatarSize: kotlin.Int,
+  /* These are pixel sizes. Larger images are automatically downscaled. */
+  @SerializedName("image_max_thumbnail_size")
+  val imageMaxThumbnailSize: kotlin.Int,
 
-    /* These are pixel sizes. Larger images are automatically downscaled. */
-    @SerializedName("image_max_thumbnail_size")
-    val imageMaxThumbnailSize: kotlin.Int,
+  @SerializedName("image_upload_timeout_seconds")
+  val imageUploadTimeoutSeconds: kotlin.Int,
 
-    @SerializedName("image_upload_timeout_seconds")
-    val imageUploadTimeoutSeconds: kotlin.Int,
+  @SerializedName("image_mode")
+  val imageMode: ImageMode,
 
-    @SerializedName("image_mode")
-    val imageMode: ImageMode,
+  @SerializedName("default_items_per_page")
+  val defaultItemsPerPage: kotlin.Int,
 
-    @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Int,
+  /* Dont send email notifications to users for new replies, mentions etc */
+  @SerializedName("email_notifications_disabled")
+  val emailNotificationsDisabled: kotlin.Boolean,
 
-    /* Dont send email notifications to users for new replies, mentions etc */
-    @SerializedName("email_notifications_disabled")
-    val emailNotificationsDisabled: kotlin.Boolean,
+  /* The number of users with any activity in the last half year. */
+  @SerializedName("users_active_half_year")
+  val usersActiveHalfYear: kotlin.Int,
 
-    /* The number of users with any activity in the last half year. */
-    @SerializedName("users_active_half_year")
-    val usersActiveHalfYear: kotlin.Int,
+  /* The number of users with any activity in the last month. */
+  @SerializedName("users_active_month")
+  val usersActiveMonth: kotlin.Int,
 
-    /* The number of users with any activity in the last month. */
-    @SerializedName("users_active_month")
-    val usersActiveMonth: kotlin.Int,
+  /* The number of users with any activity in the last week. */
+  @SerializedName("users_active_week")
+  val usersActiveWeek: kotlin.Int,
 
-    /* The number of users with any activity in the last week. */
-    @SerializedName("users_active_week")
-    val usersActiveWeek: kotlin.Int,
+  /* The number of users with any activity in the last day. */
+  @SerializedName("users_active_day")
+  val usersActiveDay: kotlin.Int,
 
-    /* The number of users with any activity in the last day. */
-    @SerializedName("users_active_day")
-    val usersActiveDay: kotlin.Int,
+  @SerializedName("communities")
+  val communities: kotlin.Int,
 
-    @SerializedName("communities")
-    val communities: kotlin.Int,
+  @SerializedName("comments")
+  val comments: kotlin.Int,
 
-    @SerializedName("comments")
-    val comments: kotlin.Int,
+  @SerializedName("posts")
+  val posts: kotlin.Int,
 
-    @SerializedName("posts")
-    val posts: kotlin.Int,
+  @SerializedName("users")
+  val users: kotlin.Int,
 
-    @SerializedName("users")
-    val users: kotlin.Int,
+  /* Block NSFW content being created */
+  @SerializedName("nsfw_content_disallowed")
+  val nsfwContentDisallowed: kotlin.Boolean,
 
-    /* Block NSFW content being created */
-    @SerializedName("nsfw_content_disallowed")
-    val nsfwContentDisallowed: kotlin.Boolean,
+  @SerializedName("comment_downvotes")
+  val commentDownvotes: FederationMode,
 
-    @SerializedName("comment_downvotes")
-    val commentDownvotes: FederationMode,
+  @SerializedName("comment_upvotes")
+  val commentUpvotes: FederationMode,
 
-    @SerializedName("comment_upvotes")
-    val commentUpvotes: FederationMode,
+  @SerializedName("post_downvotes")
+  val postDownvotes: FederationMode,
 
-    @SerializedName("post_downvotes")
-    val postDownvotes: FederationMode,
+  @SerializedName("post_upvotes")
+  val postUpvotes: FederationMode,
 
-    @SerializedName("post_upvotes")
-    val postUpvotes: FederationMode,
+  /* Whether or not external auth methods can auto-register users. */
+  @SerializedName("oauth_registration")
+  val oauthRegistration: kotlin.Boolean,
 
-    /* Whether or not external auth methods can auto-register users. */
-    @SerializedName("oauth_registration")
-    val oauthRegistration: kotlin.Boolean,
+  @SerializedName("default_comment_sort_type")
+  val defaultCommentSortType: CommentSortType,
 
-    @SerializedName("default_comment_sort_type")
-    val defaultCommentSortType: CommentSortType,
+  @SerializedName("default_post_sort_type")
+  val defaultPostSortType: PostSortType,
 
-    @SerializedName("default_post_sort_type")
-    val defaultPostSortType: PostSortType,
+  @SerializedName("default_post_listing_mode")
+  val defaultPostListingMode: PostListingMode,
 
-    @SerializedName("default_post_listing_mode")
-    val defaultPostListingMode: PostListingMode,
+  /* Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this. */
+  @SerializedName("federation_signed_fetch")
+  val federationSignedFetch: kotlin.Boolean,
 
-    /* Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this. */
-    @SerializedName("federation_signed_fetch")
-    val federationSignedFetch: kotlin.Boolean,
+  /* Whether to email admins on new reports. */
+  @SerializedName("reports_email_admins")
+  val reportsEmailAdmins: kotlin.Boolean,
 
-    /* Whether to email admins on new reports. */
-    @SerializedName("reports_email_admins")
-    val reportsEmailAdmins: kotlin.Boolean,
+  @SerializedName("registration_mode")
+  val registrationMode: RegistrationMode,
 
-    @SerializedName("registration_mode")
-    val registrationMode: RegistrationMode,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  /* Whether federation is enabled. */
+  @SerializedName("federation_enabled")
+  val federationEnabled: kotlin.Boolean,
 
-    /* Whether federation is enabled. */
-    @SerializedName("federation_enabled")
-    val federationEnabled: kotlin.Boolean,
+  /* Whether new applications email admins. */
+  @SerializedName("application_email_admins")
+  val applicationEmailAdmins: kotlin.Boolean,
 
-    /* Whether new applications email admins. */
-    @SerializedName("application_email_admins")
-    val applicationEmailAdmins: kotlin.Boolean,
+  @SerializedName("default_post_listing_type")
+  val defaultPostListingType: ListingType,
 
-    @SerializedName("default_post_listing_type")
-    val defaultPostListingType: ListingType,
+  /* The default front-end theme. */
+  @SerializedName("default_theme")
+  val defaultTheme: kotlin.String,
 
-    /* The default front-end theme. */
-    @SerializedName("default_theme")
-    val defaultTheme: kotlin.String,
+  /* Whether the instance is private or public. */
+  @SerializedName("private_instance")
+  val privateInstance: kotlin.Boolean,
 
-    /* Whether the instance is private or public. */
-    @SerializedName("private_instance")
-    val privateInstance: kotlin.Boolean,
+  /* Whether emails are required. */
+  @SerializedName("email_verification_required")
+  val emailVerificationRequired: kotlin.Boolean,
 
-    /* Whether emails are required. */
-    @SerializedName("email_verification_required")
-    val emailVerificationRequired: kotlin.Boolean,
+  /* Whether only admins can create communities. */
+  @SerializedName("community_creation_admin_only")
+  val communityCreationAdminOnly: kotlin.Boolean,
 
-    /* Whether only admins can create communities. */
-    @SerializedName("community_creation_admin_only")
-    val communityCreationAdminOnly: kotlin.Boolean,
+  /* True if the site is set up. */
+  @SerializedName("site_setup")
+  val siteSetup: kotlin.Boolean,
 
-    /* True if the site is set up. */
-    @SerializedName("site_setup")
-    val siteSetup: kotlin.Boolean,
+  /* The site id. */
+  @SerializedName("site_id")
+  val siteId: kotlin.Int,
 
-    /* The site id. */
-    @SerializedName("site_id")
-    val siteId: kotlin.Int,
+  /* The local site id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The local site id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
+  @SerializedName("image_proxy_bypass_domains")
+  val imageProxyBypassDomains: kotlin.String? = null,
 
-    /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
-    @SerializedName("image_proxy_bypass_domains")
-    val imageProxyBypassDomains: kotlin.String? = null,
+  @SerializedName("suggested_multi_community_id")
+  val suggestedMultiCommunityId: kotlin.Int? = null,
 
-    @SerializedName("suggested_multi_community_id")
-    val suggestedMultiCommunityId: kotlin.Int? = null,
+  /* A default time range limit to apply to post sorts, in seconds. */
+  @SerializedName("default_post_time_range_seconds")
+  val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
-    /* A default time range limit to apply to post sorts, in seconds. */
-    @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* An optional regex to filter words. */
+  @SerializedName("slur_filter_regex")
+  val slurFilterRegex: kotlin.String? = null,
 
-    /* An optional regex to filter words. */
-    @SerializedName("slur_filter_regex")
-    val slurFilterRegex: kotlin.String? = null,
+  /* An optional legal disclaimer page. */
+  @SerializedName("legal_information")
+  val legalInformation: kotlin.String? = null,
 
-    /* An optional legal disclaimer page. */
-    @SerializedName("legal_information")
-    val legalInformation: kotlin.String? = null,
+  /* An optional registration application questionnaire in markdown. */
+  @SerializedName("application_question")
+  val applicationQuestion: kotlin.String? = null,
 
-    /* An optional registration application questionnaire in markdown. */
-    @SerializedName("application_question")
-    val applicationQuestion: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param filename 
- * @param imageUrl 
+ *
+ * @param filename
+ * @param imageUrl
  */
 
+data class UploadImageResponse(
 
-data class UploadImageResponse (
+  @SerializedName("filename")
+  val filename: kotlin.String,
 
-    @SerializedName("filename")
-    val filename: kotlin.String,
+  @SerializedName("image_url")
+  val imageUrl: kotlin.String,
 
-    @SerializedName("image_url")
-    val imageUrl: kotlin.String
-
-) {
-
-
-}
-
+)

@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Purges a person from the database. This will delete all content attached to that person.
  *
- * @param reason 
+ * @param reason
  * @param personId The person id.
  */
 
+data class PurgePerson(
 
-data class PurgePerson (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Long
-
-) {
-
-
-}
-
+)

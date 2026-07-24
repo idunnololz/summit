@@ -7,58 +7,52 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NodeInfoServices
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NodeInfoSoftware
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NodeInfoUsage
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * Nodeinfo spec: http://nodeinfo.diaspora.software/docson/index.html#/ns/schema/2.1
  *
- * @param metadata 
- * @param services 
- * @param openRegistrations 
- * @param usage 
- * @param protocols 
- * @param software 
- * @param version 
+ * @param metadata
+ * @param services
+ * @param openRegistrations
+ * @param usage
+ * @param protocols
+ * @param software
+ * @param version
  */
 
+data class NodeInfo(
 
-data class NodeInfo (
+  @SerializedName("metadata")
+  val metadata: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
-    @SerializedName("metadata")
-    val metadata: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+  @SerializedName("services")
+  val services: NodeInfoServices? = null,
 
-    @SerializedName("services")
-    val services: NodeInfoServices? = null,
+  @SerializedName("openRegistrations")
+  val openRegistrations: kotlin.Boolean? = null,
 
-    @SerializedName("openRegistrations")
-    val openRegistrations: kotlin.Boolean? = null,
+  @SerializedName("usage")
+  val usage: NodeInfoUsage? = null,
 
-    @SerializedName("usage")
-    val usage: NodeInfoUsage? = null,
+  @SerializedName("protocols")
+  val protocols: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerializedName("protocols")
-    val protocols: kotlin.collections.List<kotlin.String>? = null,
+  @SerializedName("software")
+  val software: NodeInfoSoftware? = null,
 
-    @SerializedName("software")
-    val software: NodeInfoSoftware? = null,
+  @SerializedName("version")
+  val version: kotlin.String? = null,
 
-    @SerializedName("version")
-    val version: kotlin.String? = null
-
-) {
-
-
-}
-
+)

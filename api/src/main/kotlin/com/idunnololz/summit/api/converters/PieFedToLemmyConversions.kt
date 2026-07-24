@@ -936,12 +936,11 @@ internal fun ListCommentLikesResponse.toListCommentLikesResponse() =
     prev_page = null,
   )
 
-internal fun CommentLikeView.toVoteView() =
-  VoteView(
-    creator = creator.toPerson(),
-    creator_banned_from_community = creatorBannedFromCommunity,
-    score = score.toLong(),
-  )
+internal fun CommentLikeView.toVoteView() = VoteView(
+  creator = creator.toPerson(),
+  creator_banned_from_community = creatorBannedFromCommunity,
+  score = score.toLong(),
+)
 
 internal fun ListPostLikesResponse.toListPostLikesResponse() =
   com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse(
@@ -950,12 +949,11 @@ internal fun ListPostLikesResponse.toListPostLikesResponse() =
     prev_page = null,
   )
 
-internal fun PostLikeView.toVoteView() =
-  VoteView(
-    creator = creator.toPerson(),
-    creator_banned_from_community = creatorBannedFromCommunity,
-    score = score.toLong(),
-  )
+internal fun PostLikeView.toVoteView() = VoteView(
+  creator = creator.toPerson(),
+  creator_banned_from_community = creatorBannedFromCommunity,
+  score = score.toLong(),
+)
 
 // internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =
 //  ModRemovePostView(

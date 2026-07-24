@@ -7,40 +7,34 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NodeInfoUsers
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param localComments 
- * @param localPosts 
- * @param users 
+ *
+ * @param localComments
+ * @param localPosts
+ * @param users
  */
 
+data class NodeInfoUsage(
 
-data class NodeInfoUsage (
+  @SerializedName("localComments")
+  val localComments: kotlin.Int? = null,
 
-    @SerializedName("localComments")
-    val localComments: kotlin.Int? = null,
+  @SerializedName("localPosts")
+  val localPosts: kotlin.Int? = null,
 
-    @SerializedName("localPosts")
-    val localPosts: kotlin.Int? = null,
+  @SerializedName("users")
+  val users: NodeInfoUsers? = null,
 
-    @SerializedName("users")
-    val users: NodeInfoUsers? = null
-
-) {
-
-
-}
-
+)

@@ -7,21 +7,20 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostListingMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.VoteShow
-
-import com.google.gson.annotations.SerializedName
 
 /**
  * Saves settings for your user.
@@ -29,16 +28,16 @@ import com.google.gson.annotations.SerializedName
  * @param showPersonVotes Whether to show vote totals given to others.
  * @param hidePostsWithMedia Whether to hide posts containing images/videos. Often labeled hide_memes.
  * @param autoMarkFetchedPostsAsRead Whether to automatically mark fetched posts as read.
- * @param showUpvotePercentage 
- * @param showDownvotes 
- * @param showUpvotes 
+ * @param showUpvotePercentage
+ * @param showDownvotes
+ * @param showUpvotes
  * @param showScore Some vote display mode settings
  * @param collapseBotComments Whether to auto-collapse bot comments.
  * @param privateMessagesEnabled Whether a user can send / receive private messages
  * @param animatedImagesEnabled Whether user avatars or inline images in the UI that are gifs should be allowed to play or should be paused
  * @param infiniteScrollEnabled Enable infinite scroll
  * @param openLinksInNewTab Open links in a new tab
- * @param blockingKeywords 
+ * @param blockingKeywords
  * @param discussionLanguages A list of languages you are able to see discussion in.
  * @param showReadPosts Whether to show read posts.
  * @param showBotAccounts Whether to show bot accounts.
@@ -48,152 +47,147 @@ import com.google.gson.annotations.SerializedName
  * @param showAvatars Whether to show or hide avatars.
  * @param matrixUserId Your matrix user id. Ex:
  * @param bio Your bio / info, in markdown.
- * @param email 
+ * @param email
  * @param displayName Your display name, which can contain strange characters, and does not need to be unique.
  * @param interfaceLanguage The language of the lemmy interface
- * @param defaultCommentSortType 
+ * @param defaultCommentSortType
  * @param defaultItemsPerPage A default fetch limit for number of items returned.
  * @param defaultPostTimeRangeSeconds A default time range limit to apply to post sorts, in seconds. 0 means none.
- * @param defaultPostSortType 
- * @param postListingMode 
- * @param defaultListingType 
+ * @param defaultPostSortType
+ * @param postListingMode
+ * @param defaultListingType
  * @param theme Your user's theme.
  * @param blurNsfw Blur nsfw posts.
  * @param showNsfw Show nsfw posts.
  */
 
+data class SaveUserSettings(
 
-data class SaveUserSettings (
+  /* Whether to show vote totals given to others. */
+  @SerializedName("show_person_votes")
+  val showPersonVotes: kotlin.Boolean? = null,
 
-    /* Whether to show vote totals given to others. */
-    @SerializedName("show_person_votes")
-    val showPersonVotes: kotlin.Boolean? = null,
+  /* Whether to hide posts containing images/videos. Often labeled hide_memes. */
+  @SerializedName("hide_posts_with_media")
+  val hidePostsWithMedia: kotlin.Boolean? = null,
 
-    /* Whether to hide posts containing images/videos. Often labeled hide_memes. */
-    @SerializedName("hide_posts_with_media")
-    val hidePostsWithMedia: kotlin.Boolean? = null,
+  /* Whether to automatically mark fetched posts as read. */
+  @SerializedName("auto_mark_fetched_posts_as_read")
+  val autoMarkFetchedPostsAsRead: kotlin.Boolean? = null,
 
-    /* Whether to automatically mark fetched posts as read. */
-    @SerializedName("auto_mark_fetched_posts_as_read")
-    val autoMarkFetchedPostsAsRead: kotlin.Boolean? = null,
+  @SerializedName("show_upvote_percentage")
+  val showUpvotePercentage: kotlin.Boolean? = null,
 
-    @SerializedName("show_upvote_percentage")
-    val showUpvotePercentage: kotlin.Boolean? = null,
+  @SerializedName("show_downvotes")
+  val showDownvotes: VoteShow? = null,
 
-    @SerializedName("show_downvotes")
-    val showDownvotes: VoteShow? = null,
+  @SerializedName("show_upvotes")
+  val showUpvotes: kotlin.Boolean? = null,
 
-    @SerializedName("show_upvotes")
-    val showUpvotes: kotlin.Boolean? = null,
+  /* Some vote display mode settings */
+  @SerializedName("show_score")
+  val showScore: kotlin.Boolean? = null,
 
-    /* Some vote display mode settings */
-    @SerializedName("show_score")
-    val showScore: kotlin.Boolean? = null,
+  /* Whether to auto-collapse bot comments. */
+  @SerializedName("collapse_bot_comments")
+  val collapseBotComments: kotlin.Boolean? = null,
 
-    /* Whether to auto-collapse bot comments. */
-    @SerializedName("collapse_bot_comments")
-    val collapseBotComments: kotlin.Boolean? = null,
+  /* Whether a user can send / receive private messages */
+  @SerializedName("private_messages_enabled")
+  val privateMessagesEnabled: kotlin.Boolean? = null,
 
-    /* Whether a user can send / receive private messages */
-    @SerializedName("private_messages_enabled")
-    val privateMessagesEnabled: kotlin.Boolean? = null,
+  /* Whether user avatars or inline images in the UI that are gifs should be allowed to play or should be paused */
+  @SerializedName("animated_images_enabled")
+  val animatedImagesEnabled: kotlin.Boolean? = null,
 
-    /* Whether user avatars or inline images in the UI that are gifs should be allowed to play or should be paused */
-    @SerializedName("animated_images_enabled")
-    val animatedImagesEnabled: kotlin.Boolean? = null,
+  /* Enable infinite scroll */
+  @SerializedName("infinite_scroll_enabled")
+  val infiniteScrollEnabled: kotlin.Boolean? = null,
 
-    /* Enable infinite scroll */
-    @SerializedName("infinite_scroll_enabled")
-    val infiniteScrollEnabled: kotlin.Boolean? = null,
+  /* Open links in a new tab */
+  @SerializedName("open_links_in_new_tab")
+  val openLinksInNewTab: kotlin.Boolean? = null,
 
-    /* Open links in a new tab */
-    @SerializedName("open_links_in_new_tab")
-    val openLinksInNewTab: kotlin.Boolean? = null,
+  @SerializedName("blocking_keywords")
+  val blockingKeywords: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerializedName("blocking_keywords")
-    val blockingKeywords: kotlin.collections.List<kotlin.String>? = null,
+  /* A list of languages you are able to see discussion in. */
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
 
-    /* A list of languages you are able to see discussion in. */
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
+  /* Whether to show read posts. */
+  @SerializedName("show_read_posts")
+  val showReadPosts: kotlin.Boolean? = null,
 
-    /* Whether to show read posts. */
-    @SerializedName("show_read_posts")
-    val showReadPosts: kotlin.Boolean? = null,
+  /* Whether to show bot accounts. */
+  @SerializedName("show_bot_accounts")
+  val showBotAccounts: kotlin.Boolean? = null,
 
-    /* Whether to show bot accounts. */
-    @SerializedName("show_bot_accounts")
-    val showBotAccounts: kotlin.Boolean? = null,
+  /* Whether this account is a bot account. Users can hide these accounts easily if they wish. */
+  @SerializedName("bot_account")
+  val botAccount: kotlin.Boolean? = null,
 
-    /* Whether this account is a bot account. Users can hide these accounts easily if they wish. */
-    @SerializedName("bot_account")
-    val botAccount: kotlin.Boolean? = null,
+  /* Sends notifications to your email. */
+  @SerializedName("send_notifications_to_email")
+  val sendNotificationsToEmail: kotlin.Boolean? = null,
 
-    /* Sends notifications to your email. */
-    @SerializedName("send_notifications_to_email")
-    val sendNotificationsToEmail: kotlin.Boolean? = null,
+  /* Whether to show media in the UI. */
+  @SerializedName("show_media")
+  val showMedia: kotlin.Boolean? = null,
 
-    /* Whether to show media in the UI. */
-    @SerializedName("show_media")
-    val showMedia: kotlin.Boolean? = null,
+  /* Whether to show or hide avatars. */
+  @SerializedName("show_avatars")
+  val showAvatars: kotlin.Boolean? = null,
 
-    /* Whether to show or hide avatars. */
-    @SerializedName("show_avatars")
-    val showAvatars: kotlin.Boolean? = null,
+  /* Your matrix user id. Ex: */
+  @SerializedName("matrix_user_id")
+  val matrixUserId: kotlin.String? = null,
 
-    /* Your matrix user id. Ex: */
-    @SerializedName("matrix_user_id")
-    val matrixUserId: kotlin.String? = null,
+  /* Your bio / info, in markdown. */
+  @SerializedName("bio")
+  val bio: kotlin.String? = null,
 
-    /* Your bio / info, in markdown. */
-    @SerializedName("bio")
-    val bio: kotlin.String? = null,
+  @SerializedName("email")
+  val email: kotlin.String? = null,
 
-    @SerializedName("email")
-    val email: kotlin.String? = null,
+  /* Your display name, which can contain strange characters, and does not need to be unique. */
+  @SerializedName("display_name")
+  val displayName: kotlin.String? = null,
 
-    /* Your display name, which can contain strange characters, and does not need to be unique. */
-    @SerializedName("display_name")
-    val displayName: kotlin.String? = null,
+  /* The language of the lemmy interface */
+  @SerializedName("interface_language")
+  val interfaceLanguage: kotlin.String? = null,
 
-    /* The language of the lemmy interface */
-    @SerializedName("interface_language")
-    val interfaceLanguage: kotlin.String? = null,
+  @SerializedName("default_comment_sort_type")
+  val defaultCommentSortType: CommentSortType? = null,
 
-    @SerializedName("default_comment_sort_type")
-    val defaultCommentSortType: CommentSortType? = null,
+  /* A default fetch limit for number of items returned. */
+  @SerializedName("default_items_per_page")
+  val defaultItemsPerPage: kotlin.Int? = null,
 
-    /* A default fetch limit for number of items returned. */
-    @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Int? = null,
+  /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
+  @SerializedName("default_post_time_range_seconds")
+  val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
-    /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
-    @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
+  @SerializedName("default_post_sort_type")
+  val defaultPostSortType: PostSortType? = null,
 
-    @SerializedName("default_post_sort_type")
-    val defaultPostSortType: PostSortType? = null,
+  @SerializedName("post_listing_mode")
+  val postListingMode: PostListingMode? = null,
 
-    @SerializedName("post_listing_mode")
-    val postListingMode: PostListingMode? = null,
+  @SerializedName("default_listing_type")
+  val defaultListingType: ListingType? = null,
 
-    @SerializedName("default_listing_type")
-    val defaultListingType: ListingType? = null,
+  /* Your user's theme. */
+  @SerializedName("theme")
+  val theme: kotlin.String? = null,
 
-    /* Your user's theme. */
-    @SerializedName("theme")
-    val theme: kotlin.String? = null,
+  /* Blur nsfw posts. */
+  @SerializedName("blur_nsfw")
+  val blurNsfw: kotlin.Boolean? = null,
 
-    /* Blur nsfw posts. */
-    @SerializedName("blur_nsfw")
-    val blurNsfw: kotlin.Boolean? = null,
+  /* Show nsfw posts. */
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    /* Show nsfw posts. */
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

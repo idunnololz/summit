@@ -12,7 +12,6 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
-import com.idunnololz.summit.api.local.ActionType
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.ModEvent
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -23,7 +22,6 @@ import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.requireMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

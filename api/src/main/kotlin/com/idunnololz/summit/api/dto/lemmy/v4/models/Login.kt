@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Logging into lemmy.  Note: Banned users can still log in, to be able to do certain things like delete their account.
  *
- * @param password 
- * @param usernameOrEmail 
+ * @param password
+ * @param usernameOrEmail
  * @param stayLoggedIn If this is true the login is valid forever, otherwise it expires after one week.
  * @param totp2faToken May be required, if totp is enabled for their account.
  */
 
+data class Login(
 
-data class Login (
+  @SerializedName("password")
+  val password: kotlin.String,
 
-    @SerializedName("password")
-    val password: kotlin.String,
+  @SerializedName("username_or_email")
+  val usernameOrEmail: kotlin.String,
 
-    @SerializedName("username_or_email")
-    val usernameOrEmail: kotlin.String,
+  /* If this is true the login is valid forever, otherwise it expires after one week. */
+  @SerializedName("stay_logged_in")
+  val stayLoggedIn: kotlin.Boolean? = null,
 
-    /* If this is true the login is valid forever, otherwise it expires after one week. */
-    @SerializedName("stay_logged_in")
-    val stayLoggedIn: kotlin.Boolean? = null,
+  /* May be required, if totp is enabled for their account. */
+  @SerializedName("totp_2fa_token")
+  val totp2faToken: kotlin.String? = null,
 
-    /* May be required, if totp is enabled for their account. */
-    @SerializedName("totp_2fa_token")
-    val totp2faToken: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param follow 
- * @param multiCommunityId 
+ *
+ * @param follow
+ * @param multiCommunityId
  */
 
+data class FollowMultiCommunity(
 
-data class FollowMultiCommunity (
+  @SerializedName("follow")
+  val follow: kotlin.Boolean,
 
-    @SerializedName("follow")
-    val follow: kotlin.Boolean,
+  @SerializedName("multi_community_id")
+  val multiCommunityId: kotlin.Int,
 
-    @SerializedName("multi_community_id")
-    val multiCommunityId: kotlin.Int
-
-) {
-
-
-}
-
+)

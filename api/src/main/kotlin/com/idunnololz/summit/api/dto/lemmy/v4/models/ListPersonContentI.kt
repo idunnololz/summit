@@ -7,60 +7,54 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonContentType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param limit 
+ *
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param communityName 
+ * @param communityName
  * @param communityId The community id.
  * @param username Example: dessalines , or dessalines@xyz.tld
  * @param personId The person id.
- * @param type 
+ * @param type
  */
 
+data class ListPersonContentI(
 
-data class ListPersonContentI (
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  @SerializedName("community_name")
+  val communityName: kotlin.String? = null,
 
-    @SerializedName("community_name")
-    val communityName: kotlin.String? = null,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int? = null,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+  /* Example: dessalines , or dessalines@xyz.tld */
+  @SerializedName("username")
+  val username: kotlin.String? = null,
 
-    /* Example: dessalines , or dessalines@xyz.tld */
-    @SerializedName("username")
-    val username: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Long? = null,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Long? = null,
+  @SerializedName("type_")
+  val type: PersonContentType? = null,
 
-    @SerializedName("type_")
-    val type: PersonContentType? = null
-
-) {
-
-
-}
-
+)

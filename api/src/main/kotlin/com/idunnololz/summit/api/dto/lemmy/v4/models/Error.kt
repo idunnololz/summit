@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param name 
- * @param message 
- * @param stack 
+ *
+ * @param name
+ * @param message
+ * @param stack
  */
 
+data class Error(
 
-data class Error (
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("message")
+  val message: kotlin.String,
 
-    @SerializedName("message")
-    val message: kotlin.String,
+  @SerializedName("stack")
+  val stack: kotlin.String? = null,
 
-    @SerializedName("stack")
-    val stack: kotlin.String? = null
-
-) {
-
-
-}
-
+)

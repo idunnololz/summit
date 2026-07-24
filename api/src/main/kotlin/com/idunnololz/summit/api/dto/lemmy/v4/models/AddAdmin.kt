@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Adds an admin to a site.
  *
- * @param added 
+ * @param added
  * @param personId The person id.
  */
 
+data class AddAdmin(
 
-data class AddAdmin (
+  @SerializedName("added")
+  val added: kotlin.Boolean,
 
-    @SerializedName("added")
-    val added: kotlin.Boolean,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Long
-
-) {
-
-
-}
-
+)

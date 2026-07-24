@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param totpSecretUrl 
+ *
+ * @param totpSecretUrl
  */
 
+data class GenerateTotpSecretResponse(
 
-data class GenerateTotpSecretResponse (
+  @SerializedName("totp_secret_url")
+  val totpSecretUrl: kotlin.String,
 
-    @SerializedName("totp_secret_url")
-    val totpSecretUrl: kotlin.String
-
-) {
-
-
-}
-
+)

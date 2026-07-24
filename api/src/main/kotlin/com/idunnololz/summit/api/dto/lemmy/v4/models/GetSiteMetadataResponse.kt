@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.LinkMetadata
 
 /**
  * The site metadata response.
  *
- * @param metadata 
+ * @param metadata
  */
 
+data class GetSiteMetadataResponse(
 
-data class GetSiteMetadataResponse (
+  @SerializedName("metadata")
+  val metadata: LinkMetadata,
 
-    @SerializedName("metadata")
-    val metadata: LinkMetadata
-
-) {
-
-
-}
-
+)

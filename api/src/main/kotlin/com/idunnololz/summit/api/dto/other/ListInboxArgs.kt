@@ -7,5 +7,5 @@ class ListInboxArgs(
   val page_cursor: String?,
   val creator_id: Int?,
   val unread_only: Boolean?,
-  val type: NotificationTypeFilter?
+  val type: NotificationTypeFilter?,
 )

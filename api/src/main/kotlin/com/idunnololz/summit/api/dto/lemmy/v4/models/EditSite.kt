@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ImageMode
@@ -23,59 +24,57 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.PostListingMode
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationMode
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * Edits a site.
  *
- * @param maxInvitesPerUserAllowed 
- * @param imageUploadDisabled 
- * @param imageAllowVideoUploads 
- * @param imageMaxUploadSize 
- * @param imageMaxBannerSize 
- * @param imageMaxAvatarSize 
- * @param imageMaxThumbnailSize 
- * @param imageUploadTimeoutSeconds 
+ * @param maxInvitesPerUserAllowed
+ * @param imageUploadDisabled
+ * @param imageAllowVideoUploads
+ * @param imageMaxUploadSize
+ * @param imageMaxBannerSize
+ * @param imageMaxAvatarSize
+ * @param imageMaxThumbnailSize
+ * @param imageUploadTimeoutSeconds
  * @param imageProxyBypassDomains Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc
- * @param imageMode 
- * @param suggestedMultiCommunityId 
+ * @param imageMode
+ * @param suggestedMultiCommunityId
  * @param emailNotificationsDisabled Dont send email notifications to users for new replies, mentions etc
  * @param nsfwContentDisallowed Block NSFW content being created
- * @param commentDownvotes 
- * @param commentUpvotes 
- * @param postDownvotes 
- * @param postUpvotes 
+ * @param commentDownvotes
+ * @param commentUpvotes
+ * @param postDownvotes
+ * @param postUpvotes
  * @param oauthRegistration Whether or not external auth methods can auto-register users.
  * @param contentWarning If present, nsfw content is visible by default. Should be displayed by frontends/clients when the site is first opened by a user.
  * @param reportsEmailAdmins Whether to email admins for new reports.
- * @param registrationMode 
+ * @param registrationMode
  * @param blockedUrls A list of blocked URLs
  * @param federationEnabled Whether to enable federation.
- * @param rateLimitImportUserSettingsIntervalSeconds 
+ * @param rateLimitImportUserSettingsIntervalSeconds
  * @param rateLimitImportUserSettingsMaxRequests The number of settings imports or exports allowed in a given time frame.
- * @param rateLimitSearchIntervalSeconds 
+ * @param rateLimitSearchIntervalSeconds
  * @param rateLimitSearchMaxRequests The number of searches allowed in a given time frame.
- * @param rateLimitCommentIntervalSeconds 
+ * @param rateLimitCommentIntervalSeconds
  * @param rateLimitCommentMaxRequests The number of comments allowed in a given time frame.
- * @param rateLimitImageIntervalSeconds 
+ * @param rateLimitImageIntervalSeconds
  * @param rateLimitImageMaxRequests The number of image uploads allowed in a given time frame.
- * @param rateLimitRegisterIntervalSeconds 
+ * @param rateLimitRegisterIntervalSeconds
  * @param rateLimitRegisterMaxRequests The number of registrations allowed in a given time frame.
- * @param rateLimitPostIntervalSeconds 
+ * @param rateLimitPostIntervalSeconds
  * @param rateLimitPostMaxRequests The number of posts allowed in a given time frame.
- * @param rateLimitMessageIntervalSeconds 
+ * @param rateLimitMessageIntervalSeconds
  * @param rateLimitMessageMaxRequests The number of messages allowed in a given time frame.
  * @param slurFilterRegex A regex string of items to filter.
  * @param discussionLanguages A list of allowed discussion languages.
  * @param federationSignedFetch Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this.
  * @param applicationEmailAdmins Whether to email admins when receiving a new application.
  * @param legalInformation An optional page of legal information
- * @param defaultCommentSortType 
+ * @param defaultCommentSortType
  * @param defaultItemsPerPage A default fetch limit for number of items returned.
  * @param defaultPostTimeRangeSeconds A default time range limit to apply to post sorts, in seconds. 0 means none.
- * @param defaultPostSortType 
- * @param defaultPostListingMode 
- * @param defaultPostListingType 
+ * @param defaultPostSortType
+ * @param defaultPostListingMode
+ * @param defaultPostListingType
  * @param defaultTheme The default theme. Usually \"browser\"
  * @param privateInstance Whether your instance is public, or private.
  * @param applicationQuestion Your application question form. This is in markdown, and can be many questions.
@@ -83,211 +82,206 @@ import com.google.gson.annotations.SerializedName
  * @param communityCreationAdminOnly Limits community creation to admins only.
  * @param summary A shorter, one line description of your site.
  * @param sidebar A sidebar for the site, in markdown.
- * @param name 
+ * @param name
  */
 
+data class EditSite(
 
-data class EditSite (
+  @SerializedName("max_invites_per_user_allowed")
+  val maxInvitesPerUserAllowed: kotlin.Int? = null,
 
-    @SerializedName("max_invites_per_user_allowed")
-    val maxInvitesPerUserAllowed: kotlin.Int? = null,
+  @SerializedName("image_upload_disabled")
+  val imageUploadDisabled: kotlin.Boolean? = null,
 
-    @SerializedName("image_upload_disabled")
-    val imageUploadDisabled: kotlin.Boolean? = null,
+  @SerializedName("image_allow_video_uploads")
+  val imageAllowVideoUploads: kotlin.Boolean? = null,
 
-    @SerializedName("image_allow_video_uploads")
-    val imageAllowVideoUploads: kotlin.Boolean? = null,
+  @SerializedName("image_max_upload_size")
+  val imageMaxUploadSize: kotlin.Int? = null,
 
-    @SerializedName("image_max_upload_size")
-    val imageMaxUploadSize: kotlin.Int? = null,
+  @SerializedName("image_max_banner_size")
+  val imageMaxBannerSize: kotlin.Int? = null,
 
-    @SerializedName("image_max_banner_size")
-    val imageMaxBannerSize: kotlin.Int? = null,
+  @SerializedName("image_max_avatar_size")
+  val imageMaxAvatarSize: kotlin.Int? = null,
 
-    @SerializedName("image_max_avatar_size")
-    val imageMaxAvatarSize: kotlin.Int? = null,
+  @SerializedName("image_max_thumbnail_size")
+  val imageMaxThumbnailSize: kotlin.Int? = null,
 
-    @SerializedName("image_max_thumbnail_size")
-    val imageMaxThumbnailSize: kotlin.Int? = null,
+  @SerializedName("image_upload_timeout_seconds")
+  val imageUploadTimeoutSeconds: kotlin.Int? = null,
 
-    @SerializedName("image_upload_timeout_seconds")
-    val imageUploadTimeoutSeconds: kotlin.Int? = null,
+  /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
+  @SerializedName("image_proxy_bypass_domains")
+  val imageProxyBypassDomains: kotlin.String? = null,
 
-    /* Allows bypassing proxy for specific image hosts when using [[ImageMode.ProxyAllImages]]. Use a comma-delimited string.  Example: i.imgur.com,postimg.cc */
-    @SerializedName("image_proxy_bypass_domains")
-    val imageProxyBypassDomains: kotlin.String? = null,
+  @SerializedName("image_mode")
+  val imageMode: ImageMode? = null,
 
-    @SerializedName("image_mode")
-    val imageMode: ImageMode? = null,
+  @SerializedName("suggested_multi_community_id")
+  val suggestedMultiCommunityId: kotlin.Int? = null,
 
-    @SerializedName("suggested_multi_community_id")
-    val suggestedMultiCommunityId: kotlin.Int? = null,
+  /* Dont send email notifications to users for new replies, mentions etc */
+  @SerializedName("email_notifications_disabled")
+  val emailNotificationsDisabled: kotlin.Boolean? = null,
 
-    /* Dont send email notifications to users for new replies, mentions etc */
-    @SerializedName("email_notifications_disabled")
-    val emailNotificationsDisabled: kotlin.Boolean? = null,
+  /* Block NSFW content being created */
+  @SerializedName("nsfw_content_disallowed")
+  val nsfwContentDisallowed: kotlin.Boolean? = null,
 
-    /* Block NSFW content being created */
-    @SerializedName("nsfw_content_disallowed")
-    val nsfwContentDisallowed: kotlin.Boolean? = null,
+  @SerializedName("comment_downvotes")
+  val commentDownvotes: FederationMode? = null,
 
-    @SerializedName("comment_downvotes")
-    val commentDownvotes: FederationMode? = null,
+  @SerializedName("comment_upvotes")
+  val commentUpvotes: FederationMode? = null,
 
-    @SerializedName("comment_upvotes")
-    val commentUpvotes: FederationMode? = null,
+  @SerializedName("post_downvotes")
+  val postDownvotes: FederationMode? = null,
 
-    @SerializedName("post_downvotes")
-    val postDownvotes: FederationMode? = null,
+  @SerializedName("post_upvotes")
+  val postUpvotes: FederationMode? = null,
 
-    @SerializedName("post_upvotes")
-    val postUpvotes: FederationMode? = null,
+  /* Whether or not external auth methods can auto-register users. */
+  @SerializedName("oauth_registration")
+  val oauthRegistration: kotlin.Boolean? = null,
 
-    /* Whether or not external auth methods can auto-register users. */
-    @SerializedName("oauth_registration")
-    val oauthRegistration: kotlin.Boolean? = null,
+  /* If present, nsfw content is visible by default. Should be displayed by frontends/clients when the site is first opened by a user. */
+  @SerializedName("content_warning")
+  val contentWarning: kotlin.String? = null,
 
-    /* If present, nsfw content is visible by default. Should be displayed by frontends/clients when the site is first opened by a user. */
-    @SerializedName("content_warning")
-    val contentWarning: kotlin.String? = null,
+  /* Whether to email admins for new reports. */
+  @SerializedName("reports_email_admins")
+  val reportsEmailAdmins: kotlin.Boolean? = null,
 
-    /* Whether to email admins for new reports. */
-    @SerializedName("reports_email_admins")
-    val reportsEmailAdmins: kotlin.Boolean? = null,
+  @SerializedName("registration_mode")
+  val registrationMode: RegistrationMode? = null,
 
-    @SerializedName("registration_mode")
-    val registrationMode: RegistrationMode? = null,
+  /* A list of blocked URLs */
+  @SerializedName("blocked_urls")
+  val blockedUrls: kotlin.collections.List<kotlin.String>? = null,
 
-    /* A list of blocked URLs */
-    @SerializedName("blocked_urls")
-    val blockedUrls: kotlin.collections.List<kotlin.String>? = null,
+  /* Whether to enable federation. */
+  @SerializedName("federation_enabled")
+  val federationEnabled: kotlin.Boolean? = null,
 
-    /* Whether to enable federation. */
-    @SerializedName("federation_enabled")
-    val federationEnabled: kotlin.Boolean? = null,
+  @SerializedName("rate_limit_import_user_settings_interval_seconds")
+  val rateLimitImportUserSettingsIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_import_user_settings_interval_seconds")
-    val rateLimitImportUserSettingsIntervalSeconds: kotlin.Int? = null,
+  /* The number of settings imports or exports allowed in a given time frame. */
+  @SerializedName("rate_limit_import_user_settings_max_requests")
+  val rateLimitImportUserSettingsMaxRequests: kotlin.Int? = null,
 
-    /* The number of settings imports or exports allowed in a given time frame. */
-    @SerializedName("rate_limit_import_user_settings_max_requests")
-    val rateLimitImportUserSettingsMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_search_interval_seconds")
+  val rateLimitSearchIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_search_interval_seconds")
-    val rateLimitSearchIntervalSeconds: kotlin.Int? = null,
+  /* The number of searches allowed in a given time frame. */
+  @SerializedName("rate_limit_search_max_requests")
+  val rateLimitSearchMaxRequests: kotlin.Int? = null,
 
-    /* The number of searches allowed in a given time frame. */
-    @SerializedName("rate_limit_search_max_requests")
-    val rateLimitSearchMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_comment_interval_seconds")
+  val rateLimitCommentIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_comment_interval_seconds")
-    val rateLimitCommentIntervalSeconds: kotlin.Int? = null,
+  /* The number of comments allowed in a given time frame. */
+  @SerializedName("rate_limit_comment_max_requests")
+  val rateLimitCommentMaxRequests: kotlin.Int? = null,
 
-    /* The number of comments allowed in a given time frame. */
-    @SerializedName("rate_limit_comment_max_requests")
-    val rateLimitCommentMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_image_interval_seconds")
+  val rateLimitImageIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_image_interval_seconds")
-    val rateLimitImageIntervalSeconds: kotlin.Int? = null,
+  /* The number of image uploads allowed in a given time frame. */
+  @SerializedName("rate_limit_image_max_requests")
+  val rateLimitImageMaxRequests: kotlin.Int? = null,
 
-    /* The number of image uploads allowed in a given time frame. */
-    @SerializedName("rate_limit_image_max_requests")
-    val rateLimitImageMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_register_interval_seconds")
+  val rateLimitRegisterIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_register_interval_seconds")
-    val rateLimitRegisterIntervalSeconds: kotlin.Int? = null,
+  /* The number of registrations allowed in a given time frame. */
+  @SerializedName("rate_limit_register_max_requests")
+  val rateLimitRegisterMaxRequests: kotlin.Int? = null,
 
-    /* The number of registrations allowed in a given time frame. */
-    @SerializedName("rate_limit_register_max_requests")
-    val rateLimitRegisterMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_post_interval_seconds")
+  val rateLimitPostIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_post_interval_seconds")
-    val rateLimitPostIntervalSeconds: kotlin.Int? = null,
+  /* The number of posts allowed in a given time frame. */
+  @SerializedName("rate_limit_post_max_requests")
+  val rateLimitPostMaxRequests: kotlin.Int? = null,
 
-    /* The number of posts allowed in a given time frame. */
-    @SerializedName("rate_limit_post_max_requests")
-    val rateLimitPostMaxRequests: kotlin.Int? = null,
+  @SerializedName("rate_limit_message_interval_seconds")
+  val rateLimitMessageIntervalSeconds: kotlin.Int? = null,
 
-    @SerializedName("rate_limit_message_interval_seconds")
-    val rateLimitMessageIntervalSeconds: kotlin.Int? = null,
+  /* The number of messages allowed in a given time frame. */
+  @SerializedName("rate_limit_message_max_requests")
+  val rateLimitMessageMaxRequests: kotlin.Int? = null,
 
-    /* The number of messages allowed in a given time frame. */
-    @SerializedName("rate_limit_message_max_requests")
-    val rateLimitMessageMaxRequests: kotlin.Int? = null,
+  /* A regex string of items to filter. */
+  @SerializedName("slur_filter_regex")
+  val slurFilterRegex: kotlin.String? = null,
 
-    /* A regex string of items to filter. */
-    @SerializedName("slur_filter_regex")
-    val slurFilterRegex: kotlin.String? = null,
+  /* A list of allowed discussion languages. */
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
 
-    /* A list of allowed discussion languages. */
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
+  /* Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this. */
+  @SerializedName("federation_signed_fetch")
+  val federationSignedFetch: kotlin.Boolean? = null,
 
-    /* Whether to sign outgoing Activitypub fetches with private key of local instance. Some Fediverse instances and platforms require this. */
-    @SerializedName("federation_signed_fetch")
-    val federationSignedFetch: kotlin.Boolean? = null,
+  /* Whether to email admins when receiving a new application. */
+  @SerializedName("application_email_admins")
+  val applicationEmailAdmins: kotlin.Boolean? = null,
 
-    /* Whether to email admins when receiving a new application. */
-    @SerializedName("application_email_admins")
-    val applicationEmailAdmins: kotlin.Boolean? = null,
+  /* An optional page of legal information */
+  @SerializedName("legal_information")
+  val legalInformation: kotlin.String? = null,
 
-    /* An optional page of legal information */
-    @SerializedName("legal_information")
-    val legalInformation: kotlin.String? = null,
+  @SerializedName("default_comment_sort_type")
+  val defaultCommentSortType: CommentSortType? = null,
 
-    @SerializedName("default_comment_sort_type")
-    val defaultCommentSortType: CommentSortType? = null,
+  /* A default fetch limit for number of items returned. */
+  @SerializedName("default_items_per_page")
+  val defaultItemsPerPage: kotlin.Int? = null,
 
-    /* A default fetch limit for number of items returned. */
-    @SerializedName("default_items_per_page")
-    val defaultItemsPerPage: kotlin.Int? = null,
+  /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
+  @SerializedName("default_post_time_range_seconds")
+  val defaultPostTimeRangeSeconds: kotlin.Int? = null,
 
-    /* A default time range limit to apply to post sorts, in seconds. 0 means none. */
-    @SerializedName("default_post_time_range_seconds")
-    val defaultPostTimeRangeSeconds: kotlin.Int? = null,
+  @SerializedName("default_post_sort_type")
+  val defaultPostSortType: PostSortType? = null,
 
-    @SerializedName("default_post_sort_type")
-    val defaultPostSortType: PostSortType? = null,
+  @SerializedName("default_post_listing_mode")
+  val defaultPostListingMode: PostListingMode? = null,
 
-    @SerializedName("default_post_listing_mode")
-    val defaultPostListingMode: PostListingMode? = null,
+  @SerializedName("default_post_listing_type")
+  val defaultPostListingType: ListingType? = null,
 
-    @SerializedName("default_post_listing_type")
-    val defaultPostListingType: ListingType? = null,
+  /* The default theme. Usually \"browser\" */
+  @SerializedName("default_theme")
+  val defaultTheme: kotlin.String? = null,
 
-    /* The default theme. Usually \"browser\" */
-    @SerializedName("default_theme")
-    val defaultTheme: kotlin.String? = null,
+  /* Whether your instance is public, or private. */
+  @SerializedName("private_instance")
+  val privateInstance: kotlin.Boolean? = null,
 
-    /* Whether your instance is public, or private. */
-    @SerializedName("private_instance")
-    val privateInstance: kotlin.Boolean? = null,
+  /* Your application question form. This is in markdown, and can be many questions. */
+  @SerializedName("application_question")
+  val applicationQuestion: kotlin.String? = null,
 
-    /* Your application question form. This is in markdown, and can be many questions. */
-    @SerializedName("application_question")
-    val applicationQuestion: kotlin.String? = null,
+  /* Whether to require email verification. */
+  @SerializedName("email_verification_required")
+  val emailVerificationRequired: kotlin.Boolean? = null,
 
-    /* Whether to require email verification. */
-    @SerializedName("email_verification_required")
-    val emailVerificationRequired: kotlin.Boolean? = null,
+  /* Limits community creation to admins only. */
+  @SerializedName("community_creation_admin_only")
+  val communityCreationAdminOnly: kotlin.Boolean? = null,
 
-    /* Limits community creation to admins only. */
-    @SerializedName("community_creation_admin_only")
-    val communityCreationAdminOnly: kotlin.Boolean? = null,
+  /* A shorter, one line description of your site. */
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    /* A shorter, one line description of your site. */
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  /* A sidebar for the site, in markdown. */
+  @SerializedName("sidebar")
+  val sidebar: kotlin.String? = null,
 
-    /* A sidebar for the site, in markdown. */
-    @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null,
+  @SerializedName("name")
+  val name: kotlin.String? = null,
 
-    @SerializedName("name")
-    val name: kotlin.String? = null
-
-) {
-
-
-}
-
+)

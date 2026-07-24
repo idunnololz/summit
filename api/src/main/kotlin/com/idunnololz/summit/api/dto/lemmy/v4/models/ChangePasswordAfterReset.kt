@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Change your password after receiving a reset request.
  *
- * @param passwordVerify 
- * @param password 
- * @param token 
+ * @param passwordVerify
+ * @param password
+ * @param token
  */
 
+data class ChangePasswordAfterReset(
 
-data class ChangePasswordAfterReset (
+  @SerializedName("password_verify")
+  val passwordVerify: kotlin.String,
 
-    @SerializedName("password_verify")
-    val passwordVerify: kotlin.String,
+  @SerializedName("password")
+  val password: kotlin.String,
 
-    @SerializedName("password")
-    val password: kotlin.String,
+  @SerializedName("token")
+  val token: kotlin.String,
 
-    @SerializedName("token")
-    val token: kotlin.String
-
-) {
-
-
-}
-
+)

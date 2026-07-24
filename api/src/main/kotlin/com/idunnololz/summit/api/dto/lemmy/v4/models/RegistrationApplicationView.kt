@@ -7,46 +7,40 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUser
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplication
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * A registration application view.
  *
- * @param creator 
- * @param creatorLocalUser 
- * @param registrationApplication 
- * @param admin 
+ * @param creator
+ * @param creatorLocalUser
+ * @param registrationApplication
+ * @param admin
  */
 
+data class RegistrationApplicationView(
 
-data class RegistrationApplicationView (
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("creator_local_user")
+  val creatorLocalUser: LocalUser,
 
-    @SerializedName("creator_local_user")
-    val creatorLocalUser: LocalUser,
+  @SerializedName("registration_application")
+  val registrationApplication: RegistrationApplication,
 
-    @SerializedName("registration_application")
-    val registrationApplication: RegistrationApplication,
+  @SerializedName("admin")
+  val admin: Person? = null,
 
-    @SerializedName("admin")
-    val admin: Person? = null
-
-) {
-
-
-}
-
+)

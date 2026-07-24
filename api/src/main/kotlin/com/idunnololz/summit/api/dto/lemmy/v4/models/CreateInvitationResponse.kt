@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUserInvite
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param invite 
+ *
+ * @param invite
  */
 
+data class CreateInvitationResponse(
 
-data class CreateInvitationResponse (
+  @SerializedName("invite")
+  val invite: LocalUserInvite,
 
-    @SerializedName("invite")
-    val invite: LocalUserInvite
-
-) {
-
-
-}
-
+)

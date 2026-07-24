@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Create a custom emoji.
  *
- * @param keywords 
- * @param altText 
- * @param imageUrl 
- * @param shortcode 
- * @param category 
+ * @param keywords
+ * @param altText
+ * @param imageUrl
+ * @param shortcode
+ * @param category
  */
 
+data class CreateCustomEmoji(
 
-data class CreateCustomEmoji (
+  @SerializedName("keywords")
+  val keywords: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("keywords")
-    val keywords: kotlin.collections.List<kotlin.String>,
+  @SerializedName("alt_text")
+  val altText: kotlin.String,
 
-    @SerializedName("alt_text")
-    val altText: kotlin.String,
+  @SerializedName("image_url")
+  val imageUrl: kotlin.String,
 
-    @SerializedName("image_url")
-    val imageUrl: kotlin.String,
+  @SerializedName("shortcode")
+  val shortcode: kotlin.String,
 
-    @SerializedName("shortcode")
-    val shortcode: kotlin.String,
+  @SerializedName("category")
+  val category: kotlin.String,
 
-    @SerializedName("category")
-    val category: kotlin.String
-
-) {
-
-
-}
-
+)

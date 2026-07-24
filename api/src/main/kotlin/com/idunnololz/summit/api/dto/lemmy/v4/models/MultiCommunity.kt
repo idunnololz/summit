@@ -7,95 +7,89 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param communities 
- * @param subscribersLocal 
- * @param subscribers 
- * @param publishedAt 
- * @param lastRefreshedAt 
- * @param apId 
- * @param deleted 
- * @param local 
- * @param name 
+ *
+ * @param communities
+ * @param subscribersLocal
+ * @param subscribers
+ * @param publishedAt
+ * @param lastRefreshedAt
+ * @param apId
+ * @param deleted
+ * @param local
+ * @param name
  * @param instanceId The instance id.
  * @param creatorId The person id.
- * @param id 
+ * @param id
  * @param sidebar A sidebar in markdown.
- * @param updatedAt 
+ * @param updatedAt
  * @param summary A shorter, one-line summary.
- * @param title 
+ * @param title
  */
 
+data class MultiCommunity(
 
-data class MultiCommunity (
+  @SerializedName("communities")
+  val communities: kotlin.Int,
 
-    @SerializedName("communities")
-    val communities: kotlin.Int,
+  @SerializedName("subscribers_local")
+  val subscribersLocal: kotlin.Int,
 
-    @SerializedName("subscribers_local")
-    val subscribersLocal: kotlin.Int,
+  @SerializedName("subscribers")
+  val subscribers: kotlin.Int,
 
-    @SerializedName("subscribers")
-    val subscribers: kotlin.Int,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("last_refreshed_at")
+  val lastRefreshedAt: kotlin.String,
 
-    @SerializedName("last_refreshed_at")
-    val lastRefreshedAt: kotlin.String,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  /* The instance id. */
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    /* The instance id. */
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  /* A sidebar in markdown. */
+  @SerializedName("sidebar")
+  val sidebar: kotlin.String? = null,
 
-    /* A sidebar in markdown. */
-    @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* A shorter, one-line summary. */
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    /* A shorter, one-line summary. */
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,44 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PagedResponseFederatedInstanceView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param `data` 
- * @param state 
+ *
+ * @param `data`
+ * @param state
  */
 
+data class SuccessRequestStatePagedResponseFederatedInstanceView(
 
-data class SuccessRequestStatePagedResponseFederatedInstanceView (
+  @SerializedName("data")
+  val `data`: PagedResponseFederatedInstanceView,
 
-    @SerializedName("data")
-    val `data`: PagedResponseFederatedInstanceView,
-
-    @SerializedName("state")
-    val state: SuccessRequestStatePagedResponseFederatedInstanceView.State
+  @SerializedName("state")
+  val state: SuccessRequestStatePagedResponseFederatedInstanceView.State,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: success
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "success") success("success");
-    }
-
+  /**
+   *
+   *
+   * Values: success
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "success")
+    success("success"),
+  }
 }
-

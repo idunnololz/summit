@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CaptchaResponse
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CaptchaResponse
 
 /**
  * A wrapper for the captcha response.
  *
- * @param ok 
+ * @param ok
  */
 
+data class GetCaptchaResponse(
 
-data class GetCaptchaResponse (
+  @SerializedName("ok")
+  val ok: CaptchaResponse? = null,
 
-    @SerializedName("ok")
-    val ok: CaptchaResponse? = null
-
-) {
-
-
-}
-
+)

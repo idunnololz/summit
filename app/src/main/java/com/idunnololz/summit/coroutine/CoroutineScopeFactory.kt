@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-
 interface CoroutineScopeFactory {
 
   fun create(): CoroutineScope
@@ -18,14 +17,13 @@ interface CoroutineScopeFactory {
   fun createConfined(): CoroutineScope
 }
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AnalyticsModule {
 
   @Binds
   abstract fun bindCoroutineScopeFactory(
-    realCoroutineScopeFactory: RealCoroutineScopeFactory
+    realCoroutineScopeFactory: RealCoroutineScopeFactory,
   ): CoroutineScopeFactory
 }
 

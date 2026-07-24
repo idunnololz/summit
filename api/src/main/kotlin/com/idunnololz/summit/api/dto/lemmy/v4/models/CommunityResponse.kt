@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView
 
 /**
  * A simple community response.
  *
- * @param discussionLanguages 
- * @param communityView 
+ * @param discussionLanguages
+ * @param communityView
  */
 
+data class CommunityResponse(
 
-data class CommunityResponse (
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<Int>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<Int>,
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView
-
-) {
-
-
-}
-
+)

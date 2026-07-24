@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReportView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReportView
 
 /**
  * A private message report response.
  *
- * @param privateMessageReportView 
+ * @param privateMessageReportView
  */
 
+data class PrivateMessageReportResponse(
 
-data class PrivateMessageReportResponse (
+  @SerializedName("private_message_report_view")
+  val privateMessageReportView: PrivateMessageReportView,
 
-    @SerializedName("private_message_report_view")
-    val privateMessageReportView: PrivateMessageReportView
-
-) {
-
-
-}
-
+)

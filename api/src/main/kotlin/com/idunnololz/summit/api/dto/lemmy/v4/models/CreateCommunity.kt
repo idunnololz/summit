@@ -7,24 +7,23 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityVisibility
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityVisibility
 
 /**
  * Create a community.
  *
  * @param name The unique name.
- * @param visibility 
- * @param discussionLanguages 
+ * @param visibility
+ * @param discussionLanguages
  * @param postingRestrictedToMods Whether to restrict posting only to moderators.
  * @param nsfw Whether its an NSFW community.
  * @param summary A shorter, one line summary of your community.
@@ -32,41 +31,36 @@ import com.google.gson.annotations.SerializedName
  * @param title A longer title.
  */
 
+data class CreateCommunity(
 
-data class CreateCommunity (
+  /* The unique name. */
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    /* The unique name. */
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("visibility")
+  val visibility: CommunityVisibility? = null,
 
-    @SerializedName("visibility")
-    val visibility: CommunityVisibility? = null,
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Double>? = null,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>? = null,
+  /* Whether to restrict posting only to moderators. */
+  @SerializedName("posting_restricted_to_mods")
+  val postingRestrictedToMods: kotlin.Boolean? = null,
 
-    /* Whether to restrict posting only to moderators. */
-    @SerializedName("posting_restricted_to_mods")
-    val postingRestrictedToMods: kotlin.Boolean? = null,
+  /* Whether its an NSFW community. */
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    /* Whether its an NSFW community. */
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  /* A shorter, one line summary of your community. */
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    /* A shorter, one line summary of your community. */
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  /* A sidebar for the community in markdown. */
+  @SerializedName("sidebar")
+  val sidebar: kotlin.String? = null,
 
-    /* A sidebar for the community in markdown. */
-    @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null,
+  /* A longer title. */
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    /* A longer title. */
-    @SerializedName("title")
-    val title: kotlin.String? = null
-
-) {
-
-
-}
-
+)

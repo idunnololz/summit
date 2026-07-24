@@ -7,87 +7,81 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A comment report.
  *
- * @param publishedAt 
- * @param resolved 
- * @param reason 
- * @param originalCommunityName 
+ * @param publishedAt
+ * @param resolved
+ * @param reason
+ * @param originalCommunityName
  * @param communityId The community id.
  * @param creatorId The person id.
  * @param id The community report id.
- * @param updatedAt 
+ * @param updatedAt
  * @param resolverId The person id.
- * @param originalCommunityBanner 
- * @param originalCommunityIcon 
- * @param originalCommunitySidebar 
- * @param originalCommunitySummary 
- * @param originalCommunityTitle 
+ * @param originalCommunityBanner
+ * @param originalCommunityIcon
+ * @param originalCommunitySidebar
+ * @param originalCommunitySummary
+ * @param originalCommunityTitle
  */
 
+data class CommunityReport(
 
-data class CommunityReport (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("original_community_name")
+  val originalCommunityName: kotlin.String,
 
-    @SerializedName("original_community_name")
-    val originalCommunityName: kotlin.String,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  /* The community report id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The community report id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("resolver_id")
+  val resolverId: kotlin.Long? = null,
 
-    /* The person id. */
-    @SerializedName("resolver_id")
-    val resolverId: kotlin.Long? = null,
+  @SerializedName("original_community_banner")
+  val originalCommunityBanner: kotlin.String? = null,
 
-    @SerializedName("original_community_banner")
-    val originalCommunityBanner: kotlin.String? = null,
+  @SerializedName("original_community_icon")
+  val originalCommunityIcon: kotlin.String? = null,
 
-    @SerializedName("original_community_icon")
-    val originalCommunityIcon: kotlin.String? = null,
+  @SerializedName("original_community_sidebar")
+  val originalCommunitySidebar: kotlin.String? = null,
 
-    @SerializedName("original_community_sidebar")
-    val originalCommunitySidebar: kotlin.String? = null,
+  @SerializedName("original_community_summary")
+  val originalCommunitySummary: kotlin.String? = null,
 
-    @SerializedName("original_community_summary")
-    val originalCommunitySummary: kotlin.String? = null,
+  @SerializedName("original_community_title")
+  val originalCommunityTitle: kotlin.String? = null,
 
-    @SerializedName("original_community_title")
-    val originalCommunityTitle: kotlin.String? = null
-
-) {
-
-
-}
-
+)

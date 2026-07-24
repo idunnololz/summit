@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -23,107 +22,102 @@ import com.google.gson.annotations.SerializedName
  *
  * @param locked Whether the comment is locked.
  * @param federationPending If a local user comments in a remote community, the comment is hidden until it is confirmed accepted by the community (by receiving it back via federation).
- * @param unresolvedReportCount 
- * @param reportCount 
+ * @param unresolvedReportCount
+ * @param reportCount
  * @param childCount The total number of children in this comment branch.
- * @param downvotes 
- * @param upvotes 
- * @param score 
+ * @param downvotes
+ * @param upvotes
+ * @param score
  * @param languageId The language id.
  * @param distinguished Whether the comment has been distinguished(speaking officially) by a mod.
  * @param path The path / tree location of a comment, separated by dots, ending with the comment's id. Ex: 0.24.27
  * @param local Whether the comment is local.
- * @param apId 
+ * @param apId
  * @param deleted Whether the comment has been deleted by its creator.
- * @param publishedAt 
+ * @param publishedAt
  * @param removed Whether the comment has been removed.
- * @param content 
+ * @param content
  * @param postId The post id.
  * @param creatorId The person id.
  * @param id The comment id.
- * @param updatedAt 
+ * @param updatedAt
  */
 
+data class Comment(
 
-data class Comment (
+  /* Whether the comment is locked. */
+  @SerializedName("locked")
+  val locked: kotlin.Boolean,
 
-    /* Whether the comment is locked. */
-    @SerializedName("locked")
-    val locked: kotlin.Boolean,
+  /* If a local user comments in a remote community, the comment is hidden until it is confirmed accepted by the community (by receiving it back via federation). */
+  @SerializedName("federation_pending")
+  val federationPending: kotlin.Boolean,
 
-    /* If a local user comments in a remote community, the comment is hidden until it is confirmed accepted by the community (by receiving it back via federation). */
-    @SerializedName("federation_pending")
-    val federationPending: kotlin.Boolean,
+  @SerializedName("unresolved_report_count")
+  val unresolvedReportCount: kotlin.Int,
 
-    @SerializedName("unresolved_report_count")
-    val unresolvedReportCount: kotlin.Int,
+  @SerializedName("report_count")
+  val reportCount: kotlin.Int,
 
-    @SerializedName("report_count")
-    val reportCount: kotlin.Int,
+  /* The total number of children in this comment branch. */
+  @SerializedName("child_count")
+  val childCount: kotlin.Int,
 
-    /* The total number of children in this comment branch. */
-    @SerializedName("child_count")
-    val childCount: kotlin.Int,
+  @SerializedName("downvotes")
+  val downvotes: kotlin.Int,
 
-    @SerializedName("downvotes")
-    val downvotes: kotlin.Int,
+  @SerializedName("upvotes")
+  val upvotes: kotlin.Int,
 
-    @SerializedName("upvotes")
-    val upvotes: kotlin.Int,
+  @SerializedName("score")
+  val score: kotlin.Int,
 
-    @SerializedName("score")
-    val score: kotlin.Int,
+  /* The language id. */
+  @SerializedName("language_id")
+  val languageId: kotlin.Int,
 
-    /* The language id. */
-    @SerializedName("language_id")
-    val languageId: kotlin.Int,
+  /* Whether the comment has been distinguished(speaking officially) by a mod. */
+  @SerializedName("distinguished")
+  val distinguished: kotlin.Boolean,
 
-    /* Whether the comment has been distinguished(speaking officially) by a mod. */
-    @SerializedName("distinguished")
-    val distinguished: kotlin.Boolean,
+  /* The path / tree location of a comment, separated by dots, ending with the comment's id. Ex: 0.24.27 */
+  @SerializedName("path")
+  val path: kotlin.String,
 
-    /* The path / tree location of a comment, separated by dots, ending with the comment's id. Ex: 0.24.27 */
-    @SerializedName("path")
-    val path: kotlin.String,
+  /* Whether the comment is local. */
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    /* Whether the comment is local. */
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  /* Whether the comment has been deleted by its creator. */
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    /* Whether the comment has been deleted by its creator. */
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  /* Whether the comment has been removed. */
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    /* Whether the comment has been removed. */
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("content")
+  val content: kotlin.String,
 
-    @SerializedName("content")
-    val content: kotlin.String,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  /* The comment id. */
+  @SerializedName("id")
+  val id: Int,
 
-    /* The comment id. */
-    @SerializedName("id")
-    val id: Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

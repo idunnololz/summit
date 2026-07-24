@@ -7,46 +7,40 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param isNewInstance 
- * @param community 
- * @param person 
- * @param followState 
+ *
+ * @param isNewInstance
+ * @param community
+ * @param person
+ * @param followState
  */
 
+data class PendingFollowerView(
 
-data class PendingFollowerView (
+  @SerializedName("is_new_instance")
+  val isNewInstance: kotlin.Boolean,
 
-    @SerializedName("is_new_instance")
-    val isNewInstance: kotlin.Boolean,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("person")
+  val person: Person,
 
-    @SerializedName("person")
-    val person: Person,
+  @SerializedName("follow_state")
+  val followState: CommunityFollowerState? = null,
 
-    @SerializedName("follow_state")
-    val followState: CommunityFollowerState? = null
-
-) {
-
-
-}
-
+)

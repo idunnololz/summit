@@ -7,42 +7,36 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalImage
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * A local image view.
  *
- * @param person 
- * @param localImage 
- * @param post 
+ * @param person
+ * @param localImage
+ * @param post
  */
 
+data class LocalImageView(
 
-data class LocalImageView (
+  @SerializedName("person")
+  val person: Person,
 
-    @SerializedName("person")
-    val person: Person,
+  @SerializedName("local_image")
+  val localImage: LocalImage,
 
-    @SerializedName("local_image")
-    val localImage: LocalImage,
+  @SerializedName("post")
+  val post: Post? = null,
 
-    @SerializedName("post")
-    val post: Post? = null
-
-) {
-
-
-}
-
+)

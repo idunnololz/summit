@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityTag
-
-import com.google.gson.annotations.SerializedName
 
 /**
  * A community view.
  *
  * @param tags We wrap this in a struct so we can implement FromSqlRow<Json> for it
- * @param canMod 
- * @param community 
- * @param communityActions 
+ * @param canMod
+ * @param community
+ * @param communityActions
  */
 
+data class CommunityView(
 
-data class CommunityView (
+  /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<CommunityTag>,
 
-    /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<CommunityTag>,
+  @SerializedName("can_mod")
+  val canMod: kotlin.Boolean,
 
-    @SerializedName("can_mod")
-    val canMod: kotlin.Boolean,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("community_actions")
+  val communityActions: CommunityActions? = null,
 
-    @SerializedName("community_actions")
-    val communityActions: CommunityActions? = null
-
-) {
-
-
-}
-
+)

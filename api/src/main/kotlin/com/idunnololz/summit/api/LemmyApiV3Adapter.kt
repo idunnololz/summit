@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api
 
-import android.util.Log
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -61,16 +60,11 @@ import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
-import com.idunnololz.summit.api.dto.lemmy.GetReportCount
-import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSite
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
@@ -122,13 +116,11 @@ import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
-import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.local.toModEvents
+import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -205,7 +197,7 @@ class LemmyApiV3Adapter(
   ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
     api.listCommentVotes(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -216,7 +208,7 @@ class LemmyApiV3Adapter(
   ): Result<ListPostLikesResponse> = retrofitErrorHandler {
     api.listPostVotes(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -389,7 +381,7 @@ class LemmyApiV3Adapter(
   ): Result<GetRepliesResponse> = retrofitErrorHandler {
     api.getReplies(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -432,7 +424,7 @@ class LemmyApiV3Adapter(
   ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
     api.getPersonMentions(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -443,7 +435,7 @@ class LemmyApiV3Adapter(
   ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
     api.getPrivateMessages(
       generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -454,7 +446,7 @@ class LemmyApiV3Adapter(
   ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
     api.getPrivateMessageReports(
       headers = generateHeaders(authorization = authorization, force = force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -482,7 +474,7 @@ class LemmyApiV3Adapter(
   ): Result<ListPostReportsResponse> = retrofitErrorHandler {
     api.getPostReports(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -499,7 +491,7 @@ class LemmyApiV3Adapter(
   ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
     api.getCommentReports(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 
@@ -519,50 +511,53 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<UnreadCount> =
-    withContext(Dispatchers.IO) {
-      val j1 = async {
-        retrofitErrorHandler {
-          api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
+  ): Result<UnreadCount> = withContext(Dispatchers.IO) {
+    val j1 = async {
+      retrofitErrorHandler {
+        api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
       }
-      val j2 = async {
-        retrofitErrorHandler {
-          api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
-      }
-      val j3 = async {
-        retrofitErrorHandler {
-          api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
-      }
-
-      val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-      val reportCount = j2.await().getOrNull()
-      val registrationCount = j3.await().getOrNull()
-
-      val registrationApplications = registrationCount?.registration_applications ?: 0
-      val commentReports = reportCount?.comment_reports ?: 0
-      val postReports = reportCount?.post_reports ?: 0
-      val privateMessageReports = reportCount?.private_message_reports ?: 0
-
-      Result.success(
-        UnreadCount(
-          notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
-          registrationApplicationCount = registrationApplications,
-          pendingFollowCount = 0,
-          reportCount = commentReports + postReports + privateMessageReports,
-
-          mentions = unreadCount.mentions,
-          privateMessages = unreadCount.private_messages,
-          replies = unreadCount.replies,
-
-          commentReports = commentReports,
-          postReports = postReports,
-          privateMessageReports = privateMessageReports,
-        )
-      )
     }
+    val j2 = async {
+      retrofitErrorHandler {
+        api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+      }
+    }
+    val j3 = async {
+      retrofitErrorHandler {
+        api.getRegistrationApplicationsCount(
+          generateHeaders(authorization, force),
+          args.serializeToMap(),
+        )
+      }
+    }
+
+    val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+    val reportCount = j2.await().getOrNull()
+    val registrationCount = j3.await().getOrNull()
+
+    val registrationApplications = registrationCount?.registration_applications ?: 0
+    val commentReports = reportCount?.comment_reports ?: 0
+    val postReports = reportCount?.post_reports ?: 0
+    val privateMessageReports = reportCount?.private_message_reports ?: 0
+
+    Result.success(
+      UnreadCount(
+        notificationCount =
+        unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
+        registrationApplicationCount = registrationApplications,
+        pendingFollowCount = 0,
+        reportCount = commentReports + postReports + privateMessageReports,
+
+        mentions = unreadCount.mentions,
+        privateMessages = unreadCount.private_messages,
+        replies = unreadCount.replies,
+
+        commentReports = commentReports,
+        postReports = postReports,
+        privateMessageReports = privateMessageReports,
+      ),
+    )
+  }
 
   override suspend fun followCommunity(
     authorization: String?,
@@ -760,7 +755,7 @@ class LemmyApiV3Adapter(
   ): Result<com.idunnololz.summit.api.local.GetModlogResponse> = retrofitErrorHandler {
     api.getModLogs(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map {
     com.idunnololz.summit.api.local.GetModlogResponse(

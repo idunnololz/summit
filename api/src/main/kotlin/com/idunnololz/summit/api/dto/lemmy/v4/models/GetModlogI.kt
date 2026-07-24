@@ -7,80 +7,74 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKindFilter
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param limit 
+ *
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param bulkActionParentId 
+ * @param bulkActionParentId
  * @param showBulk When `true` show all. When `false` or `None`, hide bulk actions (default).
  * @param commentId The comment id.
  * @param postId The post id.
  * @param otherPersonId The person id.
- * @param listingType 
- * @param type 
+ * @param listingType
+ * @param type
  * @param communityId The community id.
  * @param modPersonId The person id.
  */
 
+data class GetModlogI(
 
-data class GetModlogI (
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  @SerializedName("bulk_action_parent_id")
+  val bulkActionParentId: kotlin.Int? = null,
 
-    @SerializedName("bulk_action_parent_id")
-    val bulkActionParentId: kotlin.Int? = null,
+  /* When `true` show all. When `false` or `None`, hide bulk actions (default). */
+  @SerializedName("show_bulk")
+  val showBulk: kotlin.Boolean? = null,
 
-    /* When `true` show all. When `false` or `None`, hide bulk actions (default). */
-    @SerializedName("show_bulk")
-    val showBulk: kotlin.Boolean? = null,
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int? = null,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int? = null,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  /* The person id. */
+  @SerializedName("other_person_id")
+  val otherPersonId: kotlin.Long? = null,
 
-    /* The person id. */
-    @SerializedName("other_person_id")
-    val otherPersonId: kotlin.Long? = null,
+  @SerializedName("listing_type")
+  val listingType: ListingType? = null,
 
-    @SerializedName("listing_type")
-    val listingType: ListingType? = null,
+  @SerializedName("type_")
+  val type: ModlogKindFilter? = null,
 
-    @SerializedName("type_")
-    val type: ModlogKindFilter? = null,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int? = null,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+  /* The person id. */
+  @SerializedName("mod_person_id")
+  val modPersonId: kotlin.Long? = null,
 
-    /* The person id. */
-    @SerializedName("mod_person_id")
-    val modPersonId: kotlin.Long? = null
-
-) {
-
-
-}
-
+)

@@ -7,56 +7,50 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A custom emoji.
  *
- * @param publishedAt 
- * @param category 
- * @param altText 
- * @param imageUrl 
- * @param shortcode 
+ * @param publishedAt
+ * @param category
+ * @param altText
+ * @param imageUrl
+ * @param shortcode
  * @param id The custom emoji id.
- * @param updatedAt 
+ * @param updatedAt
  */
 
+data class CustomEmoji(
 
-data class CustomEmoji (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("category")
+  val category: kotlin.String,
 
-    @SerializedName("category")
-    val category: kotlin.String,
+  @SerializedName("alt_text")
+  val altText: kotlin.String,
 
-    @SerializedName("alt_text")
-    val altText: kotlin.String,
+  @SerializedName("image_url")
+  val imageUrl: kotlin.String,
 
-    @SerializedName("image_url")
-    val imageUrl: kotlin.String,
+  @SerializedName("shortcode")
+  val shortcode: kotlin.String,
 
-    @SerializedName("shortcode")
-    val shortcode: kotlin.String,
+  /* The custom emoji id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The custom emoji id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

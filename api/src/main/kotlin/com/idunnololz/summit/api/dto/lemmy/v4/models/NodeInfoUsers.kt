@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param activeMonth 
- * @param activeHalfyear 
- * @param total 
+ *
+ * @param activeMonth
+ * @param activeHalfyear
+ * @param total
  */
 
+data class NodeInfoUsers(
 
-data class NodeInfoUsers (
+  @SerializedName("activeMonth")
+  val activeMonth: kotlin.Int? = null,
 
-    @SerializedName("activeMonth")
-    val activeMonth: kotlin.Int? = null,
+  @SerializedName("activeHalfyear")
+  val activeHalfyear: kotlin.Int? = null,
 
-    @SerializedName("activeHalfyear")
-    val activeHalfyear: kotlin.Int? = null,
+  @SerializedName("total")
+  val total: kotlin.Int? = null,
 
-    @SerializedName("total")
-    val total: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

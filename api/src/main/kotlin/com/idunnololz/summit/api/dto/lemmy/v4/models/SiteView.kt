@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Instance
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalSite
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalSiteRateLimit
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Site
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * A site view.
  *
- * @param instance 
- * @param localSiteRateLimit 
- * @param localSite 
- * @param site 
+ * @param instance
+ * @param localSiteRateLimit
+ * @param localSite
+ * @param site
  */
 
+data class SiteView(
 
-data class SiteView (
+  @SerializedName("instance")
+  val instance: Instance,
 
-    @SerializedName("instance")
-    val instance: Instance,
+  @SerializedName("local_site_rate_limit")
+  val localSiteRateLimit: LocalSiteRateLimit,
 
-    @SerializedName("local_site_rate_limit")
-    val localSiteRateLimit: LocalSiteRateLimit,
+  @SerializedName("local_site")
+  val localSite: LocalSite,
 
-    @SerializedName("local_site")
-    val localSite: LocalSite,
+  @SerializedName("site")
+  val site: Site,
 
-    @SerializedName("site")
-    val site: Site
-
-) {
-
-
-}
-
+)

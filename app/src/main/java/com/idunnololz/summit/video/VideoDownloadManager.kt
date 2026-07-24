@@ -20,17 +20,17 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.UrlUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.util.concurrent.Executor
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.concurrent.Executor
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.coroutines.resume
 
 private typealias DownloadId = String
 

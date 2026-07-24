@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,59 +23,61 @@ import com.google.gson.annotations.SerializedName
  * Values: active,hot,new,old,top,most_comments,new_comments,controversial,scaled
  */
 
-enum class PostSortType(val value: kotlin.String) {
+enum class PostSortType(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "active")
-    active("active"),
+  @SerializedName(value = "active")
+  active("active"),
 
-    @SerializedName(value = "hot")
-    hot("hot"),
+  @SerializedName(value = "hot")
+  hot("hot"),
 
-    @SerializedName(value = "new")
-    new("new"),
+  @SerializedName(value = "new")
+  new("new"),
 
-    @SerializedName(value = "old")
-    old("old"),
+  @SerializedName(value = "old")
+  old("old"),
 
-    @SerializedName(value = "top")
-    top("top"),
+  @SerializedName(value = "top")
+  top("top"),
 
-    @SerializedName(value = "most_comments")
-    most_comments("most_comments"),
+  @SerializedName(value = "most_comments")
+  most_comments("most_comments"),
 
-    @SerializedName(value = "new_comments")
-    new_comments("new_comments"),
+  @SerializedName(value = "new_comments")
+  new_comments("new_comments"),
 
-    @SerializedName(value = "controversial")
-    controversial("controversial"),
+  @SerializedName(value = "controversial")
+  controversial("controversial"),
 
-    @SerializedName(value = "scaled")
-    scaled("scaled");
+  @SerializedName(value = "scaled")
+  scaled("scaled"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? = if (data is PostSortType) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [PostSortType] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is PostSortType) "$data" else null
-
-        /**
-         * Returns a valid [PostSortType] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): PostSortType? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): PostSortType? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

@@ -628,7 +628,7 @@ class PostsRepository @AssistedInject constructor(
         } else {
           postData
         }
-      }
+      },
     )
 
     // Mark posts as read last to prevent a callback loop
@@ -672,7 +672,10 @@ class PostsRepository @AssistedInject constructor(
       if (duplicatePostsDetector?.isPostDuplicateOfRead(post) == true) {
         isDuplicatePost = true
 
-        Log.d(TAG, "Duplicate post found. Title: ${post.post.name} community: ${post.community.toCommunityRef().fullName}")
+        Log.d(
+          TAG,
+          "Duplicate post found. Title: ${post.post.name} community: ${post.community.toCommunityRef().fullName}",
+        )
 
         if (!post.read) {
           accountActionsManager.markPostAsRead(
@@ -796,8 +799,10 @@ class PostsRepository @AssistedInject constructor(
     listingType: ListingType?,
   ): SimpleDataSource<FetchedPost, SortType> =
     if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true &&
-      (preferences.useCursorsWhenLoadingPostFeed ||
-        apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true)
+      (
+        preferences.useCursorsWhenLoadingPostFeed ||
+          apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true
+        )
     ) {
       cursorBackedSinglePostsDataSourceFactory.create(communityName, listingType)
     } else {

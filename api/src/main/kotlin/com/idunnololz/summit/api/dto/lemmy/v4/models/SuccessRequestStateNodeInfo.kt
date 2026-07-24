@@ -7,44 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NodeInfo
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param `data` 
- * @param state 
+ *
+ * @param `data`
+ * @param state
  */
 
+data class SuccessRequestStateNodeInfo(
 
-data class SuccessRequestStateNodeInfo (
+  @SerializedName("data")
+  val `data`: NodeInfo,
 
-    @SerializedName("data")
-    val `data`: NodeInfo,
-
-    @SerializedName("state")
-    val state: SuccessRequestStateNodeInfo.State
+  @SerializedName("state")
+  val state: SuccessRequestStateNodeInfo.State,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: success
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "success") success("success");
-    }
-
+  /**
+   *
+   *
+   * Values: success
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "success")
+    success("success"),
+  }
 }
-

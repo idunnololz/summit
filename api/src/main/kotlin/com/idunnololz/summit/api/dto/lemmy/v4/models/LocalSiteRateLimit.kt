@@ -7,96 +7,90 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Rate limits for your site. Given in count / length of time.
  *
- * @param importUserSettingsIntervalSeconds 
- * @param importUserSettingsMaxRequests 
- * @param publishedAt 
- * @param searchIntervalSeconds 
- * @param searchMaxRequests 
- * @param commentIntervalSeconds 
- * @param commentMaxRequests 
- * @param imageIntervalSeconds 
- * @param imageMaxRequests 
- * @param registerIntervalSeconds 
- * @param registerMaxRequests 
- * @param postIntervalSeconds 
- * @param postMaxRequests 
- * @param messageIntervalSeconds 
- * @param messageMaxRequests 
+ * @param importUserSettingsIntervalSeconds
+ * @param importUserSettingsMaxRequests
+ * @param publishedAt
+ * @param searchIntervalSeconds
+ * @param searchMaxRequests
+ * @param commentIntervalSeconds
+ * @param commentMaxRequests
+ * @param imageIntervalSeconds
+ * @param imageMaxRequests
+ * @param registerIntervalSeconds
+ * @param registerMaxRequests
+ * @param postIntervalSeconds
+ * @param postMaxRequests
+ * @param messageIntervalSeconds
+ * @param messageMaxRequests
  * @param localSiteId The local site id.
- * @param updatedAt 
+ * @param updatedAt
  */
 
+data class LocalSiteRateLimit(
 
-data class LocalSiteRateLimit (
+  @SerializedName("import_user_settings_interval_seconds")
+  val importUserSettingsIntervalSeconds: kotlin.Int,
 
-    @SerializedName("import_user_settings_interval_seconds")
-    val importUserSettingsIntervalSeconds: kotlin.Int,
+  @SerializedName("import_user_settings_max_requests")
+  val importUserSettingsMaxRequests: kotlin.Int,
 
-    @SerializedName("import_user_settings_max_requests")
-    val importUserSettingsMaxRequests: kotlin.Int,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("search_interval_seconds")
+  val searchIntervalSeconds: kotlin.Int,
 
-    @SerializedName("search_interval_seconds")
-    val searchIntervalSeconds: kotlin.Int,
+  @SerializedName("search_max_requests")
+  val searchMaxRequests: kotlin.Int,
 
-    @SerializedName("search_max_requests")
-    val searchMaxRequests: kotlin.Int,
+  @SerializedName("comment_interval_seconds")
+  val commentIntervalSeconds: kotlin.Int,
 
-    @SerializedName("comment_interval_seconds")
-    val commentIntervalSeconds: kotlin.Int,
+  @SerializedName("comment_max_requests")
+  val commentMaxRequests: kotlin.Int,
 
-    @SerializedName("comment_max_requests")
-    val commentMaxRequests: kotlin.Int,
+  @SerializedName("image_interval_seconds")
+  val imageIntervalSeconds: kotlin.Int,
 
-    @SerializedName("image_interval_seconds")
-    val imageIntervalSeconds: kotlin.Int,
+  @SerializedName("image_max_requests")
+  val imageMaxRequests: kotlin.Int,
 
-    @SerializedName("image_max_requests")
-    val imageMaxRequests: kotlin.Int,
+  @SerializedName("register_interval_seconds")
+  val registerIntervalSeconds: kotlin.Int,
 
-    @SerializedName("register_interval_seconds")
-    val registerIntervalSeconds: kotlin.Int,
+  @SerializedName("register_max_requests")
+  val registerMaxRequests: kotlin.Int,
 
-    @SerializedName("register_max_requests")
-    val registerMaxRequests: kotlin.Int,
+  @SerializedName("post_interval_seconds")
+  val postIntervalSeconds: kotlin.Int,
 
-    @SerializedName("post_interval_seconds")
-    val postIntervalSeconds: kotlin.Int,
+  @SerializedName("post_max_requests")
+  val postMaxRequests: kotlin.Int,
 
-    @SerializedName("post_max_requests")
-    val postMaxRequests: kotlin.Int,
+  @SerializedName("message_interval_seconds")
+  val messageIntervalSeconds: kotlin.Int,
 
-    @SerializedName("message_interval_seconds")
-    val messageIntervalSeconds: kotlin.Int,
+  @SerializedName("message_max_requests")
+  val messageMaxRequests: kotlin.Int,
 
-    @SerializedName("message_max_requests")
-    val messageMaxRequests: kotlin.Int,
+  /* The local site id. */
+  @SerializedName("local_site_id")
+  val localSiteId: kotlin.Int,
 
-    /* The local site id. */
-    @SerializedName("local_site_id")
-    val localSiteId: kotlin.Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

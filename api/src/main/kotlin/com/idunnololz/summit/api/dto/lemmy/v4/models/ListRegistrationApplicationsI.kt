@@ -7,41 +7,35 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param limit 
+ *
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
  * @param unreadOnly Only shows the unread applications (IE those without an admin actor)
  */
 
+data class ListRegistrationApplicationsI(
 
-data class ListRegistrationApplicationsI (
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  /* Only shows the unread applications (IE those without an admin actor) */
+  @SerializedName("unread_only")
+  val unreadOnly: kotlin.Boolean? = null,
 
-    /* Only shows the unread applications (IE those without an admin actor) */
-    @SerializedName("unread_only")
-    val unreadOnly: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

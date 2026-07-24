@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -22,25 +21,20 @@ import com.google.gson.annotations.SerializedName
  * Mods can change some metadata for posts
  *
  * @param postId The post id.
- * @param tags 
- * @param nsfw 
+ * @param tags
+ * @param nsfw
  */
 
+data class ModEditPost(
 
-data class ModEditPost (
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<kotlin.Double>? = null,
 
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<kotlin.Double>? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

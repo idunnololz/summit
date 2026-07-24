@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Comment
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Instance
@@ -22,58 +23,56 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.Modlog
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Post
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param modlog 
- * @param type 
- * @param targetComment 
- * @param targetPost 
- * @param targetCommunity 
- * @param targetInstance 
- * @param targetPerson 
- * @param moderator 
+ *
+ * @param modlog
+ * @param type
+ * @param targetComment
+ * @param targetPost
+ * @param targetCommunity
+ * @param targetInstance
+ * @param targetPerson
+ * @param moderator
  */
 
+data class NotificationDataAnyOf1(
 
-data class NotificationDataAnyOf1 (
+  @SerializedName("modlog")
+  val modlog: Modlog,
 
-    @SerializedName("modlog")
-    val modlog: Modlog,
+  @SerializedName("type_")
+  val type: NotificationDataAnyOf1.Type,
 
-    @SerializedName("type_")
-    val type: NotificationDataAnyOf1.Type,
+  @SerializedName("target_comment")
+  val targetComment: Comment? = null,
 
-    @SerializedName("target_comment")
-    val targetComment: Comment? = null,
+  @SerializedName("target_post")
+  val targetPost: Post? = null,
 
-    @SerializedName("target_post")
-    val targetPost: Post? = null,
+  @SerializedName("target_community")
+  val targetCommunity: Community? = null,
 
-    @SerializedName("target_community")
-    val targetCommunity: Community? = null,
+  @SerializedName("target_instance")
+  val targetInstance: Instance? = null,
 
-    @SerializedName("target_instance")
-    val targetInstance: Instance? = null,
+  @SerializedName("target_person")
+  val targetPerson: Person? = null,
 
-    @SerializedName("target_person")
-    val targetPerson: Person? = null,
-
-    @SerializedName("moderator")
-    val moderator: Person? = null
+  @SerializedName("moderator")
+  val moderator: Person? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: mod_action
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "mod_action") mod_action("mod_action");
-    }
-
+  /**
+   *
+   *
+   * Values: mod_action
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "mod_action")
+    mod_action("mod_action"),
+  }
 }
-

@@ -82,16 +82,17 @@ class QueryEngine(
 
   class SearchSource(
     context: Context,
-    simpleDataSource: SimpleDataSource<SearchResultView, SortType>
+    simpleDataSource: SimpleDataSource<SearchResultView, SortType>,
   ) : LemmyListSource<SearchResultView, SortType, Long>(
     context,
     { id },
     SortType.New,
     {
-      pageIndex: Int,
-      sortOrder: SortType,
-      limit: Int,
-      force: Boolean ->
+        pageIndex: Int,
+        sortOrder: SortType,
+        limit: Int,
+        force: Boolean,
+      ->
 
       simpleDataSource.fetchItems(sortOrder, pageIndex, force, limit = limit, showRead = true)
     },
@@ -113,62 +114,60 @@ class QueryEngine(
       force: Boolean,
       limit: Int,
       showRead: Boolean?,
-    ): Result<List<SearchResultView>> {
-      return apiClient
-        .searchWithRetry(
-          communityId = communityIdFilter,
-          communityName = null,
-          sortType = currentSortType,
-          listingType = listingTypeFilter ?: ListingType.All,
-          searchType = type,
-          page = page.toLemmyPageIndex(),
-          query = currentQuery,
-          limit = limit,
-          creatorId = personIdFilter,
-          force = force,
-        )
-        .map {
-          val items = mutableListOf<SearchResultView>()
+    ): Result<List<SearchResultView>> = apiClient
+      .searchWithRetry(
+        communityId = communityIdFilter,
+        communityName = null,
+        sortType = currentSortType,
+        listingType = listingTypeFilter ?: ListingType.All,
+        searchType = type,
+        page = page.toLemmyPageIndex(),
+        query = currentQuery,
+        limit = limit,
+        creatorId = personIdFilter,
+        force = force,
+      )
+      .map {
+        val items = mutableListOf<SearchResultView>()
 
-          it.comments.mapTo(items) { CommentResultView(it) }
-          it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
-          it.communities.mapTo(items) { CommunityResultView(it) }
-          it.users.mapTo(items) { UserResultView(it) }
+        it.comments.mapTo(items) { CommentResultView(it) }
+        it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
+        it.communities.mapTo(items) { CommunityResultView(it) }
+        it.users.mapTo(items) { UserResultView(it) }
 
-          val sortedItems =
-            if (currentSortType == SortType.Active) {
-              items.sortedBy {
-                when (it) {
-                  is CommentResultView ->
-                    trigram.distance(
-                      it.commentView.comment.content,
-                      currentQuery,
-                    )
-                  is CommunityResultView -> {
-                    trigram.distance(
-                      it.communityView.community.name,
-                      currentQuery,
-                    )
-                  }
-                  is PostResultView -> {
-                    val post = it.fetchedPost.postView.post
-                    val toMatch = post.name + " " + post.body
-                    trigram.distance(toMatch, currentQuery)
-                  }
-                  is UserResultView ->
-                    trigram.distance(
-                      it.personView.person.name,
-                      currentQuery,
-                    )
+        val sortedItems =
+          if (currentSortType == SortType.Active) {
+            items.sortedBy {
+              when (it) {
+                is CommentResultView ->
+                  trigram.distance(
+                    it.commentView.comment.content,
+                    currentQuery,
+                  )
+                is CommunityResultView -> {
+                  trigram.distance(
+                    it.communityView.community.name,
+                    currentQuery,
+                  )
                 }
+                is PostResultView -> {
+                  val post = it.fetchedPost.postView.post
+                  val toMatch = post.name + " " + post.body
+                  trigram.distance(toMatch, currentQuery)
+                }
+                is UserResultView ->
+                  trigram.distance(
+                    it.personView.person.name,
+                    currentQuery,
+                  )
               }
-            } else {
-              items
             }
+          } else {
+            items
+          }
 
-          sortedItems
-        }
-    }
+        sortedItems
+      }
   }
 
   class CursorSearchSource(
@@ -182,11 +181,12 @@ class QueryEngine(
     private val personIdFilter: Long?,
   ) : CursorBackedSingleDataSource<SearchResultView, SortType>(
     fetchObjects = {
-      pageCursor: String?,
-      sortOrder: SortType?,
-      limit: Int,
-      force: Boolean,
-      showRead: Boolean?, ->
+        pageCursor: String?,
+        sortOrder: SortType?,
+        limit: Int,
+        force: Boolean,
+        showRead: Boolean?,
+      ->
 
       apiClient
         .searchWithRetry(
@@ -245,7 +245,7 @@ class QueryEngine(
             nextCursor = it.nextCursor,
           )
         }
-    }
+    },
   )
 
   companion object {
@@ -285,7 +285,6 @@ class QueryEngine(
       override val id: Long
         get() = personView.person.id
     }
-
   }
 
   sealed interface QueryResultsPage {
@@ -448,7 +447,6 @@ class QueryEngine(
         reset()
       }
 
-
       if (searchSource == null) {
         searchSource = SearchSource(
           context,
@@ -474,7 +472,7 @@ class QueryEngine(
               currentQuery,
               personIdFilter,
             )
-          }
+          },
         )
       }
 
@@ -559,7 +557,7 @@ class QueryEngine(
           withContext(Dispatchers.Main) {
             activePageQueries.remove(pageIndex)
           }
-        }
+        },
       )
 
 //      apiClient

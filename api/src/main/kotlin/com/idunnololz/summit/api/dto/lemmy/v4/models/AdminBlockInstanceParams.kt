@@ -7,44 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param reason 
- * @param block 
- * @param instance 
+ *
+ * @param reason
+ * @param block
+ * @param instance
  * @param expiresAt A time that the block will expire, in unix epoch seconds.  An i64 unix timestamp is used for a simpler API client implementation.
  */
 
+data class AdminBlockInstanceParams(
 
-data class AdminBlockInstanceParams (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("block")
+  val block: kotlin.Boolean,
 
-    @SerializedName("block")
-    val block: kotlin.Boolean,
+  @SerializedName("instance")
+  val instance: kotlin.String,
 
-    @SerializedName("instance")
-    val instance: kotlin.String,
+  /* A time that the block will expire, in unix epoch seconds.  An i64 unix timestamp is used for a simpler API client implementation. */
+  @SerializedName("expires_at")
+  val expiresAt: kotlin.Int? = null,
 
-    /* A time that the block will expire, in unix epoch seconds.  An i64 unix timestamp is used for a simpler API client implementation. */
-    @SerializedName("expires_at")
-    val expiresAt: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

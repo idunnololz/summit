@@ -1,7 +1,5 @@
 package com.idunnololz.summit.api.local
 
-import com.google.gson.annotations.SerializedName
-
 class UnreadCount(
   val notificationCount: Int,
   val registrationApplicationCount: Int,

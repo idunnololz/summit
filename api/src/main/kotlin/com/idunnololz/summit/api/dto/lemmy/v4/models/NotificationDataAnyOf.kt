@@ -7,53 +7,52 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessage
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param recipient 
- * @param creator 
- * @param privateMessage 
- * @param type 
+ *
+ * @param recipient
+ * @param creator
+ * @param privateMessage
+ * @param type
  */
 
+data class NotificationDataAnyOf(
 
-data class NotificationDataAnyOf (
+  @SerializedName("recipient")
+  val recipient: Person,
 
-    @SerializedName("recipient")
-    val recipient: Person,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("private_message")
+  val privateMessage: PrivateMessage,
 
-    @SerializedName("private_message")
-    val privateMessage: PrivateMessage,
-
-    @SerializedName("type_")
-    val type: NotificationDataAnyOf.Type
+  @SerializedName("type_")
+  val type: NotificationDataAnyOf.Type,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: private_message
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "private_message") private_message("private_message");
-    }
-
+  /**
+   *
+   *
+   * Values: private_message
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "private_message")
+    private_message("private_message"),
+  }
 }
-

@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -22,31 +21,26 @@ import com.google.gson.annotations.SerializedName
  * Create a comment.
  *
  * @param postId The post id.
- * @param content 
+ * @param content
  * @param languageId The language id.
  * @param parentId The comment id.
  */
 
+data class CreateComment(
 
-data class CreateComment (
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("content")
+  val content: kotlin.String,
 
-    @SerializedName("content")
-    val content: kotlin.String,
+  /* The language id. */
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    /* The language id. */
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null,
+  /* The comment id. */
+  @SerializedName("parent_id")
+  val parentId: kotlin.Int? = null,
 
-    /* The comment id. */
-    @SerializedName("parent_id")
-    val parentId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

@@ -7,74 +7,73 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PrivateMessageReport
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param creatorBanned 
- * @param creatorIsAdmin 
- * @param privateMessageCreator 
- * @param creator 
- * @param privateMessage 
- * @param privateMessageReport 
- * @param type 
- * @param creatorBanExpiresAt 
- * @param resolver 
+ *
+ * @param creatorBanned
+ * @param creatorIsAdmin
+ * @param privateMessageCreator
+ * @param creator
+ * @param privateMessage
+ * @param privateMessageReport
+ * @param type
+ * @param creatorBanExpiresAt
+ * @param resolver
  */
 
+data class ReportCombinedViewAnyOf2(
 
-data class ReportCombinedViewAnyOf2 (
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("private_message_creator")
+  val privateMessageCreator: Person,
 
-    @SerializedName("private_message_creator")
-    val privateMessageCreator: Person,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("private_message")
+  val privateMessage: PrivateMessage,
 
-    @SerializedName("private_message")
-    val privateMessage: PrivateMessage,
+  @SerializedName("private_message_report")
+  val privateMessageReport: PrivateMessageReport,
 
-    @SerializedName("private_message_report")
-    val privateMessageReport: PrivateMessageReport,
+  @SerializedName("type_")
+  val type: ReportCombinedViewAnyOf2.Type,
 
-    @SerializedName("type_")
-    val type: ReportCombinedViewAnyOf2.Type,
+  @SerializedName("creator_ban_expires_at")
+  val creatorBanExpiresAt: kotlin.String? = null,
 
-    @SerializedName("creator_ban_expires_at")
-    val creatorBanExpiresAt: kotlin.String? = null,
-
-    @SerializedName("resolver")
-    val resolver: Person? = null
+  @SerializedName("resolver")
+  val resolver: Person? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: private_message
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "private_message") private_message("private_message");
-    }
-
+  /**
+   *
+   *
+   * Values: private_message
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "private_message")
+    private_message("private_message"),
+  }
 }
-

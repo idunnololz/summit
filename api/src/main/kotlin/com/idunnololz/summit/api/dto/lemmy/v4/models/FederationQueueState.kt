@@ -7,50 +7,44 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param failCount how many failed attempts have been made to send the next activity
  * @param instanceId The instance id.
  * @param lastRetryAt timestamp of the last retry attempt (when the last failing activity was resent)
- * @param lastSuccessfulPublishedTimeAt 
- * @param lastSuccessfulId 
+ * @param lastSuccessfulPublishedTimeAt
+ * @param lastSuccessfulId
  */
 
+data class FederationQueueState(
 
-data class FederationQueueState (
+  /* how many failed attempts have been made to send the next activity */
+  @SerializedName("fail_count")
+  val failCount: kotlin.Int,
 
-    /* how many failed attempts have been made to send the next activity */
-    @SerializedName("fail_count")
-    val failCount: kotlin.Int,
+  /* The instance id. */
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    /* The instance id. */
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  /* timestamp of the last retry attempt (when the last failing activity was resent) */
+  @SerializedName("last_retry_at")
+  val lastRetryAt: kotlin.String? = null,
 
-    /* timestamp of the last retry attempt (when the last failing activity was resent) */
-    @SerializedName("last_retry_at")
-    val lastRetryAt: kotlin.String? = null,
+  @SerializedName("last_successful_published_time_at")
+  val lastSuccessfulPublishedTimeAt: kotlin.String? = null,
 
-    @SerializedName("last_successful_published_time_at")
-    val lastSuccessfulPublishedTimeAt: kotlin.String? = null,
+  @SerializedName("last_successful_id")
+  val lastSuccessfulId: kotlin.Int? = null,
 
-    @SerializedName("last_successful_id")
-    val lastSuccessfulId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

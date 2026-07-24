@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.utils.listSource
 
 import android.util.Log
-import com.idunnololz.summit.api.toLemmyPageIndex
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import kotlin.map
 import kotlin.onSuccess
@@ -16,7 +15,7 @@ interface SimpleDataSource<T, O> {
   ): Result<List<T>>
 }
 
-class Page<T> (
+class Page<T>(
   val items: List<T>,
   val nextCursor: String?,
 )
@@ -122,7 +121,7 @@ abstract class CursorBackedSingleDataSource<T, O>(
   ): Result<Page<T>> {
     if (page > 0 && cursorIds[page] == null) {
       return Result.success(
-        Page(listOf(), null,)
+        Page(listOf(), null),
       )
     }
 

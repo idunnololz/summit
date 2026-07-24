@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
 
 /**
  * The response of current admins.
  *
- * @param admins 
+ * @param admins
  */
 
+data class AddAdminResponse(
 
-data class AddAdminResponse (
+  @SerializedName("admins")
+  val admins: kotlin.collections.List<PersonView>,
 
-    @SerializedName("admins")
-    val admins: kotlin.collections.List<PersonView>
-
-) {
-
-
-}
-
+)

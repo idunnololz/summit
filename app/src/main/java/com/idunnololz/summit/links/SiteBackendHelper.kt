@@ -1,9 +1,7 @@
 package com.idunnololz.summit.links
 
-import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
@@ -75,7 +73,7 @@ class SiteBackendHelper @Inject constructor(
             linkFetcher.downloadSite(
               url = "https://$instance/api/v4/site",
               cache = true,
-              client = okHttpClient
+              client = okHttpClient,
             )
           }
         }

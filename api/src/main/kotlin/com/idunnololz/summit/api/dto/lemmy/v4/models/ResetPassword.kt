@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Reset your password via email.
  *
- * @param email 
+ * @param email
  */
 
+data class ResetPassword(
 
-data class ResetPassword (
+  @SerializedName("email")
+  val email: kotlin.String,
 
-    @SerializedName("email")
-    val email: kotlin.String
-
-) {
-
-
-}
-
+)

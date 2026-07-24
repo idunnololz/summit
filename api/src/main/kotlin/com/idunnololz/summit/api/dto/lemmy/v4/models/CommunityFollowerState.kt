@@ -7,61 +7,63 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * Values: accepted,pending,approval_required,denied
  */
 
-enum class CommunityFollowerState(val value: kotlin.String) {
+enum class CommunityFollowerState(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "accepted")
-    accepted("accepted"),
+  @SerializedName(value = "accepted")
+  accepted("accepted"),
 
-    @SerializedName(value = "pending")
-    pending("pending"),
+  @SerializedName(value = "pending")
+  pending("pending"),
 
-    @SerializedName(value = "approval_required")
-    approval_required("approval_required"),
+  @SerializedName(value = "approval_required")
+  approval_required("approval_required"),
 
-    @SerializedName(value = "denied")
-    denied("denied");
+  @SerializedName(value = "denied")
+  denied("denied"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? =
+      if (data is CommunityFollowerState) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [CommunityFollowerState] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is CommunityFollowerState) "$data" else null
-
-        /**
-         * Returns a valid [CommunityFollowerState] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): CommunityFollowerState? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): CommunityFollowerState? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

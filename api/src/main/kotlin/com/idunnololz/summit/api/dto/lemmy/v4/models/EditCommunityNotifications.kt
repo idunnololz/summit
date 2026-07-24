@@ -7,37 +7,31 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityNotificationsMode
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityNotificationsMode
 
 /**
  * Change notification settings for a community
  *
- * @param mode 
+ * @param mode
  * @param communityId The community id.
  */
 
+data class EditCommunityNotifications(
 
-data class EditCommunityNotifications (
+  @SerializedName("mode")
+  val mode: CommunityNotificationsMode,
 
-    @SerializedName("mode")
-    val mode: CommunityNotificationsMode,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int
-
-) {
-
-
-}
-
+)

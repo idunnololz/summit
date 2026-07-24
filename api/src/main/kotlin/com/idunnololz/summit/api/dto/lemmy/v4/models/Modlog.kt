@@ -7,60 +7,54 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKind
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param childCount 
- * @param publishedAt 
- * @param isRevert 
- * @param kind 
- * @param id 
- * @param bulkActionParentId 
- * @param expiresAt 
- * @param reason 
+ *
+ * @param childCount
+ * @param publishedAt
+ * @param isRevert
+ * @param kind
+ * @param id
+ * @param bulkActionParentId
+ * @param expiresAt
+ * @param reason
  */
 
+data class Modlog(
 
-data class Modlog (
+  @SerializedName("child_count")
+  val childCount: kotlin.Int,
 
-    @SerializedName("child_count")
-    val childCount: kotlin.Int,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("is_revert")
+  val isRevert: kotlin.Boolean,
 
-    @SerializedName("is_revert")
-    val isRevert: kotlin.Boolean,
+  @SerializedName("kind")
+  val kind: ModlogKind,
 
-    @SerializedName("kind")
-    val kind: ModlogKind,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("bulk_action_parent_id")
+  val bulkActionParentId: kotlin.Int? = null,
 
-    @SerializedName("bulk_action_parent_id")
-    val bulkActionParentId: kotlin.Int? = null,
+  @SerializedName("expires_at")
+  val expiresAt: kotlin.String? = null,
 
-    @SerializedName("expires_at")
-    val expiresAt: kotlin.String? = null,
+  @SerializedName("reason")
+  val reason: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,79 +7,73 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Create an external auth method.
  *
- * @param scopes 
- * @param clientSecret 
- * @param clientId 
- * @param idClaim 
- * @param userinfoEndpoint 
- * @param tokenEndpoint 
- * @param authorizationEndpoint 
- * @param issuer 
- * @param displayName 
- * @param enabled 
- * @param usePkce 
- * @param accountLinkingEnabled 
- * @param autoVerifyEmail 
+ * @param scopes
+ * @param clientSecret
+ * @param clientId
+ * @param idClaim
+ * @param userinfoEndpoint
+ * @param tokenEndpoint
+ * @param authorizationEndpoint
+ * @param issuer
+ * @param displayName
+ * @param enabled
+ * @param usePkce
+ * @param accountLinkingEnabled
+ * @param autoVerifyEmail
  */
 
+data class CreateOAuthProvider(
 
-data class CreateOAuthProvider (
+  @SerializedName("scopes")
+  val scopes: kotlin.String,
 
-    @SerializedName("scopes")
-    val scopes: kotlin.String,
+  @SerializedName("client_secret")
+  val clientSecret: kotlin.String,
 
-    @SerializedName("client_secret")
-    val clientSecret: kotlin.String,
+  @SerializedName("client_id")
+  val clientId: kotlin.String,
 
-    @SerializedName("client_id")
-    val clientId: kotlin.String,
+  @SerializedName("id_claim")
+  val idClaim: kotlin.String,
 
-    @SerializedName("id_claim")
-    val idClaim: kotlin.String,
+  @SerializedName("userinfo_endpoint")
+  val userinfoEndpoint: kotlin.String,
 
-    @SerializedName("userinfo_endpoint")
-    val userinfoEndpoint: kotlin.String,
+  @SerializedName("token_endpoint")
+  val tokenEndpoint: kotlin.String,
 
-    @SerializedName("token_endpoint")
-    val tokenEndpoint: kotlin.String,
+  @SerializedName("authorization_endpoint")
+  val authorizationEndpoint: kotlin.String,
 
-    @SerializedName("authorization_endpoint")
-    val authorizationEndpoint: kotlin.String,
+  @SerializedName("issuer")
+  val issuer: kotlin.String,
 
-    @SerializedName("issuer")
-    val issuer: kotlin.String,
+  @SerializedName("display_name")
+  val displayName: kotlin.String,
 
-    @SerializedName("display_name")
-    val displayName: kotlin.String,
+  @SerializedName("enabled")
+  val enabled: kotlin.Boolean? = null,
 
-    @SerializedName("enabled")
-    val enabled: kotlin.Boolean? = null,
+  @SerializedName("use_pkce")
+  val usePkce: kotlin.Boolean? = null,
 
-    @SerializedName("use_pkce")
-    val usePkce: kotlin.Boolean? = null,
+  @SerializedName("account_linking_enabled")
+  val accountLinkingEnabled: kotlin.Boolean? = null,
 
-    @SerializedName("account_linking_enabled")
-    val accountLinkingEnabled: kotlin.Boolean? = null,
+  @SerializedName("auto_verify_email")
+  val autoVerifyEmail: kotlin.Boolean? = null,
 
-    @SerializedName("auto_verify_email")
-    val autoVerifyEmail: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

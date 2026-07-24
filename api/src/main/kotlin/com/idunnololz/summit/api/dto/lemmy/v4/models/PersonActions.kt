@@ -7,19 +7,18 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param downvotes A total of downvotes given to this person
  * @param upvotes A total of upvotes given to this person
@@ -29,35 +28,30 @@ import com.google.gson.annotations.SerializedName
  * @param blockedAt When the person was blocked.
  */
 
+data class PersonActions(
 
-data class PersonActions (
+  /* A total of downvotes given to this person */
+  @SerializedName("downvotes")
+  val downvotes: kotlin.Int? = null,
 
-    /* A total of downvotes given to this person */
-    @SerializedName("downvotes")
-    val downvotes: kotlin.Int? = null,
+  /* A total of upvotes given to this person */
+  @SerializedName("upvotes")
+  val upvotes: kotlin.Int? = null,
 
-    /* A total of upvotes given to this person */
-    @SerializedName("upvotes")
-    val upvotes: kotlin.Int? = null,
+  /* When the person was voted on. */
+  @SerializedName("voted_at")
+  val votedAt: kotlin.String? = null,
 
-    /* When the person was voted on. */
-    @SerializedName("voted_at")
-    val votedAt: kotlin.String? = null,
+  /* A note about the person. */
+  @SerializedName("note")
+  val note: kotlin.String? = null,
 
-    /* A note about the person. */
-    @SerializedName("note")
-    val note: kotlin.String? = null,
+  /* When the person was noted. */
+  @SerializedName("noted_at")
+  val notedAt: kotlin.String? = null,
 
-    /* When the person was noted. */
-    @SerializedName("noted_at")
-    val notedAt: kotlin.String? = null,
+  /* When the person was blocked. */
+  @SerializedName("blocked_at")
+  val blockedAt: kotlin.String? = null,
 
-    /* When the person was blocked. */
-    @SerializedName("blocked_at")
-    val blockedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

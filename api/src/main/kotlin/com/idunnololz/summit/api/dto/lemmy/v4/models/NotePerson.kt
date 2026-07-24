@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Make a note for a person.  An empty string deletes the note.
  *
- * @param note 
+ * @param note
  * @param personId The person id.
  */
 
+data class NotePerson(
 
-data class NotePerson (
+  @SerializedName("note")
+  val note: kotlin.String,
 
-    @SerializedName("note")
-    val note: kotlin.String,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Long
-
-) {
-
-
-}
-
+)

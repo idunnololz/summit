@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Mark several posts as read.
  *
- * @param read 
- * @param postIds 
+ * @param read
+ * @param postIds
  */
 
+data class MarkManyPostsAsRead(
 
-data class MarkManyPostsAsRead (
+  @SerializedName("read")
+  val read: kotlin.Boolean,
 
-    @SerializedName("read")
-    val read: kotlin.Boolean,
+  @SerializedName("post_ids")
+  val postIds: kotlin.collections.List<kotlin.Double>,
 
-    @SerializedName("post_ids")
-    val postIds: kotlin.collections.List<kotlin.Double>
-
-) {
-
-
-}
-
+)

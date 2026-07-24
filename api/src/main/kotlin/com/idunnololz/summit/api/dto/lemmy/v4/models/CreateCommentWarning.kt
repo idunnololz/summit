@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Creates a warning against a comment and notifies the user.
  *
- * @param reason 
+ * @param reason
  * @param commentId The comment id.
  */
 
+data class CreateCommentWarning(
 
-data class CreateCommentWarning (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int
-
-) {
-
-
-}
-
+)

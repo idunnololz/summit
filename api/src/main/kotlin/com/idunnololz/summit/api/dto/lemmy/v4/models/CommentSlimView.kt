@@ -7,67 +7,61 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Comment
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonActions
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * A slimmer comment view, without the post, or community.
  *
- * @param creatorBannedFromCommunity 
- * @param creatorIsModerator 
- * @param creatorBanned 
- * @param canMod 
- * @param creatorIsAdmin 
- * @param creator 
- * @param comment 
- * @param personActions 
- * @param commentActions 
+ * @param creatorBannedFromCommunity
+ * @param creatorIsModerator
+ * @param creatorBanned
+ * @param canMod
+ * @param creatorIsAdmin
+ * @param creator
+ * @param comment
+ * @param personActions
+ * @param commentActions
  */
 
+data class CommentSlimView(
 
-data class CommentSlimView (
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_is_moderator")
+  val creatorIsModerator: kotlin.Boolean,
 
-    @SerializedName("creator_is_moderator")
-    val creatorIsModerator: kotlin.Boolean,
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("can_mod")
+  val canMod: kotlin.Boolean,
 
-    @SerializedName("can_mod")
-    val canMod: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("comment")
+  val comment: Comment,
 
-    @SerializedName("comment")
-    val comment: Comment,
+  @SerializedName("person_actions")
+  val personActions: PersonActions? = null,
 
-    @SerializedName("person_actions")
-    val personActions: PersonActions? = null,
+  @SerializedName("comment_actions")
+  val commentActions: CommentActions? = null,
 
-    @SerializedName("comment_actions")
-    val commentActions: CommentActions? = null
-
-) {
-
-
-}
-
+)

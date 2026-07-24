@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostView
-
-import com.google.gson.annotations.SerializedName
 
 /**
  * The post response.
  *
  * @param crossPosts A list of cross-posts, or other times / communities this link has been posted to.
- * @param communityView 
- * @param postView 
+ * @param communityView
+ * @param postView
  */
 
+data class GetPostResponse(
 
-data class GetPostResponse (
+  @SerializedName("moderators")
+  val moderators: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderators")
-    val moderators: kotlin.collections.List<CommunityModeratorView>,
+  /* A list of cross-posts, or other times / communities this link has been posted to. */
+  @SerializedName("cross_posts")
+  val crossPosts: kotlin.collections.List<PostView>,
 
-    /* A list of cross-posts, or other times / communities this link has been posted to. */
-    @SerializedName("cross_posts")
-    val crossPosts: kotlin.collections.List<PostView>,
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView,
+  @SerializedName("post_view")
+  val postView: PostView,
 
-    @SerializedName("post_view")
-    val postView: PostView
-
-) {
-
-
-}
-
+)

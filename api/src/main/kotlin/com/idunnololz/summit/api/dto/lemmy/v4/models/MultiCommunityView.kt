@@ -7,42 +7,36 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MultiCommunity
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param owner 
- * @param multi 
- * @param followState 
+ *
+ * @param owner
+ * @param multi
+ * @param followState
  */
 
+data class MultiCommunityView(
 
-data class MultiCommunityView (
+  @SerializedName("owner")
+  val owner: Person,
 
-    @SerializedName("owner")
-    val owner: Person,
+  @SerializedName("multi")
+  val multi: MultiCommunity,
 
-    @SerializedName("multi")
-    val multi: MultiCommunity,
+  @SerializedName("follow_state")
+  val followState: CommunityFollowerState? = null,
 
-    @SerializedName("follow_state")
-    val followState: CommunityFollowerState? = null
-
-) {
-
-
-}
-
+)

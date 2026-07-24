@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CustomEmojiView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CustomEmojiView
 
 /**
  * A response for a custom emoji.
  *
- * @param customEmoji 
+ * @param customEmoji
  */
 
+data class CustomEmojiResponse(
 
-data class CustomEmojiResponse (
+  @SerializedName("custom_emoji")
+  val customEmoji: CustomEmojiView,
 
-    @SerializedName("custom_emoji")
-    val customEmoji: CustomEmojiView
-
-) {
-
-
-}
-
+)

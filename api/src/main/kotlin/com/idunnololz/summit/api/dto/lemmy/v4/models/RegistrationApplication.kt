@@ -7,58 +7,52 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A registration application.
  *
- * @param publishedAt 
- * @param answer 
+ * @param publishedAt
+ * @param answer
  * @param localUserId The local user id.
  * @param id The registration application id.
- * @param updatedAt 
- * @param denyReason 
+ * @param updatedAt
+ * @param denyReason
  * @param adminId The person id.
  */
 
+data class RegistrationApplication(
 
-data class RegistrationApplication (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("answer")
+  val answer: kotlin.String,
 
-    @SerializedName("answer")
-    val answer: kotlin.String,
+  /* The local user id. */
+  @SerializedName("local_user_id")
+  val localUserId: kotlin.Int,
 
-    /* The local user id. */
-    @SerializedName("local_user_id")
-    val localUserId: kotlin.Int,
+  /* The registration application id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The registration application id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  @SerializedName("deny_reason")
+  val denyReason: kotlin.String? = null,
 
-    @SerializedName("deny_reason")
-    val denyReason: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("admin_id")
+  val adminId: kotlin.Long? = null,
 
-    /* The person id. */
-    @SerializedName("admin_id")
-    val adminId: kotlin.Long? = null
-
-) {
-
-
-}
-
+)

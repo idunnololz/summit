@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param outbound 
- * @param inbound 
+ *
+ * @param outbound
+ * @param inbound
  */
 
+data class NodeInfoServices(
 
-data class NodeInfoServices (
+  @SerializedName("outbound")
+  val outbound: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerializedName("outbound")
-    val outbound: kotlin.collections.List<kotlin.String>? = null,
+  @SerializedName("inbound")
+  val inbound: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerializedName("inbound")
-    val inbound: kotlin.collections.List<kotlin.String>? = null
-
-) {
-
-
-}
-
+)

@@ -7,46 +7,40 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Site
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * The community response.
  *
- * @param discussionLanguages 
- * @param moderators 
- * @param communityView 
- * @param site 
+ * @param discussionLanguages
+ * @param moderators
+ * @param communityView
+ * @param site
  */
 
+data class GetCommunityResponse(
 
-data class GetCommunityResponse (
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.Double>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.Double>,
+  @SerializedName("moderators")
+  val moderators: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderators")
-    val moderators: kotlin.collections.List<CommunityModeratorView>,
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView,
+  @SerializedName("site")
+  val site: Site? = null,
 
-    @SerializedName("site")
-    val site: Site? = null
-
-) {
-
-
-}
-
+)

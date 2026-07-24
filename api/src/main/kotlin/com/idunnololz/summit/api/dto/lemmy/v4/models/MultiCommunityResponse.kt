@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MultiCommunityView
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param multiCommunityView 
+ *
+ * @param multiCommunityView
  */
 
+data class MultiCommunityResponse(
 
-data class MultiCommunityResponse (
+  @SerializedName("multi_community_view")
+  val multiCommunityView: MultiCommunityView,
 
-    @SerializedName("multi_community_view")
-    val multiCommunityView: MultiCommunityView
-
-) {
-
-
-}
-
+)

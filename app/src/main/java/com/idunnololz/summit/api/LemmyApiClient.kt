@@ -57,15 +57,9 @@ import com.idunnololz.summit.api.dto.lemmy.GetPost
 import com.idunnololz.summit.api.dto.lemmy.GetPosts
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
-import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
-import com.idunnololz.summit.api.dto.lemmy.GetReportCount
-import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSite
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
@@ -127,7 +121,6 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
-import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.Consts
 import com.idunnololz.summit.links.SiteBackendHelper
@@ -1253,12 +1246,10 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun saveUserSettings(
-    settings: SaveUserSettings,
-    account: Account,
-  ): Result<Unit> = onApiClient {
-    getApi().saveUserSettings(authorization = account.bearer, settings)
-  }.map { Unit }
+  suspend fun saveUserSettings(settings: SaveUserSettings, account: Account): Result<Unit> =
+    onApiClient {
+      getApi().saveUserSettings(authorization = account.bearer, settings)
+    }.map { Unit }
 
   suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
     val form = ResolveObject(

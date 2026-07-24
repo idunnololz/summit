@@ -7,41 +7,35 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType
 
 /**
  * Feature a post (stickies / pins to the top).
  *
- * @param featureType 
- * @param featured 
+ * @param featureType
+ * @param featured
  * @param postId The post id.
  */
 
+data class FeaturePost(
 
-data class FeaturePost (
+  @SerializedName("feature_type")
+  val featureType: PostFeatureType,
 
-    @SerializedName("feature_type")
-    val featureType: PostFeatureType,
+  @SerializedName("featured")
+  val featured: kotlin.Boolean,
 
-    @SerializedName("featured")
-    val featured: kotlin.Boolean,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int
-
-) {
-
-
-}
-
+)

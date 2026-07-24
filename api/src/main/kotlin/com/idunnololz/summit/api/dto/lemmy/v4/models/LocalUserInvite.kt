@@ -7,57 +7,51 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param publishedAt 
- * @param usesCount 
+ *
+ * @param publishedAt
+ * @param usesCount
  * @param localUserId The local user id.
- * @param token 
+ * @param token
  * @param id The invitation id.
- * @param expiresAt 
- * @param maxUses 
+ * @param expiresAt
+ * @param maxUses
  */
 
+data class LocalUserInvite(
 
-data class LocalUserInvite (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("uses_count")
+  val usesCount: kotlin.Int,
 
-    @SerializedName("uses_count")
-    val usesCount: kotlin.Int,
+  /* The local user id. */
+  @SerializedName("local_user_id")
+  val localUserId: kotlin.Long,
 
-    /* The local user id. */
-    @SerializedName("local_user_id")
-    val localUserId: kotlin.Long,
+  @SerializedName("token")
+  val token: kotlin.String,
 
-    @SerializedName("token")
-    val token: kotlin.String,
+  /* The invitation id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The invitation id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("expires_at")
+  val expiresAt: kotlin.String? = null,
 
-    @SerializedName("expires_at")
-    val expiresAt: kotlin.String? = null,
+  @SerializedName("max_uses")
+  val maxUses: kotlin.Int? = null,
 
-    @SerializedName("max_uses")
-    val maxUses: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

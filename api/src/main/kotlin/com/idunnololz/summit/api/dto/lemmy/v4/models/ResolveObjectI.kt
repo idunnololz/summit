@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param q Can be the full url, or a shortened version like: !fediverse@lemmy.ml
  */
 
+data class ResolveObjectI(
 
-data class ResolveObjectI (
+  /* Can be the full url, or a shortened version like: !fediverse@lemmy.ml */
+  @SerializedName("q")
+  val q: kotlin.String,
 
-    /* Can be the full url, or a shortened version like: !fediverse@lemmy.ml */
-    @SerializedName("q")
-    val q: kotlin.String
-
-) {
-
-
-}
-
+)

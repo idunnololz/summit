@@ -98,16 +98,11 @@ import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
-import com.idunnololz.summit.api.dto.lemmy.GetReportCount
-import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSite
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
@@ -169,12 +164,11 @@ import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
-import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.local.toModEvents
+import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -346,7 +340,7 @@ class PieFedApiAlphaAdapter(
     api.listCommentVotes(
       headers = generateHeaders(authorization, force),
       // piefed is copying lemmy's page index scheme
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map { it.toListCommentLikesResponse() }
 
@@ -358,7 +352,7 @@ class PieFedApiAlphaAdapter(
     api.listPostVotes(
       headers = generateHeaders(authorization, force),
       // piefed is copying lemmy's page index scheme
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map { it.toListPostLikesResponse() }
 
@@ -619,9 +613,11 @@ class PieFedApiAlphaAdapter(
     args: MarkAllAsRead,
   ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markAllAsRead(generateHeaders(authorization, false), args) }
-      .map { SuccessResponse(
-        true
-      ) }
+      .map {
+        SuccessResponse(
+          true,
+        )
+      }
 
   override suspend fun getPersonMentions(
     authorization: String?,
@@ -630,7 +626,7 @@ class PieFedApiAlphaAdapter(
   ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
     api.getPersonMentions(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
     .map { it.toGetPersonMentionsResponse() }
@@ -642,7 +638,7 @@ class PieFedApiAlphaAdapter(
   ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
     api.getPrivateMessages(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map {
     PrivateMessagesResponse(
@@ -707,7 +703,7 @@ class PieFedApiAlphaAdapter(
   ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
     api.getCommentReports(
       headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
     .map {
@@ -742,45 +738,52 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<UnreadCount> =
-    withContext(Dispatchers.IO) {
-      val j1 = async {
-        retrofitErrorHandler {
-          api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
+  ): Result<UnreadCount> = withContext(Dispatchers.IO) {
+    val j1 = async {
+      retrofitErrorHandler {
+        api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
       }
-      val j2 = async {
-        retrofitErrorHandler {
-          api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
-      }
-      val j3 = async {
-        retrofitErrorHandler {
-          api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap())
-        }
-      }
-
-      val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-      val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-      val registrationCount = j3.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-
-      Result.success(
-        UnreadCount(
-          notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
-          registrationApplicationCount = registrationCount.registration_applications,
-          pendingFollowCount = 0,
-          reportCount = reportCount.comment_reports + reportCount.post_reports + (reportCount.private_message_reports ?: 0),
-
-          mentions = unreadCount.mentions,
-          privateMessages = unreadCount.private_messages,
-          replies = unreadCount.replies,
-
-          commentReports = reportCount.comment_reports,
-          postReports = reportCount.post_reports,
-          privateMessageReports = reportCount.private_message_reports,
-        )
-      )
     }
+    val j2 = async {
+      retrofitErrorHandler {
+        api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+      }
+    }
+    val j3 = async {
+      retrofitErrorHandler {
+        api.getRegistrationApplicationsCount(
+          generateHeaders(authorization, force),
+          args.serializeToMap(),
+        )
+      }
+    }
+
+    val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+    val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
+    val registrationCount = j3.await().getOrElse {
+      return@withContext Result.failure<UnreadCount>(it)
+    }
+
+    Result.success(
+      UnreadCount(
+        notificationCount =
+        unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
+        registrationApplicationCount = registrationCount.registration_applications,
+        pendingFollowCount = 0,
+        reportCount =
+        reportCount.comment_reports + reportCount.post_reports +
+          (reportCount.private_message_reports ?: 0),
+
+        mentions = unreadCount.mentions,
+        privateMessages = unreadCount.private_messages,
+        replies = unreadCount.replies,
+
+        commentReports = reportCount.comment_reports,
+        postReports = reportCount.post_reports,
+        privateMessageReports = reportCount.private_message_reports,
+      ),
+    )
+  }
 
   override suspend fun followCommunity(
     authorization: String?,
@@ -1047,7 +1050,7 @@ class PieFedApiAlphaAdapter(
   ): Result<GetModlogResponse> = retrofitErrorHandler {
     api.getModLogs(
       generateHeaders(authorization, force),
-      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap()
+      args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map {
     val events = com.idunnololz.summit.api.dto.lemmy.GetModlogResponse(

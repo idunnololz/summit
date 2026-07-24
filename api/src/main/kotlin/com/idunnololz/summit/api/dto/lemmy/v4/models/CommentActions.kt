@@ -7,42 +7,36 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * @param voteIsUpvote True if upvoted, false if downvoted. Upvote is greater than downvote.
  * @param savedAt When the comment was saved.
  * @param votedAt When the comment was upvoted or downvoted.
  */
 
+data class CommentActions(
 
-data class CommentActions (
+  /* True if upvoted, false if downvoted. Upvote is greater than downvote. */
+  @SerializedName("vote_is_upvote")
+  val voteIsUpvote: kotlin.Boolean? = null,
 
-    /* True if upvoted, false if downvoted. Upvote is greater than downvote. */
-    @SerializedName("vote_is_upvote")
-    val voteIsUpvote: kotlin.Boolean? = null,
+  /* When the comment was saved. */
+  @SerializedName("saved_at")
+  val savedAt: kotlin.String? = null,
 
-    /* When the comment was saved. */
-    @SerializedName("saved_at")
-    val savedAt: kotlin.String? = null,
+  /* When the comment was upvoted or downvoted. */
+  @SerializedName("voted_at")
+  val votedAt: kotlin.String? = null,
 
-    /* When the comment was upvoted or downvoted. */
-    @SerializedName("voted_at")
-    val votedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

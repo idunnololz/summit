@@ -7,49 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonActions
-
-import com.google.gson.annotations.SerializedName
 
 /**
  * A person view.
  *
- * @param banned 
- * @param isAdmin 
- * @param person 
- * @param banExpiresAt 
- * @param personActions 
+ * @param banned
+ * @param isAdmin
+ * @param person
+ * @param banExpiresAt
+ * @param personActions
  */
 
+data class PersonView(
 
-data class PersonView (
+  @SerializedName("banned")
+  val banned: kotlin.Boolean,
 
-    @SerializedName("banned")
-    val banned: kotlin.Boolean,
+  @SerializedName("is_admin")
+  val isAdmin: kotlin.Boolean,
 
-    @SerializedName("is_admin")
-    val isAdmin: kotlin.Boolean,
+  @SerializedName("person")
+  val person: Person,
 
-    @SerializedName("person")
-    val person: Person,
+  @SerializedName("ban_expires_at")
+  val banExpiresAt: kotlin.String? = null,
 
-    @SerializedName("ban_expires_at")
-    val banExpiresAt: kotlin.String? = null,
+  @SerializedName("person_actions")
+  val personActions: PersonActions? = null,
 
-    @SerializedName("person_actions")
-    val personActions: PersonActions? = null
-
-) {
-
-
-}
-
+)

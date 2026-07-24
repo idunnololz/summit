@@ -10,13 +10,10 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.toLemmyPageIndex
-import com.idunnololz.summit.lemmy.search.QueryEngine.CursorSearchSource
-import com.idunnololz.summit.lemmy.search.QueryEngine.PagedSearchSource
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.lemmy.utils.listSource.CursorBackedSingleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.Page
-import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.util.StatefulLiveData
@@ -32,10 +29,9 @@ class CommunitiesViewModel @Inject constructor(
   private val noAuthApiClient: LemmyApiClient,
 ) : ViewModel() {
 
-
   class CommunitiesSource(
     context: Context,
-    simpleDataSource: SimpleDataSource<CommunityView, SortType>
+    simpleDataSource: SimpleDataSource<CommunityView, SortType>,
   ) : LemmyListSource<CommunityView, SortType, Long>(
     context,
     { this.community.id.toLong() },
@@ -44,7 +40,8 @@ class CommunitiesViewModel @Inject constructor(
         pageIndex: Int,
         sortOrder: SortType,
         limit: Int,
-        force: Boolean ->
+        force: Boolean,
+      ->
 
       simpleDataSource.fetchItems(sortOrder, pageIndex, force, limit = limit, showRead = true)
     },
@@ -59,19 +56,17 @@ class CommunitiesViewModel @Inject constructor(
       force: Boolean,
       limit: Int,
       showRead: Boolean?,
-    ): Result<List<CommunityView>> {
-      return noAuthApiClient
-        .fetchCommunities(
-          sortType = SortType.TopAll,
-          listingType = ListingType.Local,
-          page = page.toLemmyPageIndex(),
-          limit = limit,
-          account = null,
-        )
-        .map {
-          it.communities
-        }
-    }
+    ): Result<List<CommunityView>> = noAuthApiClient
+      .fetchCommunities(
+        sortType = SortType.TopAll,
+        listingType = ListingType.Local,
+        page = page.toLemmyPageIndex(),
+        limit = limit,
+        account = null,
+      )
+      .map {
+        it.communities
+      }
   }
 
   class CursorCommunitiesSource(
@@ -82,7 +77,8 @@ class CommunitiesViewModel @Inject constructor(
         sortOrder: SortType?,
         limit: Int,
         force: Boolean,
-        showRead: Boolean?, ->
+        showRead: Boolean?,
+      ->
 
       noAuthApiClient
         .fetchCommunities(
@@ -98,7 +94,7 @@ class CommunitiesViewModel @Inject constructor(
             it.next_page,
           )
         }
-    }
+    },
   )
 
   companion object {
@@ -128,11 +124,13 @@ class CommunitiesViewModel @Inject constructor(
       if (communitiesSource == null) {
         communitiesSource = CommunitiesSource(
           context,
-          if (noAuthApiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true) {
+          if (noAuthApiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() ==
+            true
+          ) {
             CursorCommunitiesSource(noAuthApiClient)
           } else {
             PagedCommunitiesSource(noAuthApiClient)
-          }
+          },
         )
       }
 
@@ -142,7 +140,7 @@ class CommunitiesViewModel @Inject constructor(
         page = page,
         communities = result?.fold(
           { Result.success(it.items) },
-          { Result.failure(it) }
+          { Result.failure(it) },
         ) ?: Result.failure(RuntimeException("Community source is null!")),
         hasMore = result?.fold(
           onSuccess = {

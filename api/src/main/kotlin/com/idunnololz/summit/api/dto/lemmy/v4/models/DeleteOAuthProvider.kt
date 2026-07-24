@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,15 +23,10 @@ import com.google.gson.annotations.SerializedName
  * @param id The oauth provider id.
  */
 
+data class DeleteOAuthProvider(
 
-data class DeleteOAuthProvider (
+  /* The oauth provider id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The oauth provider id. */
-    @SerializedName("id")
-    val id: kotlin.Int
-
-) {
-
-
-}
-
+)

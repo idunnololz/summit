@@ -7,40 +7,34 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Lock a post (prevent new comments).
  *
- * @param reason 
- * @param locked 
+ * @param reason
+ * @param locked
  * @param postId The post id.
  */
 
+data class LockPost(
 
-data class LockPost (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("locked")
+  val locked: kotlin.Boolean,
 
-    @SerializedName("locked")
-    val locked: kotlin.Boolean,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int
-
-) {
-
-
-}
-
+)

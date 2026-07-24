@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Delete a private message.
  *
- * @param deleted 
+ * @param deleted
  * @param privateMessageId The private message id.
  */
 
+data class DeletePrivateMessage(
 
-data class DeletePrivateMessage (
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  /* The private message id. */
+  @SerializedName("private_message_id")
+  val privateMessageId: kotlin.Int,
 
-    /* The private message id. */
-    @SerializedName("private_message_id")
-    val privateMessageId: kotlin.Int
-
-) {
-
-
-}
-
+)

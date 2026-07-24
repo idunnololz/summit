@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -22,58 +21,53 @@ import com.google.gson.annotations.SerializedName
  * Edit a post.
  *
  * @param postId The post id.
- * @param tags 
+ * @param tags
  * @param scheduledPublishTimeAt Time when this post should be scheduled. Null means publish immediately.
  * @param customThumbnail Instead of fetching a thumbnail, use a custom one.
  * @param languageId The language id.
- * @param nsfw 
+ * @param nsfw
  * @param altText An optional alt_text, usable for image posts.
  * @param body An optional body for the post in markdown.
- * @param url 
- * @param name 
+ * @param url
+ * @param name
  */
 
+data class EditPost(
 
-data class EditPost (
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<kotlin.Int>? = null,
 
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<kotlin.Int>? = null,
+  /* Time when this post should be scheduled. Null means publish immediately. */
+  @SerializedName("scheduled_publish_time_at")
+  val scheduledPublishTimeAt: kotlin.Long? = null,
 
-    /* Time when this post should be scheduled. Null means publish immediately. */
-    @SerializedName("scheduled_publish_time_at")
-    val scheduledPublishTimeAt: kotlin.Long? = null,
+  /* Instead of fetching a thumbnail, use a custom one. */
+  @SerializedName("custom_thumbnail")
+  val customThumbnail: kotlin.String? = null,
 
-    /* Instead of fetching a thumbnail, use a custom one. */
-    @SerializedName("custom_thumbnail")
-    val customThumbnail: kotlin.String? = null,
+  /* The language id. */
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    /* The language id. */
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  /* An optional alt_text, usable for image posts. */
+  @SerializedName("alt_text")
+  val altText: kotlin.String? = null,
 
-    /* An optional alt_text, usable for image posts. */
-    @SerializedName("alt_text")
-    val altText: kotlin.String? = null,
+  /* An optional body for the post in markdown. */
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    /* An optional body for the post in markdown. */
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("name")
+  val name: kotlin.String? = null,
 
-    @SerializedName("name")
-    val name: kotlin.String? = null
-
-) {
-
-
-}
-
+)

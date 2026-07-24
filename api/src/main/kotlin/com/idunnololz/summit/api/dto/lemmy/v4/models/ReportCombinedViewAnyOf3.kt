@@ -7,82 +7,81 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityReport
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param creatorBannedFromCommunity 
- * @param creatorBanned 
- * @param creatorIsModerator 
- * @param creatorIsAdmin 
- * @param creator 
- * @param community 
- * @param communityReport 
- * @param type 
- * @param creatorCommunityBanExpiresAt 
- * @param creatorBanExpiresAt 
- * @param resolver 
+ *
+ * @param creatorBannedFromCommunity
+ * @param creatorBanned
+ * @param creatorIsModerator
+ * @param creatorIsAdmin
+ * @param creator
+ * @param community
+ * @param communityReport
+ * @param type
+ * @param creatorCommunityBanExpiresAt
+ * @param creatorBanExpiresAt
+ * @param resolver
  */
 
+data class ReportCombinedViewAnyOf3(
 
-data class ReportCombinedViewAnyOf3 (
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("creator_is_moderator")
+  val creatorIsModerator: kotlin.Boolean,
 
-    @SerializedName("creator_is_moderator")
-    val creatorIsModerator: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("community_report")
+  val communityReport: CommunityReport,
 
-    @SerializedName("community_report")
-    val communityReport: CommunityReport,
+  @SerializedName("type_")
+  val type: ReportCombinedViewAnyOf3.Type,
 
-    @SerializedName("type_")
-    val type: ReportCombinedViewAnyOf3.Type,
+  @SerializedName("creator_community_ban_expires_at")
+  val creatorCommunityBanExpiresAt: kotlin.String? = null,
 
-    @SerializedName("creator_community_ban_expires_at")
-    val creatorCommunityBanExpiresAt: kotlin.String? = null,
+  @SerializedName("creator_ban_expires_at")
+  val creatorBanExpiresAt: kotlin.String? = null,
 
-    @SerializedName("creator_ban_expires_at")
-    val creatorBanExpiresAt: kotlin.String? = null,
-
-    @SerializedName("resolver")
-    val resolver: Person? = null
+  @SerializedName("resolver")
+  val resolver: Person? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: community
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "community") community("community");
-    }
-
+  /**
+   *
+   *
+   * Values: community
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "community")
+    community("community"),
+  }
 }
-

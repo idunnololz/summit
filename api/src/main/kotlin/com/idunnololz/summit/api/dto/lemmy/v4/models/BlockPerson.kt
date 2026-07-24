@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Block a person.
  *
- * @param block 
+ * @param block
  * @param personId The person id.
  */
 
+data class BlockPerson(
 
-data class BlockPerson (
+  @SerializedName("block")
+  val block: kotlin.Boolean,
 
-    @SerializedName("block")
-    val block: kotlin.Boolean,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Long
-
-) {
-
-
-}
-
+)

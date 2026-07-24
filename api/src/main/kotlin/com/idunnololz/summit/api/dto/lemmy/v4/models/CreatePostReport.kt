@@ -7,41 +7,35 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Create a post report.
  *
- * @param reason 
+ * @param reason
  * @param postId The post id.
  * @param violatesInstanceRules The post violates rules of the local instance. This report will only be shown to local admins, not to community mods and will not be federated.
  */
 
+data class CreatePostReport(
 
-data class CreatePostReport (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  /* The post violates rules of the local instance. This report will only be shown to local admins, not to community mods and will not be federated. */
+  @SerializedName("violates_instance_rules")
+  val violatesInstanceRules: kotlin.Boolean? = null,
 
-    /* The post violates rules of the local instance. This report will only be shown to local admins, not to community mods and will not be federated. */
-    @SerializedName("violates_instance_rules")
-    val violatesInstanceRules: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

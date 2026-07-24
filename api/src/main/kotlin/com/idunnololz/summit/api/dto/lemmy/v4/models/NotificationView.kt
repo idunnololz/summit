@@ -7,37 +7,31 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Notification
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationData
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param `data` 
- * @param notification 
+ *
+ * @param `data`
+ * @param notification
  */
 
+data class NotificationView(
 
-data class NotificationView (
+  @SerializedName("data")
+  val `data`: NotificationData,
 
-    @SerializedName("data")
-    val `data`: NotificationData,
+  @SerializedName("notification")
+  val notification: Notification,
 
-    @SerializedName("notification")
-    val notification: Notification
-
-) {
-
-
-}
-
+)

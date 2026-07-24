@@ -132,8 +132,7 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     }
   }
 
-  fun getSlideOffset(): Float? =
-    slideOffsetField?.get(this) as? Float
+  fun getSlideOffset(): Float? = slideOffsetField?.get(this) as? Float
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
     if (!isSwipeEnabled) return false

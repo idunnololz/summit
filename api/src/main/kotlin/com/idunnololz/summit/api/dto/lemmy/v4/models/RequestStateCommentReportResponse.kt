@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.EmptyRequestState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Error
@@ -22,38 +23,36 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.FailedRequestState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LoadingRequestState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SuccessRequestStateCommentReportResponse
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * Shows the state of an API request.  Can be empty, loading, failed, or success
  *
- * @param state 
- * @param err 
- * @param `data` 
+ * @param state
+ * @param err
+ * @param `data`
  */
 
+data class RequestStateCommentReportResponse(
 
-data class RequestStateCommentReportResponse (
+  @SerializedName("state")
+  val state: RequestStateCommentReportResponse.State,
 
-    @SerializedName("state")
-    val state: RequestStateCommentReportResponse.State,
+  @SerializedName("err")
+  val err: Error,
 
-    @SerializedName("err")
-    val err: Error,
-
-    @SerializedName("data")
-    val `data`: CommentReportResponse
+  @SerializedName("data")
+  val `data`: CommentReportResponse,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: success
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "success") success("success");
-    }
-
+  /**
+   *
+   *
+   * Values: success
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "success")
+    success("success"),
+  }
 }
-

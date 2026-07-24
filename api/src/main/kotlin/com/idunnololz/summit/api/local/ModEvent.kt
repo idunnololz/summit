@@ -14,10 +14,10 @@ import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKind
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogView
+import java.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import java.time.Instant
 
 @Serializable
 @JsonClassDiscriminator("t")
@@ -553,202 +553,218 @@ fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
   return events
 }
 
-fun ModlogView.toModEvent(): ModEvent {
-  return when (this.modlog.kind) {
-    ModlogKind.admin_add -> ModEvent.ModAddViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      removed = modlog.isRevert,
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-    )
-    ModlogKind.admin_ban -> ModEvent.ModBanViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      banned = !modlog.isRevert,
-      expires = modlog.expiresAt?.let { dateStringToTs(it) },
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason
-    )
-    ModlogKind.admin_allow_instance -> ModEvent.AdminBlockInstanceEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      blocked = modlog.isRevert,
-      instance = requireNotNull(targetInstance).toInstance(),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_block_instance -> ModEvent.AdminBlockInstanceEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      blocked = !modlog.isRevert,
-      instance = requireNotNull(targetInstance).toInstance(),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_purge_comment -> ModEvent.AdminPurgeCommentViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      post = requireNotNull(targetPost).toPost(),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_purge_community -> ModEvent.AdminPurgeCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_purge_person -> ModEvent.AdminPurgePersonViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_purge_post -> ModEvent.AdminPurgePostViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      reason = modlog.reason,
-    )
-    ModlogKind.mod_add_to_community -> ModEvent.ModAddCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      removed = modlog.isRevert,
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      community = requireNotNull(targetCommunity).toCommunity(),
-    )
-    ModlogKind.mod_ban_from_community -> ModEvent.ModBanFromCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      banned = !modlog.isRevert,
-      expires = modlog.expiresAt?.let { dateStringToTs(it) },
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_feature_post_site -> ModEvent.AdminFeaturePostViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      featured = !modlog.isRevert,
-      post = requireNotNull(targetPost).toPost(),
-    )
-    ModlogKind.mod_feature_post_community -> ModEvent.ModFeaturePostViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      featured = !modlog.isRevert,
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-    )
-    ModlogKind.mod_change_community_visibility -> ModEvent.ModHideCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      hidden = !modlog.isRevert,
-      community = requireNotNull(targetCommunity).toCommunity(),
-      reason = modlog.reason,
-    )
-    ModlogKind.mod_lock_post -> ModEvent.ModLockPostViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      locked = !modlog.isRevert,
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-    )
-    ModlogKind.mod_remove_comment -> ModEvent.ModRemoveCommentViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      removed = !modlog.isRevert,
-      comment = requireNotNull(targetComment).toComment(),
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason,
-    )
-    ModlogKind.admin_remove_community -> ModEvent.ModRemoveCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      removed = !modlog.isRevert,
-      expires = modlog.expiresAt?.let { dateStringToTs(it) },
-      community = requireNotNull(targetCommunity).toCommunity(),
-      reason = modlog.reason,
-    )
-    ModlogKind.mod_remove_post -> ModEvent.ModRemoveCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      removed = !modlog.isRevert,
-      expires = modlog.expiresAt?.let { dateStringToTs(it) },
-      community = requireNotNull(targetCommunity).toCommunity(),
-      reason = modlog.reason,
-    )
-    ModlogKind.mod_transfer_community -> ModEvent.ModTransferCommunityViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      community = requireNotNull(targetCommunity).toCommunity(),
-    )
-    ModlogKind.mod_lock_comment -> ModEvent.ModLockCommentViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      locked = !modlog.isRevert,
-      comment = requireNotNull(targetComment).toComment(),
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-    )
-    ModlogKind.mod_warn_comment -> ModEvent.ModWarnCommentViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      warned = !modlog.isRevert,
-      comment = requireNotNull(targetComment).toComment(),
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason,
-    )
-    ModlogKind.mod_warn_post -> ModEvent.ModWarnPostViewEvent(
-      id = modlog.id,
-      actionOrder = ActionType.Admin,
-      ts = dateStringToTs(modlog.publishedAt),
-      agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      warned = !modlog.isRevert,
-      post = requireNotNull(targetPost).toPost(),
-      community = requireNotNull(targetCommunity).toCommunity(),
-      person = requireNotNull(targetPerson).toPerson(isBanned = false, banExpires = null, isAdmin = false),
-      reason = modlog.reason,
-    )
-  }
+fun ModlogView.toModEvent(): ModEvent = when (this.modlog.kind) {
+  ModlogKind.admin_add -> ModEvent.ModAddViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    removed = modlog.isRevert,
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+  )
+  ModlogKind.admin_ban -> ModEvent.ModBanViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    banned = !modlog.isRevert,
+    expires = modlog.expiresAt?.let { dateStringToTs(it) },
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_allow_instance -> ModEvent.AdminBlockInstanceEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    blocked = modlog.isRevert,
+    instance = requireNotNull(targetInstance).toInstance(),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_block_instance -> ModEvent.AdminBlockInstanceEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    blocked = !modlog.isRevert,
+    instance = requireNotNull(targetInstance).toInstance(),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_purge_comment -> ModEvent.AdminPurgeCommentViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    post = requireNotNull(targetPost).toPost(),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_purge_community -> ModEvent.AdminPurgeCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_purge_person -> ModEvent.AdminPurgePersonViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_purge_post -> ModEvent.AdminPurgePostViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    reason = modlog.reason,
+  )
+  ModlogKind.mod_add_to_community -> ModEvent.ModAddCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    removed = modlog.isRevert,
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    community = requireNotNull(targetCommunity).toCommunity(),
+  )
+  ModlogKind.mod_ban_from_community -> ModEvent.ModBanFromCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    banned = !modlog.isRevert,
+    expires = modlog.expiresAt?.let { dateStringToTs(it) },
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_feature_post_site -> ModEvent.AdminFeaturePostViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    featured = !modlog.isRevert,
+    post = requireNotNull(targetPost).toPost(),
+  )
+  ModlogKind.mod_feature_post_community -> ModEvent.ModFeaturePostViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    featured = !modlog.isRevert,
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+  )
+  ModlogKind.mod_change_community_visibility -> ModEvent.ModHideCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    hidden = !modlog.isRevert,
+    community = requireNotNull(targetCommunity).toCommunity(),
+    reason = modlog.reason,
+  )
+  ModlogKind.mod_lock_post -> ModEvent.ModLockPostViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    locked = !modlog.isRevert,
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+  )
+  ModlogKind.mod_remove_comment -> ModEvent.ModRemoveCommentViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    removed = !modlog.isRevert,
+    comment = requireNotNull(targetComment).toComment(),
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
+  ModlogKind.admin_remove_community -> ModEvent.ModRemoveCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    removed = !modlog.isRevert,
+    expires = modlog.expiresAt?.let { dateStringToTs(it) },
+    community = requireNotNull(targetCommunity).toCommunity(),
+    reason = modlog.reason,
+  )
+  ModlogKind.mod_remove_post -> ModEvent.ModRemoveCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    removed = !modlog.isRevert,
+    expires = modlog.expiresAt?.let { dateStringToTs(it) },
+    community = requireNotNull(targetCommunity).toCommunity(),
+    reason = modlog.reason,
+  )
+  ModlogKind.mod_transfer_community -> ModEvent.ModTransferCommunityViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    community = requireNotNull(targetCommunity).toCommunity(),
+  )
+  ModlogKind.mod_lock_comment -> ModEvent.ModLockCommentViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    locked = !modlog.isRevert,
+    comment = requireNotNull(targetComment).toComment(),
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+  )
+  ModlogKind.mod_warn_comment -> ModEvent.ModWarnCommentViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    warned = !modlog.isRevert,
+    comment = requireNotNull(targetComment).toComment(),
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
+  ModlogKind.mod_warn_post -> ModEvent.ModWarnPostViewEvent(
+    id = modlog.id,
+    actionOrder = ActionType.Admin,
+    ts = dateStringToTs(modlog.publishedAt),
+    agent = moderator?.toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    warned = !modlog.isRevert,
+    post = requireNotNull(targetPost).toPost(),
+    community = requireNotNull(targetCommunity).toCommunity(),
+    person = requireNotNull(
+      targetPerson,
+    ).toPerson(isBanned = false, banExpires = null, isAdmin = false),
+    reason = modlog.reason,
+  )
 }

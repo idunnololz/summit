@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -22,7 +21,7 @@ import com.google.gson.annotations.SerializedName
  * oauth provider with client_secret - should never be sent to the client
  *
  * @param usePkce switch to enable or disable PKCE
- * @param publishedAt 
+ * @param publishedAt
  * @param enabled switch to enable or disable an oauth provider
  * @param accountLinkingEnabled Allows linking an OAUTH account to an existing user account by matching emails
  * @param autoVerifyEmail Automatically sets email as verified on registration
@@ -35,72 +34,67 @@ import com.google.gson.annotations.SerializedName
  * @param issuer The issuer url of the OAUTH provider.
  * @param displayName The OAuth 2.0 provider name displayed to the user on the Login page
  * @param id The oauth provider id.
- * @param updatedAt 
+ * @param updatedAt
  */
 
+data class AdminOAuthProvider(
 
-data class AdminOAuthProvider (
+  /* switch to enable or disable PKCE */
+  @SerializedName("use_pkce")
+  val usePkce: kotlin.Boolean,
 
-    /* switch to enable or disable PKCE */
-    @SerializedName("use_pkce")
-    val usePkce: kotlin.Boolean,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  /* switch to enable or disable an oauth provider */
+  @SerializedName("enabled")
+  val enabled: kotlin.Boolean,
 
-    /* switch to enable or disable an oauth provider */
-    @SerializedName("enabled")
-    val enabled: kotlin.Boolean,
+  /* Allows linking an OAUTH account to an existing user account by matching emails */
+  @SerializedName("account_linking_enabled")
+  val accountLinkingEnabled: kotlin.Boolean,
 
-    /* Allows linking an OAUTH account to an existing user account by matching emails */
-    @SerializedName("account_linking_enabled")
-    val accountLinkingEnabled: kotlin.Boolean,
+  /* Automatically sets email as verified on registration */
+  @SerializedName("auto_verify_email")
+  val autoVerifyEmail: kotlin.Boolean,
 
-    /* Automatically sets email as verified on registration */
-    @SerializedName("auto_verify_email")
-    val autoVerifyEmail: kotlin.Boolean,
+  /* Lists the scopes requested from users. Users will have to grant access to the requested scope at sign up. */
+  @SerializedName("scopes")
+  val scopes: kotlin.String,
 
-    /* Lists the scopes requested from users. Users will have to grant access to the requested scope at sign up. */
-    @SerializedName("scopes")
-    val scopes: kotlin.String,
+  /* The client_id is provided by the OAuth 2.0 provider and is a unique identifier to this service */
+  @SerializedName("client_id")
+  val clientId: kotlin.String,
 
-    /* The client_id is provided by the OAuth 2.0 provider and is a unique identifier to this service */
-    @SerializedName("client_id")
-    val clientId: kotlin.String,
+  /* The OAuth 2.0 claim containing the unique user ID returned by the provider. Usually this should be set to \"sub\". */
+  @SerializedName("id_claim")
+  val idClaim: kotlin.String,
 
-    /* The OAuth 2.0 claim containing the unique user ID returned by the provider. Usually this should be set to \"sub\". */
-    @SerializedName("id_claim")
-    val idClaim: kotlin.String,
+  /* The UserInfo Endpoint is an OAuth 2.0 Protected Resource that returns Claims about the authenticated End-User. This is defined in the OIDC specification. */
+  @SerializedName("userinfo_endpoint")
+  val userinfoEndpoint: kotlin.String,
 
-    /* The UserInfo Endpoint is an OAuth 2.0 Protected Resource that returns Claims about the authenticated End-User. This is defined in the OIDC specification. */
-    @SerializedName("userinfo_endpoint")
-    val userinfoEndpoint: kotlin.String,
+  /* The token endpoint is used by the client to obtain an access token by presenting its authorization grant or refresh token. This is usually provided by the OAUTH provider. */
+  @SerializedName("token_endpoint")
+  val tokenEndpoint: kotlin.String,
 
-    /* The token endpoint is used by the client to obtain an access token by presenting its authorization grant or refresh token. This is usually provided by the OAUTH provider. */
-    @SerializedName("token_endpoint")
-    val tokenEndpoint: kotlin.String,
+  /* The authorization endpoint is used to interact with the resource owner and obtain an authorization grant. This is usually provided by the OAUTH provider. */
+  @SerializedName("authorization_endpoint")
+  val authorizationEndpoint: kotlin.String,
 
-    /* The authorization endpoint is used to interact with the resource owner and obtain an authorization grant. This is usually provided by the OAUTH provider. */
-    @SerializedName("authorization_endpoint")
-    val authorizationEndpoint: kotlin.String,
+  /* The issuer url of the OAUTH provider. */
+  @SerializedName("issuer")
+  val issuer: kotlin.String,
 
-    /* The issuer url of the OAUTH provider. */
-    @SerializedName("issuer")
-    val issuer: kotlin.String,
+  /* The OAuth 2.0 provider name displayed to the user on the Login page */
+  @SerializedName("display_name")
+  val displayName: kotlin.String,
 
-    /* The OAuth 2.0 provider name displayed to the user on the Login page */
-    @SerializedName("display_name")
-    val displayName: kotlin.String,
+  /* The oauth provider id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The oauth provider id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

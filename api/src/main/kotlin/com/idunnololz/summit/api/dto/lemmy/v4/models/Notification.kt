@@ -7,73 +7,67 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param creatorId The person id.
- * @param kind 
- * @param publishedAt 
- * @param read 
+ * @param kind
+ * @param publishedAt
+ * @param read
  * @param recipientId The person id.
- * @param id 
- * @param modlogId 
+ * @param id
+ * @param modlogId
  * @param privateMessageId The private message id.
  * @param postId The post id.
  * @param commentId The comment id.
  */
 
+data class Notification(
 
-data class Notification (
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Long,
+  @SerializedName("kind")
+  val kind: NotificationType,
 
-    @SerializedName("kind")
-    val kind: NotificationType,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("read")
+  val read: kotlin.Boolean,
 
-    @SerializedName("read")
-    val read: kotlin.Boolean,
+  /* The person id. */
+  @SerializedName("recipient_id")
+  val recipientId: kotlin.Long,
 
-    /* The person id. */
-    @SerializedName("recipient_id")
-    val recipientId: kotlin.Long,
+  @SerializedName("id")
+  val id: Int,
 
-    @SerializedName("id")
-    val id: Int,
+  @SerializedName("modlog_id")
+  val modlogId: kotlin.Int? = null,
 
-    @SerializedName("modlog_id")
-    val modlogId: kotlin.Int? = null,
+  /* The private message id. */
+  @SerializedName("private_message_id")
+  val privateMessageId: kotlin.Int? = null,
 
-    /* The private message id. */
-    @SerializedName("private_message_id")
-    val privateMessageId: kotlin.Int? = null,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int? = null,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)
