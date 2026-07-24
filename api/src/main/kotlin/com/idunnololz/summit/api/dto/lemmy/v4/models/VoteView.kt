@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 
 /**
  * A vote view for checking a post or comments votes.
  *
  * @param isUpvote True means Upvote, False means Downvote.
- * @param creatorBannedFromCommunity 
- * @param creatorBanned 
- * @param creator 
+ * @param creatorBannedFromCommunity
+ * @param creatorBanned
+ * @param creator
  */
 
+data class VoteView(
 
-data class VoteView (
+  /* True means Upvote, False means Downvote. */
+  @SerializedName("is_upvote")
+  val isUpvote: kotlin.Boolean,
 
-    /* True means Upvote, False means Downvote. */
-    @SerializedName("is_upvote")
-    val isUpvote: kotlin.Boolean,
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_banned")
+  val creatorBanned: kotlin.Boolean,
 
-    @SerializedName("creator_banned")
-    val creatorBanned: kotlin.Boolean,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person
-
-) {
-
-
-}
-
+)

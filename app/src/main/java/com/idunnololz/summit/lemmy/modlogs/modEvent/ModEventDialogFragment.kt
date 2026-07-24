@@ -19,7 +19,6 @@ import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.DialogFragmentModEventBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.getName2
 import com.idunnololz.summit.lemmy.modlogs.getColor
@@ -27,7 +26,6 @@ import com.idunnololz.summit.lemmy.modlogs.getIconRes
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.durationToPretty
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute

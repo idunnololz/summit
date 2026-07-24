@@ -124,10 +124,7 @@ class LemmyTextHelper @Inject constructor(
     return spannable
   }
 
-  fun bindSimpleText(
-    textView: TextView,
-    text: String,
-  ) {
+  fun bindSimpleText(textView: TextView, text: String) {
     val markwon = getMarkwon(textView.context)
     markwon.setMarkdown(textView, text)
   }

@@ -7,55 +7,49 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Basic data about a Fediverse instance which is available for every known domain. Additional data may be available in [[Site]].
  *
- * @param publishedAt 
- * @param domain 
+ * @param publishedAt
+ * @param domain
  * @param id The instance id.
  * @param version The version of the instance's software.
  * @param software The software of the instance.
  * @param updatedAt When the instance was updated.
  */
 
+data class Instance(
 
-data class Instance (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("domain")
+  val domain: kotlin.String,
 
-    @SerializedName("domain")
-    val domain: kotlin.String,
+  /* The instance id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The instance id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  /* The version of the instance's software. */
+  @SerializedName("version")
+  val version: kotlin.String? = null,
 
-    /* The version of the instance's software. */
-    @SerializedName("version")
-    val version: kotlin.String? = null,
+  /* The software of the instance. */
+  @SerializedName("software")
+  val software: kotlin.String? = null,
 
-    /* The software of the instance. */
-    @SerializedName("software")
-    val software: kotlin.String? = null,
+  /* When the instance was updated. */
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    /* When the instance was updated. */
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

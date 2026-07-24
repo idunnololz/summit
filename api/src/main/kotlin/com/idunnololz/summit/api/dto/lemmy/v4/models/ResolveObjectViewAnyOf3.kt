@@ -7,59 +7,58 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Community
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityActions
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityTag
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param tags We wrap this in a struct so we can implement FromSqlRow<Json> for it
- * @param canMod 
- * @param community 
- * @param type 
- * @param communityActions 
+ * @param canMod
+ * @param community
+ * @param type
+ * @param communityActions
  */
 
+data class ResolveObjectViewAnyOf3(
 
-data class ResolveObjectViewAnyOf3 (
+  /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<CommunityTag>,
 
-    /* We wrap this in a struct so we can implement FromSqlRow<Json> for it */
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<CommunityTag>,
+  @SerializedName("can_mod")
+  val canMod: kotlin.Boolean,
 
-    @SerializedName("can_mod")
-    val canMod: kotlin.Boolean,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("type_")
+  val type: ResolveObjectViewAnyOf3.Type,
 
-    @SerializedName("type_")
-    val type: ResolveObjectViewAnyOf3.Type,
-
-    @SerializedName("community_actions")
-    val communityActions: CommunityActions? = null
+  @SerializedName("community_actions")
+  val communityActions: CommunityActions? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: community
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "community") community("community");
-    }
-
+  /**
+   *
+   *
+   * Values: community
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "community")
+    community("community"),
+  }
 }
-

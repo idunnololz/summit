@@ -7,23 +7,21 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKind
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKind
 
 /**
  * A list of possible types for the various modlog actions.
  *
  */
-
 
 enum class ModlogKindFilter {
 
@@ -91,5 +89,5 @@ enum class ModlogKindFilter {
   ModWarnComment,
 
   @SerializedName(value = "mod_warn_post")
-  ModWarnPost;
+  ModWarnPost,
 }

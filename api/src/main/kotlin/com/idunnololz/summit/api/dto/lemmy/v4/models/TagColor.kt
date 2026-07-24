@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,62 +23,64 @@ import com.google.gson.annotations.SerializedName
  * Values: color01,color02,color03,color04,color05,color06,color07,color08,color09,color10
  */
 
-enum class TagColor(val value: kotlin.String) {
+enum class TagColor(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "color01")
-    color01("color01"),
+  @SerializedName(value = "color01")
+  color01("color01"),
 
-    @SerializedName(value = "color02")
-    color02("color02"),
+  @SerializedName(value = "color02")
+  color02("color02"),
 
-    @SerializedName(value = "color03")
-    color03("color03"),
+  @SerializedName(value = "color03")
+  color03("color03"),
 
-    @SerializedName(value = "color04")
-    color04("color04"),
+  @SerializedName(value = "color04")
+  color04("color04"),
 
-    @SerializedName(value = "color05")
-    color05("color05"),
+  @SerializedName(value = "color05")
+  color05("color05"),
 
-    @SerializedName(value = "color06")
-    color06("color06"),
+  @SerializedName(value = "color06")
+  color06("color06"),
 
-    @SerializedName(value = "color07")
-    color07("color07"),
+  @SerializedName(value = "color07")
+  color07("color07"),
 
-    @SerializedName(value = "color08")
-    color08("color08"),
+  @SerializedName(value = "color08")
+  color08("color08"),
 
-    @SerializedName(value = "color09")
-    color09("color09"),
+  @SerializedName(value = "color09")
+  color09("color09"),
 
-    @SerializedName(value = "color10")
-    color10("color10");
+  @SerializedName(value = "color10")
+  color10("color10"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? = if (data is TagColor) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [TagColor] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TagColor) "$data" else null
-
-        /**
-         * Returns a valid [TagColor] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): TagColor? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): TagColor? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

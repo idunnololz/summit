@@ -7,54 +7,48 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonListingType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonSortType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param limit 
+ *
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param searchTitleOnly 
- * @param searchTerm 
- * @param sort 
- * @param type 
+ * @param searchTitleOnly
+ * @param searchTerm
+ * @param sort
+ * @param type
  */
 
+data class ListPersonsI(
 
-data class ListPersonsI (
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  @SerializedName("search_title_only")
+  val searchTitleOnly: kotlin.Boolean? = null,
 
-    @SerializedName("search_title_only")
-    val searchTitleOnly: kotlin.Boolean? = null,
+  @SerializedName("search_term")
+  val searchTerm: kotlin.String? = null,
 
-    @SerializedName("search_term")
-    val searchTerm: kotlin.String? = null,
+  @SerializedName("sort")
+  val sort: PersonSortType? = null,
 
-    @SerializedName("sort")
-    val sort: PersonSortType? = null,
+  @SerializedName("type_")
+  val type: PersonListingType? = null,
 
-    @SerializedName("type_")
-    val type: PersonListingType? = null
-
-) {
-
-
-}
-
+)

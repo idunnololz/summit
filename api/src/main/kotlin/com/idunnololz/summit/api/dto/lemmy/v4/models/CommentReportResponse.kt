@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentReportView
 
 /**
  * The comment report response.
  *
- * @param commentReportView 
+ * @param commentReportView
  */
 
+data class CommentReportResponse(
 
-data class CommentReportResponse (
+  @SerializedName("comment_report_view")
+  val commentReportView: CommentReportView,
 
-    @SerializedName("comment_report_view")
-    val commentReportView: CommentReportView
-
-) {
-
-
-}
-
+)

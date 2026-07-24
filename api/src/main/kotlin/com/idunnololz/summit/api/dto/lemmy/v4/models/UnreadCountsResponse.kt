@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Contains the amount of unread items of various types. For normal users this means the number of unread notifications, mods and admins get additional unread counts for reports, registration applications and pending follows to private communities.
  *
- * @param notificationCount 
- * @param registrationApplicationCount 
- * @param pendingFollowCount 
- * @param reportCount 
+ * @param notificationCount
+ * @param registrationApplicationCount
+ * @param pendingFollowCount
+ * @param reportCount
  */
 
+data class UnreadCountsResponse(
 
-data class UnreadCountsResponse (
+  @SerializedName("notification_count")
+  val notificationCount: kotlin.Int,
 
-    @SerializedName("notification_count")
-    val notificationCount: kotlin.Int,
+  @SerializedName("registration_application_count")
+  val registrationApplicationCount: kotlin.Int? = null,
 
-    @SerializedName("registration_application_count")
-    val registrationApplicationCount: kotlin.Int? = null,
+  @SerializedName("pending_follow_count")
+  val pendingFollowCount: kotlin.Int? = null,
 
-    @SerializedName("pending_follow_count")
-    val pendingFollowCount: kotlin.Int? = null,
+  @SerializedName("report_count")
+  val reportCount: kotlin.Int? = null,
 
-    @SerializedName("report_count")
-    val reportCount: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

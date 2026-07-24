@@ -91,8 +91,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.Instance
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
@@ -120,7 +118,6 @@ import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
 import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
@@ -157,26 +154,23 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.ListMediaI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListRegistrationApplicationsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ModlogKindFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectI
-import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams
 import com.idunnololz.summit.api.dto.other.ListInboxArgs
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
-import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.local.toModEvent
+import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.InputStream
 
 class LemmyApiV4Adapter(
   private val api: LemmyApiV4,
@@ -212,7 +206,7 @@ class LemmyApiV4Adapter(
       retrofitErrorHandler {
         api.getCurrentUser(
           headers = generateHeaders(authorization, force),
-          form = mapOf()
+          form = mapOf(),
         )
       }.map {
         it.toMyUserInfo()
@@ -311,8 +305,8 @@ class LemmyApiV4Adapter(
           false
         } else {
           null
-        }
-      )
+        },
+      ),
     )
   }.map {
     PostResponse(
@@ -334,8 +328,8 @@ class LemmyApiV4Adapter(
           false
         } else {
           null
-        }
-      )
+        },
+      ),
     )
   }.map {
     CommentResponse(
@@ -352,7 +346,7 @@ class LemmyApiV4Adapter(
   ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
     api.listCommentVotes(
       generateHeaders(authorization, force),
-      args.serializeToMap()
+      args.serializeToMap(),
     )
   }.map {
     ListCommentLikesResponse(
@@ -369,7 +363,7 @@ class LemmyApiV4Adapter(
   ): Result<ListPostLikesResponse> = retrofitErrorHandler {
     api.listPostVotes(
       generateHeaders(authorization, force),
-      args.serializeToMap()
+      args.serializeToMap(),
     )
   }.map {
     ListPostLikesResponse(
@@ -390,7 +384,7 @@ class LemmyApiV4Adapter(
         content = args.content,
         languageId = args.language_id,
         parentId = args.parent_id,
-      )
+      ),
     )
   }.map {
     CommentResponse(
@@ -410,7 +404,7 @@ class LemmyApiV4Adapter(
         commentId = args.comment_id,
         languageId = args.language_id,
         content = args.content,
-      )
+      ),
     )
   }.map {
     CommentResponse(
@@ -429,7 +423,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteComment(
         deleted = args.deleted,
         commentId = args.comment_id,
-      )
+      ),
     )
   }.map {
     CommentResponse(
@@ -439,22 +433,20 @@ class LemmyApiV4Adapter(
     )
   }
 
-  override suspend fun savePost(
-    authorization: String?,
-    args: SavePost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.savePost(
-      generateHeaders(authorization, false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.SavePost(
-        args.save,
-        args.post_id,
+  override suspend fun savePost(authorization: String?, args: SavePost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.savePost(
+        generateHeaders(authorization, false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.SavePost(
+          args.save,
+          args.post_id,
+        ),
       )
-    )
-  }.map {
-    PostResponse(
-      it.postView.toPostView(),
-    )
-  }
+    }.map {
+      PostResponse(
+        it.postView.toPostView(),
+      )
+    }
 
   override suspend fun markPostAsRead(
     authorization: String?,
@@ -465,7 +457,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.MarkPostAsRead(
         args.read,
         args.post_id,
-      )
+      ),
     )
   }.map {
     SuccessResponse(
@@ -482,7 +474,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.SaveComment(
         args.save,
         args.comment_id,
-      )
+      ),
     )
   }.map {
     CommentResponse(
@@ -491,7 +483,6 @@ class LemmyApiV4Adapter(
       null,
     )
   }
-
 
   override suspend fun getComments(
     authorization: String?,
@@ -727,11 +718,11 @@ class LemmyApiV4Adapter(
         creator_id = null,
         unread_only = args.unread_only,
         type = NotificationTypeFilter.reply,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     GetRepliesResponse(
-      replies = it.items.map { it.toCommentReplyView() }
+      replies = it.items.map { it.toCommentReplyView() },
     )
   }
 
@@ -795,7 +786,7 @@ class LemmyApiV4Adapter(
     )
   }.map {
     SuccessResponse(
-      it.success
+      it.success,
     )
   }
 
@@ -812,11 +803,11 @@ class LemmyApiV4Adapter(
         creator_id = null,
         unread_only = args.unread_only,
         type = NotificationTypeFilter.mention,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     GetPersonMentionsResponse(
-      mentions = it.items.map { it.toPersonMentionView() }
+      mentions = it.items.map { it.toPersonMentionView() },
     )
   }
 
@@ -833,7 +824,7 @@ class LemmyApiV4Adapter(
         creator_id = null,
         unread_only = args.unread_only,
         type = NotificationTypeFilter.private_message,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     PrivateMessagesResponse(
@@ -878,11 +869,11 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessageReport(
         reason = args.reason,
         privateMessageId = args.private_message_id,
-      )
+      ),
     )
   }.map {
     PrivateMessageReportResponse(
-      it.privateMessageReportView.toPrivateMessageReportView()
+      it.privateMessageReportView.toPrivateMessageReportView(),
     )
   }
 
@@ -895,11 +886,11 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePrivateMessageReport(
         resolved = args.resolved,
         reportId = args.report_id,
-      )
+      ),
     )
   }.map {
     PrivateMessageReportResponse(
-      it.privateMessageReportView.toPrivateMessageReportView()
+      it.privateMessageReportView.toPrivateMessageReportView(),
     )
   }
 
@@ -938,11 +929,11 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.ResolvePostReport(
         resolved = args.resolved,
         reportId = args.report_id,
-      )
+      ),
     )
   }.map {
     PostReportResponse(
-      it.postReportView.toPostReportView()
+      it.postReportView.toPostReportView(),
     )
   }
 
@@ -981,11 +972,11 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveCommentReport(
         resolved = args.resolved,
         reportId = args.report_id,
-      )
+      ),
     )
   }.map {
     CommentReportResponse(
-      comment_report_view = it.commentReportView.toCommentReportView()
+      comment_report_view = it.commentReportView.toCommentReportView(),
     )
   }
 
@@ -998,11 +989,11 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePrivateMessage(
         args.recipient_id,
         args.content,
-      )
+      ),
     )
   }.map {
     PrivateMessageResponse(
-      private_message_view = it.privateMessageView.toPrivateMessageView()
+      private_message_view = it.privateMessageView.toPrivateMessageView(),
     )
   }
 
@@ -1046,7 +1037,7 @@ class LemmyApiV4Adapter(
   }.map {
     CommunityResponse(
       community_view = it.communityView.toCommunityView(),
-      discussion_languages = it.discussionLanguages
+      discussion_languages = it.discussionLanguages,
     )
   }
 
@@ -1082,77 +1073,71 @@ class LemmyApiV4Adapter(
         added = args.added,
         personId = args.person_id,
         communityId = args.community_id,
-      )
-    )
-  }.map {
-    AddModToCommunityResponse(
-      moderators = it.moderators.map { it.toCommunityModeratorView() }
-    )
-  }
-
-  override suspend fun createPost(
-    authorization: String?,
-    args: CreatePost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.createPost(
-      generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePost(
-        communityId = args.community_id,
-        name = args.name,
-        scheduledPublishTimeAt = null,
-        tags = null,
-        customThumbnail = args.custom_thumbnail,
-        languageId = args.language_id,
-        nsfw = args.nsfw,
-        honeypot = args.honeypot,
-        altText = args.alt_text,
-        body = args.body,
-        url = args.url,
-      )
-    )
-  }.map {
-    PostResponse(
-      post_view = it.postView.toPostView()
-    )
-  }
-
-  override suspend fun editPost(
-    authorization: String?,
-    args: EditPost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.editPost(
-      generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.EditPost(
-        postId = args.post_id,
-        tags = null,
-        scheduledPublishTimeAt = null,
-        customThumbnail = args.custom_thumbnail,
-        languageId = args.language_id,
-        nsfw = args.nsfw,
-        altText = args.alt_text,
-        body = args.body,
-        url = args.url,
-        name = args.name,
-      )
-    )
-  }.map {
-    PostResponse(post_view = it.postView.toPostView())
-  }
-
-  override suspend fun deletePost(
-    authorization: String?,
-    args: DeletePost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.deletePost(
-      generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.DeletePost(
-        deleted = args.deleted,
-        postId = args.post_id,
       ),
     )
   }.map {
-    PostResponse(post_view = it.postView.toPostView())
+    AddModToCommunityResponse(
+      moderators = it.moderators.map { it.toCommunityModeratorView() },
+    )
   }
+
+  override suspend fun createPost(authorization: String?, args: CreatePost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.createPost(
+        generateHeaders(authorization, force = false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.CreatePost(
+          communityId = args.community_id,
+          name = args.name,
+          scheduledPublishTimeAt = null,
+          tags = null,
+          customThumbnail = args.custom_thumbnail,
+          languageId = args.language_id,
+          nsfw = args.nsfw,
+          honeypot = args.honeypot,
+          altText = args.alt_text,
+          body = args.body,
+          url = args.url,
+        ),
+      )
+    }.map {
+      PostResponse(
+        post_view = it.postView.toPostView(),
+      )
+    }
+
+  override suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.editPost(
+        generateHeaders(authorization, force = false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.EditPost(
+          postId = args.post_id,
+          tags = null,
+          scheduledPublishTimeAt = null,
+          customThumbnail = args.custom_thumbnail,
+          languageId = args.language_id,
+          nsfw = args.nsfw,
+          altText = args.alt_text,
+          body = args.body,
+          url = args.url,
+          name = args.name,
+        ),
+      )
+    }.map {
+      PostResponse(post_view = it.postView.toPostView())
+    }
+
+  override suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.deletePost(
+        generateHeaders(authorization, force = false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.DeletePost(
+          deleted = args.deleted,
+          postId = args.post_id,
+        ),
+      )
+    }.map {
+      PostResponse(post_view = it.postView.toPostView())
+    }
 
   override suspend fun featurePost(
     authorization: String?,
@@ -1167,44 +1152,40 @@ class LemmyApiV4Adapter(
         },
         featured = args.featured,
         postId = args.post_id,
-      )
+      ),
     )
   }.map {
     PostResponse(post_view = it.postView.toPostView())
   }
 
-  override suspend fun lockPost(
-    authorization: String?,
-    args: LockPost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.lockPost(
-      generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.LockPost(
-        reason = "",
-        locked = args.locked,
-        postId = args.post_id,
+  override suspend fun lockPost(authorization: String?, args: LockPost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.lockPost(
+        generateHeaders(authorization, force = false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.LockPost(
+          reason = "",
+          locked = args.locked,
+          postId = args.post_id,
+        ),
       )
-    )
-  }.map {
-    PostResponse(post_view = it.postView.toPostView())
-  }
+    }.map {
+      PostResponse(post_view = it.postView.toPostView())
+    }
 
-  override suspend fun removePost(
-    authorization: String?,
-    args: RemovePost,
-  ): Result<PostResponse> = retrofitErrorHandler {
-    api.removePost(
-      generateHeaders(authorization, force = false),
-      com.idunnololz.summit.api.dto.lemmy.v4.models.RemovePost(
-        reason = args.reason ?: "",
-        removed = args.removed,
-        postId = args.post_id,
-        removeChildren = null,
+  override suspend fun removePost(authorization: String?, args: RemovePost): Result<PostResponse> =
+    retrofitErrorHandler {
+      api.removePost(
+        generateHeaders(authorization, force = false),
+        com.idunnololz.summit.api.dto.lemmy.v4.models.RemovePost(
+          reason = args.reason ?: "",
+          removed = args.removed,
+          postId = args.post_id,
+          removeChildren = null,
+        ),
       )
-    )
-  }.map {
-    PostResponse(post_view = it.postView.toPostView())
-  }
+    }.map {
+      PostResponse(post_view = it.postView.toPostView())
+    }
 
   override suspend fun search(
     authorization: String?,
@@ -1249,12 +1230,12 @@ class LemmyApiV4Adapter(
     api.getSiteMetadata(
       generateHeaders(authorization, force),
       GetSiteMetadataI(
-        args.url
+        args.url,
       ).serializeToMap(),
     )
   }.map {
     GetSiteMetadataResponse(
-      it.metadata.toSiteMetadata()
+      it.metadata.toSiteMetadata(),
     )
   }
 
@@ -1268,7 +1249,7 @@ class LemmyApiV4Adapter(
         reason = args.reason,
         commentId = args.comment_id,
         violatesInstanceRules = null,
-      )
+      ),
     )
   }.map {
     CommentReportResponse(
@@ -1286,7 +1267,7 @@ class LemmyApiV4Adapter(
         reason = args.reason,
         postId = args.post_id,
         violatesInstanceRules = null,
-      )
+      ),
     )
   }.map {
     PostReportResponse(
@@ -1303,7 +1284,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.BlockPerson(
         block = args.block,
         personId = args.person_id,
-      )
+      ),
     )
   }.map {
     BlockPersonResponse(
@@ -1321,12 +1302,12 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.BlockCommunity(
         args.block,
         args.community_id,
-      )
+      ),
     )
   }.map {
     BlockCommunityResponse(
       community_view = it.data.communityView.toCommunityView(),
-      blocked = it.data.communityView.communityActions?.blockedAt != null
+      blocked = it.data.communityView.communityActions?.blockedAt != null,
     )
   }
 
@@ -1339,7 +1320,7 @@ class LemmyApiV4Adapter(
       UserBlockInstanceCommunitiesParams(
         block = args.block,
         instanceId = args.instance_id,
-      )
+      ),
     )
   }.map {
     BlockInstanceResponse(
@@ -1351,7 +1332,6 @@ class LemmyApiV4Adapter(
     authorization: String?,
     args: SaveUserSettings,
   ): Result<Unit> = retrofitErrorHandler {
-
     /*
   val default_sort_type: SortType? /* "Active" | "Hot" | "New" | "Old" | "TopDay" | "TopWeek" | "TopMonth" | "TopYear" | "TopAll" | "MostComments" | "NewComments" */ =
     null,
@@ -1404,7 +1384,6 @@ class LemmyApiV4Adapter(
       ),
     )
   }.map {
-
   }
 
   override suspend fun uploadImage(
@@ -1457,7 +1436,7 @@ class LemmyApiV4Adapter(
         personId = args.person_id,
         expiresAt = args.expires,
         removeOrRestoreData = null,
-      )
+      ),
     )
   }.map {
     BanPersonResponse(
@@ -1476,7 +1455,7 @@ class LemmyApiV4Adapter(
         reason = args.reason ?: "",
         removed = args.removed,
         communityId = args.community_id,
-      )
+      ),
     )
   }.map {
     CommunityResponse(
@@ -1554,7 +1533,7 @@ class LemmyApiV4Adapter(
       headers = generateHeaders(authorization, force = false),
       form = com.idunnololz.summit.api.dto.lemmy.v4.models.PurgeComment(
         reason = args.reason ?: "",
-        commentId = args.comment_id
+        commentId = args.comment_id,
       ),
     )
   }.map {
@@ -1572,7 +1551,7 @@ class LemmyApiV4Adapter(
         limit = args.limit,
         pageCursor = args.pageCursor,
         unreadOnly = args.unread_only,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     PagedResponseRegistrationApplicationView(
@@ -1592,10 +1571,9 @@ class LemmyApiV4Adapter(
         approve = args.approve,
         id = args.id,
         denyReason = args.deny_reason,
-      )
+      ),
     )
   }.map {
-
   }
 
   override suspend fun getModLogs(
@@ -1617,7 +1595,7 @@ class LemmyApiV4Adapter(
         type = args.type_.toModlogKindFilter(),
         communityId = args.community_id,
         modPersonId = args.mod_person_id,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     GetModlogResponse(
@@ -1641,8 +1619,8 @@ class LemmyApiV4Adapter(
         captchaAnswer = args.captcha_answer,
         captchaUuid = args.captcha_uuid,
         email = args.email,
-        showNsfw = args.show_nsfw
-      )
+        showNsfw = args.show_nsfw,
+      ),
     )
   }.map {
     LoginResponse(
@@ -1664,7 +1642,7 @@ class LemmyApiV4Adapter(
           wav = it.wav,
           uuid = it.uuid,
         )
-      }
+      },
     )
   }
 
@@ -1678,7 +1656,7 @@ class LemmyApiV4Adapter(
       form = ListMediaI(
         args.limit?.toInt(),
         args.pageCursor,
-      ).serializeToMap()
+      ).serializeToMap(),
     )
   }.map {
     ListMediaResponse(
@@ -1690,7 +1668,7 @@ class LemmyApiV4Adapter(
             pictrs_delete_token = null,
             published = it.localImage.publishedAt,
           ),
-          person = it.person.toPerson(false, null, false)
+          person = it.person.toPerson(false, null, false),
         )
       },
       nextPage = it.nextPage,
@@ -1725,18 +1703,15 @@ class LemmyApiV4Adapter(
     )
   }
 
-  override suspend fun deleteMedia(
-    authorization: String?,
-    args: DeleteImage,
-  ): Result<Unit> = retrofitErrorHandler {
-    api.deleteMedia(
-      headers = generateHeaders(authorization, force = false),
-      body = DeleteImageParamsI(
-        filename = args.filename
-      ),
-    )
-  }
-
+  override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =
+    retrofitErrorHandler {
+      api.deleteMedia(
+        headers = generateHeaders(authorization, force = false),
+        body = DeleteImageParamsI(
+          filename = args.filename,
+        ),
+      )
+    }
 
   private fun <T> T.serializeToMap(): Map<String, String> = convert()
 

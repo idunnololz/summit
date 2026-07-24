@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -22,63 +21,58 @@ import com.google.gson.annotations.SerializedName
  * Create a post.
  *
  * @param communityId The community id.
- * @param name 
+ * @param name
  * @param scheduledPublishTimeAt Time when this post should be scheduled. Null means publish immediately.
- * @param tags 
+ * @param tags
  * @param customThumbnail Instead of fetching a thumbnail, use a custom one.
  * @param languageId The language id.
- * @param nsfw 
+ * @param nsfw
  * @param honeypot A honeypot to catch bots. Should be None.
  * @param altText An optional alt_text, usable for image posts.
  * @param body An optional body for the post in markdown.
- * @param url 
+ * @param url
  */
 
+data class CreatePost(
 
-data class CreatePost (
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  /* Time when this post should be scheduled. Null means publish immediately. */
+  @SerializedName("scheduled_publish_time_at")
+  val scheduledPublishTimeAt: kotlin.Int? = null,
 
-    /* Time when this post should be scheduled. Null means publish immediately. */
-    @SerializedName("scheduled_publish_time_at")
-    val scheduledPublishTimeAt: kotlin.Int? = null,
+  @SerializedName("tags")
+  val tags: kotlin.collections.List<kotlin.Int>? = null,
 
-    @SerializedName("tags")
-    val tags: kotlin.collections.List<kotlin.Int>? = null,
+  /* Instead of fetching a thumbnail, use a custom one. */
+  @SerializedName("custom_thumbnail")
+  val customThumbnail: kotlin.String? = null,
 
-    /* Instead of fetching a thumbnail, use a custom one. */
-    @SerializedName("custom_thumbnail")
-    val customThumbnail: kotlin.String? = null,
+  /* The language id. */
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    /* The language id. */
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  /* A honeypot to catch bots. Should be None. */
+  @SerializedName("honeypot")
+  val honeypot: kotlin.String? = null,
 
-    /* A honeypot to catch bots. Should be None. */
-    @SerializedName("honeypot")
-    val honeypot: kotlin.String? = null,
+  /* An optional alt_text, usable for image posts. */
+  @SerializedName("alt_text")
+  val altText: kotlin.String? = null,
 
-    /* An optional alt_text, usable for image posts. */
-    @SerializedName("alt_text")
-    val altText: kotlin.String? = null,
+  /* An optional body for the post in markdown. */
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    /* An optional body for the post in markdown. */
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.SiteView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.SiteView
 
 /**
  * The response for a site.
  *
- * @param siteView 
+ * @param siteView
  */
 
+data class SiteResponse(
 
-data class SiteResponse (
+  @SerializedName("site_view")
+  val siteView: SiteView,
 
-    @SerializedName("site_view")
-    val siteView: SiteView
-
-) {
-
-
-}
-
+)

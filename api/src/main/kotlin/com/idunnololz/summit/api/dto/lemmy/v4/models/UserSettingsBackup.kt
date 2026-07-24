@@ -7,92 +7,86 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUser
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUser
 
 /**
  * Backup of user data. This struct should never be changed so that the data can be used as a long-term backup in case the instance goes down unexpectedly. All fields are optional to allow importing partial backups.  This data should not be parsed by apps/clients, but directly downloaded as a file.  Be careful with any changes to this struct, to avoid breaking changes which could prevent importing older backups.
  *
- * @param discussionLanguages 
- * @param blockingKeywords 
- * @param blockedInstancesPersons 
- * @param blockedInstancesCommunities 
- * @param blockedUsers 
- * @param blockedCommunities 
- * @param savedComments 
- * @param savedPosts 
- * @param followedCommunities 
- * @param settings 
- * @param botAccount 
- * @param matrixId 
- * @param banner 
- * @param avatar 
- * @param bio 
- * @param displayName 
+ * @param discussionLanguages
+ * @param blockingKeywords
+ * @param blockedInstancesPersons
+ * @param blockedInstancesCommunities
+ * @param blockedUsers
+ * @param blockedCommunities
+ * @param savedComments
+ * @param savedPosts
+ * @param followedCommunities
+ * @param settings
+ * @param botAccount
+ * @param matrixId
+ * @param banner
+ * @param avatar
+ * @param bio
+ * @param displayName
  */
 
+data class UserSettingsBackup(
 
-data class UserSettingsBackup (
+  @SerializedName("discussion_languages")
+  val discussionLanguages: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("discussion_languages")
-    val discussionLanguages: kotlin.collections.List<kotlin.String>,
+  @SerializedName("blocking_keywords")
+  val blockingKeywords: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("blocking_keywords")
-    val blockingKeywords: kotlin.collections.List<kotlin.String>,
+  @SerializedName("blocked_instances_persons")
+  val blockedInstancesPersons: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("blocked_instances_persons")
-    val blockedInstancesPersons: kotlin.collections.List<kotlin.String>,
+  @SerializedName("blocked_instances_communities")
+  val blockedInstancesCommunities: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("blocked_instances_communities")
-    val blockedInstancesCommunities: kotlin.collections.List<kotlin.String>,
+  @SerializedName("blocked_users")
+  val blockedUsers: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("blocked_users")
-    val blockedUsers: kotlin.collections.List<kotlin.String>,
+  @SerializedName("blocked_communities")
+  val blockedCommunities: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("blocked_communities")
-    val blockedCommunities: kotlin.collections.List<kotlin.String>,
+  @SerializedName("saved_comments")
+  val savedComments: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("saved_comments")
-    val savedComments: kotlin.collections.List<kotlin.String>,
+  @SerializedName("saved_posts")
+  val savedPosts: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("saved_posts")
-    val savedPosts: kotlin.collections.List<kotlin.String>,
+  @SerializedName("followed_communities")
+  val followedCommunities: kotlin.collections.List<kotlin.String>,
 
-    @SerializedName("followed_communities")
-    val followedCommunities: kotlin.collections.List<kotlin.String>,
+  @SerializedName("settings")
+  val settings: LocalUser? = null,
 
-    @SerializedName("settings")
-    val settings: LocalUser? = null,
+  @SerializedName("bot_account")
+  val botAccount: kotlin.Boolean? = null,
 
-    @SerializedName("bot_account")
-    val botAccount: kotlin.Boolean? = null,
+  @SerializedName("matrix_id")
+  val matrixId: kotlin.String? = null,
 
-    @SerializedName("matrix_id")
-    val matrixId: kotlin.String? = null,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  @SerializedName("avatar")
+  val avatar: kotlin.String? = null,
 
-    @SerializedName("avatar")
-    val avatar: kotlin.String? = null,
+  @SerializedName("bio")
+  val bio: kotlin.String? = null,
 
-    @SerializedName("bio")
-    val bio: kotlin.String? = null,
+  @SerializedName("display_name")
+  val displayName: kotlin.String? = null,
 
-    @SerializedName("display_name")
-    val displayName: kotlin.String? = null
-
-) {
-
-
-}
-
+)

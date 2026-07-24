@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Save / bookmark a post.
  *
- * @param save 
+ * @param save
  * @param postId The post id.
  */
 
+data class SavePost(
 
-data class SavePost (
+  @SerializedName("save")
+  val save: kotlin.Boolean,
 
-    @SerializedName("save")
-    val save: kotlin.Boolean,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int
-
-) {
-
-
-}
-
+)

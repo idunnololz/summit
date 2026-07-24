@@ -27,7 +27,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.ui.NavigationUI
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
@@ -243,7 +242,10 @@ class NavBarController(
       newRightInset = rightInset
     }
 
-    Log.d(TAG, "onInsetsChanged: b: ${bottomInset} navBarh: ${navBar.height} mh: ${navBar.measuredHeight}")
+    Log.d(
+      TAG,
+      "onInsetsChanged: b: $bottomInset navBarh: ${navBar.height} mh: ${navBar.measuredHeight}",
+    )
   }
 
   fun showBottomNav() {
@@ -275,8 +277,8 @@ class NavBarController(
 
     if (currentPercentShown + 0.01f > percentShown &&
       currentPercentShown - 0.01f < percentShown &&
-      !visibilityShouldChange) {
-
+      !visibilityShouldChange
+    ) {
       Log.d(TAG, "close enough. ignoring request")
       return
     }
@@ -286,7 +288,9 @@ class NavBarController(
     // To easily debug what is messing with the nav bar, add an exception to this log statement.
     Log.d(
       TAG,
-      "animateNavBar() %shown: $percentShown diff: ${abs(currentPercentShown - percentShown)} animate? $animate",
+      "animateNavBar() %shown: $percentShown diff: ${abs(
+        currentPercentShown - percentShown,
+      )} animate? $animate",
       kotlin.RuntimeException(),
     )
 

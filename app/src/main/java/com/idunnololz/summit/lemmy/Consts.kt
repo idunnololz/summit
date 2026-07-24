@@ -8,16 +8,18 @@ object Consts {
   const val DEFAULT_INSTANCE = INSTANCE_LEMMY_WORLD
 
   val DEFAULT_LEMMY_INSTANCES =
-    (LEMMY_INSTANCES + listOf(
-    INSTANCE_LEMMY_WORLD,
+    (
+      LEMMY_INSTANCES + listOf(
+        INSTANCE_LEMMY_WORLD,
 
-    // piefed
-    "piefed.social",
-    "piefed.world",
-    "piefed.blahaj.zone",
-    "piefed.ca",
-    "piefed.zip",
-    "feddit.online",
-    "fedinsfw.app",
-  )).toSet().toList()
+        // piefed
+        "piefed.social",
+        "piefed.world",
+        "piefed.blahaj.zone",
+        "piefed.ca",
+        "piefed.zip",
+        "feddit.online",
+        "fedinsfw.app",
+      )
+      ).toSet().toList()
 }

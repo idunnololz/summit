@@ -7,39 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param state 
+ *
+ * @param state
  */
 
+data class LoadingRequestState(
 
-data class LoadingRequestState (
-
-    @SerializedName("state")
-    val state: LoadingRequestState.State
+  @SerializedName("state")
+  val state: LoadingRequestState.State,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: loading
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "loading") loading("loading");
-    }
-
+  /**
+   *
+   *
+   * Values: loading
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "loading")
+    loading("loading"),
+  }
 }
-

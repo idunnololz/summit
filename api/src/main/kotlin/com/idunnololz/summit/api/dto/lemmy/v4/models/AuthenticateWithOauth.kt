@@ -7,63 +7,57 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Logging in with an OAuth 2.0 authorization
  *
- * @param redirectUri 
+ * @param redirectUri
  * @param oauthProviderId The oauth provider id.
- * @param code 
+ * @param code
  * @param stayLoggedIn If this is true the login is valid forever, otherwise it expires after one week.
- * @param pkceCodeVerifier 
+ * @param pkceCodeVerifier
  * @param answer An answer is mandatory if require application is enabled on the server
  * @param username Username is mandatory at registration time
- * @param showNsfw 
+ * @param showNsfw
  */
 
+data class AuthenticateWithOauth(
 
-data class AuthenticateWithOauth (
+  @SerializedName("redirect_uri")
+  val redirectUri: kotlin.String,
 
-    @SerializedName("redirect_uri")
-    val redirectUri: kotlin.String,
+  /* The oauth provider id. */
+  @SerializedName("oauth_provider_id")
+  val oauthProviderId: kotlin.Int,
 
-    /* The oauth provider id. */
-    @SerializedName("oauth_provider_id")
-    val oauthProviderId: kotlin.Int,
+  @SerializedName("code")
+  val code: kotlin.String,
 
-    @SerializedName("code")
-    val code: kotlin.String,
+  /* If this is true the login is valid forever, otherwise it expires after one week. */
+  @SerializedName("stay_logged_in")
+  val stayLoggedIn: kotlin.Boolean? = null,
 
-    /* If this is true the login is valid forever, otherwise it expires after one week. */
-    @SerializedName("stay_logged_in")
-    val stayLoggedIn: kotlin.Boolean? = null,
+  @SerializedName("pkce_code_verifier")
+  val pkceCodeVerifier: kotlin.String? = null,
 
-    @SerializedName("pkce_code_verifier")
-    val pkceCodeVerifier: kotlin.String? = null,
+  /* An answer is mandatory if require application is enabled on the server */
+  @SerializedName("answer")
+  val answer: kotlin.String? = null,
 
-    /* An answer is mandatory if require application is enabled on the server */
-    @SerializedName("answer")
-    val answer: kotlin.String? = null,
+  /* Username is mandatory at registration time */
+  @SerializedName("username")
+  val username: kotlin.String? = null,
 
-    /* Username is mandatory at registration time */
-    @SerializedName("username")
-    val username: kotlin.String? = null,
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

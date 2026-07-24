@@ -7,37 +7,31 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PostNotificationsMode
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PostNotificationsMode
 
 /**
  * Change notification settings for a post
  *
- * @param mode 
+ * @param mode
  * @param postId The post id.
  */
 
+data class EditPostNotifications(
 
-data class EditPostNotifications (
+  @SerializedName("mode")
+  val mode: PostNotificationsMode,
 
-    @SerializedName("mode")
-    val mode: PostNotificationsMode,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int
-
-) {
-
-
-}
-
+)

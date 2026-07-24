@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param contentType 
- * @param height 
- * @param width 
- * @param link 
- * @param blurhash 
+ *
+ * @param contentType
+ * @param height
+ * @param width
+ * @param link
+ * @param blurhash
  */
 
+data class ImageDetails(
 
-data class ImageDetails (
+  @SerializedName("content_type")
+  val contentType: kotlin.String,
 
-    @SerializedName("content_type")
-    val contentType: kotlin.String,
+  @SerializedName("height")
+  val height: kotlin.Int,
 
-    @SerializedName("height")
-    val height: kotlin.Int,
+  @SerializedName("width")
+  val width: kotlin.Int,
 
-    @SerializedName("width")
-    val width: kotlin.Int,
+  @SerializedName("link")
+  val link: kotlin.String,
 
-    @SerializedName("link")
-    val link: kotlin.String,
+  @SerializedName("blurhash")
+  val blurhash: kotlin.String? = null,
 
-    @SerializedName("blurhash")
-    val blurhash: kotlin.String? = null
-
-) {
-
-
-}
-
+)

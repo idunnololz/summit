@@ -7,74 +7,68 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A private message.
  *
- * @param deletedByRecipient 
- * @param removed 
- * @param local 
- * @param apId 
- * @param publishedAt 
- * @param deleted 
- * @param content 
+ * @param deletedByRecipient
+ * @param removed
+ * @param local
+ * @param apId
+ * @param publishedAt
+ * @param deleted
+ * @param content
  * @param recipientId The person id.
  * @param creatorId The person id.
  * @param id The private message id.
- * @param updatedAt 
+ * @param updatedAt
  */
 
+data class PrivateMessage(
 
-data class PrivateMessage (
+  @SerializedName("deleted_by_recipient")
+  val deletedByRecipient: kotlin.Boolean,
 
-    @SerializedName("deleted_by_recipient")
-    val deletedByRecipient: kotlin.Boolean,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("content")
+  val content: kotlin.String,
 
-    @SerializedName("content")
-    val content: kotlin.String,
+  /* The person id. */
+  @SerializedName("recipient_id")
+  val recipientId: Long,
 
-    /* The person id. */
-    @SerializedName("recipient_id")
-    val recipientId: Long,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: Long,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: Long,
+  /* The private message id. */
+  @SerializedName("id")
+  val id: Int,
 
-    /* The private message id. */
-    @SerializedName("id")
-    val id: Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

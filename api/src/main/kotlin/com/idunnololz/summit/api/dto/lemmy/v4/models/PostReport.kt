@@ -7,81 +7,75 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A post report.
  *
- * @param violatesInstanceRules 
- * @param publishedAt 
- * @param resolved 
- * @param reason 
+ * @param violatesInstanceRules
+ * @param publishedAt
+ * @param resolved
+ * @param reason
  * @param originalPostName The original post title.
  * @param postId The post id.
  * @param creatorId The person id.
  * @param id The post report id.
- * @param updatedAt 
+ * @param updatedAt
  * @param resolverId The person id.
  * @param originalPostBody The original post body.
- * @param originalPostUrl 
+ * @param originalPostUrl
  */
 
+data class PostReport(
 
-data class PostReport (
+  @SerializedName("violates_instance_rules")
+  val violatesInstanceRules: kotlin.Boolean,
 
-    @SerializedName("violates_instance_rules")
-    val violatesInstanceRules: kotlin.Boolean,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  /* The original post title. */
+  @SerializedName("original_post_name")
+  val originalPostName: kotlin.String,
 
-    /* The original post title. */
-    @SerializedName("original_post_name")
-    val originalPostName: kotlin.String,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: Int,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: Long,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: Long,
+  /* The post report id. */
+  @SerializedName("id")
+  val id: Int,
 
-    /* The post report id. */
-    @SerializedName("id")
-    val id: Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("resolver_id")
+  val resolverId: Long? = null,
 
-    /* The person id. */
-    @SerializedName("resolver_id")
-    val resolverId: Long? = null,
+  /* The original post body. */
+  @SerializedName("original_post_body")
+  val originalPostBody: kotlin.String? = null,
 
-    /* The original post body. */
-    @SerializedName("original_post_body")
-    val originalPostBody: kotlin.String? = null,
+  @SerializedName("original_post_url")
+  val originalPostUrl: kotlin.String? = null,
 
-    @SerializedName("original_post_url")
-    val originalPostUrl: kotlin.String? = null
-
-) {
-
-
-}
-
+)

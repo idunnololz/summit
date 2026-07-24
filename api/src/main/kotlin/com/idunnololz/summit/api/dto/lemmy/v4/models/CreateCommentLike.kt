@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -25,19 +24,14 @@ import com.google.gson.annotations.SerializedName
  * @param isUpvote True means Upvote, False means Downvote, and None means remove vote.
  */
 
+data class CreateCommentLike(
 
-data class CreateCommentLike (
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  /* True means Upvote, False means Downvote, and None means remove vote. */
+  @SerializedName("is_upvote")
+  val isUpvote: kotlin.Boolean? = null,
 
-    /* True means Upvote, False means Downvote, and None means remove vote. */
-    @SerializedName("is_upvote")
-    val isUpvote: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

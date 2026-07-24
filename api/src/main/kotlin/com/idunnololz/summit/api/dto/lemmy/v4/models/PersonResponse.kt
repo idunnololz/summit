@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
 
 /**
  * A person response for actions done to a person.
  *
- * @param personView 
+ * @param personView
  */
 
+data class PersonResponse(
 
-data class PersonResponse (
+  @SerializedName("person_view")
+  val personView: PersonView,
 
-    @SerializedName("person_view")
-    val personView: PersonView
-
-) {
-
-
-}
-
+)

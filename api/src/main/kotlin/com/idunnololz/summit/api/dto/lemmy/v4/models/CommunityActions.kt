@@ -7,24 +7,23 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityFollowerState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityNotificationsMode
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param notifications 
- * @param followState 
+ *
+ * @param notifications
+ * @param followState
  * @param banExpiresAt When their ban expires.
  * @param receivedBanAt When this user received a ban.
  * @param becameModeratorAt When this user became a moderator.
@@ -32,37 +31,32 @@ import com.google.gson.annotations.SerializedName
  * @param followedAt When the community was followed.
  */
 
+data class CommunityActions(
 
-data class CommunityActions (
+  @SerializedName("notifications")
+  val notifications: CommunityNotificationsMode? = null,
 
-    @SerializedName("notifications")
-    val notifications: CommunityNotificationsMode? = null,
+  @SerializedName("follow_state")
+  val followState: CommunityFollowerState? = null,
 
-    @SerializedName("follow_state")
-    val followState: CommunityFollowerState? = null,
+  /* When their ban expires. */
+  @SerializedName("ban_expires_at")
+  val banExpiresAt: kotlin.String? = null,
 
-    /* When their ban expires. */
-    @SerializedName("ban_expires_at")
-    val banExpiresAt: kotlin.String? = null,
+  /* When this user received a ban. */
+  @SerializedName("received_ban_at")
+  val receivedBanAt: kotlin.String? = null,
 
-    /* When this user received a ban. */
-    @SerializedName("received_ban_at")
-    val receivedBanAt: kotlin.String? = null,
+  /* When this user became a moderator. */
+  @SerializedName("became_moderator_at")
+  val becameModeratorAt: kotlin.String? = null,
 
-    /* When this user became a moderator. */
-    @SerializedName("became_moderator_at")
-    val becameModeratorAt: kotlin.String? = null,
+  /* When the community was blocked. */
+  @SerializedName("blocked_at")
+  val blockedAt: kotlin.String? = null,
 
-    /* When the community was blocked. */
-    @SerializedName("blocked_at")
-    val blockedAt: kotlin.String? = null,
+  /* When the community was followed. */
+  @SerializedName("followed_at")
+  val followedAt: kotlin.String? = null,
 
-    /* When the community was followed. */
-    @SerializedName("followed_at")
-    val followedAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

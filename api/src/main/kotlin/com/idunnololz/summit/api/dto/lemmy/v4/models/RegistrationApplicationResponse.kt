@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplicationView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.RegistrationApplicationView
 
 /**
  * The response of an action done to a registration application.
  *
- * @param registrationApplication 
+ * @param registrationApplication
  */
 
+data class RegistrationApplicationResponse(
 
-data class RegistrationApplicationResponse (
+  @SerializedName("registration_application")
+  val registrationApplication: RegistrationApplicationView,
 
-    @SerializedName("registration_application")
-    val registrationApplication: RegistrationApplicationView
-
-) {
-
-
-}
-
+)

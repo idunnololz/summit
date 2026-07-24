@@ -7,39 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param state 
+ *
+ * @param state
  */
 
+data class EmptyRequestState(
 
-data class EmptyRequestState (
-
-    @SerializedName("state")
-    val state: EmptyRequestState.State
+  @SerializedName("state")
+  val state: EmptyRequestState.State,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: empty
-     */
-    enum class State(val value: kotlin.String) {
-        @SerializedName(value = "empty") empty("empty");
-    }
-
+  /**
+   *
+   *
+   * Values: empty
+   */
+  enum class State(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "empty")
+    empty("empty"),
+  }
 }
-

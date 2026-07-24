@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Delete your account.
  *
- * @param deleteContent 
- * @param password 
+ * @param deleteContent
+ * @param password
  */
 
+data class DeleteAccount(
 
-data class DeleteAccount (
+  @SerializedName("delete_content")
+  val deleteContent: kotlin.Boolean,
 
-    @SerializedName("delete_content")
-    val deleteContent: kotlin.Boolean,
+  @SerializedName("password")
+  val password: kotlin.String,
 
-    @SerializedName("password")
-    val password: kotlin.String
-
-) {
-
-
-}
-
+)

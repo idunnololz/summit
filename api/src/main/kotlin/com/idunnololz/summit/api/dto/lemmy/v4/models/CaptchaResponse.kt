@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -26,23 +25,18 @@ import com.google.gson.annotations.SerializedName
  * @param png A Base64 encoded png
  */
 
+data class CaptchaResponse(
 
-data class CaptchaResponse (
+  /* The UUID for the captcha item. */
+  @SerializedName("uuid")
+  val uuid: kotlin.String,
 
-    /* The UUID for the captcha item. */
-    @SerializedName("uuid")
-    val uuid: kotlin.String,
+  /* A Base64 encoded wav audio */
+  @SerializedName("wav")
+  val wav: kotlin.String,
 
-    /* A Base64 encoded wav audio */
-    @SerializedName("wav")
-    val wav: kotlin.String,
+  /* A Base64 encoded png */
+  @SerializedName("png")
+  val png: kotlin.String,
 
-    /* A Base64 encoded png */
-    @SerializedName("png")
-    val png: kotlin.String
-
-) {
-
-
-}
-
+)

@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -23,25 +22,20 @@ import com.google.gson.annotations.SerializedName
  *
  * @param verifyEmailSent If email verifications are required, this will return true for a signup response.
  * @param registrationCreated If registration applications are required, this will return true for a signup response.
- * @param jwt 
+ * @param jwt
  */
 
+data class LoginResponse(
 
-data class LoginResponse (
+  /* If email verifications are required, this will return true for a signup response. */
+  @SerializedName("verify_email_sent")
+  val verifyEmailSent: kotlin.Boolean,
 
-    /* If email verifications are required, this will return true for a signup response. */
-    @SerializedName("verify_email_sent")
-    val verifyEmailSent: kotlin.Boolean,
+  /* If registration applications are required, this will return true for a signup response. */
+  @SerializedName("registration_created")
+  val registrationCreated: kotlin.Boolean,
 
-    /* If registration applications are required, this will return true for a signup response. */
-    @SerializedName("registration_created")
-    val registrationCreated: kotlin.Boolean,
+  @SerializedName("jwt")
+  val jwt: kotlin.String? = null,
 
-    @SerializedName("jwt")
-    val jwt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,44 +23,47 @@ import com.google.gson.annotations.SerializedName
  * Values: all_posts_and_comments,all_posts,replies_and_mentions,mute
  */
 
-enum class CommunityNotificationsMode(val value: kotlin.String) {
+enum class CommunityNotificationsMode(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "all_posts_and_comments")
-    all_posts_and_comments("all_posts_and_comments"),
+  @SerializedName(value = "all_posts_and_comments")
+  all_posts_and_comments("all_posts_and_comments"),
 
-    @SerializedName(value = "all_posts")
-    all_posts("all_posts"),
+  @SerializedName(value = "all_posts")
+  all_posts("all_posts"),
 
-    @SerializedName(value = "replies_and_mentions")
-    replies_and_mentions("replies_and_mentions"),
+  @SerializedName(value = "replies_and_mentions")
+  replies_and_mentions("replies_and_mentions"),
 
-    @SerializedName(value = "mute")
-    mute("mute");
+  @SerializedName(value = "mute")
+  mute("mute"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? =
+      if (data is CommunityNotificationsMode) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [CommunityNotificationsMode] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is CommunityNotificationsMode) "$data" else null
-
-        /**
-         * Returns a valid [CommunityNotificationsMode] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): CommunityNotificationsMode? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): CommunityNotificationsMode? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

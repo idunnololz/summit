@@ -7,77 +7,71 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Register / Sign up to lemmy.
  *
- * @param passwordVerify 
- * @param password 
- * @param username 
+ * @param passwordVerify
+ * @param password
+ * @param username
  * @param token Invitation token
  * @param stayLoggedIn If this is true the login is valid forever, otherwise it expires after one week.
  * @param answer An answer is mandatory if require application is enabled on the server
  * @param honeypot A form field to trick signup bots. Should be None.
  * @param captchaAnswer Your captcha answer.
  * @param captchaUuid The UUID of the captcha item.
- * @param email 
- * @param showNsfw 
+ * @param email
+ * @param showNsfw
  */
 
+data class Register(
 
-data class Register (
+  @SerializedName("password_verify")
+  val passwordVerify: kotlin.String,
 
-    @SerializedName("password_verify")
-    val passwordVerify: kotlin.String,
+  @SerializedName("password")
+  val password: kotlin.String,
 
-    @SerializedName("password")
-    val password: kotlin.String,
+  @SerializedName("username")
+  val username: kotlin.String,
 
-    @SerializedName("username")
-    val username: kotlin.String,
+  /* Invitation token */
+  @SerializedName("token")
+  val token: kotlin.String? = null,
 
-    /* Invitation token */
-    @SerializedName("token")
-    val token: kotlin.String? = null,
+  /* If this is true the login is valid forever, otherwise it expires after one week. */
+  @SerializedName("stay_logged_in")
+  val stayLoggedIn: kotlin.Boolean? = null,
 
-    /* If this is true the login is valid forever, otherwise it expires after one week. */
-    @SerializedName("stay_logged_in")
-    val stayLoggedIn: kotlin.Boolean? = null,
+  /* An answer is mandatory if require application is enabled on the server */
+  @SerializedName("answer")
+  val answer: kotlin.String? = null,
 
-    /* An answer is mandatory if require application is enabled on the server */
-    @SerializedName("answer")
-    val answer: kotlin.String? = null,
+  /* A form field to trick signup bots. Should be None. */
+  @SerializedName("honeypot")
+  val honeypot: kotlin.String? = null,
 
-    /* A form field to trick signup bots. Should be None. */
-    @SerializedName("honeypot")
-    val honeypot: kotlin.String? = null,
+  /* Your captcha answer. */
+  @SerializedName("captcha_answer")
+  val captchaAnswer: kotlin.String? = null,
 
-    /* Your captcha answer. */
-    @SerializedName("captcha_answer")
-    val captchaAnswer: kotlin.String? = null,
+  /* The UUID of the captcha item. */
+  @SerializedName("captcha_uuid")
+  val captchaUuid: kotlin.String? = null,
 
-    /* The UUID of the captcha item. */
-    @SerializedName("captcha_uuid")
-    val captchaUuid: kotlin.String? = null,
+  @SerializedName("email")
+  val email: kotlin.String? = null,
 
-    @SerializedName("email")
-    val email: kotlin.String? = null,
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

@@ -7,103 +7,97 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A person.
  *
- * @param commentCount 
- * @param postCount 
+ * @param commentCount
+ * @param postCount
  * @param instanceId The instance id.
  * @param botAccount Whether the person is a bot account.
  * @param deleted Whether the person is deleted.
- * @param lastRefreshedAt 
+ * @param lastRefreshedAt
  * @param local Whether the person is local to our site.
- * @param apId 
- * @param publishedAt 
- * @param name 
+ * @param apId
+ * @param publishedAt
+ * @param name
  * @param id The person id.
  * @param matrixUserId A matrix id, usually given an
- * @param banner 
+ * @param banner
  * @param bio An optional bio, in markdown.
- * @param updatedAt 
- * @param avatar 
+ * @param updatedAt
+ * @param avatar
  * @param displayName A shorter display name.
  */
 
+data class Person(
 
-data class Person (
+  @SerializedName("comment_count")
+  val commentCount: kotlin.Int,
 
-    @SerializedName("comment_count")
-    val commentCount: kotlin.Int,
+  @SerializedName("post_count")
+  val postCount: kotlin.Int,
 
-    @SerializedName("post_count")
-    val postCount: kotlin.Int,
+  /* The instance id. */
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    /* The instance id. */
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  /* Whether the person is a bot account. */
+  @SerializedName("bot_account")
+  val botAccount: kotlin.Boolean,
 
-    /* Whether the person is a bot account. */
-    @SerializedName("bot_account")
-    val botAccount: kotlin.Boolean,
+  /* Whether the person is deleted. */
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    /* Whether the person is deleted. */
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("last_refreshed_at")
+  val lastRefreshedAt: kotlin.String,
 
-    @SerializedName("last_refreshed_at")
-    val lastRefreshedAt: kotlin.String,
+  /* Whether the person is local to our site. */
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    /* Whether the person is local to our site. */
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  /* The person id. */
+  @SerializedName("id")
+  val id: Long,
 
-    /* The person id. */
-    @SerializedName("id")
-    val id: Long,
+  /* A matrix id, usually given an */
+  @SerializedName("matrix_user_id")
+  val matrixUserId: kotlin.String? = null,
 
-    /* A matrix id, usually given an */
-    @SerializedName("matrix_user_id")
-    val matrixUserId: kotlin.String? = null,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  /* An optional bio, in markdown. */
+  @SerializedName("bio")
+  val bio: kotlin.String? = null,
 
-    /* An optional bio, in markdown. */
-    @SerializedName("bio")
-    val bio: kotlin.String? = null,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  @SerializedName("avatar")
+  val avatar: kotlin.String? = null,
 
-    @SerializedName("avatar")
-    val avatar: kotlin.String? = null,
+  /* A shorter display name. */
+  @SerializedName("display_name")
+  val displayName: kotlin.String? = null,
 
-    /* A shorter display name. */
-    @SerializedName("display_name")
-    val displayName: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,40 +7,34 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Approves a registration application.
  *
- * @param approve 
+ * @param approve
  * @param id The registration application id.
- * @param denyReason 
+ * @param denyReason
  */
 
+data class ApproveRegistrationApplication(
 
-data class ApproveRegistrationApplication (
+  @SerializedName("approve")
+  val approve: kotlin.Boolean,
 
-    @SerializedName("approve")
-    val approve: kotlin.Boolean,
+  /* The registration application id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The registration application id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("deny_reason")
+  val denyReason: kotlin.String? = null,
 
-    @SerializedName("deny_reason")
-    val denyReason: kotlin.String? = null
-
-) {
-
-
-}
-
+)

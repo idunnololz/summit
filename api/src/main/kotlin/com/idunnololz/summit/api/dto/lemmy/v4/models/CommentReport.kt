@@ -7,71 +7,65 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * A comment report.
  *
- * @param violatesInstanceRules 
- * @param publishedAt 
- * @param resolved 
- * @param reason 
- * @param originalCommentText 
+ * @param violatesInstanceRules
+ * @param publishedAt
+ * @param resolved
+ * @param reason
+ * @param originalCommentText
  * @param commentId The comment id.
  * @param creatorId The person id.
  * @param id The comment report id.
- * @param updatedAt 
+ * @param updatedAt
  * @param resolverId The person id.
  */
 
+data class CommentReport(
 
-data class CommentReport (
+  @SerializedName("violates_instance_rules")
+  val violatesInstanceRules: kotlin.Boolean,
 
-    @SerializedName("violates_instance_rules")
-    val violatesInstanceRules: kotlin.Boolean,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("original_comment_text")
+  val originalCommentText: kotlin.String,
 
-    @SerializedName("original_comment_text")
-    val originalCommentText: kotlin.String,
+  /* The comment id. */
+  @SerializedName("comment_id")
+  val commentId: Int,
 
-    /* The comment id. */
-    @SerializedName("comment_id")
-    val commentId: Int,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: Long,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: Long,
+  /* The comment report id. */
+  @SerializedName("id")
+  val id: Int,
 
-    /* The comment report id. */
-    @SerializedName("id")
-    val id: Int,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("resolver_id")
+  val resolverId: Long? = null,
 
-    /* The person id. */
-    @SerializedName("resolver_id")
-    val resolverId: Long? = null
-
-) {
-
-
-}
-
+)

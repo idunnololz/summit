@@ -7,87 +7,81 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param searchTerm The search query. Can be a plain text, or an object ID which will be resolved (eg `https://lemmy.world/comment/1` or `!fediverse@lemmy.ml`).
- * @param limit 
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
  * @param showNsfw If true, then show the nsfw posts (even if your user setting is to hide them)
- * @param postUrlOnly 
- * @param titleOnly 
- * @param listingType 
+ * @param postUrlOnly
+ * @param titleOnly
+ * @param listingType
  * @param timeRangeSeconds Filter to within a given time range, in seconds. IE 60 would give results for the past minute.
- * @param type 
- * @param creatorUsername 
+ * @param type
+ * @param creatorUsername
  * @param creatorId The person id.
- * @param communityName 
+ * @param communityName
  * @param communityId The community id.
  */
 
+data class SearchI(
 
-data class SearchI (
+  /* The search query. Can be a plain text, or an object ID which will be resolved (eg `https://lemmy.world/comment/1` or `!fediverse@lemmy.ml`). */
+  @SerializedName("search_term")
+  val searchTerm: kotlin.String,
 
-    /* The search query. Can be a plain text, or an object ID which will be resolved (eg `https://lemmy.world/comment/1` or `!fediverse@lemmy.ml`). */
-    @SerializedName("search_term")
-    val searchTerm: kotlin.String,
+  @SerializedName("limit")
+  val limit: Int? = null,
 
-    @SerializedName("limit")
-    val limit: Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  /* If true, then show the nsfw posts (even if your user setting is to hide them) */
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    /* If true, then show the nsfw posts (even if your user setting is to hide them) */
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null,
+  @SerializedName("post_url_only")
+  val postUrlOnly: kotlin.Boolean? = null,
 
-    @SerializedName("post_url_only")
-    val postUrlOnly: kotlin.Boolean? = null,
+  @SerializedName("title_only")
+  val titleOnly: kotlin.Boolean? = null,
 
-    @SerializedName("title_only")
-    val titleOnly: kotlin.Boolean? = null,
+  @SerializedName("listing_type")
+  val listingType: ListingType? = null,
 
-    @SerializedName("listing_type")
-    val listingType: ListingType? = null,
+  /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
+  @SerializedName("time_range_seconds")
+  val timeRangeSeconds: Long? = null,
 
-    /* Filter to within a given time range, in seconds. IE 60 would give results for the past minute. */
-    @SerializedName("time_range_seconds")
-    val timeRangeSeconds: Long? = null,
+  @SerializedName("type_")
+  val type: SearchType? = null,
 
-    @SerializedName("type_")
-    val type: SearchType? = null,
+  @SerializedName("creator_username")
+  val creatorUsername: kotlin.String? = null,
 
-    @SerializedName("creator_username")
-    val creatorUsername: kotlin.String? = null,
+  /* The person id. */
+  @SerializedName("creator_id")
+  val creatorId: Long? = null,
 
-    /* The person id. */
-    @SerializedName("creator_id")
-    val creatorId: Long? = null,
+  @SerializedName("community_name")
+  val communityName: kotlin.String? = null,
 
-    @SerializedName("community_name")
-    val communityName: kotlin.String? = null,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: Int? = null,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: Int? = null
-
-) {
-
-
-}
-
+)

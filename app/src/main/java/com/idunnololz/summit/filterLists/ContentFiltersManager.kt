@@ -8,18 +8,16 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.coroutines.IoDispatcher
 import com.idunnololz.summit.util.crashLogger.crashLogger
-import kotlinx.coroutines.CoroutineDispatcher
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.collections.set
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class ContentFiltersManager @Inject constructor(

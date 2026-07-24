@@ -7,47 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MultiCommunityView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Site
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * A person's details response.
  *
- * @param multiCommunitiesCreated 
- * @param moderates 
- * @param personView 
- * @param site 
+ * @param multiCommunitiesCreated
+ * @param moderates
+ * @param personView
+ * @param site
  */
 
+data class GetPersonDetailsResponse(
 
-data class GetPersonDetailsResponse (
+  @SerializedName("multi_communities_created")
+  val multiCommunitiesCreated: kotlin.collections.List<MultiCommunityView>,
 
-    @SerializedName("multi_communities_created")
-    val multiCommunitiesCreated: kotlin.collections.List<MultiCommunityView>,
+  @SerializedName("moderates")
+  val moderates: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderates")
-    val moderates: kotlin.collections.List<CommunityModeratorView>,
+  @SerializedName("person_view")
+  val personView: PersonView,
 
-    @SerializedName("person_view")
-    val personView: PersonView,
+  @SerializedName("site")
+  val site: Site? = null,
 
-    @SerializedName("site")
-    val site: Site? = null
-
-) {
-
-
-}
-
+)

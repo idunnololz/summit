@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LoginToken
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param logins 
+ *
+ * @param logins
  */
 
+data class ListLoginsResponse(
 
-data class ListLoginsResponse (
+  @SerializedName("logins")
+  val logins: kotlin.collections.List<LoginToken>,
 
-    @SerializedName("logins")
-    val logins: kotlin.collections.List<LoginToken>
-
-) {
-
-
-}
-
+)

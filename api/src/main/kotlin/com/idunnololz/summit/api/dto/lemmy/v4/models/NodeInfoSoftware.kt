@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param homepage 
- * @param repository 
- * @param version 
- * @param name 
+ *
+ * @param homepage
+ * @param repository
+ * @param version
+ * @param name
  */
 
+data class NodeInfoSoftware(
 
-data class NodeInfoSoftware (
+  @SerializedName("homepage")
+  val homepage: kotlin.String? = null,
 
-    @SerializedName("homepage")
-    val homepage: kotlin.String? = null,
+  @SerializedName("repository")
+  val repository: kotlin.String? = null,
 
-    @SerializedName("repository")
-    val repository: kotlin.String? = null,
+  @SerializedName("version")
+  val version: kotlin.String? = null,
 
-    @SerializedName("version")
-    val version: kotlin.String? = null,
+  @SerializedName("name")
+  val name: kotlin.String? = null,
 
-    @SerializedName("name")
-    val name: kotlin.String? = null
-
-) {
-
-
-}
-
+)

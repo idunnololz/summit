@@ -270,7 +270,6 @@ interface LemmyApiV4 {
     @QueryMap form: Map<String, String>,
   ): Call<PagedResponseCommunityView>
 
-
   /**
    * Get the details for a person.
    */
@@ -317,9 +316,7 @@ interface LemmyApiV4 {
    * Mark all notifications as read.
    */
   @POST("account/notification/mark_as_read/all")
-  fun markAllAsRead(
-    @HeaderMap headers: Map<String, String>,
-  ): Call<SuccessResponse>
+  fun markAllAsRead(@HeaderMap headers: Map<String, String>): Call<SuccessResponse>
 
   @POST("private_message/report")
   fun createPrivateMessageReport(
@@ -611,5 +608,8 @@ interface LemmyApiV4 {
   ): Call<PagedResponseFederatedInstanceView>
 
   @DELETE("account/media")
-  fun deleteMedia(@HeaderMap headers: Map<String, String>, @Body body: DeleteImageParamsI): Call<Unit>
+  fun deleteMedia(
+    @HeaderMap headers: Map<String, String>,
+    @Body body: DeleteImageParamsI,
+  ): Call<Unit>
 }

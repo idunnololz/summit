@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.LocalUser
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
-
-import com.google.gson.annotations.SerializedName
 
 /**
  * A local user view.
  *
- * @param banned 
- * @param person 
- * @param localUser 
- * @param banExpiresAt 
+ * @param banned
+ * @param person
+ * @param localUser
+ * @param banExpiresAt
  */
 
+data class LocalUserView(
 
-data class LocalUserView (
+  @SerializedName("banned")
+  val banned: kotlin.Boolean,
 
-    @SerializedName("banned")
-    val banned: kotlin.Boolean,
+  @SerializedName("person")
+  val person: Person,
 
-    @SerializedName("person")
-    val person: Person,
+  @SerializedName("local_user")
+  val localUser: LocalUser,
 
-    @SerializedName("local_user")
-    val localUser: LocalUser,
+  @SerializedName("ban_expires_at")
+  val banExpiresAt: kotlin.String? = null,
 
-    @SerializedName("ban_expires_at")
-    val banExpiresAt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

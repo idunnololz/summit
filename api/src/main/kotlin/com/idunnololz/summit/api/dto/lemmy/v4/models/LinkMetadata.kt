@@ -7,63 +7,57 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Site metadata, from its opengraph tags.
  *
- * @param videoHeight 
- * @param videoWidth 
- * @param embedVideoUrl 
- * @param imageHeight 
- * @param imageWidth 
- * @param image 
- * @param description 
- * @param title 
- * @param contentType 
+ * @param videoHeight
+ * @param videoWidth
+ * @param embedVideoUrl
+ * @param imageHeight
+ * @param imageWidth
+ * @param image
+ * @param description
+ * @param title
+ * @param contentType
  */
 
+data class LinkMetadata(
 
-data class LinkMetadata (
+  @SerializedName("video_height")
+  val videoHeight: kotlin.Int? = null,
 
-    @SerializedName("video_height")
-    val videoHeight: kotlin.Int? = null,
+  @SerializedName("video_width")
+  val videoWidth: kotlin.Int? = null,
 
-    @SerializedName("video_width")
-    val videoWidth: kotlin.Int? = null,
+  @SerializedName("embed_video_url")
+  val embedVideoUrl: kotlin.String? = null,
 
-    @SerializedName("embed_video_url")
-    val embedVideoUrl: kotlin.String? = null,
+  @SerializedName("image_height")
+  val imageHeight: kotlin.Int? = null,
 
-    @SerializedName("image_height")
-    val imageHeight: kotlin.Int? = null,
+  @SerializedName("image_width")
+  val imageWidth: kotlin.Int? = null,
 
-    @SerializedName("image_width")
-    val imageWidth: kotlin.Int? = null,
+  @SerializedName("image")
+  val image: kotlin.String? = null,
 
-    @SerializedName("image")
-    val image: kotlin.String? = null,
+  @SerializedName("description")
+  val description: kotlin.String? = null,
 
-    @SerializedName("description")
-    val description: kotlin.String? = null,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null,
+  @SerializedName("content_type")
+  val contentType: kotlin.String? = null,
 
-    @SerializedName("content_type")
-    val contentType: kotlin.String? = null
-
-) {
-
-
-}
-
+)

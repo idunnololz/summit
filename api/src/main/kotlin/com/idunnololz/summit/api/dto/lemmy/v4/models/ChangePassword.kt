@@ -7,44 +7,38 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Changes your account password.
  *
- * @param oldPassword 
- * @param newPasswordVerify 
- * @param newPassword 
+ * @param oldPassword
+ * @param newPasswordVerify
+ * @param newPassword
  * @param stayLoggedIn If this is true the login is valid forever, otherwise it expires after one week.
  */
 
+data class ChangePassword(
 
-data class ChangePassword (
+  @SerializedName("old_password")
+  val oldPassword: kotlin.String,
 
-    @SerializedName("old_password")
-    val oldPassword: kotlin.String,
+  @SerializedName("new_password_verify")
+  val newPasswordVerify: kotlin.String,
 
-    @SerializedName("new_password_verify")
-    val newPasswordVerify: kotlin.String,
+  @SerializedName("new_password")
+  val newPassword: kotlin.String,
 
-    @SerializedName("new_password")
-    val newPassword: kotlin.String,
+  /* If this is true the login is valid forever, otherwise it expires after one week. */
+  @SerializedName("stay_logged_in")
+  val stayLoggedIn: kotlin.Boolean? = null,
 
-    /* If this is true the login is valid forever, otherwise it expires after one week. */
-    @SerializedName("stay_logged_in")
-    val stayLoggedIn: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

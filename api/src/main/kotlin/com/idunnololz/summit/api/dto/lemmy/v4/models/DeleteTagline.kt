@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,15 +23,10 @@ import com.google.gson.annotations.SerializedName
  * @param id The tagline id.
  */
 
+data class DeleteTagline(
 
-data class DeleteTagline (
+  /* The tagline id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The tagline id. */
-    @SerializedName("id")
-    val id: kotlin.Int
-
-) {
-
-
-}
-
+)

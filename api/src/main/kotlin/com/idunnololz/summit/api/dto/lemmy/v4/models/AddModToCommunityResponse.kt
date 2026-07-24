@@ -7,32 +7,26 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityModeratorView
 
 /**
  * The response of adding a moderator to a community.
  *
- * @param moderators 
+ * @param moderators
  */
 
+data class AddModToCommunityResponse(
 
-data class AddModToCommunityResponse (
+  @SerializedName("moderators")
+  val moderators: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderators")
-    val moderators: kotlin.collections.List<CommunityModeratorView>
-
-) {
-
-
-}
-
+)

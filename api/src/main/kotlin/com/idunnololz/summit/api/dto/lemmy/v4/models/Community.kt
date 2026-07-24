@@ -7,158 +7,152 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityVisibility
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityVisibility
 
 /**
  * A community.
  *
- * @param localRemoved 
- * @param unresolvedReportCount 
- * @param reportCount 
- * @param subscribersLocal 
+ * @param localRemoved
+ * @param unresolvedReportCount
+ * @param reportCount
+ * @param subscribersLocal
  * @param usersActiveHalfYear The number of users with any activity in the last year.
  * @param usersActiveMonth The number of users with any activity in the last month.
  * @param usersActiveWeek The number of users with any activity in the last week.
  * @param usersActiveDay The number of users with any activity in the last day.
- * @param comments 
- * @param posts 
- * @param subscribers 
- * @param visibility 
+ * @param comments
+ * @param posts
+ * @param subscribers
+ * @param visibility
  * @param instanceId The instance id.
  * @param postingRestrictedToMods Whether posting is restricted to mods only.
- * @param lastRefreshedAt 
+ * @param lastRefreshedAt
  * @param local Whether the community is local.
- * @param apId 
+ * @param apId
  * @param nsfw Whether its an NSFW community.
  * @param deleted Whether the community has been deleted by its creator.
- * @param publishedAt 
+ * @param publishedAt
  * @param removed Whether the community is removed by a mod.
- * @param name 
+ * @param name
  * @param id The community id.
  * @param summary A shorter, one-line summary.
- * @param banner 
- * @param icon 
- * @param updatedAt 
+ * @param banner
+ * @param icon
+ * @param updatedAt
  * @param sidebar A sidebar for the community in markdown.
  * @param title A longer title, that can contain other characters, and doesn't have to be unique.
  */
 
+data class Community(
 
-data class Community (
+  @SerializedName("local_removed")
+  val localRemoved: kotlin.Boolean,
 
-    @SerializedName("local_removed")
-    val localRemoved: kotlin.Boolean,
+  @SerializedName("unresolved_report_count")
+  val unresolvedReportCount: kotlin.Int,
 
-    @SerializedName("unresolved_report_count")
-    val unresolvedReportCount: kotlin.Int,
+  @SerializedName("report_count")
+  val reportCount: kotlin.Int,
 
-    @SerializedName("report_count")
-    val reportCount: kotlin.Int,
+  @SerializedName("subscribers_local")
+  val subscribersLocal: kotlin.Int,
 
-    @SerializedName("subscribers_local")
-    val subscribersLocal: kotlin.Int,
+  /* The number of users with any activity in the last year. */
+  @SerializedName("users_active_half_year")
+  val usersActiveHalfYear: kotlin.Int,
 
-    /* The number of users with any activity in the last year. */
-    @SerializedName("users_active_half_year")
-    val usersActiveHalfYear: kotlin.Int,
+  /* The number of users with any activity in the last month. */
+  @SerializedName("users_active_month")
+  val usersActiveMonth: kotlin.Int,
 
-    /* The number of users with any activity in the last month. */
-    @SerializedName("users_active_month")
-    val usersActiveMonth: kotlin.Int,
+  /* The number of users with any activity in the last week. */
+  @SerializedName("users_active_week")
+  val usersActiveWeek: kotlin.Int,
 
-    /* The number of users with any activity in the last week. */
-    @SerializedName("users_active_week")
-    val usersActiveWeek: kotlin.Int,
+  /* The number of users with any activity in the last day. */
+  @SerializedName("users_active_day")
+  val usersActiveDay: kotlin.Int,
 
-    /* The number of users with any activity in the last day. */
-    @SerializedName("users_active_day")
-    val usersActiveDay: kotlin.Int,
+  @SerializedName("comments")
+  val comments: kotlin.Int,
 
-    @SerializedName("comments")
-    val comments: kotlin.Int,
+  @SerializedName("posts")
+  val posts: kotlin.Int,
 
-    @SerializedName("posts")
-    val posts: kotlin.Int,
+  @SerializedName("subscribers")
+  val subscribers: kotlin.Int,
 
-    @SerializedName("subscribers")
-    val subscribers: kotlin.Int,
+  @SerializedName("visibility")
+  val visibility: CommunityVisibility,
 
-    @SerializedName("visibility")
-    val visibility: CommunityVisibility,
+  /* The instance id. */
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    /* The instance id. */
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  /* Whether posting is restricted to mods only. */
+  @SerializedName("posting_restricted_to_mods")
+  val postingRestrictedToMods: kotlin.Boolean,
 
-    /* Whether posting is restricted to mods only. */
-    @SerializedName("posting_restricted_to_mods")
-    val postingRestrictedToMods: kotlin.Boolean,
+  @SerializedName("last_refreshed_at")
+  val lastRefreshedAt: kotlin.String,
 
-    @SerializedName("last_refreshed_at")
-    val lastRefreshedAt: kotlin.String,
+  /* Whether the community is local. */
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    /* Whether the community is local. */
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  /* Whether its an NSFW community. */
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean,
 
-    /* Whether its an NSFW community. */
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean,
+  /* Whether the community has been deleted by its creator. */
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    /* Whether the community has been deleted by its creator. */
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  /* Whether the community is removed by a mod. */
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    /* Whether the community is removed by a mod. */
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  /* The community id. */
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("id")
-    val id: kotlin.Int,
+  /* A shorter, one-line summary. */
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    /* A shorter, one-line summary. */
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  @SerializedName("icon")
+  val icon: kotlin.String? = null,
 
-    @SerializedName("icon")
-    val icon: kotlin.String? = null,
+  @SerializedName("updated_at")
+  val updatedAt: kotlin.String? = null,
 
-    @SerializedName("updated_at")
-    val updatedAt: kotlin.String? = null,
+  /* A sidebar for the community in markdown. */
+  @SerializedName("sidebar")
+  val sidebar: kotlin.String? = null,
 
-    /* A sidebar for the community in markdown. */
-    @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null,
+  /* A longer title, that can contain other characters, and doesn't have to be unique. */
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    /* A longer title, that can contain other characters, and doesn't have to be unique. */
-    @SerializedName("title")
-    val title: kotlin.String? = null
-
-) {
-
-
-}
-
+)

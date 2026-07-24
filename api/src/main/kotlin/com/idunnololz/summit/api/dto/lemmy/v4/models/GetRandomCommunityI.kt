@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListingType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param showNsfw 
- * @param type 
+ *
+ * @param showNsfw
+ * @param type
  */
 
+data class GetRandomCommunityI(
 
-data class GetRandomCommunityI (
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null,
+  @SerializedName("type_")
+  val type: ListingType? = null,
 
-    @SerializedName("type_")
-    val type: ListingType? = null
-
-) {
-
-
-}
-
+)

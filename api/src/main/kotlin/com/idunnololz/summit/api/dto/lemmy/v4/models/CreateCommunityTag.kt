@@ -7,49 +7,43 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.TagColor
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.TagColor
 
 /**
  * Create a tag for a community.
  *
- * @param name 
+ * @param name
  * @param communityId The community id.
- * @param color 
- * @param summary 
- * @param displayName 
+ * @param color
+ * @param summary
+ * @param displayName
  */
 
+data class CreateCommunityTag(
 
-data class CreateCommunityTag (
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("color")
+  val color: TagColor? = null,
 
-    @SerializedName("color")
-    val color: TagColor? = null,
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  @SerializedName("display_name")
+  val displayName: kotlin.String? = null,
 
-    @SerializedName("display_name")
-    val displayName: kotlin.String? = null
-
-) {
-
-
-}
-
+)

@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param enabled 
+ *
+ * @param enabled
  */
 
+data class EditTotpResponse(
 
-data class EditTotpResponse (
+  @SerializedName("enabled")
+  val enabled: kotlin.Boolean,
 
-    @SerializedName("enabled")
-    val enabled: kotlin.Boolean
-
-) {
-
-
-}
-
+)

@@ -26,7 +26,6 @@ import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
-import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
 import com.idunnololz.summit.api.dto.lemmy.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -354,7 +353,7 @@ class AccountAwareLemmyClient @Inject constructor(
       listingType = listingType,
       pageCursor = pageCursor,
       page = page,
-      limit = limit
+      limit = limit,
     ).autoSignOut(account)
   }
 

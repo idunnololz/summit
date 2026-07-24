@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -23,30 +22,25 @@ import com.google.gson.annotations.SerializedName
  *
  * @param publishedAt Time of login
  * @param userId The local user id.
- * @param userAgent 
+ * @param userAgent
  * @param ip IP address where login was made from, allows invalidating logins by IP address. Could be stored in truncated format, or store derived information for better privacy.
  */
 
+data class LoginToken(
 
-data class LoginToken (
+  /* Time of login */
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    /* Time of login */
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  /* The local user id. */
+  @SerializedName("user_id")
+  val userId: kotlin.Long,
 
-    /* The local user id. */
-    @SerializedName("user_id")
-    val userId: kotlin.Long,
+  @SerializedName("user_agent")
+  val userAgent: kotlin.String? = null,
 
-    @SerializedName("user_agent")
-    val userAgent: kotlin.String? = null,
+  /* IP address where login was made from, allows invalidating logins by IP address. Could be stored in truncated format, or store derived information for better privacy. */
+  @SerializedName("ip")
+  val ip: kotlin.String? = null,
 
-    /* IP address where login was made from, allows invalidating logins by IP address. Could be stored in truncated format, or store derived information for better privacy. */
-    @SerializedName("ip")
-    val ip: kotlin.String? = null
-
-) {
-
-
-}
-
+)

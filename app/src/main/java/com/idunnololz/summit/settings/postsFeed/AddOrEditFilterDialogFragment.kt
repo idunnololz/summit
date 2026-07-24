@@ -68,7 +68,7 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
       filterField.editText?.addTextChangedListener(
         afterTextChanged = {
           checkForErrors()
-        }
+        },
       )
 
       filterField.editText?.setText(currentFilter?.filter)
@@ -104,7 +104,9 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
         return
       }
 
-      if (matchWholeWordSwitch.isEnabled && !wordRegex.matches(filterField.editText?.text.toString())) {
+      if (matchWholeWordSwitch.isEnabled &&
+        !wordRegex.matches(filterField.editText?.text.toString())
+      ) {
         filterField.error = getString(R.string.warn_match_whole_word_enabled)
       } else {
         filterField.isErrorEnabled = false

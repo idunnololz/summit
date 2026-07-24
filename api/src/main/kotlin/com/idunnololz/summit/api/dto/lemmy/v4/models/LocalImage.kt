@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param publishedAt 
- * @param pictrsAlias 
+ *
+ * @param publishedAt
+ * @param pictrsAlias
  * @param thumbnailForPostId The post id.
  * @param personId The person id.
  */
 
+data class LocalImage(
 
-data class LocalImage (
+  @SerializedName("published_at")
+  val publishedAt: kotlin.String,
 
-    @SerializedName("published_at")
-    val publishedAt: kotlin.String,
+  @SerializedName("pictrs_alias")
+  val pictrsAlias: kotlin.String,
 
-    @SerializedName("pictrs_alias")
-    val pictrsAlias: kotlin.String,
+  /* The post id. */
+  @SerializedName("thumbnail_for_post_id")
+  val thumbnailForPostId: kotlin.Int? = null,
 
-    /* The post id. */
-    @SerializedName("thumbnail_for_post_id")
-    val thumbnailForPostId: kotlin.Int? = null,
+  /* The person id. */
+  @SerializedName("person_id")
+  val personId: kotlin.Int? = null,
 
-    /* The person id. */
-    @SerializedName("person_id")
-    val personId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

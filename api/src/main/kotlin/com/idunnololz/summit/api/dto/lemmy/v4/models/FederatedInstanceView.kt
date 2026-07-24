@@ -7,52 +7,46 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationAllowList
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationBlockList
 import com.idunnololz.summit.api.dto.lemmy.v4.models.FederationQueueState
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Instance
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Site
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param instance 
- * @param allowed 
- * @param blocked 
- * @param queueState 
- * @param site 
+ *
+ * @param instance
+ * @param allowed
+ * @param blocked
+ * @param queueState
+ * @param site
  */
 
+data class FederatedInstanceView(
 
-data class FederatedInstanceView (
+  @SerializedName("instance")
+  val instance: Instance,
 
-    @SerializedName("instance")
-    val instance: Instance,
+  @SerializedName("allowed")
+  val allowed: FederationAllowList? = null,
 
-    @SerializedName("allowed")
-    val allowed: FederationAllowList? = null,
+  @SerializedName("blocked")
+  val blocked: FederationBlockList? = null,
 
-    @SerializedName("blocked")
-    val blocked: FederationBlockList? = null,
+  @SerializedName("queue_state")
+  val queueState: FederationQueueState? = null,
 
-    @SerializedName("queue_state")
-    val queueState: FederationQueueState? = null,
+  @SerializedName("site")
+  val site: Site? = null,
 
-    @SerializedName("site")
-    val site: Site? = null
-
-) {
-
-
-}
-
+)

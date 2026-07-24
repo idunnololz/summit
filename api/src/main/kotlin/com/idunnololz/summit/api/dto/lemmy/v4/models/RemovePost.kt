@@ -7,45 +7,39 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Remove a post (only doable by mods).
  *
- * @param reason 
- * @param removed 
+ * @param reason
+ * @param removed
  * @param postId The post id.
  * @param removeChildren Setting this will override whatever `removed` was set to, leave as null or unset to act just on the post itself.
  */
 
+data class RemovePost(
 
-data class RemovePost (
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the post itself. */
+  @SerializedName("remove_children")
+  val removeChildren: kotlin.Boolean? = null,
 
-    /* Setting this will override whatever `removed` was set to, leave as null or unset to act just on the post itself. */
-    @SerializedName("remove_children")
-    val removeChildren: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

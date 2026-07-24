@@ -6,7 +6,6 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.local.ModEvent
-import com.idunnololz.summit.api.local.toModEvents
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

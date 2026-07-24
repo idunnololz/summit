@@ -10,23 +10,22 @@
   "ArrayInDataClass",
   "EnumEntryName",
   "RemoveRedundantQualifierName",
-  "UnusedImport"
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationType
-
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationType
 
 /**
  * A list of possible types for the inbox.
  *
  */
 
-
-enum class NotificationTypeFilter(val value: kotlin.String) {
-
+enum class NotificationTypeFilter(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "mention")
   mention("mention"),
@@ -41,7 +40,5 @@ enum class NotificationTypeFilter(val value: kotlin.String) {
   private_message("private_message"),
 
   @SerializedName(value = "mod_action")
-  mod_action("mod_action");
-
+  mod_action("mod_action"),
 }
-

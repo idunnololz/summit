@@ -7,71 +7,65 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportSortType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  * @param myReportsOnly If true, view all your created reports. Works for non-admins/mods also.
  * @param showCommunityRuleViolations Only for admins: also show reports with `violates_instance_rules=false`
- * @param limit 
+ * @param limit
  * @param pageCursor To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param sort 
+ * @param sort
  * @param communityId The community id.
  * @param postId The post id.
- * @param type 
+ * @param type
  * @param unresolvedOnly Only shows the unresolved reports
  */
 
+data class ListReportsI(
 
-data class ListReportsI (
+  /* If true, view all your created reports. Works for non-admins/mods also. */
+  @SerializedName("my_reports_only")
+  val myReportsOnly: kotlin.Boolean? = null,
 
-    /* If true, view all your created reports. Works for non-admins/mods also. */
-    @SerializedName("my_reports_only")
-    val myReportsOnly: kotlin.Boolean? = null,
+  /* Only for admins: also show reports with `violates_instance_rules=false` */
+  @SerializedName("show_community_rule_violations")
+  val showCommunityRuleViolations: kotlin.Boolean? = null,
 
-    /* Only for admins: also show reports with `violates_instance_rules=false` */
-    @SerializedName("show_community_rule_violations")
-    val showCommunityRuleViolations: kotlin.Boolean? = null,
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("page_cursor")
+  val pageCursor: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("page_cursor")
-    val pageCursor: kotlin.String? = null,
+  @SerializedName("sort")
+  val sort: ReportSortType? = null,
 
-    @SerializedName("sort")
-    val sort: ReportSortType? = null,
+  /* The community id. */
+  @SerializedName("community_id")
+  val communityId: kotlin.Int? = null,
 
-    /* The community id. */
-    @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+  /* The post id. */
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    /* The post id. */
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  @SerializedName("type_")
+  val type: ReportType? = null,
 
-    @SerializedName("type_")
-    val type: ReportType? = null,
+  /* Only shows the unresolved reports */
+  @SerializedName("unresolved_only")
+  val unresolvedOnly: kotlin.Boolean? = null,
 
-    /* Only shows the unresolved reports */
-    @SerializedName("unresolved_only")
-    val unresolvedOnly: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

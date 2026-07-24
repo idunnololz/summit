@@ -7,14 +7,13 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
@@ -24,47 +23,49 @@ import com.google.gson.annotations.SerializedName
  * Values: hot,top,new,old,controversial
  */
 
-enum class CommentSortType(val value: kotlin.String) {
+enum class CommentSortType(
+  val value: kotlin.String,
+) {
 
-    @SerializedName(value = "hot")
-    hot("hot"),
+  @SerializedName(value = "hot")
+  hot("hot"),
 
-    @SerializedName(value = "top")
-    top("top"),
+  @SerializedName(value = "top")
+  top("top"),
 
-    @SerializedName(value = "new")
-    new("new"),
+  @SerializedName(value = "new")
+  new("new"),
 
-    @SerializedName(value = "old")
-    old("old"),
+  @SerializedName(value = "old")
+  old("old"),
 
-    @SerializedName(value = "controversial")
-    controversial("controversial");
+  @SerializedName(value = "controversial")
+  controversial("controversial"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? = if (data is CommentSortType) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [CommentSortType] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is CommentSortType) "$data" else null
-
-        /**
-         * Returns a valid [CommentSortType] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): CommentSortType? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): CommentSortType? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

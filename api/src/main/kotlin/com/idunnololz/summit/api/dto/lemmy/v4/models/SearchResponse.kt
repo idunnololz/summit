@@ -7,14 +7,15 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommentView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MultiCommunityView
@@ -22,52 +23,45 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectView
 
-import com.google.gson.annotations.SerializedName
-
 /**
  * The search response, containing lists of the return type possibilities
  *
- * @param multiCommunities 
- * @param persons 
- * @param communities 
- * @param posts 
- * @param comments 
+ * @param multiCommunities
+ * @param persons
+ * @param communities
+ * @param posts
+ * @param comments
  * @param nextPage To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
  * @param prevPage To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions.
- * @param resolve 
+ * @param resolve
  */
 
+data class SearchResponse(
 
-data class SearchResponse (
+  @SerializedName("multi_communities")
+  val multiCommunities: kotlin.collections.List<MultiCommunityView>,
 
-    @SerializedName("multi_communities")
-    val multiCommunities: kotlin.collections.List<MultiCommunityView>,
+  @SerializedName("persons")
+  val persons: kotlin.collections.List<PersonView>,
 
-    @SerializedName("persons")
-    val persons: kotlin.collections.List<PersonView>,
+  @SerializedName("communities")
+  val communities: kotlin.collections.List<CommunityView>,
 
-    @SerializedName("communities")
-    val communities: kotlin.collections.List<CommunityView>,
+  @SerializedName("posts")
+  val posts: kotlin.collections.List<PostView>,
 
-    @SerializedName("posts")
-    val posts: kotlin.collections.List<PostView>,
+  @SerializedName("comments")
+  val comments: kotlin.collections.List<CommentView>,
 
-    @SerializedName("comments")
-    val comments: kotlin.collections.List<CommentView>,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("next_page")
+  val nextPage: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("next_page")
-    val nextPage: kotlin.String? = null,
+  /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
+  @SerializedName("prev_page")
+  val prevPage: kotlin.String? = null,
 
-    /* To get the next or previous page, pass this string unchanged as `page_cursor` in a new request to the same endpoint.  Do not attempt to parse or modify the cursor string. The format is internal and may change in minor Lemmy versions. */
-    @SerializedName("prev_page")
-    val prevPage: kotlin.String? = null,
+  @SerializedName("resolve")
+  val resolve: ResolveObjectView? = null,
 
-    @SerializedName("resolve")
-    val resolve: ResolveObjectView? = null
-
-) {
-
-
-}
-
+)

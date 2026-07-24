@@ -7,43 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param name 
- * @param sidebar 
- * @param summary 
- * @param title 
+ *
+ * @param name
+ * @param sidebar
+ * @param summary
+ * @param title
  */
 
+data class CreateMultiCommunity(
 
-data class CreateMultiCommunity (
+  @SerializedName("name")
+  val name: kotlin.String,
 
-    @SerializedName("name")
-    val name: kotlin.String,
+  @SerializedName("sidebar")
+  val sidebar: kotlin.String? = null,
 
-    @SerializedName("sidebar")
-    val sidebar: kotlin.String? = null,
+  @SerializedName("summary")
+  val summary: kotlin.String? = null,
 
-    @SerializedName("summary")
-    val summary: kotlin.String? = null,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null
-
-) {
-
-
-}
-
+)

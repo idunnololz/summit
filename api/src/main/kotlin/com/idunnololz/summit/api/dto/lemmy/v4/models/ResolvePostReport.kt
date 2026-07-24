@@ -7,36 +7,30 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
-
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * Resolve a post report (mods only).
  *
- * @param resolved 
+ * @param resolved
  * @param reportId The post report id.
  */
 
+data class ResolvePostReport(
 
-data class ResolvePostReport (
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  /* The post report id. */
+  @SerializedName("report_id")
+  val reportId: Int,
 
-    /* The post report id. */
-    @SerializedName("report_id")
-    val reportId: Int,
-
-) {
-
-
-}
-
+)

@@ -7,61 +7,60 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.lemmy.v4.models
 
+import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.lemmy.v4.models.Person
 import com.idunnololz.summit.api.dto.lemmy.v4.models.PersonActions
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
  *
- * @param banned 
- * @param isAdmin 
- * @param person 
- * @param type 
- * @param banExpiresAt 
- * @param personActions 
+ *
+ * @param banned
+ * @param isAdmin
+ * @param person
+ * @param type
+ * @param banExpiresAt
+ * @param personActions
  */
 
+data class ResolveObjectViewAnyOf2(
 
-data class ResolveObjectViewAnyOf2 (
+  @SerializedName("banned")
+  val banned: kotlin.Boolean,
 
-    @SerializedName("banned")
-    val banned: kotlin.Boolean,
+  @SerializedName("is_admin")
+  val isAdmin: kotlin.Boolean,
 
-    @SerializedName("is_admin")
-    val isAdmin: kotlin.Boolean,
+  @SerializedName("person")
+  val person: Person,
 
-    @SerializedName("person")
-    val person: Person,
+  @SerializedName("type_")
+  val type: ResolveObjectViewAnyOf2.Type,
 
-    @SerializedName("type_")
-    val type: ResolveObjectViewAnyOf2.Type,
+  @SerializedName("ban_expires_at")
+  val banExpiresAt: kotlin.String? = null,
 
-    @SerializedName("ban_expires_at")
-    val banExpiresAt: kotlin.String? = null,
-
-    @SerializedName("person_actions")
-    val personActions: PersonActions? = null
+  @SerializedName("person_actions")
+  val personActions: PersonActions? = null,
 
 ) {
 
-    /**
-     * 
-     *
-     * Values: person
-     */
-    enum class Type(val value: kotlin.String) {
-        @SerializedName(value = "person") person("person");
-    }
-
+  /**
+   *
+   *
+   * Values: person
+   */
+  enum class Type(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "person")
+    person("person"),
+  }
 }
-
