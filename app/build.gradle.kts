@@ -14,13 +14,13 @@ plugins {
 }
 
 android {
-  compileSdk = 36
+  compileSdk = 37
   namespace = "com.idunnololz.summit"
 
   defaultConfig {
     applicationId = "com.idunnololz.summit"
     minSdk = 23
-    targetSdk = 36
+    targetSdk = 37
     versionCode = 344
     versionName = "1.83.0"
 

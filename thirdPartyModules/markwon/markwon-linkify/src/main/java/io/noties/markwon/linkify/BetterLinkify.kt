@@ -531,7 +531,7 @@ object BetterLinkify {
     return url
   }
 
-  private fun pruneOverlaps(links: java.util.ArrayList<LinkSpec>, text: Spannable) {
+  private fun pruneOverlaps(links: MutableList<LinkSpec>, text: Spannable) {
     // Append spans added by framework
     val urlSpans = text.getSpans<URLSpan?>(0, text.length, URLSpan::class.java)
     for (urlSpan in urlSpans) {
@@ -542,7 +542,7 @@ object BetterLinkify {
       links.add(spec)
     }
 
-    Collections.sort<LinkSpec?>(links, COMPARATOR)
+    links.sortWith(COMPARATOR)
 
     var len = links.size
     var i = 0
