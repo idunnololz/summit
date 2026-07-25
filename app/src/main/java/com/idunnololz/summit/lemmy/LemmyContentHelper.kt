@@ -20,7 +20,7 @@ import androidx.core.net.toUri
 import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import coil3.asImage
 import coil3.dispose
 import coil3.load

@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import kotlinx.parcelize.Parcelize
 
 sealed interface PostOrCommentRef : Parcelable {

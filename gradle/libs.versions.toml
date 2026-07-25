@@ -1,6 +1,5 @@
 [versions]
 androidGradlePlugin = "9.2.1"
-arrowCore = "2.2.2.1"
 datastorePreferences = "1.2.1"
 desugar_jdk_libs = "2.1.5"
 exifinterface = "1.4.2"
@@ -26,7 +25,6 @@ avif = "1.3.0.841110fd"
 junitKtx = "1.3.0"
 
 [libraries]
-arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
 coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version = "1.3.0" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }

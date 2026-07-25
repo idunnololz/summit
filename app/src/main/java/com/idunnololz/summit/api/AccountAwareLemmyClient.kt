@@ -3,7 +3,7 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager

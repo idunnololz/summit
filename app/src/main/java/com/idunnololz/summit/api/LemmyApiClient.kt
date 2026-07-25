@@ -1,7 +1,7 @@
 package com.idunnololz.summit.api
 
 import android.util.Log
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse

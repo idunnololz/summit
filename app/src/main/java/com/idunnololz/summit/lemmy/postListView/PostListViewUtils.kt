@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import androidx.fragment.app.FragmentManager
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount

@@ -2,7 +2,7 @@ package com.idunnololz.summit.tabs
 
 import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager

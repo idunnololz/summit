@@ -2,7 +2,7 @@ package com.idunnololz.summit.lemmy.multicommunity
 
 import android.content.Context
 import android.util.Log
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException

@@ -1,7 +1,7 @@
 package com.idunnololz.summit.actions
 
 import android.util.Log
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult.Failure
 import com.idunnololz.summit.api.ApiException

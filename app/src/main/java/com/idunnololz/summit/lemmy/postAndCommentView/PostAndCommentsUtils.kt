@@ -2,7 +2,7 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount

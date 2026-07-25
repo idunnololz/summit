@@ -4,7 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.database.getIntOrNull
 import androidx.sqlite.db.SupportSQLiteDatabase
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.getStringOrNull
 import java.io.Closeable
 import kotlinx.coroutines.Dispatchers

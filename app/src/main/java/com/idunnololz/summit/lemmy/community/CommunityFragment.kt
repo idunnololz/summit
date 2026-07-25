@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar

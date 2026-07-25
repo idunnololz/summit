@@ -12,8 +12,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import arrow.core.Either
-import arrow.core.Either.*
+import com.idunnololz.summit.util.arrow.Either
+import com.idunnololz.summit.util.arrow.Either.*
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -513,7 +513,7 @@ class PostAdapter(
               onInstanceMismatch = onInstanceMismatch,
               onLinkClick = onLinkClick,
               onLinkLongClick = { url, text ->
-                onLinkLongClick(Either.Left(post), url, text)
+                onLinkLongClick(Left(post), url, text)
               },
               screenshotConfig = screenshotConfig,
               onTextBound = {

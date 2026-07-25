@@ -186,8 +186,6 @@ dependencies {
 
   implementation(libs.browser)
 
-  implementation(libs.arrow.core)
-
   implementation(libs.hilt.common)
   implementation(libs.hilt.work)
   implementation(libs.core.splashscreen)

@@ -3,7 +3,7 @@ package com.idunnololz.summit.history
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.Either
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.lemmy.CommentRef
