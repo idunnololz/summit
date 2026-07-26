@@ -21,8 +21,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 23
     targetSdk = 37
-    versionCode = 346
-    versionName = "1.83.2"
+    versionCode = 347
+    versionName = "1.83.3"
 
     buildConfigField(
       "String",

@@ -252,8 +252,8 @@ class LemmyApiV3Adapter(
   ): Result<GetCommentsResponse> = retrofitErrorHandler {
     if (args.post_id != null) {
       return@retrofitErrorHandler api.getComments(
-        generateHeaders(authorization, force),
-        args.serializeToMap(),
+        headers = generateHeaders(authorization, force),
+        form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
       )
     }
 
@@ -265,7 +265,7 @@ class LemmyApiV3Adapter(
         return retrofitErrorHandler {
           api.getComments(
             headers = headers,
-            form = args.serializeToMap(),
+            form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
           )
         }
       }

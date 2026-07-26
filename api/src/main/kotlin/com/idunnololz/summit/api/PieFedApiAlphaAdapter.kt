@@ -414,7 +414,7 @@ class PieFedApiAlphaAdapter(
         return retrofitErrorHandler {
           api.getComments(
             headers = headers,
-            form = args.serializeToMap(),
+            form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
           )
         }
       }
@@ -426,7 +426,7 @@ class PieFedApiAlphaAdapter(
         val result = retrofitErrorHandler {
           api.getComments(
             headers = headers,
-            form = args.copy(page = page, limit = limit).serializeToMap(),
+            form = args.copy(page = page.toLemmyPageIndex(), limit = limit).serializeToMap(),
           )
         }
 
