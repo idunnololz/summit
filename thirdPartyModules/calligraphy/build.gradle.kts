@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-  compileSdk = 36
+  compileSdk = 37
   namespace = "io.github.inflationx.calligraphy3"
 
   defaultConfig {

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-  compileSdk = 36
+  compileSdk = 37
   namespace = "com.idunnololz.summit.api"
 
   defaultConfig {

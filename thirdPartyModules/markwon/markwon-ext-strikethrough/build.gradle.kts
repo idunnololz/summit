@@ -4,7 +4,7 @@ plugins {
 
 android {
   namespace = "io.noties.markwon.ext.strikethrough"
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig {
     minSdk = 23
