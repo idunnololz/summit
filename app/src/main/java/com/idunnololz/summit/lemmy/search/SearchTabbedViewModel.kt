@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -18,6 +17,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

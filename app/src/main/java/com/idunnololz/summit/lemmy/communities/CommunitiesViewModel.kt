@@ -60,7 +60,7 @@ class CommunitiesViewModel @Inject constructor(
       .fetchCommunities(
         sortType = SortType.TopAll,
         listingType = ListingType.Local,
-        page = page.toLemmyPageIndex(),
+        page = page,
         limit = limit,
         account = null,
       )
@@ -134,7 +134,7 @@ class CommunitiesViewModel @Inject constructor(
         )
       }
 
-      val result = communitiesSource?.getPage(page.toLemmyPageIndex(), force = false)
+      val result = communitiesSource?.getPage(page, force = false)
 
       communitiesEngine.addPage(
         page = page,

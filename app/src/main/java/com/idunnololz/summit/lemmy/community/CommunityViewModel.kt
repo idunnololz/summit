@@ -8,7 +8,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
@@ -51,6 +50,7 @@ import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.toErrorMessage

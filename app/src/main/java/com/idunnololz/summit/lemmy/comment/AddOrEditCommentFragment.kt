@@ -26,7 +26,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.idunnololz.summit.util.arrow.Either
 import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
@@ -70,6 +69,7 @@ import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText

@@ -3,7 +3,6 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
@@ -49,6 +48,7 @@ import com.idunnololz.summit.models.GetPostResponse
 import com.idunnololz.summit.models.GetPostsResponse
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.models.SearchResponse
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InputStream

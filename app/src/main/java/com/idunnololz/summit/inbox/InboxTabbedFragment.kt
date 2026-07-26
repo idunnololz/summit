@@ -15,7 +15,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -37,6 +36,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
 import com.idunnololz.summit.util.TwoPaneOnBackPressedCallback
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe

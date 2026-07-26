@@ -1,7 +1,6 @@
 package com.idunnololz.summit.links
 
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -10,6 +9,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.consts.LEMMY_INSTANCES
 import javax.inject.Inject
 import javax.inject.Singleton

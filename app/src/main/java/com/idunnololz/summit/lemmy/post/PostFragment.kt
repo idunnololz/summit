@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
-import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -87,6 +86,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -1014,6 +1014,8 @@ class PostFragment :
   }
 
   private fun goToPreviousComment() {
+    if (!isBindingAvailable()) return
+
     (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
       val curPos = it.getFirstVisibleItem()
 

@@ -11,7 +11,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.idunnololz.summit.util.arrow.Either
 import coil3.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
@@ -36,6 +35,7 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper

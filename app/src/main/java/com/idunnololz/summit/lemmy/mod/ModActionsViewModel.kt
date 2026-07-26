@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.mod
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
@@ -11,6 +10,7 @@ import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async

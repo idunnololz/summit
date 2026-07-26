@@ -20,7 +20,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
@@ -60,6 +59,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.setup

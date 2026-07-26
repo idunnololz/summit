@@ -40,6 +40,7 @@ import com.idunnololz.summit.api.dto.piefed.models.WidthHeight
  * @param instanceSticky
  * @param title
  * @param userId
+ * @param postType
  * @param altText
  * @param body
  * @param smallThumbnailUrl
@@ -48,7 +49,6 @@ import com.idunnololz.summit.api.dto.piefed.models.WidthHeight
  * @param url
  * @param imageDetails
  * @param crossPosts
- * @param postType
  * @param tags
  * @param flair
  * @param emojiReactions
@@ -103,6 +103,9 @@ data class Post(
   @SerializedName("user_id")
   val userId: kotlin.Int,
 
+  @SerializedName("post_type")
+  val postType: Post.PostType,
+
   @SerializedName("alt_text")
   val altText: kotlin.String? = null,
 
@@ -126,9 +129,6 @@ data class Post(
 
   @SerializedName("cross_posts")
   val crossPosts: kotlin.collections.List<MiniCrossPosts>? = null,
-
-  @SerializedName("post_type")
-  val postType: Post.PostType? = null,
 
   @SerializedName("tags")
   val tags: kotlin.String? = null,

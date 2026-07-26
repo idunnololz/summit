@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy
 
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
@@ -9,6 +8,7 @@ import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.utils.listSource.CursorBackedSingleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.Page
 import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
+import com.idunnololz.summit.util.arrow.Either
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

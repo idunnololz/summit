@@ -12,8 +12,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.idunnololz.summit.util.arrow.Either
-import com.idunnololz.summit.util.arrow.Either.*
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -59,6 +57,8 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
+import com.idunnololz.summit.util.arrow.Either.*
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.count
 import com.idunnololz.summit.util.ext.getDimen

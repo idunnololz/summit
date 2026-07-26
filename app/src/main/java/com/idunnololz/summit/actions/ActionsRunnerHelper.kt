@@ -1,7 +1,6 @@
 package com.idunnololz.summit.actions
 
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult.Failure
 import com.idunnololz.summit.api.ApiException
@@ -21,6 +20,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyReque
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.util.arrow.Either
 import javax.inject.Inject
 import kotlin.random.Random
 

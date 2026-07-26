@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -22,6 +21,7 @@ import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.fold
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.requireMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

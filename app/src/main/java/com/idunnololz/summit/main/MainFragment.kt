@@ -18,7 +18,6 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.idunnololz.summit.util.arrow.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.discord.panels.PanelsChildGestureRegionObserver
@@ -49,6 +48,7 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.obtainNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat

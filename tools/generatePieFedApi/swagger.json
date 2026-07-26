@@ -642,9 +642,20 @@
           },
           "show_scores": {
             "type": "boolean"
+          },
+          "manually_approves_followers": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "required": [
+          "accept_private_messages",
+          "ai_visibility",
+          "bot_visibility",
+          "default_comment_sort_type",
+          "default_listing_type",
           "email_unread",
           "federate_votes",
           "feed_auto_follow",
@@ -652,6 +663,8 @@
           "hide_low_quality",
           "indexable",
           "newsletter",
+          "nsfl_visibility",
+          "nsfw_visibility",
           "reply_collapse_threshold",
           "reply_hide_threshold",
           "searchable",
@@ -1132,7 +1145,8 @@
           "activity_alert",
           "blocked",
           "community",
-          "counts"
+          "counts",
+          "subscribed"
         ]
       },
       "PostAggregates": {
@@ -1376,7 +1390,8 @@
           }
         },
         "required": [
-          "choices"
+          "choices",
+          "mode"
         ]
       },
       "Post": {
@@ -1512,6 +1527,7 @@
           "local",
           "locked",
           "nsfw",
+          "post_type",
           "published",
           "removed",
           "sticky",
@@ -1598,6 +1614,7 @@
           "post",
           "read",
           "saved",
+          "subscribed",
           "unread_comments"
         ]
       },
@@ -1780,7 +1797,8 @@
           "creator_is_admin",
           "creator_is_moderator",
           "post",
-          "saved"
+          "saved",
+          "subscribed"
         ]
       },
       "SearchResponse": {
@@ -1825,6 +1843,7 @@
           "comments",
           "communities",
           "posts",
+          "type_",
           "users"
         ]
       },
@@ -4177,6 +4196,17 @@
           "jwt"
         ]
       },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
       "UserUnreadCountsResponse": {
         "type": "object",
         "properties": {
@@ -4303,7 +4333,8 @@
           "my_vote",
           "post",
           "recipient",
-          "saved"
+          "saved",
+          "subscribed"
         ]
       },
       "UserRepliesResponse": {
@@ -4739,7 +4770,8 @@
           "notif_body",
           "notif_id",
           "notif_subtype",
-          "notif_type"
+          "notif_type",
+          "status"
         ]
       },
       "UserNotificationsResponse": {
@@ -4776,6 +4808,7 @@
         "required": [
           "counts",
           "items",
+          "status",
           "username"
         ]
       },
@@ -4842,6 +4875,44 @@
         "properties": {
           "person_view": {
             "$ref": "#/components/schemas/PersonView"
+          }
+        }
+      },
+      "UserFollowRequest": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      },
+      "UserFollowResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "string"
+          }
+        }
+      },
+      "UserUnfollowRequest": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      },
+      "UserUnfollowResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "string"
           }
         }
       },
@@ -5290,7 +5361,8 @@
           "creator_is_admin",
           "creator_is_moderator",
           "post",
-          "saved"
+          "saved",
+          "subscribed"
         ]
       },
       "GetCommentReportResponse": {
@@ -5322,6 +5394,21 @@
         },
         "required": [
           "comment_reports"
+        ]
+      },
+      "PutCommentReportResolveRequest": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "integer"
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_id",
+          "resolved"
         ]
       },
       "RemoveCommentRequest": {
@@ -5574,7 +5661,8 @@
           "creator_blocked",
           "creator_is_admin",
           "creator_is_moderator",
-          "saved"
+          "saved",
+          "subscribed"
         ]
       },
       "GetPostRepliesResponse": {
@@ -5934,7 +6022,8 @@
           "post",
           "post_creator",
           "post_report",
-          "saved"
+          "saved",
+          "subscribed"
         ]
       },
       "PostReportResponse": {
@@ -5946,6 +6035,41 @@
         },
         "required": [
           "post_report_view"
+        ]
+      },
+      "GetPostReportListResponse": {
+        "type": "object",
+        "properties": {
+          "post_reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostReportView"
+            }
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "post_reports"
+        ]
+      },
+      "PutPostReportResolveRequest": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "integer"
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_id",
+          "resolved"
         ]
       },
       "LockPostRequest": {
@@ -6193,6 +6317,7 @@
           "post",
           "read",
           "saved",
+          "subscribed",
           "unread_comments"
         ]
       },
@@ -6466,12 +6591,268 @@
             "type": "integer"
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 255
           }
         },
         "required": [
           "private_message_id",
           "reason"
+        ]
+      },
+      "PrivateMessageReport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "creator_id": {
+            "type": "integer",
+            "description": "User id of the reporter"
+          },
+          "private_message_id": {
+            "type": "integer"
+          },
+          "original_pm_text": {
+            "type": "string"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "published": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "creator_id",
+          "id",
+          "original_pm_text",
+          "private_message_id",
+          "published",
+          "reason",
+          "resolved"
+        ]
+      },
+      "PrivateMessageReportView": {
+        "type": "object",
+        "properties": {
+          "private_message_report": {
+            "$ref": "#/components/schemas/PrivateMessageReport"
+          },
+          "private_message": {
+            "$ref": "#/components/schemas/PrivateMessage"
+          },
+          "private_message_creator": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/Person"
+          }
+        }
+      },
+      "PrivateMessageReportResponse": {
+        "type": "object",
+        "properties": {
+          "private_message_report_view": {
+            "$ref": "#/components/schemas/PrivateMessageReportView"
+          }
+        }
+      },
+      "ReportConversationRequest": {
+        "type": "object",
+        "properties": {
+          "conversation_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "conversation_id",
+          "reason"
+        ]
+      },
+      "GetPrivateMessageReportListResponse": {
+        "type": "object",
+        "properties": {
+          "private_message_reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrivateMessageReportView"
+            }
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "private_message_reports"
+        ]
+      },
+      "ConversationReport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "creator_id": {
+            "type": "integer",
+            "description": "User id of the reporter"
+          },
+          "conversation_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Any other additional information provided by the reporter"
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "published": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "conversation_id",
+          "creator_id",
+          "description",
+          "id",
+          "published",
+          "reason",
+          "resolved"
+        ]
+      },
+      "ConversationInfoView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Person"
+            }
+          },
+          "creator_id": {
+            "type": "integer"
+          },
+          "published": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          },
+          "updated": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "creator_id",
+          "id",
+          "published",
+          "updated"
+        ]
+      },
+      "ConversationReportView": {
+        "type": "object",
+        "properties": {
+          "conversation_report": {
+            "$ref": "#/components/schemas/ConversationReport"
+          },
+          "conversation_information": {
+            "$ref": "#/components/schemas/ConversationInfoView"
+          },
+          "message_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrivateMessageView"
+            }
+          },
+          "creator": {
+            "$ref": "#/components/schemas/Person"
+          }
+        },
+        "required": [
+          "conversation_information",
+          "conversation_report",
+          "creator"
+        ]
+      },
+      "GetConversationReportListResponse": {
+        "type": "object",
+        "properties": {
+          "conversation_reports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationReportView"
+            }
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "conversation_reports"
+        ]
+      },
+      "PutPrivateMessageReportResolveRequest": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "integer"
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_id",
+          "resolved"
+        ]
+      },
+      "PutConversationReportResolveRequest": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "integer"
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_id",
+          "resolved"
         ]
       },
       "UserRegistration": {
@@ -6535,6 +6916,7 @@
           "answer",
           "email",
           "ip_address",
+          "status",
           "user_id",
           "user_name"
         ]
@@ -6588,24 +6970,16 @@
       "description": "This instance"
     },
     {
+      "url": "https://piefed.social",
+      "description": "Flagship instance, stable branch"
+    },
+    {
       "url": "https://crust.piefed.social",
-      "description": "Development instance"
-    },
-    {
-      "url": "https://piefed.social"
-    },
-    {
-      "url": "https://preferred.social"
-    },
-    {
-      "url": "https://feddit.online"
-    },
-    {
-      "url": "https://piefed.world"
+      "description": "Official development instance"
     }
   ],
   "info": {
-    "title": "PieFed 1.6 Alpha API",
+    "title": "PieFed 1.7 Alpha API",
     "contact": {
       "name": "Developer",
       "url": "https://codeberg.org/rimu/pyfedi"
@@ -6614,7 +6988,7 @@
       "name": "AGPLv3",
       "url": "https://www.gnu.org/licenses/agpl-3.0.en.html#license-text"
     },
-    "version": "alpha 1.6"
+    "version": "alpha 1.7"
   },
   "paths": {
     "/api/alpha/site": {
@@ -8605,6 +8979,36 @@
         "summary": "Log into PieFed"
       }
     },
+    "/api/alpha/user/logout": {
+      "post": {
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "summary": "Logout / Revoke JWT token"
+      }
+    },
     "/api/alpha/user/unread_count": {
       "get": {
         "responses": {
@@ -9278,6 +9682,92 @@
           "User"
         ],
         "summary": "Set your flair for a community"
+      }
+    },
+    "/api/alpha/user/follow": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFollowResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFollowRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "summary": "Follow a user"
+      }
+    },
+    "/api/alpha/user/unfollow": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUnfollowResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUnfollowRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "summary": "Unfollow a user"
       }
     },
     "/api/alpha/user/note": {
@@ -10062,6 +10552,49 @@
           "Comment"
         ],
         "summary": "Get list of comment reports."
+      }
+    },
+    "/api/alpha/comment/report/resolve": {
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCommentReportResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutCommentReportResolveRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Resolve or unresolve a comment report"
       }
     },
     "/api/alpha/comment/remove": {
@@ -11200,6 +11733,129 @@
         "summary": "Report a post."
       }
     },
+    "/api/alpha/post/report/list": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "community_id",
+            "description": "Limit reports to within a single community",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "post_id",
+            "description": "Get the reports for a single post",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "unresolved_only",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPostReportListResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Post"
+        ],
+        "summary": "Get list of comment reports."
+      }
+    },
+    "/api/alpha/post/report/resolve": {
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostReportResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutPostReportResolveRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Post"
+        ],
+        "summary": "Resolve or unresolve a report"
+      }
+    },
     "/api/alpha/post/lock": {
       "post": {
         "responses": {
@@ -12141,7 +12797,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PrivateMessageResponse"
+                  "$ref": "#/components/schemas/PrivateMessageReportResponse"
                 }
               }
             }
@@ -12161,6 +12817,282 @@
           "Private Message"
         ],
         "summary": "Report a private message."
+      }
+    },
+    "/api/alpha/private_message/conversation/report": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportConversationRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Private Message"
+        ],
+        "summary": "Report a conversation"
+      }
+    },
+    "/api/alpha/private_message/report/list": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "conversation_id",
+            "description": "Restrict reports to within a single conversation",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "private_message_id",
+            "description": "Restrict reports to a single message",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "unresolved_only",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPrivateMessageReportListResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Private Message"
+        ],
+        "summary": "Get list of individual private message reports"
+      }
+    },
+    "/api/alpha/private_message/conversation/report/list": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "conversation_id",
+            "description": "Restrict reports to a single conversation",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "unresolved_only",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "message_history_limit",
+            "description": "Number of most recent messages in the conversation to include in the response",
+            "schema": {
+              "type": "integer",
+              "default": 5
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetConversationReportListResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Private Message"
+        ],
+        "summary": "Get list of reported conversations and conversations containing a reported private message"
+      }
+    },
+    "/api/alpha/private_message/report/resolve": {
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivateMessageReportResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutPrivateMessageReportResolveRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Private Message"
+        ],
+        "summary": "Resolve or unresolve a private message report"
+      }
+    },
+    "/api/alpha/private_message/conversation/report/resolve": {
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutConversationReportResolveRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Private Message"
+        ],
+        "summary": "Resolve or unresolve a reported conversation"
       }
     },
     "/api/alpha/admin/registration_application/list": {

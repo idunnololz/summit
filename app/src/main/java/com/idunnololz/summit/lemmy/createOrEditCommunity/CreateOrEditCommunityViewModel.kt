@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.createOrEditCommunity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
@@ -14,6 +13,7 @@ import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

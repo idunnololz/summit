@@ -13,7 +13,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
@@ -28,6 +27,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.anyServerBasedSectionsEnabled
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.getStringOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

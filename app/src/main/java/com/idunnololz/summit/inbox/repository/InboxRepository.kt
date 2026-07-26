@@ -13,6 +13,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.LiteInboxItem
 import com.idunnololz.summit.inbox.PageType
+import com.idunnololz.summit.inbox.toInboxItem
 import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -346,7 +347,7 @@ class InboxRepository @Inject constructor(
       force = force,
     ).fold(
       onSuccess = {
-        Result.success(it.post_reports.map { InboxItem.ReportPostInboxItem(it) })
+        Result.success(it.post_reports.mapNotNull { it.toInboxItem() })
       },
       onFailure = {
         if (it is NotAModOrAdmin || it is NotYetImplemented) {

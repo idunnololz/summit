@@ -14,12 +14,12 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize

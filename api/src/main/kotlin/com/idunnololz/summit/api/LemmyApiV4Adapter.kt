@@ -155,6 +155,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.ListRegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ListReportsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.MarkNotificationAsRead
 import com.idunnololz.summit.api.dto.lemmy.v4.models.NotificationTypeFilter
+import com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType as PostFeatureTypeV4
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ReportType
 import com.idunnololz.summit.api.dto.lemmy.v4.models.ResolveObjectI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchI
@@ -1147,8 +1148,8 @@ class LemmyApiV4Adapter(
       generateHeaders(authorization, force = false),
       com.idunnololz.summit.api.dto.lemmy.v4.models.FeaturePost(
         featureType = when (args.feature_type) {
-          PostFeatureType.Local -> com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType.local
-          PostFeatureType.Community -> com.idunnololz.summit.api.dto.lemmy.v4.models.PostFeatureType.community
+          PostFeatureType.Local -> PostFeatureTypeV4.local
+          PostFeatureType.Community -> PostFeatureTypeV4.community
         },
         featured = args.featured,
         postId = args.post_id,

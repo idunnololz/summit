@@ -1,7 +1,6 @@
 package com.idunnololz.summit.prefetcher
 
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
@@ -9,6 +8,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.arrow.Either
 import javax.inject.Inject
 import javax.inject.Singleton
 

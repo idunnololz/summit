@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import androidx.fragment.app.FragmentManager
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount
@@ -26,6 +25,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
 fun BaseFragment<*>.showMorePostOptions(

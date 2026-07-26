@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -30,6 +29,7 @@ import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
 import com.idunnololz.summit.lemmy.utils.actions.SavePostResult
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel

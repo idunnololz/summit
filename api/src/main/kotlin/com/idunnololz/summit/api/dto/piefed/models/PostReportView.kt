@@ -35,8 +35,8 @@ import com.idunnololz.summit.api.dto.piefed.models.PostReport
  * @param creatorIsModerator
  * @param creatorIsAdmin
  * @param creatorBlocked
- * @param saved
  * @param subscribed
+ * @param saved
  */
 
 data class PostReportView(
@@ -71,11 +71,11 @@ data class PostReportView(
   @SerializedName("creator_blocked")
   val creatorBlocked: kotlin.Boolean,
 
+  @SerializedName("subscribed")
+  val subscribed: PostReportView.Subscribed,
+
   @SerializedName("saved")
   val saved: kotlin.Boolean,
-
-  @SerializedName("subscribed")
-  val subscribed: PostReportView.Subscribed? = null,
 
 ) {
 

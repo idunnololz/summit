@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.isGuestAccount
@@ -72,6 +71,7 @@ import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.isLoading
@@ -330,14 +330,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           queryEngine
             ?.onItemsChangeFlow
             ?.collect {
-              if (!isBindingAvailable()) {
-                return@collect
-              }
-
-              adapter?.setData(queryEngine.getItems()) {
-                if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading) {
-                  binding.recyclerView.scrollToPosition(0)
-                }
+              withContext(Dispatchers.Main) {
+                onQueryEngineItemsChange(queryEngine)
               }
             }
         }
@@ -370,6 +364,18 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
       queryEngine?.getItems()?.let {
         adapter?.setData(it) {}
+      }
+    }
+  }
+
+  private fun onQueryEngineItemsChange(queryEngine: QueryEngine) {
+    if (!isBindingAvailable()) {
+      return
+    }
+
+    adapter?.setData(queryEngine.getItems()) {
+      if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading) {
+        binding.recyclerView.scrollToPosition(0)
       }
     }
   }

@@ -2,11 +2,11 @@ package com.idunnololz.summit.tabs
 
 import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
+import com.idunnololz.summit.util.arrow.Either
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow

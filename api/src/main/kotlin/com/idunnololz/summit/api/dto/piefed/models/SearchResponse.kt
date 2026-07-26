@@ -24,14 +24,17 @@ import com.idunnololz.summit.api.dto.piefed.models.PostView
 /**
  *
  *
+ * @param type
  * @param communities
  * @param posts
  * @param users
  * @param comments
- * @param type
  */
 
 data class SearchResponse(
+
+  @SerializedName("type_")
+  val type: SearchResponse.Type,
 
   @SerializedName("communities")
   val communities: kotlin.collections.List<CommunityView>,
@@ -44,9 +47,6 @@ data class SearchResponse(
 
   @SerializedName("comments")
   val comments: kotlin.collections.List<CommentView>,
-
-  @SerializedName("type_")
-  val type: SearchResponse.Type? = null,
 
 ) {
 

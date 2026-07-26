@@ -1,12 +1,12 @@
 package com.idunnololz.summit.lemmy.multicommunity
 
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
+import com.idunnololz.summit.util.arrow.Either
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow

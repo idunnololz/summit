@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Context
 import android.net.Uri
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -35,6 +34,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.video.VideoDownloadManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

@@ -8,7 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -46,6 +45,7 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -771,7 +771,7 @@ class PostViewModel @Inject constructor(
     sortOrder: CommentSortType,
     maxDepth: Int? = null,
     force: Boolean = false,
-  ): Result<List<CommentView>> {
+  ): Result<List<CommentView>> = mutex.withLock {
     Log.d(TAG, "fetchMoreCommentsInternal(): parentId = $parentId")
     val result = commentsFetcher.fetchCommentsWithRetry(
       id = Either.Right(parentId),
@@ -800,14 +800,6 @@ class PostViewModel @Inject constructor(
           fullyLoadedCommentIds.add(thisComment.comment.id)
         }
 
-        //            val commentChildCount = thisComment?.counts?.child_count ?: 0
-        //            if (thisComment != null && commentChildCount > 0 && comments.size == 1 && depthIsMoreThanOne) {
-        //                // This comment's child was deleted...
-        //                val fakeComment = createFakeDeletedComment(thisComment.comment.path)
-        //                removedCommentIds.add(fakeComment.comment.id)
-        //                supplementaryComments[fakeComment.comment.id] = fakeComment
-        //            }
-
         comments.forEach {
           supplementaryComments[it.comment.id] = it
         }
@@ -819,7 +811,7 @@ class PostViewModel @Inject constructor(
         }
       }
 
-    return result
+    result
   }
 
   fun onCommentActionChanged() {

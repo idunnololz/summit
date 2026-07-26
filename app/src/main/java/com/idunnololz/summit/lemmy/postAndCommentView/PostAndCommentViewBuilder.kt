@@ -40,7 +40,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
-import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -112,6 +111,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute

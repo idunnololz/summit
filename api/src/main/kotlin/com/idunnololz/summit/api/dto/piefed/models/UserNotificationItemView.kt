@@ -63,7 +63,7 @@ data class UserNotificationItemView(
 
   /* returned for all notif types */
   @SerializedName("status")
-  val status: UserNotificationItemView.Status? = null,
+  val status: UserNotificationItemView.Status,
 
   /* returned for notif_types: 3, 4, 6 (comment_mention subtype) */
   @SerializedName("comment")

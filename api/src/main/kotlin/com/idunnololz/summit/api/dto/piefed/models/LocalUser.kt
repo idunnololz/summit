@@ -20,6 +20,11 @@ import com.google.gson.annotations.SerializedName
 /**
  *
  *
+ * @param acceptPrivateMessages Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
+ * @param botVisibility
+ * @param aiVisibility
+ * @param defaultCommentSortType
+ * @param defaultListingType
  * @param emailUnread Receive email about missed notifications (if set up by local admin)
  * @param federateVotes If false, votes are only counted on local instance instead of federated remotely
  * @param feedAutoFollow Automatically follow communities in a subscribed feed
@@ -27,6 +32,8 @@ import com.google.gson.annotations.SerializedName
  * @param hideLowQuality Hide posts from communities marked as low-quality by the local instance admin
  * @param indexable If posts can show up in search results
  * @param newsletter Subscribe to the email newsletter that the local instance admin can send
+ * @param nsflVisibility
+ * @param nsfwVisibility
  * @param replyCollapseThreshold Collapse replies with a score at or below this level
  * @param replyHideThreshold Hide replies with a score at or below this level
  * @param searchable If profile shows up in the user list on the instance
@@ -35,18 +42,28 @@ import com.google.gson.annotations.SerializedName
  * @param showNsfw True for any visibility option other than Hide
  * @param showReadPosts
  * @param showScores
- * @param acceptPrivateMessages Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
- * @param botVisibility
- * @param aiVisibility
  * @param communityKeywordFilter Filter out communities with these words in their name
- * @param defaultCommentSortType
- * @param defaultListingType
  * @param defaultSortType
- * @param nsflVisibility
- * @param nsfwVisibility
+ * @param manuallyApprovesFollowers
  */
 
 data class LocalUser(
+
+  /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
+  @SerializedName("accept_private_messages")
+  val acceptPrivateMessages: LocalUser.AcceptPrivateMessages,
+
+  @SerializedName("bot_visibility")
+  val botVisibility: LocalUser.BotVisibility,
+
+  @SerializedName("ai_visibility")
+  val aiVisibility: LocalUser.AiVisibility,
+
+  @SerializedName("default_comment_sort_type")
+  val defaultCommentSortType: LocalUser.DefaultCommentSortType,
+
+  @SerializedName("default_listing_type")
+  val defaultListingType: LocalUser.DefaultListingType,
 
   /* Receive email about missed notifications (if set up by local admin) */
   @SerializedName("email_unread")
@@ -75,6 +92,12 @@ data class LocalUser(
   /* Subscribe to the email newsletter that the local instance admin can send */
   @SerializedName("newsletter")
   val newsletter: kotlin.Boolean,
+
+  @SerializedName("nsfl_visibility")
+  val nsflVisibility: LocalUser.NsflVisibility,
+
+  @SerializedName("nsfw_visibility")
+  val nsfwVisibility: LocalUser.NsfwVisibility,
 
   /* Collapse replies with a score at or below this level */
   @SerializedName("reply_collapse_threshold")
@@ -106,34 +129,15 @@ data class LocalUser(
   @SerializedName("show_scores")
   val showScores: kotlin.Boolean,
 
-  /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
-  @SerializedName("accept_private_messages")
-  val acceptPrivateMessages: LocalUser.AcceptPrivateMessages? = null,
-
-  @SerializedName("bot_visibility")
-  val botVisibility: LocalUser.BotVisibility? = null,
-
-  @SerializedName("ai_visibility")
-  val aiVisibility: LocalUser.AiVisibility? = null,
-
   /* Filter out communities with these words in their name */
   @SerializedName("community_keyword_filter")
   val communityKeywordFilter: kotlin.collections.List<kotlin.String>? = null,
 
-  @SerializedName("default_comment_sort_type")
-  val defaultCommentSortType: LocalUser.DefaultCommentSortType? = null,
-
-  @SerializedName("default_listing_type")
-  val defaultListingType: LocalUser.DefaultListingType? = null,
-
   @SerializedName("default_sort_type")
   val defaultSortType: LocalUser.DefaultSortType? = null,
 
-  @SerializedName("nsfl_visibility")
-  val nsflVisibility: LocalUser.NsflVisibility? = null,
-
-  @SerializedName("nsfw_visibility")
-  val nsfwVisibility: LocalUser.NsfwVisibility? = null,
+  @SerializedName("manually_approves_followers")
+  val manuallyApprovesFollowers: kotlin.Boolean? = null,
 
 ) {
 
@@ -257,6 +261,48 @@ data class LocalUser(
   /**
    *
    *
+   * Values: Show,Blur,Hide,Transparent
+   */
+  enum class NsflVisibility(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "Show")
+    Show("Show"),
+
+    @SerializedName(value = "Blur")
+    Blur("Blur"),
+
+    @SerializedName(value = "Hide")
+    Hide("Hide"),
+
+    @SerializedName(value = "Transparent")
+    Transparent("Transparent"),
+  }
+
+  /**
+   *
+   *
+   * Values: Show,Blur,Hide,Transparent
+   */
+  enum class NsfwVisibility(
+    val value: kotlin.String,
+  ) {
+    @SerializedName(value = "Show")
+    Show("Show"),
+
+    @SerializedName(value = "Blur")
+    Blur("Blur"),
+
+    @SerializedName(value = "Hide")
+    Hide("Hide"),
+
+    @SerializedName(value = "Transparent")
+    Transparent("Transparent"),
+  }
+
+  /**
+   *
+   *
    * Values: Active,Hot,New,Top,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled,Old,Relevance,TopPosts,TopSubscribers,NewFederated,OldFederated
    */
   enum class DefaultSortType(
@@ -327,47 +373,5 @@ data class LocalUser(
 
     @SerializedName(value = "OldFederated")
     OldFederated("OldFederated"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsflVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsfwVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
   }
 }

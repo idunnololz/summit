@@ -2,7 +2,6 @@ package com.idunnololz.summit.inbox.message
 
 import android.app.Application
 import androidx.core.content.ContextCompat
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentsManager
@@ -16,6 +15,7 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.scopes.ViewModelScoped
 import java.lang.AutoCloseable
 import javax.inject.Inject

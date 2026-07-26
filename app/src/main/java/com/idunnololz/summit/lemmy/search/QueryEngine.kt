@@ -11,7 +11,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
-import com.idunnololz.summit.api.toLemmyPageIndex
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.PostHeaderInfo
@@ -84,17 +83,23 @@ class QueryEngine(
     context: Context,
     simpleDataSource: SimpleDataSource<SearchResultView, SortType>,
   ) : LemmyListSource<SearchResultView, SortType, Long>(
-    context,
-    { id },
-    SortType.New,
-    {
+    context = context,
+    id = { id },
+    defaultSortOrder = SortType.New,
+    fetchObjects = {
         pageIndex: Int,
         sortOrder: SortType,
         limit: Int,
         force: Boolean,
       ->
 
-      simpleDataSource.fetchItems(sortOrder, pageIndex, force, limit = limit, showRead = true)
+      simpleDataSource.fetchItems(
+        sortOrder = sortOrder,
+        page = pageIndex,
+        force = force,
+        limit = limit,
+        showRead = true,
+      )
     },
   )
 
@@ -121,7 +126,7 @@ class QueryEngine(
         sortType = currentSortType,
         listingType = listingTypeFilter ?: ListingType.All,
         searchType = type,
-        page = page.toLemmyPageIndex(),
+        page = page,
         query = currentQuery,
         limit = limit,
         creatorId = personIdFilter,
@@ -452,25 +457,25 @@ class QueryEngine(
           context,
           if (apiClient.supportsFeature(ApiFeature.ListByCursorRequired).getOrNull() == true) {
             CursorSearchSource(
-              apiClient,
-              trigram,
-              communityIdFilter,
-              currentSortType,
-              listingTypeFilter,
-              type,
-              currentQuery,
-              personIdFilter,
+              apiClient = apiClient,
+              trigram = trigram,
+              communityIdFilter = communityIdFilter,
+              currentSortType = currentSortType,
+              listingTypeFilter = listingTypeFilter,
+              type = type,
+              currentQuery = currentQuery,
+              personIdFilter = personIdFilter,
             )
           } else {
             PagedSearchSource(
-              apiClient,
-              trigram,
-              communityIdFilter,
-              currentSortType,
-              listingTypeFilter,
-              type,
-              currentQuery,
-              personIdFilter,
+              apiClient = apiClient,
+              trigram = trigram,
+              communityIdFilter = communityIdFilter,
+              currentSortType = currentSortType,
+              listingTypeFilter = listingTypeFilter,
+              type = type,
+              currentQuery = currentQuery,
+              personIdFilter = personIdFilter,
             )
           },
         )
@@ -567,7 +572,7 @@ class QueryEngine(
 //          sortType = currentSortType,
 //          listingType = listingTypeFilter ?: ListingType.All,
 //          searchType = type,
-//          page = pageIndex.toLemmyPageIndex(),
+//          page = pageIndex,
 //          query = currentQuery,
 //          limit = MAX_QUERY_PAGE_LIMIT,
 //          creatorId = personIdFilter,

@@ -82,7 +82,7 @@ data class CommentView(
 
   /* Indicates whether auth'ed user is subscribed to the community this comment is in or not. */
   @SerializedName("subscribed")
-  val subscribed: CommentView.Subscribed? = null,
+  val subscribed: CommentView.Subscribed,
 
   @SerializedName("my_vote")
   val myVote: kotlin.Int? = null,

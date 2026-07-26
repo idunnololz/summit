@@ -14,7 +14,6 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.utils.getImageUrl
@@ -32,6 +31,7 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
 import com.idunnololz.summit.prefetcher.PostPrefetcher
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.getParcelable
 import com.idunnololz.summit.util.ext.toByteArray
 import dagger.assisted.Assisted

@@ -229,11 +229,7 @@ class SearchTabbedFragment :
           null
         },
         SearchType.Posts,
-        if (apiInfo?.supportsFeature(ApiFeature.SearchComments) != false) {
-          SearchType.Comments
-        } else {
-          null
-        },
+        SearchType.Comments,
         SearchType.Communities,
         SearchType.Users,
         SearchType.Url,

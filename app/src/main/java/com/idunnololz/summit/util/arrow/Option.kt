@@ -320,7 +320,7 @@ sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-16.kt -->
    */
-  inline fun onNone(action: () -> Unit): Option<A>  {
+  inline fun onNone(action: () -> Unit): Option<A> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
       (this@Option is None) holdsIn action
@@ -346,7 +346,7 @@ sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-17.kt -->
    */
-  inline fun onSome(action: (A) -> Unit): Option<A>  {
+  inline fun onSome(action: (A) -> Unit): Option<A> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
       (this@Option is Some) holdsIn action
@@ -524,7 +524,7 @@ sealed class Option<out A> {
 
   override fun toString(): String = fold(
     { "Option.None" },
-    { "Option.Some($it)" }
+    { "Option.Some($it)" },
   )
 }
 
@@ -532,7 +532,9 @@ object None : Option<Nothing>() {
   override fun toString(): String = "Option.None"
 }
 
-data class Some<out T>(val value: T) : Option<T>() {
+data class Some<out T>(
+  val value: T,
+) : Option<T>() {
   override fun toString(): String = "Option.Some($value)"
 
   companion object
@@ -564,16 +566,14 @@ fun <A> none(): Option<A> = None
 /**
  * Returns an Option containing all elements that are instances of specified type parameter [B].
  */
-inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
-  flatMap {
-    when (it) {
-      is B -> Some(it)
-      else -> None
-    }
+inline fun <reified B> Option<*>.filterIsInstance(): Option<B> = flatMap {
+  when (it) {
+    is B -> Some(it)
+    else -> None
   }
+}
 
-fun <A> Option<Option<A>>.flatten(): Option<A> =
-  flatMap(::identity)
+fun <A> Option<Option<A>>.flatten(): Option<A> = flatMap(::identity)
 
 fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
@@ -596,5 +596,5 @@ operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fo
   { other.fold({ 0 }, { -1 }) },
   { a1 ->
     other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
-  }
+  },
 )

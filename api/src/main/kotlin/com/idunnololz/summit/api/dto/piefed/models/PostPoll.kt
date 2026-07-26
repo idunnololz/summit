@@ -21,9 +21,9 @@ import com.idunnololz.summit.api.dto.piefed.models.PollChoice
 /**
  *
  *
+ * @param mode single or multiple - determines whether people can vote for one or multiple options
  * @param choices
  * @param endPoll
- * @param mode single or multiple - determines whether people can vote for one or multiple options
  * @param localOnly
  * @param latestVote
  * @param myVotes
@@ -31,15 +31,15 @@ import com.idunnololz.summit.api.dto.piefed.models.PollChoice
 
 data class PostPoll(
 
+  /* single or multiple - determines whether people can vote for one or multiple options */
+  @SerializedName("mode")
+  val mode: PostPoll.Mode,
+
   @SerializedName("choices")
   val choices: kotlin.collections.List<PollChoice>,
 
   @SerializedName("end_poll")
   val endPoll: kotlin.String? = null,
-
-  /* single or multiple - determines whether people can vote for one or multiple options */
-  @SerializedName("mode")
-  val mode: PostPoll.Mode? = null,
 
   @SerializedName("local_only")
   val localOnly: kotlin.Boolean? = false,

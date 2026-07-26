@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.multicommunity
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
@@ -17,6 +16,7 @@ import com.idunnololz.summit.lemmy.utils.getHotRank
 import com.idunnololz.summit.lemmy.utils.getScaledRank
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

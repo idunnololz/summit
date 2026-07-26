@@ -5,7 +5,6 @@ import android.text.Spanned
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import androidx.core.text.util.LinkifyCompat
-import java.util.Collections
 import java.util.EnumSet
 import java.util.regex.Matcher
 import java.util.regex.Pattern

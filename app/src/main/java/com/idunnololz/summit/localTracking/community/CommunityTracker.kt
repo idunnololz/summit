@@ -1,7 +1,6 @@
 package com.idunnololz.summit.localTracking.community
 
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -11,6 +10,7 @@ import com.idunnololz.summit.localTracking.DerivedTracker
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.SimpleOnTrackingEventListener
 import com.idunnololz.summit.localTracking.TrackedAction
+import com.idunnololz.summit.util.arrow.Either
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.launch

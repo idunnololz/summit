@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.idunnololz.summit.util.arrow.Either
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
@@ -31,6 +30,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.clearItemDecorations
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 

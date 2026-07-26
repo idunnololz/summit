@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
@@ -27,6 +26,7 @@ import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.collections.ifEmpty

@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.mod.viewVotes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -11,6 +10,7 @@ import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import com.idunnololz.summit.lemmy.utils.listSource.onFailure
 import com.idunnololz.summit.lemmy.utils.listSource.onSuccess
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job

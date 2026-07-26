@@ -157,19 +157,19 @@ open class LemmyListSource<T, O, Key>(
 
   private fun deleteCache(startIndex: Int, endIndex: Int) {
     // delete all cached data for the given page
-    val minPageInteral = allObjects
+    val minPageInternal = allObjects
       .slice(startIndex until min(endIndex, allObjects.size))
       .map { it.pageIndexInternal }
-      .minOrNull() ?: 1
+      .minOrNull() ?: 0
 
-    deleteFromPage(minPageInteral)
+    deleteFromPage(minPageInternal)
     endReached = false
 
     Log.d(TAG, "Force = true. Clearing data. Remaining: ${allObjects.size}")
   }
 
   fun invalidate() {
-    for (i in 1..currentPageInternal) {
+    for (i in 0..currentPageInternal) {
       invalidatedPages.add(i)
     }
     reset()
@@ -216,18 +216,18 @@ open class LemmyListSource<T, O, Key>(
     }
   }
 
-  private fun deleteFromPage(minPageInternal: Int) {
+  private fun deleteFromPage(minPage: Int) {
     allObjects.retainAll {
-      val keep = it.pageIndexInternal < minPageInternal
+      val keep = it.pageIndexInternal < minPage
       if (!keep) {
         seenObjects.remove(it.obj.id())
       }
       keep
     }
 
-    currentPageInternal = minPageInternal
+    currentPageInternal = minPage
 
-    Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allObjects.size}")
+    Log.d(TAG, "Deleted pages $minPage and beyond. Posts left: ${allObjects.size}")
   }
 
   protected fun removeItemAt(position: Int): ObjectData<T> = allObjects.removeAt(position).also {

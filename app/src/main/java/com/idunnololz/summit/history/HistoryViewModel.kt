@@ -3,12 +3,12 @@ package com.idunnololz.summit.history
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

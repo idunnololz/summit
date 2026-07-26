@@ -608,8 +608,7 @@ sealed class Either<out A, out B> {
    * <!--- KNIT example-either-24.kt -->
    * <!-- TEST lines.isEmpty() -->
    */
-  fun swap(): Either<B, A> =
-    fold({ Right(it) }, { Left(it) })
+  fun swap(): Either<B, A> = fold({ Right(it) }, { Left(it) })
 
   /**
    * Map, or transform, the right value [B] of this [Either] to a new value [C].
@@ -633,7 +632,6 @@ sealed class Either<out A, out B> {
     }
     return flatMap { Right(f(it)) }
   }
-
 
   /**
    * Map, or transform, the left value [A] of this [Either] to a new value [C].
@@ -772,11 +770,12 @@ sealed class Either<out A, out B> {
    */
   fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
 
-
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
-  data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
+  data class Left<out A> constructor(
+    val value: A,
+  ) : Either<A, Nothing>() {
     override fun toString(): String = "Either.Left($value)"
 
     companion object
@@ -785,7 +784,9 @@ sealed class Either<out A, out B> {
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
-  data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
+  data class Right<out B> constructor(
+    val value: B,
+  ) : Either<Nothing, B>() {
     override fun toString(): String = "Either.Right($value)"
 
     companion object {
@@ -796,7 +797,7 @@ sealed class Either<out A, out B> {
 
   override fun toString(): String = fold(
     { "Either.Left($it)" },
-    { "Either.Right($it)" }
+    { "Either.Right($it)" },
   )
 }
 
@@ -836,8 +837,7 @@ inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Eithe
   }
 }
 
-fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
-  flatMap(::identity)
+fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> = flatMap(::identity)
 
 /**
  * Get the right value [B] of this [Either],
@@ -883,25 +883,29 @@ inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  * <!--- KNIT example-either-34.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-fun <A> Either<A, A>.merge(): A =
-  fold(::identity, ::identity)
+fun <A> Either<A, A>.merge(): A = fold(::identity, ::identity)
 
 fun <A> A.left(): Either<A, Nothing> = Left(this)
 
 fun <A> A.right(): Either<Nothing, A> = Right(this)
 
-operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
-  fold(
-    { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }) },
-    { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
-  )
+operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(
+  other: Either<A, B>,
+): Int = fold(
+  { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }) },
+  { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) },
+)
 
 /**
  * Combine two [Either] values.
  * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
  * otherwise return the sole [Left] value (either `this` or [other]).
  */
-inline fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> {
+inline fun <A, B> Either<A, B>.combine(
+  other: Either<A, B>,
+  combineLeft: (A, A) -> A,
+  combineRight: (B, B) -> B,
+): Either<A, B> {
   contract {
     callsInPlace(combineLeft, InvocationKind.AT_MOST_ONCE)
     callsInPlace(combineRight, InvocationKind.AT_MOST_ONCE)

@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.mod.viewVotes
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -10,6 +9,7 @@ import com.idunnololz.summit.api.dto.lemmy.VoteView
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.PageResult
+import com.idunnololz.summit.util.arrow.Either
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

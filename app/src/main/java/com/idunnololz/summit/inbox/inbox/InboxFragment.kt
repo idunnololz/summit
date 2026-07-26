@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.idunnololz.summit.util.arrow.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
@@ -72,6 +71,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
@@ -351,6 +351,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
     ).attachToRecyclerView(binding.recyclerView)
 
     fun updatePaneBackPressHandler() {
+      if (!isBindingAvailable()) return
+
       if (binding.paneLayout.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
         paneOnBackPressHandler.remove()
         requireSummitActivity().onBackPressedDispatcher.addCallback(paneOnBackPressHandler)

@@ -46,7 +46,7 @@ data class CommunityView(
   val counts: CommunityAggregates,
 
   @SerializedName("subscribed")
-  val subscribed: CommunityView.Subscribed? = null,
+  val subscribed: CommunityView.Subscribed,
 
   @SerializedName("flair_list")
   val flairList: kotlin.collections.List<CommunityFlair>? = null,

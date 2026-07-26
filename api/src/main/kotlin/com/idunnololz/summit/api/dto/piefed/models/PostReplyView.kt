@@ -35,9 +35,9 @@ import com.idunnololz.summit.api.dto.piefed.models.Post
  * @param creatorIsAdmin
  * @param creatorIsModerator
  * @param saved
+ * @param subscribed Indicates whether auth'ed user is subscribed to the community this comment is in or not.
  * @param community
  * @param post
- * @param subscribed Indicates whether auth'ed user is subscribed to the community this comment is in or not.
  * @param myVote
  * @param canAuthUserModerate
  * @param replies
@@ -75,15 +75,15 @@ data class PostReplyView(
   @SerializedName("saved")
   val saved: kotlin.Boolean,
 
+  /* Indicates whether auth'ed user is subscribed to the community this comment is in or not. */
+  @SerializedName("subscribed")
+  val subscribed: PostReplyView.Subscribed,
+
   @SerializedName("community")
   val community: Community? = null,
 
   @SerializedName("post")
   val post: Post? = null,
-
-  /* Indicates whether auth'ed user is subscribed to the community this comment is in or not. */
-  @SerializedName("subscribed")
-  val subscribed: PostReplyView.Subscribed? = null,
 
   @SerializedName("my_vote")
   val myVote: kotlin.Int? = null,

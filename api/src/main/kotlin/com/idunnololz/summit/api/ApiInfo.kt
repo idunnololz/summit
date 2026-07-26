@@ -15,7 +15,6 @@ data class ApiInfo(
         ApiFeature.UploadsList -> true
         ApiFeature.Downvote -> downvoteAllowed
         ApiFeature.SearchAll -> true
-        ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
         ApiFeature.GetPostsByCursor -> true
         ApiFeature.ListByCursorRequired -> false
@@ -28,7 +27,6 @@ data class ApiInfo(
         ApiFeature.UploadsList -> true
         ApiFeature.Downvote -> downvoteAllowed
         ApiFeature.SearchAll -> true
-        ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
         ApiFeature.GetPostsByCursor -> true
         ApiFeature.ListByCursorRequired -> true
@@ -41,7 +39,6 @@ data class ApiInfo(
         ApiFeature.UploadsList -> false
         ApiFeature.Downvote -> downvoteAllowed
         ApiFeature.SearchAll -> false
-        ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
         ApiFeature.GetPostsByCursor -> false
         ApiFeature.ListByCursorRequired -> false
@@ -54,7 +51,6 @@ data class ApiInfo(
         ApiFeature.UploadsList -> false
         ApiFeature.Downvote -> downvoteAllowed
         ApiFeature.SearchAll -> false
-        ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
         ApiFeature.GetPostsByCursor -> false
         ApiFeature.ListByCursorRequired -> false

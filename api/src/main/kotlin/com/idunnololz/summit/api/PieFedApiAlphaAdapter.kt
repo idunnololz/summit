@@ -39,6 +39,7 @@ import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostReportView
 import com.idunnololz.summit.api.converters.toPostResponse
 import com.idunnololz.summit.api.converters.toPostView
+import com.idunnololz.summit.api.converters.toPrivateMessageReports
 import com.idunnololz.summit.api.converters.toPrivateMessageView
 import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
@@ -152,7 +153,6 @@ import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
-import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
@@ -525,7 +525,7 @@ class PieFedApiAlphaAdapter(
   ): Result<ListCommunitiesResponse> = retrofitErrorHandler {
     api.getCommunityList(
       headers = generateHeaders(authorization, force),
-      form = args.serializeToMap(),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }.map {
     ListCommunitiesResponse(
@@ -655,6 +655,12 @@ class PieFedApiAlphaAdapter(
       headers = generateHeaders(authorization, force),
       form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
+  }.map {
+    ListPrivateMessageReportsResponse(
+      private_message_reports = it.privateMessageReports.mapNotNull {
+        it.toPrivateMessageReports()
+      },
+    )
   }
 
   override suspend fun createPrivateMessageReport(
@@ -682,6 +688,10 @@ class PieFedApiAlphaAdapter(
     api.getPostReports(
       headers = generateHeaders(authorization, force),
       form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+    )
+  }.map {
+    ListPostReportsResponse(
+      post_reports = it.postReports.map { it.toPostReportView() },
     )
   }
 
@@ -847,14 +857,14 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<SearchResponse> = retrofitErrorHandler {
     api.search(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
     .map {
       SearchResponse(
-        type_ = it.type?.toSearchType() ?: SearchType.All,
-        comments = listOf(),
+        type_ = it.type.toSearchType(),
+        comments = it.comments.map { it.toCommentView() },
         posts = it.posts.map { it.toPostView() },
         communities = it.communities.map { it.toCommunityView() },
         users = it.users.map { it.toPersonView() },

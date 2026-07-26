@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import com.idunnololz.summit.util.arrow.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -107,6 +106,7 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss

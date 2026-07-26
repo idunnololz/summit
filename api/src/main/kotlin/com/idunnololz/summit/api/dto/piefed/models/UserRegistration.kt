@@ -26,10 +26,10 @@ import com.idunnololz.summit.api.dto.piefed.models.Person
  * @param ipAddress
  * @param userId
  * @param userName
+ * @param status
  * @param appliedAt
  * @param countryCode
  * @param throwawayEmail
- * @param status
  * @param approvedBy
  * @param approvedAt
  * @param referrer
@@ -52,6 +52,9 @@ data class UserRegistration(
   @SerializedName("user_name")
   val userName: kotlin.String,
 
+  @SerializedName("status")
+  val status: UserRegistration.Status,
+
   @SerializedName("applied_at")
   val appliedAt: kotlin.String? = null,
 
@@ -60,9 +63,6 @@ data class UserRegistration(
 
   @SerializedName("throwaway_email")
   val throwawayEmail: kotlin.Boolean? = null,
-
-  @SerializedName("status")
-  val status: UserRegistration.Status? = null,
 
   @SerializedName("approved_by")
   val approvedBy: Person? = null,

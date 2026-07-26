@@ -19,7 +19,6 @@ enum class ApiFeature {
   Downvote,
 
   SearchAll,
-  SearchComments,
 
   // Whether the server supports GetCommunities with the ALL type.
   GetCommunitiesAll,

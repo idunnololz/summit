@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.dto.lemmy.CommentId
@@ -27,6 +26,7 @@ import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.FixedSlidingPaneLayout
 import dagger.assisted.Assisted

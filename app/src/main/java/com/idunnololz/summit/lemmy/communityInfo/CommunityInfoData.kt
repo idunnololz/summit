@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.communityInfo
 
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
@@ -9,6 +8,7 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.util.arrow.Either
 
 data class CommunityInfoData(
   val backingObject: Either<CommunityView, SiteView>,

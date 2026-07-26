@@ -1,7 +1,6 @@
 package com.idunnololz.summit.api
 
 import android.util.Log
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
@@ -133,6 +132,7 @@ import com.idunnololz.summit.models.processed.DtoConverter
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.extensionForMimeType
 import com.idunnololz.summit.util.guessMimeType
 import com.idunnololz.summit.util.retry

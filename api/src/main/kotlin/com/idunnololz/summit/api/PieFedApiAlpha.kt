@@ -29,8 +29,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
-import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
@@ -65,7 +63,9 @@ import com.idunnololz.summit.api.dto.piefed.models.GetCommentResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetCommunityResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetFederatedInstancesResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetModLogResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetPostReportListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetPostResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetPrivateMessageReportListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetRegistrationListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetSiteResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetUserResponse
@@ -374,7 +374,7 @@ interface PieFedApiAlpha {
   fun getPrivateMessageReports(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<ListPrivateMessageReportsResponse>
+  ): Call<GetPrivateMessageReportListResponse>
 
   @POST("private_message/report")
   fun createPrivateMessageReport(
@@ -392,7 +392,7 @@ interface PieFedApiAlpha {
   fun getPostReports(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<ListPostReportsResponse>
+  ): Call<GetPostReportListResponse>
 
   @PUT("post/report/resolve")
   fun resolvePostReport(

@@ -20,7 +20,6 @@ import androidx.core.net.toUri
 import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
-import com.idunnololz.summit.util.arrow.Either
 import coil3.asImage
 import coil3.dispose
 import coil3.load
@@ -61,6 +60,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.coil.BlurTransformation
 import com.idunnololz.summit.util.ext.setup

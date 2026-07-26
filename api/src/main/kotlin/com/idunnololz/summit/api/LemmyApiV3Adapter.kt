@@ -357,7 +357,10 @@ class LemmyApiV3Adapter(
     args: ListCommunities,
     force: Boolean,
   ): Result<ListCommunitiesResponse> = retrofitErrorHandler {
-    api.getCommunityList(generateHeaders(authorization, force), args.serializeToMap())
+    api.getCommunityList(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+    )
   }
 
   override suspend fun getPersonDetails(
@@ -604,8 +607,8 @@ class LemmyApiV3Adapter(
     force: Boolean,
   ): Result<SearchResponse> = retrofitErrorHandler {
     api.search(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
     )
   }
 

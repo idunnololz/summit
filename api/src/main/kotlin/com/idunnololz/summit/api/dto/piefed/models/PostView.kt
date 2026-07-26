@@ -36,8 +36,8 @@ import com.idunnololz.summit.api.dto.piefed.models.PostAggregates
  * @param post
  * @param read
  * @param saved
- * @param unreadComments
  * @param subscribed
+ * @param unreadComments
  * @param activityAlert
  * @param altText
  * @param myVote
@@ -80,11 +80,11 @@ data class PostView(
   @SerializedName("saved")
   val saved: kotlin.Boolean,
 
+  @SerializedName("subscribed")
+  val subscribed: PostView.Subscribed,
+
   @SerializedName("unread_comments")
   val unreadComments: kotlin.Int,
-
-  @SerializedName("subscribed")
-  val subscribed: PostView.Subscribed? = null,
 
   @SerializedName("activity_alert")
   val activityAlert: kotlin.Boolean? = null,

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccountLiveData
@@ -16,6 +15,7 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.changeLogPostRef as changeLogPostRef1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File

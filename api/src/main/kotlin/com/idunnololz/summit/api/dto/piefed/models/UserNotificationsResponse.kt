@@ -24,8 +24,8 @@ import com.idunnololz.summit.api.dto.piefed.models.UserNotificationsCounts
  *
  * @param counts
  * @param items
- * @param username
  * @param status
+ * @param username
  * @param nextPage
  */
 
@@ -37,11 +37,11 @@ data class UserNotificationsResponse(
   @SerializedName("items")
   val items: kotlin.collections.List<UserNotificationItemView>,
 
+  @SerializedName("status")
+  val status: UserNotificationsResponse.Status,
+
   @SerializedName("username")
   val username: kotlin.String,
-
-  @SerializedName("status")
-  val status: UserNotificationsResponse.Status? = null,
 
   @SerializedName("next_page")
   val nextPage: kotlin.String? = null,

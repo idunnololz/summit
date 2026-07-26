@@ -174,7 +174,7 @@ class NotificationsUpdater @AssistedInject constructor(
         account = account,
         force = true,
       ).fold(
-        { it.post_reports.map { it.toInboxItem() } },
+        { it.post_reports.mapNotNull { it.toInboxItem() } },
         { listOf() },
       )
     }

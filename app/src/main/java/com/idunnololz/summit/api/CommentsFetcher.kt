@@ -1,11 +1,11 @@
 package com.idunnololz.summit.api
 
-import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.util.arrow.Either
 
 class CommentsFetcher(
   private val apiClient: AccountAwareLemmyClient,
@@ -47,7 +47,7 @@ class CommentsFetcher(
         maxDepth = maxDepth,
         // setting a limit doesn't seem to do anything...
         limit = limit,
-        page = page.toLemmyPageIndex(),
+        page = page,
         force = force,
         account = account,
       )

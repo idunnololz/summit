@@ -50,6 +50,7 @@ import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
@@ -77,6 +78,7 @@ import com.idunnololz.summit.api.dto.piefed.models.PersonBlockView
 import com.idunnololz.summit.api.dto.piefed.models.Post
 import com.idunnololz.summit.api.dto.piefed.models.PostAggregates
 import com.idunnololz.summit.api.dto.piefed.models.PostLikeView
+import com.idunnololz.summit.api.dto.piefed.models.PrivateMessageReport
 import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.models.Site
 import com.idunnololz.summit.api.dto.piefed.models.UserRegistration
@@ -91,7 +93,7 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.PersonView.toPersonView
 private fun Person.toPerson(): com.idunnololz.summit.api.dto.lemmy.Person =
   com.idunnololz.summit.api.dto.lemmy.Person(
     id = this.id.toLong(),
-    name = this.userName,
+    name = requireNotNull(this.userName),
     display_name = this.title,
     avatar = this.avatar,
     banned = this.banned,
@@ -540,6 +542,27 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.PrivateMessageView.toPr
     this.privateMessage.toPrivateMessage(),
     this.creator.toPerson(),
     this.recipient.toPerson(),
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.PrivateMessageReportView.toPrivateMessageReports(): PrivateMessageReportView? {
+  return PrivateMessageReportView(
+    private_message_report = privateMessageReport?.toPrivateMessageReport() ?: return null,
+    private_message = privateMessage?.toPrivateMessage() ?: return null,
+    private_message_creator = privateMessageCreator?.toPerson() ?: return null,
+    creator = creator?.toPerson() ?: return null,
+  )
+}
+
+internal fun PrivateMessageReport.toPrivateMessageReport(): com.idunnololz.summit.api.dto.lemmy.PrivateMessageReport =
+  com.idunnololz.summit.api.dto.lemmy.PrivateMessageReport(
+    id = id,
+    creator_id = creatorId.toLong(),
+    private_message_id = privateMessageId,
+    original_pm_text = originalPmText,
+    reason = reason ?: "",
+    resolved = resolved,
+    resolver_id = null,
+    published = published,
   )
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.PrivateMessage.toPrivateMessage(): PrivateMessage =

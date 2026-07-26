@@ -1,6 +1,7 @@
 package com.idunnololz.summit.inbox
 
 import android.os.Parcelable
+import android.util.Log
 import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
 import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.Person
@@ -17,6 +18,8 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+
+private const val TAG = "InboxItem"
 
 interface CommentBackedItem {
   val score: Int
@@ -477,6 +480,11 @@ fun PrivateMessageView.toInboxItem() = InboxItem.MessageInboxItem(this)
 
 fun CommentReportView.toInboxItem() = InboxItem.ReportCommentInboxItem(this)
 
-fun PostReportView.toInboxItem() = InboxItem.ReportPostInboxItem(this)
+fun PostReportView.toInboxItem() = try {
+  InboxItem.ReportPostInboxItem(this)
+} catch (e: Exception) {
+  Log.e(TAG, "Error converting PostReportView to InboxItem. report id: ${this.post_report.id}", e)
+  null
+}
 
 fun PrivateMessageReportView.toInboxItem() = InboxItem.ReportMessageInboxItem(this)
