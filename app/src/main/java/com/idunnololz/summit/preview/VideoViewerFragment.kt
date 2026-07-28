@@ -3,7 +3,6 @@ package com.idunnololz.summit.preview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.PlaybackException
@@ -281,22 +281,27 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
   ) {
     when (videoType) {
       VideoType.Unknown -> {
-        val uri = Uri.parse(url)
+        val uri = url.toUri()
         if (ContentUtils.isUrlMp4(uri.path ?: "")) {
           loadVideo(context, url, VideoType.Mp4, videoState)
         } else if (ContentUtils.isUrlWebm(uri.path ?: "")) {
           loadVideo(context, url, VideoType.Webm, videoState)
         } else if (uri.host?.endsWith("loops.video", ignoreCase = true) == true) {
           viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            val videoUrl = LoopsVideoUtils.extractVideoUrl(okHttpClient, url)
+            val videoUrlResult = LoopsVideoUtils.extractVideoUrl(okHttpClient, url)
 
             withContext(Dispatchers.Main) {
-              if (videoUrl != null) {
-                loadVideo(context, videoUrl, videoType, videoState)
-              } else {
-                showUnsupportedVideoTypeError(url)
-                (activity as? MainActivity)?.showSystemUI()
-              }
+              videoUrlResult
+                .onSuccess {
+                  val resolvedVideoType = getVideoTypeStrippingParams(it)
+                    .takeUnless { it == VideoType.Unknown }
+                    ?: VideoType.Mp4
+                  loadVideo(context, it, resolvedVideoType, videoState)
+                }
+                .onFailure {
+                  showUnsupportedVideoTypeError(url)
+                  (activity as? MainActivity)?.showSystemUI()
+                }
             }
           }
         } else if (uri.host?.endsWith("imgur.com", ignoreCase = true) == true) {

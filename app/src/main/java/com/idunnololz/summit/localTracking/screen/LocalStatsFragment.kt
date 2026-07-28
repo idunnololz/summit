@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.shape.CornerFamily
@@ -31,15 +32,18 @@ import com.idunnololz.summit.databinding.LocalStatsWarningItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.localTracking.screen.list.LocalStatsListFragment.LocalStatsListType
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -105,6 +109,25 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
         onLocalTrackingSettingsClick = {
           requireSummitActivity().showLocalTrackingEventsSettings()
         },
+        onFrequentedCommunitiesClick = {
+          val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
+            LocalStatsListType.FrequentedCommunities
+          )
+          findNavController().navigateSafe(direction)
+        },
+        onFavoriteCommunitiesClick = {
+          val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
+            LocalStatsListType.FavoriteCommunities
+          )
+          findNavController().navigateSafe(direction)
+        },
+        onUserInteractionsClick = {
+          val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
+            LocalStatsListType.UserInteractions
+          )
+          findNavController().navigateSafe(direction)
+
+        },
       )
       recyclerView.adapter = adapter
 
@@ -160,6 +183,9 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
     private val onCommunityClick: (CommunityRef) -> Unit,
     private val onPersonClick: (PersonRef) -> Unit,
     private val onLocalTrackingSettingsClick: () -> Unit,
+    private val onFrequentedCommunitiesClick: () -> Unit,
+    private val onFavoriteCommunitiesClick: () -> Unit,
+    private val onUserInteractionsClick: () -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var model: LocalStatsViewModel.Model? = null
@@ -176,6 +202,12 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
         refresh()
       }
 
+    enum class TitleType {
+      FrequentedCommunities,
+      FavoriteCommunities,
+      TopUserInteractions,
+    }
+
     sealed interface Item {
 
       data object HeaderItem : Item
@@ -185,7 +217,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       ) : Item
 
       data class SectionTitleItem(
-        val title: String,
+        val titleType: TitleType,
       ) : Item
 
       data class CommunityStat(
@@ -194,7 +226,8 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       ) : Item
 
       data class PersonStat(
-        val person: Person?,
+        val personId: Long?,
+        val person: Result<Person>?,
         val value: Int,
       ) : Item
 
@@ -218,7 +251,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
             is Item.PersonStat ->
               old.person == (new as Item.PersonStat).person
             is Item.SectionTitleItem ->
-              old.title == (new as Item.SectionTitleItem).title
+              old.titleType == (new as Item.SectionTitleItem).titleType
             is Item.StatSummaryItem ->
               true
             Item.StatEndItem -> false
@@ -250,7 +283,26 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           }.build()
         },
       ) { item, b, h ->
-        b.title.text = item.title
+        when (item.titleType) {
+          TitleType.FrequentedCommunities -> {
+            b.title.text = context.getString(R.string.frequented_communities)
+            b.root.setOnClickListener {
+              onFrequentedCommunitiesClick()
+            }
+          }
+          TitleType.FavoriteCommunities -> {
+            b.title.text = context.getString(R.string.favorite_communities)
+            b.root.setOnClickListener {
+              onFavoriteCommunitiesClick()
+            }
+          }
+          TitleType.TopUserInteractions -> {
+            b.title.text = context.getString(R.string.user_interactions)
+            b.root.setOnClickListener {
+              onUserInteractionsClick()
+            }
+          }
+        }
       }
       addItemType(
         clazz = Item.CommunityStat::class,
@@ -280,10 +332,21 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           }.build()
         },
       ) { item, b, h ->
-        if (item.person != null) {
-          b.title.text =
-            "${(item.person.display_name ?: item.person.name).toBidiSafe()}@${item.person.instance}"
-          b.card.setOnClickListener { onPersonClick(item.person.toPersonRef()) }
+        if (item.personId != null) {
+          if (item.person == null) {
+            b.title.text = context.getString(R.string.loading)
+          } else {
+            item.person.fold(
+              { person ->
+                b.title.text = "${(person.display_name ?: person.name).toBidiSafe()}@${person.instance}"
+                b.card.setOnClickListener { onPersonClick(person.toPersonRef()) }
+              },
+              {
+                b.title.text = it.toErrorMessage(context)
+                b.card.setOnClickListener(null)
+              }
+            )
+          }
         } else {
           b.title.text = context.getString(R.string.unknown)
           b.card.setOnClickListener(null)
@@ -342,7 +405,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
         newItems += Item.SpaceItem
       }
 
-      newItems += Item.SectionTitleItem(context.getString(R.string.frequented_communities))
+      newItems += Item.SectionTitleItem(TitleType.FrequentedCommunities)
       if (data.mostVisitedCommunities.isEmpty()) {
         newItems += Item.NoDataItem
       } else {
@@ -353,7 +416,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       newItems += Item.StatEndItem
       newItems += Item.SpaceItem
 
-      newItems += Item.SectionTitleItem(context.getString(R.string.favorite_communities))
+      newItems += Item.SectionTitleItem(TitleType.FavoriteCommunities)
       if (data.favoriteCommunities.isEmpty()) {
         newItems += Item.NoDataItem
       } else {
@@ -364,12 +427,12 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       newItems += Item.StatEndItem
       newItems += Item.SpaceItem
 
-      newItems += Item.SectionTitleItem(context.getString(R.string.user_interactions))
+      newItems += Item.SectionTitleItem(TitleType.TopUserInteractions)
       if (data.userInteractions.isEmpty()) {
         newItems += Item.NoDataItem
       } else {
         data.userInteractions.mapTo(newItems) {
-          Item.PersonStat(it.first, it.second)
+          Item.PersonStat(personId = it.personId, person = it.personResult, value = it.count)
         }
       }
       newItems += Item.StatEndItem

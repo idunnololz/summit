@@ -467,5 +467,17 @@
     <fragment
         android:id="@+id/localStatsFragment"
         android:name="com.idunnololz.summit.localTracking.screen.LocalStatsFragment"
-        android:label="LocalStatsFragment" />
+        android:label="LocalStatsFragment" >
+        <action
+            android:id="@+id/action_localStatsFragment_to_localStatsListFragment"
+            app:destination="@id/localStatsListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/localStatsListFragment"
+        android:name="com.idunnololz.summit.localTracking.screen.list.LocalStatsListFragment"
+        android:label="LocalStatsListFragment" >
+        <argument
+            android:name="type"
+            app:argType="com.idunnololz.summit.localTracking.screen.list.LocalStatsListFragment$LocalStatsListType" />
+    </fragment>
 </navigation>
