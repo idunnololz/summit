@@ -137,8 +137,8 @@ object Utils {
   }
 
   @Throws(DataFormatException::class, IOException::class)
-  fun decompressZlibRaw(s: String): ByteArray {
-    val bytes = Base64.decode(s, Base64.DEFAULT)
+  fun decompressZlibRaw(s: String, flags: Int = Base64.DEFAULT): ByteArray {
+    val bytes = Base64.decode(s, flags)
 
     val decompresser = Inflater()
     decompresser.setInput(bytes)
