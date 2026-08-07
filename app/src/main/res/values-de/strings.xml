@@ -338,7 +338,7 @@
     <string name="hide_comment_scores">Kommentarbewertungen ausblenden</string>
     <string name="font">Schriftart</string>
     <string name="roboto_serif">Roboto Serif</string>
-    <string name="open_sans">Offene Sans</string>
+    <string name="open_sans">Open Sans</string>
     <string name="misc">Sonstiges</string>
     <string name="misc_desc">Verschiedene Einstellungen</string>
     <string name="upvote_color">Upvote-Farbe</string>
@@ -740,7 +740,7 @@
     <string name="download_video">Video herunterladen</string>
     <string name="share_image">Bild teilen</string>
     <string name="error_retry_target_too_old_format">Sie kommentieren/antworten auf einen alten Beitrag/Kommentar. Er wurde vor %1$s veröffentlicht.</string>
-    <string name="open_comment">Offener Kommentar</string>
+    <string name="open_comment">Kommentar öffnen</string>
     <string name="backup_settings">Exporteinstellungen</string>
     <string name="restore_settings">Importeinstellungen</string>
     <string name="error_generating_backup">Fehler beim Exportieren der Einstellungen.</string>
@@ -1408,4 +1408,5 @@
     <string name="advanced_settings">Erweiterte Einstellungen</string>
     <string name="advanced">Erweiterte Einstellungen</string>
     <string name="account_created_on_format">Konto erstellt in %1$s (Kuchentag in %2$s Tagen)</string>
+    <string name="hide_posts_like_this">Solche Beiträge verstecken…</string>
 </resources>
