@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -488,22 +489,33 @@ class PostListAdapter(
     }
   }
 
-  override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-    val position = holder.absoluteAdapterPosition
+  fun onItemScrolledOffScreen(position: Int) {
+    if (!seenItemPositions.contains(position)) {
+      return
+    }
 
-    super.onViewDetachedFromWindow(holder)
-
-    if (holder is ListingItemViewHolder) {
-      if (markPostsAsReadOnScroll) {
-        val fetchedPost = holder.root.getTag(R.id.fetched_post) as? FetchedPost
-
-        if (fetchedPost != null && seenItemPositions.contains(position)) {
-          onPostRead(
-            fetchedPost.source.accountId,
-            fetchedPost.postView,
-          )
-        }
+    when (val item = items.getOrNull(position)) {
+      is PostListEngineItem.FilteredPostItem -> {
+        item.fetchedPost
       }
+      is PostListEngineItem.VisiblePostItem -> {
+        item.fetchedPost
+      }
+      is PostListEngineItem.AutoLoadItem,
+      PostListEngineItem.EndItem,
+      is PostListEngineItem.ErrorItem,
+      is PostListEngineItem.FooterItem,
+      PostListEngineItem.FooterSpacerItem,
+      PostListEngineItem.HeaderItem,
+      is PostListEngineItem.ManualLoadItem,
+      is PostListEngineItem.PageTitle,
+      is PostListEngineItem.PersistentErrorItem,
+      null -> null
+    }?.let { fetchedPost ->
+      onPostRead(
+        fetchedPost.source.accountId,
+        fetchedPost.postView,
+      )
     }
   }
 

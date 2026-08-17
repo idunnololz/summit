@@ -102,6 +102,9 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
     if (errMsg == "couldnt_find_object" || errMsg == "couldnt_find_community") {
       return Result.failure(CouldntFindObjectError())
     }
+    if (errMsg == "couldnt_find_person") {
+      return Result.failure(CouldntFindPersonError())
+    }
     if (errMsg == "not_yet_implemented") {
       return Result.failure(NotYetImplemented())
     }

@@ -2426,6 +2426,16 @@
     <string name="unblocked_instance">Unblocked instance %1$s.</string>
     <string name="use_lemmy_api_v4">Use Lemmy API V4</string>
     <string name="use_lemmy_api_v4_desc">When enabled, Lemmy V4 will be preferred over Lemmy V3. **This feature is experimental**.</string>
+    <string name="local_community_stats">Local community stats</string>
+    <string name="error_unknown_post">Unknown post</string>
+    <string name="total_score">Total score</string>
+    <string name="recent_interactions">Recent interactions</string>
+    <string name="last_7_days">Last 7d</string>
+    <string name="views">Views</string>
+    <string name="last_7_days_format">%1$s (7d)</string>
+    <string name="error_couldnt_find_person">Could not find this person on this instance.</string>
+    <string name="posts_your_interacted_with">Posts you interacted with</string>
+    <string name="error_opening_link">Error opening link.</string>
 
 
     <!-- uCrop string resource end -->

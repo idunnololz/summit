@@ -75,7 +75,12 @@ fun BaseFragment<*>.showMoreVideoOptions(
           onLinkClick(originalUrl, null, LinkContext.Force)
         }
         R.id.open_link_incognito -> {
-          Utils.openExternalLink(context, originalUrl, openNewIncognitoTab = true)
+          Utils.openExternalLink(
+            context = context,
+            url = originalUrl,
+            fragmentManager = fragmentManager,
+            openNewIncognitoTab = true
+          )
         }
         R.id.preview_link -> {
           LinkPreviewDialogFragment.show(fragmentManager, originalUrl)

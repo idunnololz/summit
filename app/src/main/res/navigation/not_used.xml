@@ -487,4 +487,12 @@ safeargs.
             android:name="postView"
             app:argType="com.idunnololz.summit.models.PostView" />
     </dialog>
+    <dialog
+        android:id="@+id/localStatsCommunityDialogFragment"
+        android:name="com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityDialogFragment"
+        android:label="LocalStatsCommunityDialogFragment" >
+        <argument
+            android:name="communityRef"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
+    </dialog>
 </navigation>

@@ -75,6 +75,7 @@ class NotYetImplemented : ServerApiException("Server has not implemented this AP
 
 class CouldntFindObjectError : ClientApiException("Couldn't find object", 400)
 class CouldntFindPostError : ClientApiException("Couldn't find post", 400)
+class CouldntFindPersonError : ClientApiException("Couldn't find person", 400)
 
 class FileTooLargeError : ClientApiException("File is over the size limit", 413)
 

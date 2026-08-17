@@ -11,7 +11,7 @@ import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.models.GetPersonDetailsResponse
-import com.idunnololz.summit.util.PersonResolverHelper
+import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +63,6 @@ class LocalStatsListViewModel @Inject constructor(
     if (!force && data.isLoaded) {
       return
     }
-
 
     data.setIsLoading()
 
@@ -151,7 +150,8 @@ class LocalStatsListViewModel @Inject constructor(
 
   fun fetchPerson(
     personId: Long,
+    force: Boolean,
   ) {
-    personResolverHelper.fetchPerson(personId)
+    personResolverHelper.fetchPerson(personId, force)
   }
 }

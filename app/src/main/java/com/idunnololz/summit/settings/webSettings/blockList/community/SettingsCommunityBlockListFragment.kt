@@ -13,6 +13,8 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.BlockListCommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedCommunityItem
@@ -73,6 +75,9 @@ class SettingsCommunityBlockListFragment :
         onRemoveCommunity = {
           viewModel.unblockCommunity(it)
         },
+        onCommunityClick = {
+          getMainActivity()?.showCommunityLocalStats(it)
+        }
       )
       binding.recyclerView.setup(animationsHelper)
       binding.recyclerView.setHasFixedSize(true)
@@ -102,6 +107,7 @@ class SettingsCommunityBlockListFragment :
 
   private class CommunityBlockListAdapter(
     val onRemoveCommunity: (CommunityId) -> Unit,
+    val onCommunityClick: (CommunityRef) -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data: List<BlockedCommunityItem> = listOf()
@@ -133,6 +139,9 @@ class SettingsCommunityBlockListFragment :
 
         b.delete.setOnClickListener {
           onRemoveCommunity(item.blockedCommunity.community.id)
+        }
+        b.root.setOnClickListener {
+          onCommunityClick(item.blockedCommunity.community.toCommunityRef())
         }
       }
     }

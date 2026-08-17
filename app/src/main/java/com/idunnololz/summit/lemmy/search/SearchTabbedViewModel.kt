@@ -17,6 +17,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +34,7 @@ class SearchTabbedViewModel @Inject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val savedStateHandle: SavedStateHandle,
   override val postReadManager: PostReadManager,
+  private val queryEngineFactory: QueryEngine.Factory,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 
@@ -66,40 +68,29 @@ class SearchTabbedViewModel @Inject constructor(
   val currentQueryLiveData = currentQueryFlow.asLiveData()
 
   init {
-    queryEnginesByType[SearchType.All] = QueryEngine(
+    queryEnginesByType[SearchType.All] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.All,
+
     )
-    queryEnginesByType[SearchType.Url] = QueryEngine(
+    queryEnginesByType[SearchType.Url] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.Url,
     )
-    queryEnginesByType[SearchType.Posts] = QueryEngine(
+    queryEnginesByType[SearchType.Posts] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.Posts,
     )
-    queryEnginesByType[SearchType.Comments] = QueryEngine(
+    queryEnginesByType[SearchType.Comments] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.Comments,
     )
-    queryEnginesByType[SearchType.Communities] = QueryEngine(
+    queryEnginesByType[SearchType.Communities] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.Communities,
     )
-    queryEnginesByType[SearchType.Users] = QueryEngine(
+    queryEnginesByType[SearchType.Users] = queryEngineFactory.create(
       context = context,
-      coroutineScopeFactory = coroutineScopeFactory,
-      apiClient = apiClient,
       type = SearchType.Users,
     )
 

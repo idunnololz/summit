@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.utils.listSource
 
 import android.content.Context
 import android.util.Log
+import com.idunnololz.summit.lemmy.search.QueryEngine.SearchResultView
 import com.idunnololz.summit.util.ext.hasInternet
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext

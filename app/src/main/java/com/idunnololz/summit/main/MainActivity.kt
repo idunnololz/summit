@@ -76,6 +76,7 @@ import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityDialogFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
@@ -1224,5 +1225,9 @@ class MainActivity : SummitActivity() {
 
   fun openLinkEditor(url: String) {
     LinkEditorDialogFragment.show(supportFragmentManager, url)
+  }
+
+  fun showCommunityLocalStats(communityRef: CommunityRef) {
+    LocalStatsCommunityDialogFragment.show(supportFragmentManager, communityRef)
   }
 }

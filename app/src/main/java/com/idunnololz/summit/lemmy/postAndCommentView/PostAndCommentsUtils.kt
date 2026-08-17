@@ -207,7 +207,9 @@ fun BaseFragment<*>.createCommentActionHandler(
   postRef: PostRef?,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
-  onLoadComment: ((CommentId) -> Unit)? = null,
+  onLoadComment: ((CommentId) -> Unit)? = {
+    getMainActivity()?.launchPage(CommentRef(moreActionsHelper.apiInstance, it))
+  },
   onScreenshotClick: (() -> Unit)? = null,
 ): (Int) -> Unit = outer@{ id: Int ->
 

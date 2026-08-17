@@ -488,3 +488,5 @@ fun PostReportView.toInboxItem() = try {
 }
 
 fun PrivateMessageReportView.toInboxItem() = InboxItem.ReportMessageInboxItem(this)
+
+fun UserRegistrationApplication.toInboxItem() = InboxItem.RegistrationApplicationInboxItem(this)

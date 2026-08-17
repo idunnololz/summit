@@ -12,7 +12,7 @@ import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.screen.list.LocalStatsListModel
 import com.idunnololz.summit.models.GetPersonDetailsResponse
-import com.idunnololz.summit.util.PersonResolverHelper
+import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -122,10 +122,10 @@ class LocalStatsViewModel @Inject constructor(
         .sortedByDescending { it.value }
         .take(10)
 
-      val allPeopleData = topUserInteractions.forEach {
-        val key = it.key
-        if (key != null) {
-          personResolverHelper.fetchPerson(key)
+      topUserInteractions.forEach {
+        val personId = it.key
+        if (personId!= null) {
+          personResolverHelper.fetchPerson(personId, force = false)
         }
       }
 

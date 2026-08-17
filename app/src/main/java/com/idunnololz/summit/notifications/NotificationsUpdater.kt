@@ -52,7 +52,7 @@ class NotificationsUpdater @AssistedInject constructor(
     val j1: Deferred<List<InboxItem>> = coroutineScope.async {
       apiClient.fetchUnreadCount(force = true, account)
         .fold(
-          {
+          onSuccess = {
             val jobs = mutableListOf<Deferred<List<InboxItem>>>()
             val mentions = it.mentions
             val privateMessages = it.privateMessages
@@ -60,8 +60,20 @@ class NotificationsUpdater @AssistedInject constructor(
             val commentReports = it.commentReports
             val postReports = it.postReports
             val privateMessageReports = it.privateMessageReports
+            val registrationApplicationCount = it.registrationApplicationCount
 
-            // TODO(lemmyv1): Add support for LemmyV1
+            // Lemmy v1 no longer returns granular notification counts so just refresh everything
+            if (mentions == null && privateMessages == null && replies == null && it.notificationCount > 0) {
+              jobs.add(runMentionsJob(account))
+              jobs.add(runPrivateMessagesJob(account))
+              jobs.add(runRepliesJob(account))
+            }
+            // Lemmy v1 no longer returns granular report counts so just refresh everything
+            if (commentReports == null && postReports == null && privateMessageReports == null && it.reportCount > 0) {
+              jobs.add(runCommentReportsJob(account))
+              jobs.add(runPostReportsJob(account))
+              jobs.add(runPrivateMessageReportsJob(account))
+            }
 
             if (mentions != null && mentions > 0) {
               jobs.add(runMentionsJob(account))
@@ -81,9 +93,16 @@ class NotificationsUpdater @AssistedInject constructor(
             if (privateMessageReports != null && privateMessageReports > 0) {
               jobs.add(runPrivateMessageReportsJob(account))
             }
+            if (registrationApplicationCount > 0) {
+              jobs.add(runRegistrationApplicationJob(account))
+            }
+
             jobs.flatMap { it.await() }
           },
-          { listOf() },
+          onFailure = {
+            Log.d(TAG, "[${account.fullName}] error updating notifications", it)
+            listOf()
+          },
         )
     }
 
@@ -190,6 +209,22 @@ class NotificationsUpdater @AssistedInject constructor(
       ).fold(
         {
           it.private_message_reports.map { it.toInboxItem() }
+        },
+        { listOf() },
+      )
+    }
+
+  private fun runRegistrationApplicationJob(account: Account): Deferred<List<InboxItem>> =
+    coroutineScope.async {
+      apiClient.getRegistrationApplications(
+        page = 0,
+        limit = 10,
+        unreadOnly = true,
+        account = account,
+        force = true,
+      ).fold(
+        {
+          it.items.map { it.toInboxItem() }
         },
         { listOf() },
       )

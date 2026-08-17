@@ -54,6 +54,7 @@ import java.util.LinkedList
 import java.util.zip.DataFormatException
 import java.util.zip.Deflater
 import java.util.zip.Inflater
+import androidx.core.net.toUri
 
 object Utils {
   private val TAG = Utils::class.java.simpleName
@@ -159,17 +160,29 @@ object Utils {
   @Throws(DataFormatException::class, IOException::class)
   fun decompressZlib(s: String): String = String(decompressZlibRaw(s))
 
-  fun safeLaunchExternalIntent(context: Context, intent: Intent): Boolean = try {
-    context.startActivity(intent)
-    true
-  } catch (e: ActivityNotFoundException) {
-    false
-  }
+  fun safeLaunchExternalIntent(context: Context, intent: Intent): Result<Unit> =
+    runCatching { context.startActivity(intent) }
 
   var openExternalLinksInBrowser = false
   var defaultWebApp: DefaultAppPreference? = null
   var defaultTypeface: Typeface? = null
-  fun openExternalLink(context: Context, url: String, openNewIncognitoTab: Boolean = false) {
+  fun openExternalLink(
+    context: Context,
+    url: String,
+    fragmentManager: FragmentManager?,
+    openNewIncognitoTab: Boolean = false,
+  ) {
+
+    fun showErrorMessageDialog(e: Throwable) {
+      if (fragmentManager == null) return
+
+      ErrorDialogFragment.show(
+        message = context.getString(R.string.error_opening_link),
+        error = e,
+        fm = fragmentManager,
+      )
+    }
+
     val defaultAppPackage = defaultWebApp?.packageName
     if (defaultAppPackage != null) {
       val componentName = defaultWebApp?.componentName
@@ -181,7 +194,7 @@ object Utils {
 //                    }
 //                } else
         if (componentName != null) {
-          Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+          Intent(Intent.ACTION_VIEW, url.toUri()).apply {
             setComponent(
               ComponentName(
                 defaultAppPackage,
@@ -193,20 +206,26 @@ object Utils {
           context.packageManager.getLaunchIntentForPackage(defaultAppPackage)
             ?.apply {
               action = Intent.ACTION_VIEW
-              data = Uri.parse(url)
+              data = url.toUri()
             }
         }
       if (intent != null) {
         safeLaunchExternalIntent(context, intent)
+          .onFailure {
+            showErrorMessageDialog(it)
+          }
         return
       }
     }
 
     if (openExternalLinksInBrowser) {
       val intent = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
+        data = url.toUri()
       }
       safeLaunchExternalIntent(context, intent)
+        .onFailure {
+          showErrorMessageDialog(it)
+        }
     } else {
       try {
         val intent = CustomTabsIntent.Builder()
@@ -219,14 +238,17 @@ object Utils {
           )
         }
 
-        intent.launchUrl(context, Uri.parse(url))
+        intent.launchUrl(context, url.toUri())
       } catch (e: ActivityNotFoundException) {
         Log.e(TAG, "Unable to open link.", e)
 
         val intent = Intent(Intent.ACTION_VIEW).apply {
-          data = Uri.parse(url)
+          data = url.toUri()
         }
         safeLaunchExternalIntent(context, intent)
+          .onFailure {
+            showErrorMessageDialog(it)
+          }
       }
     }
   }
@@ -440,17 +462,6 @@ fun assertMainThread() {
   }
 }
 
-@Deprecated(
-  message = "convertSpToPixel does not take into account additional modifications to the " +
-    "activity/fragment context that can change the conversion rate between sp <-> px.",
-  replaceWith = ReplaceWith("Use Context.spToPx(sp) instead."),
-)
-fun convertSpToPixel(sp: Float): Float = TypedValue.applyDimension(
-  TypedValue.COMPLEX_UNIT_SP,
-  sp,
-  Utils.displayMetrics,
-)
-
 fun convertPixelToSp(px: Float): Float = px / Utils.displayMetrics.scaledDensity
 
 fun Context.isLightTheme(): Boolean = resources.getBoolean(R.bool.isLightTheme)
@@ -499,16 +510,14 @@ fun Fragment.openAppOnPlayStore() = try {
   startActivity(
     Intent(
       Intent.ACTION_VIEW,
-      Uri.parse("market://details?id=com.idunnololz.summit"),
+      "market://details?id=com.idunnololz.summit".toUri(),
     ),
   )
 } catch (e: ActivityNotFoundException) {
   startActivity(
     Intent(
       Intent.ACTION_VIEW,
-      Uri.parse(
-        "https://play.google.com/store/apps/details?id=com.idunnololz.summit",
-      ),
+      "https://play.google.com/store/apps/details?id=com.idunnololz.summit".toUri(),
     ),
   )
 }

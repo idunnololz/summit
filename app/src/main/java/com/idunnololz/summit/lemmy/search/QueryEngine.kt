@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.search
 import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -14,8 +15,11 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.PostHeaderInfo
+import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.Source.*
+import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.search.QueryEngine.QueryResultsPage.*
 import com.idunnololz.summit.lemmy.search.QueryEngine.SearchResultView.*
 import com.idunnololz.summit.lemmy.toCommentHeaderInfo
@@ -25,8 +29,13 @@ import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.Page
 import com.idunnololz.summit.lemmy.utils.listSource.SimpleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.fold
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.models.ResolveObjectResponse
 import com.idunnololz.summit.util.StatefulData
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import info.debatty.java.stringsimilarity.NGram
 import kotlinx.coroutines.Dispatchers
@@ -72,12 +81,21 @@ sealed class Item {
   data object FooterSpacerItem : Item()
 }
 
-class QueryEngine(
-  @ApplicationContext private val context: Context,
+class QueryEngine @AssistedInject constructor(
+  @Assisted private val context: Context,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val apiClient: AccountAwareLemmyClient,
-  private val type: SearchType,
+  @Assisted private val type: SearchType,
+  private val linkResolver: LinkResolver,
 ) {
+
+  @AssistedFactory
+  interface Factory {
+    fun create(
+      context: Context,
+      type: SearchType,
+    ): QueryEngine
+  }
 
   class SearchSource(
     context: Context,
@@ -119,60 +137,62 @@ class QueryEngine(
       force: Boolean,
       limit: Int,
       showRead: Boolean?,
-    ): Result<List<SearchResultView>> = apiClient
-      .searchWithRetry(
-        communityId = communityIdFilter,
-        communityName = null,
-        sortType = currentSortType,
-        listingType = listingTypeFilter ?: ListingType.All,
-        searchType = type,
-        page = page,
-        query = currentQuery,
-        limit = limit,
-        creatorId = personIdFilter,
-        force = force,
-      )
-      .map {
-        val items = mutableListOf<SearchResultView>()
+    ): Result<List<SearchResultView>> {
+      return apiClient
+        .searchWithRetry(
+          communityId = communityIdFilter,
+          communityName = null,
+          sortType = currentSortType,
+          listingType = listingTypeFilter ?: ListingType.All,
+          searchType = type,
+          page = page,
+          query = currentQuery,
+          limit = limit,
+          creatorId = personIdFilter,
+          force = force,
+        )
+        .map {
+          val items = mutableListOf<SearchResultView>()
 
-        it.comments.mapTo(items) { CommentResultView(it) }
-        it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
-        it.communities.mapTo(items) { CommunityResultView(it) }
-        it.users.mapTo(items) { UserResultView(it) }
+          it.comments.mapTo(items) { CommentResultView(it) }
+          it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
+          it.communities.mapTo(items) { CommunityResultView(it) }
+          it.users.mapTo(items) { UserResultView(it) }
 
-        val sortedItems =
-          if (currentSortType == SortType.Active) {
-            items.sortedBy {
-              when (it) {
-                is CommentResultView ->
-                  trigram.distance(
-                    it.commentView.comment.content,
-                    currentQuery,
-                  )
-                is CommunityResultView -> {
-                  trigram.distance(
-                    it.communityView.community.name,
-                    currentQuery,
-                  )
+          val sortedItems =
+            if (currentSortType == SortType.Active) {
+              items.sortedBy {
+                when (it) {
+                  is CommentResultView ->
+                    trigram.distance(
+                      it.commentView.comment.content,
+                      currentQuery,
+                    )
+                  is CommunityResultView -> {
+                    trigram.distance(
+                      it.communityView.community.name,
+                      currentQuery,
+                    )
+                  }
+                  is PostResultView -> {
+                    val post = it.fetchedPost.postView.post
+                    val toMatch = post.name + " " + post.body
+                    trigram.distance(toMatch, currentQuery)
+                  }
+                  is UserResultView ->
+                    trigram.distance(
+                      it.personView.person.name,
+                      currentQuery,
+                    )
                 }
-                is PostResultView -> {
-                  val post = it.fetchedPost.postView.post
-                  val toMatch = post.name + " " + post.body
-                  trigram.distance(toMatch, currentQuery)
-                }
-                is UserResultView ->
-                  trigram.distance(
-                    it.personView.person.name,
-                    currentQuery,
-                  )
               }
+            } else {
+              items
             }
-          } else {
-            items
-          }
 
-        sortedItems
-      }
+          sortedItems
+        }
+    }
   }
 
   class CursorSearchSource(
@@ -256,7 +276,10 @@ class QueryEngine(
   companion object {
     private const val TAG = "QueryEngine"
 
-    private const val MAX_QUERY_PAGE_LIMIT = 20
+    private val lemmyHandleRegex =
+      Regex(
+        """^([!@])?([A-Za-z0-9_]+)@([A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?)(?::\d{1,5})?$"""
+      )
   }
 
   sealed interface SearchResultView {
@@ -484,44 +507,81 @@ class QueryEngine(
       val pageResult = searchSource?.getPage(pageIndex, force)
         ?: return@launch
 
+      fun ResolveObjectResponse.toQueryResults(): List<SearchResultView> =
+        when (type) {
+          SearchType.All,
+          SearchType.Comments,
+          SearchType.Posts,
+          SearchType.Communities,
+          SearchType.Users -> {
+            buildList {
+              // We can just add all of the possible results and it will be filtered below...
+              comment?.let { add(CommentResultView(it)) }
+              post?.let { add(PostResultView(it.toFetchedPost())) }
+              community?.let { add(CommunityResultView(it)) }
+              person?.let { add(UserResultView(it)) }
+            }
+          }
+          SearchType.Url -> {
+            listOf()
+          }
+        }
+
+      var prependResults: List<SearchResultView> = listOf()
+      if (pageIndex == 0 && lemmyHandleRegex.matches(currentQuery)) {
+        val (name, url) = currentQuery.trim { it == '@' || it == '!' }.split("@")
+
+        prependResults = apiClient.resolveObject(currentQuery)
+          .getOrNull()
+          ?.toQueryResults()
+          .orEmpty() + apiClient.resolveObject("https://$url/c/$name")
+          .getOrNull()
+          ?.toQueryResults()
+          .orEmpty()
+      }
+
       pageResult.fold(
         {
           val result: QueryResultsPage? = when (type) {
             SearchType.All ->
               AllResultsPage(
-                it.items,
-                pageIndex,
-                it.hasMore,
+                results = prependResults + it.items,
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
             SearchType.Url ->
               AllResultsPage(
-                it.items,
-                pageIndex,
-                it.hasMore,
+                results = prependResults + it.items,
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
             SearchType.Comments ->
               CommentResultsPage(
-                it.items.filterIsInstance<CommentResultView>().map { it.commentView },
-                pageIndex,
-                it.hasMore,
+                results = (prependResults + it.items)
+                  .filterIsInstance<CommentResultView>().map { it.commentView },
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
             SearchType.Posts ->
               PostResultsPage(
-                it.items.filterIsInstance<PostResultView>().map { it.fetchedPost.postView },
-                pageIndex,
-                it.hasMore,
+                results = (prependResults + it.items)
+                  .filterIsInstance<PostResultView>().map { it.fetchedPost.postView },
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
             SearchType.Communities ->
               CommunityResultsPage(
-                it.items.filterIsInstance<CommunityResultView>().map { it.communityView },
-                pageIndex,
-                it.hasMore,
+                results = (prependResults + it.items)
+                  .filterIsInstance<CommunityResultView>().map { it.communityView },
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
             SearchType.Users ->
               UserResultsPage(
-                it.items.filterIsInstance<UserResultView>().map { it.personView },
-                pageIndex,
-                it.hasMore,
+                results = (prependResults + it.items)
+                  .filterIsInstance<UserResultView>().map { it.personView },
+                pageIndex = pageIndex,
+                hasMore = it.hasMore,
               )
           }
 

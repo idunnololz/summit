@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.postListView
 
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
@@ -20,7 +21,9 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -39,10 +42,55 @@ fun BaseFragment<*>.showMorePostOptions(
   onFindInPageClick: () -> Unit = {},
   onScreenshotClick: (() -> Unit)? = null,
 ) {
-  if (!isBindingAvailable()) {
-    return
-  }
+  showMorePostOptions(
+    accountId = accountId,
+    postView = postView,
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = fragmentManager,
+    isPostMenu = isPostMenu,
+    getMainActivity = { getMainActivity() },
+    onSortOrderClick = onSortOrderClick,
+    onRefreshClick = onRefreshClick,
+    onFindInPageClick = onFindInPageClick,
+    onScreenshotClick = onScreenshotClick,
+  )
+}
 
+fun BaseFragment<*>.createPostActionHandler(
+  accountId: Long?,
+  postView: PostView,
+  moreActionsHelper: MoreActionsHelper,
+  fragmentManager: FragmentManager,
+  onSortOrderClick: () -> Unit = {},
+  onRefreshClick: () -> Unit = {},
+  onFindInPageClick: () -> Unit = {},
+  onScreenshotClick: (() -> Unit)? = null,
+): (Int) -> Unit = a@{ id: Int ->
+  createPostActionHandler(
+    accountId = accountId,
+    postView = postView,
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = fragmentManager,
+    getMainActivity = { getMainActivity() },
+    onSortOrderClick = onSortOrderClick,
+    onRefreshClick = onRefreshClick,
+    onFindInPageClick = onFindInPageClick,
+    onScreenshotClick = onScreenshotClick,
+  )(id)
+}
+
+fun Fragment.showMorePostOptions(
+  accountId: Long?,
+  postView: PostView,
+  moreActionsHelper: MoreActionsHelper,
+  fragmentManager: FragmentManager,
+  isPostMenu: Boolean = false,
+  getMainActivity: () -> MainActivity?,
+  onSortOrderClick: () -> Unit = {},
+  onRefreshClick: () -> Unit = {},
+  onFindInPageClick: () -> Unit = {},
+  onScreenshotClick: (() -> Unit)? = null,
+) {
   val context = requireContext()
   val instance = moreActionsHelper.apiInstance
 
@@ -248,6 +296,7 @@ fun BaseFragment<*>.showMorePostOptions(
         postView = postView,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
+        getMainActivity = getMainActivity,
         onSortOrderClick = onSortOrderClick,
         onRefreshClick = onRefreshClick,
         onFindInPageClick = onFindInPageClick,
@@ -259,11 +308,12 @@ fun BaseFragment<*>.showMorePostOptions(
   getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 }
 
-fun BaseFragment<*>.createPostActionHandler(
+fun Fragment.createPostActionHandler(
   accountId: Long?,
   postView: PostView,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
+  getMainActivity: () -> MainActivity?,
   onSortOrderClick: () -> Unit = {},
   onRefreshClick: () -> Unit = {},
   onFindInPageClick: () -> Unit = {},
@@ -423,6 +473,7 @@ fun BaseFragment<*>.createPostActionHandler(
         postView = postView,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
+        getMainActivity = getMainActivity,
         onSortOrderClick = onSortOrderClick,
         onRefreshClick = onRefreshClick,
         onFindInPageClick = onFindInPageClick,

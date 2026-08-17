@@ -109,7 +109,6 @@ commonmark = { module = "com.atlassian.commonmark:commonmark", version.ref = "co
 commonmark-strikethrough = { module = "com.atlassian.commonmark:commonmark-ext-gfm-strikethrough", version.ref = "commonmark"}
 commonmark-table = { module = "com.atlassian.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark"}
 
-tools-patreon = { module = "com.patreon:patreon", version = "0.4.2" }
 palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 
 avif = { module = "org.aomedia.avif.android:avif", version.ref = "avif" }

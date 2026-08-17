@@ -1251,13 +1251,21 @@ class LemmyApiClient @Inject constructor(
       getApi().saveUserSettings(authorization = account.bearer, settings)
     }.map { Unit }
 
-  suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
+  suspend fun resolveObject(q: String, account: Account): Result<com.idunnololz.summit.models.ResolveObjectResponse> {
     val form = ResolveObject(
       q = q,
     )
 
     return onApiClient {
       getApi().resolveObject(authorization = account.bearer, form, force = false)
+        .map {
+          com.idunnololz.summit.models.ResolveObjectResponse(
+            comment = it.comment,
+            post = it.post?.let { dtoConverter.convertPostView(it) },
+            community = it.community,
+            person = it.person,
+          )
+        }
     }
   }
 

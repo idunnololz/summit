@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/column_guideline_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.3333" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/column_guideline_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.6667" />
+
+            <TextView
+                android:id="@+id/total_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/total_score"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_1"/>
+
+            <TextView
+                android:id="@+id/score"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceHeadlineSmall"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/total_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_1"/>
+
+            <TextView
+                android:id="@+id/score_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodySmall"
+                android:gravity="center"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintTop_toBottomOf="@+id/score"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_1"/>
+
+            <TextView
+                android:id="@+id/last_7_days_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/last_7_days"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_1"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_2"/>
+
+            <TextView
+                android:id="@+id/score_recent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceHeadlineSmall"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/last_7_days_title"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_1"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_2"/>
+
+            <TextView
+                android:id="@+id/score_recent_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodySmall"
+                android:gravity="center"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintTop_toBottomOf="@+id/score_recent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_1"
+                app:layout_constraintEnd_toEndOf="@+id/column_guideline_2"/>
+
+
+
+            <TextView
+                android:id="@+id/views_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/views"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_2"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/views"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceHeadlineSmall"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/views_title"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_2"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/recent_views"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodySmall"
+                android:gravity="center"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintTop_toBottomOf="@+id/views"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/column_guideline_2"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/posts_your_interacted_with"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:textAppearance="?textAppearanceTitleMedium"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintTop_toBottomOf="@+id/card"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

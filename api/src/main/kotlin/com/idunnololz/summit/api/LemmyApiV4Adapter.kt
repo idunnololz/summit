@@ -1009,10 +1009,10 @@ class LemmyApiV4Adapter(
     )
   }.map {
     UnreadCount(
-      notificationCount = it.notificationCount.toInt(),
-      registrationApplicationCount = it.registrationApplicationCount?.toInt() ?: 0,
-      pendingFollowCount = it.pendingFollowCount?.toInt() ?: 0,
-      reportCount = it.reportCount?.toInt() ?: 0,
+      notificationCount = it.notificationCount,
+      registrationApplicationCount = it.registrationApplicationCount ?: 0,
+      pendingFollowCount = it.pendingFollowCount ?: 0,
+      reportCount = it.reportCount ?: 0,
 
       mentions = null,
       privateMessages = null,

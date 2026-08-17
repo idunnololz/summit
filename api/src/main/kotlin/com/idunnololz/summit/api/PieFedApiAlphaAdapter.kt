@@ -99,11 +99,14 @@ import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
+import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSite
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
@@ -768,16 +771,44 @@ class PieFedApiAlphaAdapter(
       }
     }
 
-    val unreadCount = j1.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-    val reportCount = j2.await().getOrElse { return@withContext Result.failure<UnreadCount>(it) }
-    val registrationCount = j3.await().getOrElse {
-      return@withContext Result.failure<UnreadCount>(it)
+    val unreadCount = j1.await().getOrElse {
+      if (it is ClientApiException) {
+        GetUnreadCountResponse(
+          replies = 0, 
+          mentions = 0, 
+          private_messages = 0,
+        )
+      } else {
+        return@withContext Result.failure<UnreadCount>(it)
+      }
     }
+    val reportCount = j2.await().getOrElse {
+      if (it is ClientApiException || it is NotYetImplemented) {
+        GetReportCountResponse(
+          community_id = null,
+          comment_reports = 0,
+          post_reports = 0,
+          private_message_reports = 0,
+        )
+      } else {
+        return@withContext Result.failure<UnreadCount>(it)
+      }
+    }
+    val registrationCount = j3.await().getOrElse {
+      if (it is ClientApiException || it is NotYetImplemented) {
+        GetUnreadRegistrationApplicationCountResponse(
+          registration_applications = 0
+        )
+      } else {
+        return@withContext Result.failure<UnreadCount>(it)
+      }
+    }
+
+    val notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages
 
     Result.success(
       UnreadCount(
-        notificationCount =
-        unreadCount.replies + unreadCount.mentions + unreadCount.private_messages,
+        notificationCount = notificationCount,
         registrationApplicationCount = registrationCount.registration_applications,
         pendingFollowCount = 0,
         reportCount =

@@ -160,7 +160,7 @@ class MultiCommunityDataSource(
       reset()
     }
 
-    setSortType(sortType)
+    setSortType(sortOrder)
 
     // prefetch if needed
     val prefetchJobs = validSources.map {

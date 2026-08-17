@@ -8,6 +8,7 @@ import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.ConnectionException
 import com.idunnololz.summit.api.CouldntFindObjectError
+import com.idunnololz.summit.api.CouldntFindPersonError
 import com.idunnololz.summit.api.CouldntFindPostError
 import com.idunnololz.summit.api.ForbiddenException
 import com.idunnololz.summit.api.GetNetworkException
@@ -53,6 +54,10 @@ fun Throwable.toErrorMessage(context: Context): String = when (val t = this) {
 
           is CouldntFindPostError -> {
             context.getString(R.string.error_couldnt_find_post)
+          }
+
+          is CouldntFindPersonError -> {
+            context.getString(R.string.error_couldnt_find_person)
           }
 
           is CommunityBlockedError -> {

@@ -85,7 +85,7 @@ class LocalStatsListFragment : BaseFragment<FragmentLocalStatsListBinding>() {
     val context = requireContext()
     val adapter = LocalStatsListAdapter(
       context = context,
-      fetchPerson = { viewModel.fetchPerson(it) },
+      fetchPerson = { viewModel.fetchPerson(it, false) },
     )
 
     binding.recyclerView.setHasFixedSize(true)
@@ -182,6 +182,5 @@ class LocalStatsListFragment : BaseFragment<FragmentLocalStatsListBinding>() {
     private fun refreshItems() {
       adapterHelper.setItems(newItems = data?.items ?: listOf(), adapter = this)
     }
-
   }
 }

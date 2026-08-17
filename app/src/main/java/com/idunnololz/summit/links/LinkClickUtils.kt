@@ -66,13 +66,21 @@ fun BaseActivity.onLinkClick(
   }
 
   if (linkContext == LinkContext.Force) {
-    Utils.openExternalLink(context, url)
+    Utils.openExternalLink(
+      context = context,
+      url = url,
+      fragmentManager = fragmentManager,
+    )
     return
   }
 
   when (preferences.previewLinks) {
     PreviewNoLinks -> {
-      Utils.openExternalLink(context, url)
+      Utils.openExternalLink(
+        context = context,
+        url = url,
+        fragmentManager = fragmentManager,
+      )
     }
     PreviewAllLinks -> {
       LinkPreviewDialogFragment.show(fragmentManager, url)
@@ -81,7 +89,11 @@ fun BaseActivity.onLinkClick(
       if (linkContext == LinkContext.Text) {
         LinkPreviewDialogFragment.show(fragmentManager, url)
       } else {
-        Utils.openExternalLink(context, url)
+        Utils.openExternalLink(
+          context = context,
+          url = url,
+          fragmentManager = fragmentManager,
+        )
       }
     }
   }

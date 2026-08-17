@@ -15,7 +15,6 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.tools.patreon)
   implementation(libs.retrofit2.retrofit)
   implementation(libs.retrofit2.converter.kotlinx.serialization)
   implementation(libs.kotlinx.serialization.json)

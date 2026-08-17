@@ -151,6 +151,13 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                   icon = R.drawable.baseline_block_24,
                 )
               }
+              if (preferences.localTrackingEnabled) {
+                addItemWithIcon(
+                  id = R.id.local_community_stats,
+                  getString(R.string.local_community_stats),
+                  R.drawable.outline_bar_chart_24,
+                )
+              }
 
               addDivider()
               addItemWithIcon(
@@ -474,7 +481,12 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
       )
     }
     R.id.open_link_incognito -> {
-      Utils.openExternalLink(context, url, openNewIncognitoTab = true)
+      Utils.openExternalLink(
+        context = context,
+        url = url,
+        fragmentManager = fragmentManager,
+        openNewIncognitoTab = true
+      )
     }
     R.id.preview_link -> {
       LinkPreviewDialogFragment.show(fragmentManager, url)
@@ -483,6 +495,13 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
       (advancedLink as? AdvancedLink.PageLink)?.let {
         (it.pageRef as? CommunityRef)?.let {
           mainActivity?.showCommunityInfo(it)
+        }
+      }
+    }
+    R.id.local_community_stats -> {
+      (advancedLink as? AdvancedLink.PageLink)?.let {
+        (it.pageRef as? CommunityRef)?.let {
+          mainActivity?.showCommunityLocalStats(it)
         }
       }
     }
