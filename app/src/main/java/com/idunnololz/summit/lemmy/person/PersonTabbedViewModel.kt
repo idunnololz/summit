@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.account.toPersonRef
@@ -35,6 +37,7 @@ import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -44,6 +47,7 @@ class PersonTabbedViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val apiClientFactory: LemmyApiClient.Factory,
   private val accountInfoManager: AccountInfoManager,
+  private val accountManager: AccountManager,
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
   private val savedStateHandle: SavedStateHandle,
@@ -92,6 +96,7 @@ class PersonTabbedViewModel @Inject constructor(
       _personRef.value = value
     }
   private var fetchingPages = mutableSetOf<Int>()
+  private var fetchingJobs = mutableListOf<Job>()
   private val personIdToPersonName = mutableMapOf<String, String>()
   var showCurrentAccount = savedStateHandle.getLiveData<Boolean>("show_current_account", false)
 
@@ -108,17 +113,20 @@ class PersonTabbedViewModel @Inject constructor(
       }
     }
     viewModelScope.launch {
-      accountInfoManager.currentFullAccountOnChange.collect {
+      accountManager.currentAccountOnChange.collect {
+        Log.d(TAG, "currentAccountOnChange(): $it")
         if (showCurrentAccount.value == true) {
-          fetchPersonIfNotDone(it?.account?.toPersonRef())
-          fetchPage(0, isPeronInfoFetch = true, force = true)
+          resetFetchingJobs()
+
+          fetchPersonIfNotDone(personRef = it.asAccount?.toPersonRef(), force = true)
+//          fetchPage(0, isPeronInfoFetch = true, force = true)
         }
       }
     }
   }
 
   fun fetchPersonIfNotDone(personRef: PersonRef?, force: Boolean = false) {
-    if (personData.valueOrNull != null && this.personRef == personRef) return
+    if (personData.valueOrNull != null && this.personRef == personRef && !force) return
 
     this.personRef = personRef
 
@@ -134,7 +142,7 @@ class PersonTabbedViewModel @Inject constructor(
       return
     }
 
-    Log.d(TAG, "Fetching page $pageIndex")
+    Log.d(TAG, "Fetching page $pageIndex. personRef: $personRef")
 
     fetchingPages.add(pageIndex)
 
@@ -146,7 +154,7 @@ class PersonTabbedViewModel @Inject constructor(
     postsState.setIsLoading()
     commentsState.setIsLoading()
 
-    viewModelScope.launch {
+    val fetchJob = viewModelScope.launch {
       if (force) {
         reset()
       }
@@ -193,7 +201,7 @@ class PersonTabbedViewModel @Inject constructor(
             )
 
             r.fold(
-              {
+              onSuccess = {
                 val fullName = PersonRef.PersonRefByName(
                   it.personView.person.name,
                   it.personView.person.instance,
@@ -210,7 +218,7 @@ class PersonTabbedViewModel @Inject constructor(
                   includeContent = true,
                 )
               },
-              {
+              onFailure = {
                 r
               },
             )
@@ -223,10 +231,10 @@ class PersonTabbedViewModel @Inject constructor(
           if (isPeronInfoFetch) {
             personData.postValue(
               PersonDetailsData(
-                result.personView,
-                result.comments,
-                result.posts,
-                result.moderates,
+                personView = result.personView,
+                comments = result.comments,
+                posts = result.posts,
+                moderates = result.moderates,
               ),
             )
           }
@@ -277,6 +285,7 @@ class PersonTabbedViewModel @Inject constructor(
           fetchingPages.remove(pageIndex)
         }
         .onFailure {
+          Log.d(TAG, "Error fetching posts", it)
           if (postListEngine.hasMore || force) {
             postListEngine.addPage(
               LoadedPostsData(
@@ -318,6 +327,11 @@ class PersonTabbedViewModel @Inject constructor(
           fetchingPages.remove(pageIndex)
         }
     }
+
+    fetchingJobs += fetchJob
+    fetchJob.invokeOnCompletion {
+      fetchingJobs -= fetchJob
+    }
   }
 
   fun fetchNextCommentPage() {
@@ -328,7 +342,14 @@ class PersonTabbedViewModel @Inject constructor(
     personData.setIdle()
   }
 
+  private fun resetFetchingJobs() {
+    fetchingPages.clear()
+    fetchingJobs.forEach { it.cancel() }
+  }
+
   private fun reset() {
+    Log.d(TAG, "reset()")
+
     postListEngine.clear()
     commentListEngine.clear()
   }

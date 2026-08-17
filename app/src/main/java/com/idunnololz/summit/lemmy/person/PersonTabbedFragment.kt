@@ -442,10 +442,10 @@ class PersonTabbedFragment :
       binding.loadingView.showErrorText(
         getString(R.string.error_not_signed_in),
       )
-      binding.profileIcon.visibility = View.GONE
-      binding.collapsingToolbarContent.visibility = View.GONE
-      binding.viewPager.visibility = View.GONE
-      binding.tabLayoutContainer.visibility = View.GONE
+      binding.profileIcon.visibility = View.INVISIBLE
+      binding.collapsingToolbarContent.visibility = View.INVISIBLE
+      binding.viewPager.visibility = View.INVISIBLE
+      binding.tabLayoutContainer.visibility = View.INVISIBLE
       binding.fab.hide()
 
       viewModel.clearPersonData()
@@ -459,10 +459,10 @@ class PersonTabbedFragment :
     }
 
     if (data == null) {
-      binding.profileIcon.visibility = View.GONE
-      binding.collapsingToolbarContent.visibility = View.GONE
-      binding.viewPager.visibility = View.GONE
-      binding.tabLayoutContainer.visibility = View.GONE
+      binding.profileIcon.visibility = View.INVISIBLE
+      binding.collapsingToolbarContent.visibility = View.INVISIBLE
+      binding.viewPager.visibility = View.INVISIBLE
+      binding.tabLayoutContainer.visibility = View.INVISIBLE
       binding.fab.hide()
       return
     }
