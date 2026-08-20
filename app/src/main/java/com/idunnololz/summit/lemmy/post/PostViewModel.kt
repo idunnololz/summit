@@ -931,10 +931,14 @@ class PostViewModel @Inject constructor(
           postOrCommentRef
             .fold(
               {
-                lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
+                withContext(Dispatchers.IO) {
+                  lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
+                }
               },
               {
-                lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
+                withContext(Dispatchers.IO) {
+                  lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
+                }
               },
             )
         } else {
