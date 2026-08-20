@@ -765,7 +765,10 @@ class LemmyApiV3Adapter(
     args: ListRegistrationApplications,
     force: Boolean,
   ): Result<PagedResponseRegistrationApplicationView> = retrofitErrorHandler {
-    api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+    api.listRegistrationApplications(
+      headers = generateHeaders(authorization, force),
+      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+    )
   }.map {
     PagedResponseRegistrationApplicationView(
       items = it.registration_applications.map { it.toUserRegistrationApplication(instance) },
