@@ -219,6 +219,7 @@ class AccountInfoManager @Inject constructor(
 
       result
         .onSuccess { response ->
+          accountManager.updateAccountWith(account, response)
           updateAccountInfoWith(account, response)
         }
 

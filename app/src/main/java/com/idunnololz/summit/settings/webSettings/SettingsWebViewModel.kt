@@ -174,6 +174,9 @@ class SettingsWebViewModel @Inject constructor(
           defaultSettingValues = defaultSettingValues + updatedSettingValues
           updatedSettingValues.clear()
           saveUserSettings.postValue(Unit)
+
+          // Update account info object
+          accountInfoManager.fetchAccountInfo(force = true)
         }
         .onFailure {
           saveUserSettings.postError(it)
@@ -192,7 +195,8 @@ class SettingsWebViewModel @Inject constructor(
 
     defaultSettingValues = mapOf(
       lemmyWebSettings.instanceSetting.id to account.instance,
-      lemmyWebSettings.displayNameSetting.id to person.name,
+      lemmyWebSettings.nameSetting.id to person.name,
+      lemmyWebSettings.displayNameSetting.id to person.display_name,
       lemmyWebSettings.bioSetting.id to person.bio,
       lemmyWebSettings.emailSetting.id to localUser.email,
       lemmyWebSettings.matrixSetting.id to person.matrix_user_id,
@@ -222,7 +226,8 @@ class SettingsWebViewModel @Inject constructor(
 
     return SettingValues(
       instance = merged[settings.instanceSetting.id] as String,
-      name = merged[settings.displayNameSetting.id] as? String ?: "",
+      name = merged[settings.nameSetting.id] as? String ?: "",
+      displayName = merged[settings.displayNameSetting.id] as? String ?: "",
       bio = merged[settings.bioSetting.id] as? String ?: "",
       email = merged[settings.emailSetting.id] as? String ?: "",
       matrixUserId = merged[settings.matrixSetting.id] as? String ?: "",
@@ -304,6 +309,7 @@ class SettingsWebViewModel @Inject constructor(
   data class SettingValues(
     val instance: String,
     val name: String,
+    val displayName: String,
     val bio: String,
     val email: String,
     val matrixUserId: String,

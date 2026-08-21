@@ -170,8 +170,12 @@ class SettingsWebFragment :
         { settingValues.instance },
         {},
       ),
-      settings.displayNameSetting.asCustomItemWithTextEditorDialog(
+      settings.nameSetting.asCustomItem(
         { settingValues.name },
+        {},
+      ),
+      settings.displayNameSetting.asCustomItemWithTextEditorDialog(
+        { settingValues.displayName },
         childFragmentManager,
       ),
       settings.bioSetting.asCustomItemWithTextEditorDialog(

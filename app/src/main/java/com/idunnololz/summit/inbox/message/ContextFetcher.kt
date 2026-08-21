@@ -2,6 +2,7 @@ package com.idunnololz.summit.inbox.message
 
 import android.app.Application
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.preferencesOf
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentsManager
@@ -14,6 +15,7 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -34,6 +36,7 @@ class ContextFetcher @Inject constructor(
   private val accountActionsManager: AccountActionsManager,
   private val pendingCommentsManager: PendingCommentsManager,
   val accountManager: AccountManager,
+  private val preferences: Preferences,
   coroutineScopeFactory: CoroutineScopeFactory,
 ) : AutoCloseable {
 
@@ -120,6 +123,7 @@ class ContextFetcher @Inject constructor(
       context = ContextCompat.getContextForLanguage(application),
       accountManager = accountManager,
       contentFiltersManager = contentFiltersManager,
+      preferences = preferences,
     ).buildCommentsTreeListView(
       post = null,
       comments = commentResult?.getOrNull(),

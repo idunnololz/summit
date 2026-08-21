@@ -33,6 +33,7 @@ import com.idunnololz.summit.databinding.ItemYouSignInOrSignUpBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -58,6 +59,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
 
   @Inject
   lateinit var avatarHelper: AvatarHelper
+
+  @Inject
+  lateinit var preferences: Preferences
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -104,6 +108,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
         screenWidthDp = Utils.convertPixelsToDp(
           requireActivity().computeWindowMetrics().bounds.width().toFloat(),
         ).toInt(),
+        preferences = preferences,
         onSwitchAccountClick = {
           AccountsAndSettingsDialogFragment.newInstance()
             .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
@@ -270,6 +275,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
     private val context: Context,
     private val avatarHelper: AvatarHelper,
     private val screenWidthDp: Int,
+    private val preferences: Preferences,
     private val onSwitchAccountClick: () -> Unit,
     private val onProfileClick: (Account, View, String?) -> Unit,
     private val onPostsClick: () -> Unit,
@@ -373,7 +379,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
           onSwitchAccountClick()
         }
 
-        b.title.text = account?.name ?: context.getString(R.string.guest)
+        b.title.text = if (preferences.preferUserDisplayName) {
+          account?.displayName ?: account?.name ?: context.getString(R.string.guest)
+        } else {
+          account?.name ?: context.getString(R.string.guest)
+        }
         if (account != null) {
           b.subtitle.visibility = View.VISIBLE
           b.subtitle.text = "${account.name}@${account.instance}"

@@ -19,6 +19,7 @@ data class Account(
   @ColumnInfo(name = "current") val current: Boolean,
   @ColumnInfo(name = "instance") override val instance: String,
   @ColumnInfo(name = "name") val name: String,
+  @ColumnInfo(name = "display_name", defaultValue = "null") val displayName: String?,
   @ColumnInfo(name = "jwt") val jwt: String,
   @ColumnInfo(
     name = "default_listing_type",
@@ -37,6 +38,7 @@ data class Account(
     fun from(instance: String, localUserView: LocalUserView, jwt: String) = Account(
       id = localUserView.person.id,
       name = localUserView.person.name,
+      displayName = localUserView.person.display_name,
       current = true,
       instance = instance,
       jwt = jwt,

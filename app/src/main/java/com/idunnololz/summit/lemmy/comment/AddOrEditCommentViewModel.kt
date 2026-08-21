@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.comment
 
 import android.app.Application
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -30,6 +31,7 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +48,7 @@ class AddOrEditCommentViewModel @Inject constructor(
   private val state: SavedStateHandle,
   private val contentFiltersManager: ContentFiltersManager,
   val draftsManager: DraftsManager,
+  private val preferences: Preferences,
 ) : ViewModel() {
 
   companion object {
@@ -308,6 +311,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         context = ContextCompat.getContextForLanguage(application),
         accountManager = accountManager,
         contentFiltersManager = contentFiltersManager,
+        preferences = preferences,
       ).buildCommentsTreeListView(
         post = null,
         comments = commentResult?.getOrNull(),

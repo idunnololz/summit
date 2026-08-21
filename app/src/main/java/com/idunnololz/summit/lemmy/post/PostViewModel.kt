@@ -696,6 +696,7 @@ class PostViewModel @Inject constructor(
         context = context,
         accountManager = accountManager,
         contentFiltersManager = contentFiltersManager,
+        preferences = preferences,
       ).buildCommentsTreeListView(
         post = post,
         comments = comments,

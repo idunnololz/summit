@@ -11,6 +11,7 @@ import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostListItem
 import com.idunnololz.summit.lemmy.post.PostListItem.CommentListView
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.preferences.Preferences
 import java.util.LinkedHashMap
 import java.util.LinkedList
 
@@ -26,6 +27,7 @@ class CommentTreeBuilder(
   private val context: Context,
   private val accountManager: AccountManager,
   private val contentFiltersManager: ContentFiltersManager,
+  private val preferences: Preferences,
 ) {
 
   suspend fun buildCommentsTreeListView(
@@ -255,8 +257,15 @@ class CommentTreeBuilder(
           0,
           CommentNodeData(
             listView = PostListItem.PendingCommentListView(
-              pendingComment,
-              author = accountManager.getAccountById(pendingComment.accountId)?.name,
+              pendingCommentView = pendingComment,
+              author =
+                accountManager.getAccountById(pendingComment.accountId)?.let {
+                  if (preferences.preferUserDisplayName) {
+                    it.displayName ?: it.name
+                  } else {
+                    it.name
+                  }
+                },
             ),
             children = mutableListOf(),
             depth = 0,
@@ -270,10 +279,16 @@ class CommentTreeBuilder(
             0,
             CommentNodeData(
               listView = PostListItem.PendingCommentListView(
-                pendingComment,
+                pendingCommentView = pendingComment,
                 author = accountManager.getAccountById(
                   pendingComment.accountId,
-                )?.name,
+                )?.let {
+                  if (preferences.preferUserDisplayName) {
+                    it.displayName ?: it.name
+                  } else {
+                    it.name
+                  }
+                },
               ),
               children = mutableListOf(),
               depth = it.depth + 1,

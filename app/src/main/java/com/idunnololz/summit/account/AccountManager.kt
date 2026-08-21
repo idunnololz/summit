@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.AccountIdsSharedPreference
 import com.idunnololz.summit.preferences.GuestAccountSettings
@@ -17,12 +18,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import kotlin.io.path.Path
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -34,6 +36,8 @@ class AccountManager @Inject constructor(
 ) {
 
   companion object {
+    private const val TAG = "AccountManager"
+
     private const val KEY_ACCOUNT_ID_COUNTER = "#counter"
     private const val ACCOUNT_ID_MAX_VALUE = 10000
   }
@@ -54,7 +58,10 @@ class AccountManager @Inject constructor(
   private val accountByIdCache = mutableMapOf<Long, Account?>()
 
   val currentAccount: StateFlow<GuestOrUserAccount> = _currentAccount
-  val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
+
+  val currentAccountOnChange = _currentAccount
+    .distinctUntilChangedBy { it.id }
+    .drop(1)
 
   val numAccounts: StateFlow<Int> = _numAccounts
 
@@ -238,6 +245,27 @@ class AccountManager @Inject constructor(
   }
 
   fun isSignedIntoAnyAccount(): Boolean = _numAccounts.value > 0
+
+  suspend fun updateAccountWith(account: Account, response: GetSiteResponse) =
+    withContext(Dispatchers.IO) {
+      val deferred = coroutineScope.async {
+        val person = response.my_user?.local_user_view?.person ?: return@async
+        val displayName = person.display_name
+
+        Log.d(TAG, "updateAccountWith() - displayName: $displayName")
+
+        val newAccount = account.copy(
+          displayName = displayName
+        )
+        accountDao.update(newAccount)
+
+        if (newAccount.id == currentAccount.value.id) {
+          _currentAccount.value = newAccount
+        }
+      }
+
+      deferred.await()
+    }
 }
 
 val StateFlow<GuestOrUserAccount?>.asAccount

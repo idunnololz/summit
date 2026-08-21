@@ -468,6 +468,13 @@ class LemmyWebSettings @Inject constructor(
     isEnabled = false,
   )
 
+  val nameSetting = TextValueSettingItem(
+    title = context.getString(R.string.name),
+    description = null,
+    supportsRichText = false,
+    isEnabled = false,
+  )
+
   val displayNameSetting = TextValueSettingItem(
     title = context.getString(R.string.display_name),
     description = null,
