@@ -130,6 +130,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FAILED_ACTIONS_BADGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
@@ -2237,6 +2238,11 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.use_lemmy_api_v4),
     description = context.getString(R.string.use_lemmy_api_v4_desc),
     relatedKeys = listOf(KEY_USE_LEMMY_V4),
+  )
+  val showFailedActionsBadge = OnOffSettingItem(
+    title = context.getString(R.string.show_failed_actions_badge),
+    description = context.getString(R.string.show_failed_actions_badge_desc),
+    relatedKeys = listOf(KEY_SHOW_FAILED_ACTIONS_BADGE),
   )
 }
 

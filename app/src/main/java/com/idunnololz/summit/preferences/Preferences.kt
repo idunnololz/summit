@@ -146,6 +146,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FAILED_ACTIONS_BADGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
@@ -765,6 +766,8 @@ class Preferences(
     by booleanPreference(KEY_SHOW_PER_USER_SCORES, false)
   var useLemmyV4: Boolean
     by booleanPreference(KEY_USE_LEMMY_V4, false)
+  var showFailedActionsBadge: Boolean
+    by booleanPreference(KEY_SHOW_FAILED_ACTIONS_BADGE, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

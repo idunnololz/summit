@@ -324,6 +324,10 @@ class SettingsMiscFragment :
         { preferences.useLemmyV4 },
         { preferences.useLemmyV4 = it },
       ),
+      settings.showFailedActionsBadge.asOnOffSwitch(
+        { preferences.showFailedActionsBadge },
+        { preferences.showFailedActionsBadge = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

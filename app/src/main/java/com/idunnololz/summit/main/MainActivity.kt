@@ -301,16 +301,7 @@ class MainActivity : SummitActivity() {
       }
     }
     viewModel.newActionErrorsCount.observe(this) { count ->
-      if (!navBarController.useBottomNavBar) return@observe
-
-      navBarController.navBar.getOrCreateBadge(R.id.youFragment).apply {
-        if (count > 0) {
-          isVisible = true
-          number = count
-        } else {
-          isVisible = false
-        }
-      }
+      updateFailedActionsBadge(count)
     }
 
     viewModel.currentAccount.observe(this) {
@@ -422,8 +413,20 @@ class MainActivity : SummitActivity() {
     }
 
     navBarController.onPreferencesChanged(preferences)
+    updateFailedActionsBadge(viewModel.newActionErrorsCount.value ?: 0)
 
     updateUserAvatar()
+  }
+
+  private fun updateFailedActionsBadge(failedActionsCount: Int) {
+    if (!navBarController.useBottomNavBar) return
+
+    navBarController.navBar.getOrCreateBadge(R.id.youFragment).apply {
+      isVisible = preferences.showFailedActionsBadge && failedActionsCount > 0
+      if (isVisible) {
+        number = failedActionsCount
+      }
+    }
   }
 
   private fun isVersionUpdate(): Boolean {

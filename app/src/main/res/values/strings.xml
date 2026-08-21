@@ -2436,6 +2436,8 @@
     <string name="error_couldnt_find_person">Could not find this person on this instance.</string>
     <string name="posts_your_interacted_with">Posts you interacted with</string>
     <string name="error_opening_link">Error opening link.</string>
+    <string name="show_failed_actions_badge">Show failed actions badge</string>
+    <string name="show_failed_actions_badge_desc">When enabled a badge is displayed on the bottom bar when certain actions fail (eg. comments fail to send).</string>
 
 
     <!-- uCrop string resource end -->
