@@ -511,17 +511,19 @@ class PostViewModel @Inject constructor(
     val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
     viewModelScope.launch {
-      updatePendingCommentsInternal(
-        postOrCommentRef = postOrCommentRef,
-        sortOrder = sortOrder,
-        resolveCompletedPendingComments = resolveCompletedPendingComments,
-      )
+      mutex.withLock {
+        updatePendingCommentsInternalLocked(
+          postOrCommentRef = postOrCommentRef,
+          sortOrder = sortOrder,
+          resolveCompletedPendingComments = resolveCompletedPendingComments,
+        )
+      }
 
       updateData(wasUpdateForced = false)
     }
   }
 
-  private suspend fun updatePendingCommentsInternal(
+  private suspend fun updatePendingCommentsInternalLocked(
     postOrCommentRef: Either<PostRef, CommentRef>,
     sortOrder: CommentSortType,
     resolveCompletedPendingComments: Boolean,
@@ -603,7 +605,7 @@ class PostViewModel @Inject constructor(
           val commentsResult = if (pendingComment.parentId == null) {
             result
           } else {
-            fetchMoreCommentsInternal(
+            fetchMoreCommentsInternalLocked(
               parentId = pendingComment.parentId,
               sortOrder = sortOrder,
               force = true,
@@ -773,6 +775,20 @@ class PostViewModel @Inject constructor(
     maxDepth: Int? = null,
     force: Boolean = false,
   ): Result<List<CommentView>> = mutex.withLock {
+    fetchMoreCommentsInternalLocked(
+      parentId = parentId,
+      sortOrder = sortOrder,
+      maxDepth = maxDepth,
+      force = force,
+    )
+  }
+
+  private suspend fun fetchMoreCommentsInternalLocked(
+    parentId: CommentId,
+    sortOrder: CommentSortType,
+    maxDepth: Int? = null,
+    force: Boolean = false,
+  ): Result<List<CommentView>> {
     Log.d(TAG, "fetchMoreCommentsInternal(): parentId = $parentId")
     val result = commentsFetcher.fetchCommentsWithRetry(
       id = Either.Right(parentId),
@@ -812,7 +828,7 @@ class PostViewModel @Inject constructor(
         }
       }
 
-    result
+    return result
   }
 
   fun onCommentActionChanged() {
@@ -892,6 +908,7 @@ class PostViewModel @Inject constructor(
     switchToNativeInstance: Boolean = false,
     markPostAsRead: Boolean = true,
   ) {
+    Log.d(TAG, "_fetchPostData(): fetchPostData = $fetchPostData fetchCommentData = $fetchCommentData")
     mutex.withLock {
       var fetchPostData = fetchPostData
       var force = force
@@ -1001,7 +1018,7 @@ class PostViewModel @Inject constructor(
 
       if (force) {
         additionalLoadedCommentIds.forEach {
-          fetchMoreCommentsInternal(
+          fetchMoreCommentsInternalLocked(
             parentId = it,
             sortOrder = sortOrder,
             maxDepth = null,
@@ -1010,7 +1027,7 @@ class PostViewModel @Inject constructor(
         }
       }
 
-      updatePendingCommentsInternal(postOrCommentRef, sortOrder, true)
+      updatePendingCommentsInternalLocked(postOrCommentRef, sortOrder, true)
 
       val post = postResult.getOrNull()
       val comments = commentsResult?.getOrNull()

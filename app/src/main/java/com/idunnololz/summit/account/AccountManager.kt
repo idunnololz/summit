@@ -70,6 +70,7 @@ class AccountManager @Inject constructor(
   init {
     runBlocking {
       val curAccount = accountDao.getCurrentAccount()?.fix()
+
       preferenceManager.updateCurrentPreferences(curAccount)
       curAccount?.let {
         _currentAccount.emit(it)
@@ -254,12 +255,15 @@ class AccountManager @Inject constructor(
 
         Log.d(TAG, "updateAccountWith() - displayName: $displayName")
 
+        val isCurrentAccount = account.id == currentAccount.value.id
         val newAccount = account.copy(
-          displayName = displayName
+          displayName = displayName,
+          current = isCurrentAccount
         )
+
         accountDao.update(newAccount)
 
-        if (newAccount.id == currentAccount.value.id) {
+        if (isCurrentAccount) {
           _currentAccount.value = newAccount
         }
       }
