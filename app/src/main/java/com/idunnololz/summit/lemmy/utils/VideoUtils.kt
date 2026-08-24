@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.utils
 
 import android.content.Intent
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
@@ -18,6 +19,8 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import com.idunnololz.summit.video.VideoInfoDialogFragment
 import java.io.IOException
+
+private const val TAG = "VideoUtils"
 
 fun BaseFragment<*>.showMoreVideoOptions(
   url: String,
@@ -100,7 +103,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
           Snackbar
             .make(
               parent.getSnackbarContainer(),
-              R.string.error_downloading_image,
+              R.string.error_downloading_video,
               Snackbar.LENGTH_LONG,
             )
             .setAction(R.string.downloads_settings) {
@@ -108,11 +111,12 @@ fun BaseFragment<*>.showMoreVideoOptions(
             }
             .show()
         } else {
+          Log.e(TAG, "Error downloading video", it.error)
           crashLogger?.recordException(it.error)
           Snackbar
             .make(
               parent.getSnackbarContainer(),
-              R.string.error_downloading_image,
+              R.string.error_downloading_video,
               Snackbar.LENGTH_LONG,
             )
             .show()

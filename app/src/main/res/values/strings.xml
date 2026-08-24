@@ -17,6 +17,7 @@
     <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
     <!-- Error string. -->
     <string name="error_downloading_image">There was an error downloading the image.</string>
+    <string name="error_downloading_video">There was an error downloading the video.</string>
     <!--
     Retry is defined by the navigation component library.
     <string name="retry">Retry</string>
