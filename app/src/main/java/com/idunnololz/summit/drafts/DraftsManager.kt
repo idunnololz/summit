@@ -146,4 +146,15 @@ class DraftsManager @Inject constructor(
       _onDraftChanged.emit(Unit)
     }
   }
+
+
+  suspend fun deleteDraftsWithIds(entryIds: List<Long>) = withContext(dbContext) {
+    entryIds.forEach {
+      draftsDao.deleteWithId(it)
+    }
+
+    coroutineScope.launch {
+      _onDraftChanged.emit(Unit)
+    }
+  }
 }

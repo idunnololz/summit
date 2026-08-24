@@ -1,4 +1,4 @@
-package com.idunnololz.summit.drafts
+package com.idunnololz.summit.drafts.drafts
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +8,10 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.drafts.DraftData
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftTypes
+import com.idunnololz.summit.drafts.DraftsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -38,13 +42,30 @@ class DraftsViewModel @Inject constructor(
 
   private val draftEntriesContext = Dispatchers.Default.limitedParallelism(1)
 
+  private var selectedItems = setOf<Long>()
   private val draftEntries = mutableListOf<DraftEntry>()
   private val seenDrafts = mutableSetOf<Long>()
   private var isLoading = false
   private var hasMore = true
   private var loadingJob: Job? = null
 
-  val viewModelItems = MutableLiveData<List<ViewModelItem>>(listOf(ViewModelItem.LoadingItem))
+  val model = MutableLiveData<DraftsModel>(DraftsModel())
+
+  val selectedItemsCount
+    get() = selectedItems.size
+
+  var isInSelectMode: Boolean = false
+    set(value) {
+      field = value
+
+      if (!value) {
+        selectedItems = setOf()
+      }
+
+      viewModelScope.launch {
+        generateItems()
+      }
+    }
 
   init {
     viewModelScope.launch {
@@ -114,10 +135,24 @@ class DraftsViewModel @Inject constructor(
       for (draft in draftEntries) {
         when (draft.data) {
           is DraftData.CommentDraftData ->
-            items.add(ViewModelItem.CommentDraftItem(draft, draft.data))
+            items.add(
+              ViewModelItem.CommentDraftItem(
+                draftEntry = draft,
+                commentData = draft.data,
+                isSelectable = isInSelectMode,
+                isSelected = selectedItems.contains(draft.id)
+              )
+            )
 
           is DraftData.PostDraftData ->
-            items.add(ViewModelItem.PostDraftItem(draft, draft.data))
+            items.add(
+              ViewModelItem.PostDraftItem(
+                draftEntry = draft,
+                postData = draft.data,
+                isSelectable = isInSelectMode,
+                isSelected = selectedItems.contains(draft.id),
+              )
+            )
 
           is DraftData.MessageDraftData -> {
             /* do nothing */
@@ -135,12 +170,26 @@ class DraftsViewModel @Inject constructor(
       items.add(ViewModelItem.EmptyItem)
     }
 
-    viewModelItems.postValue(items)
+    model.postValue(
+      model.value?.copy(
+        items = items,
+        isInSelectMode = isInSelectMode,
+      )
+    )
   }
 
   fun deleteDraft(draftId: Long) {
     viewModelScope.launch {
       draftsManager.deleteDraftWithId(draftId)
+    }
+  }
+
+  fun deleteAllSelectedDrafts() {
+    viewModelScope.launch {
+      val selectedItems = selectedItems
+      draftsManager.deleteDraftsWithIds(selectedItems.toList())
+
+      isInSelectMode = false
     }
   }
 
@@ -153,6 +202,22 @@ class DraftsViewModel @Inject constructor(
       } else {
         draftsManager.deleteAll()
       }
+
+      isInSelectMode = false
+    }
+  }
+
+  fun markItemAsSelected(itemId: Long, selected: Boolean) {
+    viewModelScope.launch {
+      if (selected) {
+        selectedItems += itemId
+      } else {
+        selectedItems -= itemId
+      }
+
+      isInSelectMode = !selectedItems.isEmpty()
+
+      generateItems()
     }
   }
 
@@ -163,24 +228,5 @@ class DraftsViewModel @Inject constructor(
       isLoading = false
       hasMore = true
     }
-  }
-
-  sealed interface ViewModelItem {
-
-    data object HeaderItem : ViewModelItem
-
-    data class PostDraftItem(
-      val draftEntry: DraftEntry,
-      val postData: DraftData.PostDraftData,
-    ) : ViewModelItem
-
-    data class CommentDraftItem(
-      val draftEntry: DraftEntry,
-      val commentData: DraftData.CommentDraftData,
-    ) : ViewModelItem
-
-    data object LoadingItem : ViewModelItem
-
-    data object EmptyItem : ViewModelItem
   }
 }

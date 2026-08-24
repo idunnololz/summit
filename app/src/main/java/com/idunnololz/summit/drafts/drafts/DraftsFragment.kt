@@ -1,9 +1,10 @@
-package com.idunnololz.summit.drafts
+package com.idunnololz.summit.drafts.drafts
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,17 +14,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentDraftsBinding
+import com.idunnololz.summit.drafts.DraftData
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftTypes
+import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.DraftsDialogFragmentArgs
+import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.drafts.DraftsTabbedFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DraftsFragment :
@@ -59,6 +68,17 @@ class DraftsFragment :
     }
   }
 
+  private val deleteSelectedDialogLauncher = newAlertDialogLauncher("delete_selected") {
+    if (it.isOk) {
+      viewModel.deleteAllSelectedDrafts()
+    }
+  }
+  private val deleteAllDialogLauncher = newAlertDialogLauncher("delete_all") {
+    if (it.isOk) {
+      viewModel.deleteAll(args.draftType)
+    }
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -78,6 +98,20 @@ class DraftsFragment :
 
     viewModel.draftType = args.draftType
 
+    val onBackPressedCallback = object : OnBackPressedCallback(
+      enabled = viewModel.model.value?.isInSelectMode == true
+    ) {
+      override fun handleOnBackPressed() {
+        viewModel.isInSelectMode = false
+      }
+    }
+
+    requireSummitActivity().onBackPressedDispatcher
+      .addCallback(
+        viewLifecycleOwner,
+        onBackPressedCallback,
+      )
+
     with(binding) {
       val adapter = DraftsAdapter(
         onDraftClick = {
@@ -91,6 +125,12 @@ class DraftsFragment :
             extras.putLong("draft_id", it.id)
           }
         },
+        onStartSelectionMode = {
+          viewModel.isInSelectMode = true
+        },
+        onItemSelected = { draftEntry, isSelected ->
+          viewModel.markItemAsSelected(draftEntry.id, isSelected)
+        }
       )
       val layoutManager = LinearLayoutManager(context)
       recyclerView.adapter = adapter
@@ -99,7 +139,7 @@ class DraftsFragment :
       recyclerView.setHasFixedSize(true)
 
       fun fetchPageIfLoadItem(position: Int) {
-        (adapter.items.getOrNull(position) as? DraftsViewModel.ViewModelItem.LoadingItem)
+        (adapter.model.items.getOrNull(position) as? ViewModelItem.LoadingItem)
           ?.let {
             viewModel.loadMoreDrafts()
           }
@@ -114,11 +154,25 @@ class DraftsFragment :
         }
       }
 
-      viewModel.viewModelItems.observe(viewLifecycleOwner) {
+      viewModel.model.observe(viewLifecycleOwner) {
         swipeRefreshLayout.isRefreshing = false
 
-        adapter.setItems(it) {
+        adapter.setModel(it) {
           checkIfFetchNeeded()
+        }
+
+        onBackPressedCallback.isEnabled = it.isInSelectMode
+
+        if (it.isInSelectMode) {
+          if (addFab.isShown || !deleteFab.isShown) {
+            addFab.hide()
+            deleteFab.show()
+          }
+        } else {
+          if (!addFab.isShown || deleteFab.isShown) {
+            addFab.show()
+            deleteFab.hide()
+          }
         }
       }
 
@@ -135,12 +189,8 @@ class DraftsFragment :
       swipeRefreshLayout.setOnRefreshListener {
         viewModel.loadMoreDrafts(force = true)
       }
-    }
-  }
 
-  fun onSelected() {
-    (parentFragment as? DraftsTabbedFragment)?.binding?.fab?.apply {
-      setOnClickListener {
+      addFab.setOnClickListener {
         val currentAccount = viewModel.currentAccount ?: return@setOnClickListener
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -179,7 +229,22 @@ class DraftsFragment :
           }
         }
       }
+
+      deleteFab.setOnClickListener {
+        deleteSelectedDialogLauncher.launchDialog {
+          message = resources.getQuantityString(
+            R.plurals.warn_delete_drafts_format,
+            viewModel.selectedItemsCount,
+            PrettyPrintUtils.defaultDecimalFormat.format(viewModel.selectedItemsCount),
+          )
+          positionButtonResId = R.string.delete
+          negativeButtonResId = R.string.cancel
+        }
+      }
     }
+  }
+
+  fun onSelected() {
   }
 
   private fun openDraft(draftEntry: DraftEntry) {
@@ -212,5 +277,18 @@ class DraftsFragment :
       is DraftData.MessageDraftData -> {}
       null -> {}
     }
+  }
+
+  fun onToolbarItemSelected(itemId: Int): Boolean {
+    when (itemId) {
+      R.id.delete_all -> {
+        deleteAllDialogLauncher.launchDialog {
+          messageResId = R.string.warn_delete_all_drafts
+          positionButtonResId = R.string.delete_all
+          negativeButtonResId = R.string.cancel
+        }
+      }
+    }
+    return true
   }
 }

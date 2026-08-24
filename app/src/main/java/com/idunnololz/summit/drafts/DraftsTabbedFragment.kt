@@ -10,6 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentDraftsTabbedBinding
+import com.idunnololz.summit.drafts.drafts.DraftsFragment
+import com.idunnololz.summit.drafts.drafts.DraftsFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
@@ -69,6 +71,13 @@ class DraftsTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
       toolbar.setNavigationIconTint(
         context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
       )
+      toolbar.inflateMenu(R.menu.menu_drafts2)
+
+      toolbar.setOnMenuItemClickListener { item ->
+        val draftFragment = childFragmentManager
+          .findFragmentByTag("f${viewPager.currentItem}") as? DraftsFragment
+        draftFragment?.onToolbarItemSelected(item.itemId) == true
+      }
 
       if (viewPager.adapter == null) {
         viewPager.offscreenPageLimit = 5

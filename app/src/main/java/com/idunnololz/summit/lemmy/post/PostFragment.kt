@@ -339,7 +339,7 @@ class PostFragment :
       // when the activity is killed and recreated.
       requireSummitActivity().onBackPressedDispatcher
         .addCallback(
-          this,
+          viewLifecycleOwner,
           object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
               getSlidingPaneProvider()?.slidingPaneController?.unlockNavBar()
@@ -383,11 +383,11 @@ class PostFragment :
 
     requireSummitActivity().onBackPressedDispatcher.apply {
       addCallback(
-        this@PostFragment,
+        viewLifecycleOwner,
         findInPageBackPressHandler,
       )
       addCallback(
-        this@PostFragment,
+        viewLifecycleOwner,
         screenshotModeBackPressHandler,
       )
     }

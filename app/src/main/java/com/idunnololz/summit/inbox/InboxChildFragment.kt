@@ -16,7 +16,7 @@ interface InboxChildFragment {
     // when the activity is killed and recreated.
     requireSummitActivity().onBackPressedDispatcher
       .addCallback(
-        this,
+        viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
             inboxTabbedFragment?.slidingPaneController?.unlockNavBar()

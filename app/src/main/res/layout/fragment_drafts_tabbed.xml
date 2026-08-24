@@ -21,8 +21,7 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+                android:layout_height="?attr/actionBarSize">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/account_image_view"
@@ -62,16 +61,5 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </FrameLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/padding"
-            android:layout_gravity="end|bottom"
-            app:srcCompat="@drawable/baseline_add_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

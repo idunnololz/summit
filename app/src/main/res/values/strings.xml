@@ -2440,5 +2440,11 @@
     <string name="show_failed_actions_badge_desc">When enabled a badge is displayed on the bottom bar when certain actions fail (eg. comments fail to send).</string>
 
 
+    <plurals name="warn_delete_drafts_format">
+        <item quantity="one">Delete %1$s draft?</item>
+        <item quantity="other">Delete %1$s drafts?</item>
+    </plurals>
+
+
     <!-- uCrop string resource end -->
 </resources>

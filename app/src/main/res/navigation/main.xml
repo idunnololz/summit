@@ -388,7 +388,7 @@
         android:label="HiddenPostsFragment" />
     <fragment
         android:id="@+id/draftsFragment"
-        android:name="com.idunnololz.summit.drafts.DraftsFragment"
+        android:name="com.idunnololz.summit.drafts.drafts.DraftsFragment"
         android:label="DraftsFragment">
         <argument
             android:name="draftType"

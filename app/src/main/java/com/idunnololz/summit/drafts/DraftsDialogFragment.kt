@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
+import com.idunnololz.summit.drafts.drafts.DraftsAdapter
+import com.idunnololz.summit.drafts.drafts.DraftsViewModel
+import com.idunnololz.summit.drafts.drafts.ViewModelItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -148,11 +151,13 @@ class DraftsDialogFragment :
                       languageId = it.data.languageId,
                     ),
                   )
+
                 is DraftData.PostDraftData -> it
                 is DraftData.MessageDraftData -> null
                 null -> null
               }
             }
+
             DraftTypes.Comment -> {
               when (it.data) {
                 is DraftData.CommentDraftData -> it
@@ -169,10 +174,12 @@ class DraftsDialogFragment :
                       languageId = it.data.languageId,
                     ),
                   )
+
                 is DraftData.MessageDraftData -> null
                 null -> null
               }
             }
+
             else -> null
           }
 
@@ -198,7 +205,7 @@ class DraftsDialogFragment :
       recyclerView.setHasFixedSize(true)
 
       fun fetchPageIfLoadItem(position: Int) {
-        (adapter.items.getOrNull(position) as? DraftsViewModel.ViewModelItem.LoadingItem)
+        (adapter.model.items.getOrNull(position) as? ViewModelItem.LoadingItem)
           ?.let {
             viewModel.loadMoreDrafts()
           }
@@ -213,10 +220,10 @@ class DraftsDialogFragment :
         }
       }
 
-      viewModel.viewModelItems.observe(viewLifecycleOwner) {
+      viewModel.model.observe(viewLifecycleOwner) {
         val wasAtTop = layoutManager.findFirstVisibleItemPosition() == 0
 
-        adapter.setItems(it) {
+        adapter.setModel(it) {
           checkIfFetchNeeded()
 
           if (wasAtTop) {
