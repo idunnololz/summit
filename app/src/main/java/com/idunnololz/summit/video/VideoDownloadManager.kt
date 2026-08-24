@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import androidx.core.net.toUri
+import androidx.media3.common.C
 
 private typealias DownloadId = String
 
@@ -139,6 +141,7 @@ class VideoDownloadManager @Inject constructor(
       val transformer = Transformer.Builder(context)
         .setVideoMimeType(MimeTypes.VIDEO_H264)
         .setAudioMimeType(MimeTypes.AUDIO_AAC)
+        .setMaxDelayBetweenMuxerSamplesMs(C.TIME_UNSET)
         .build()
       val outputFile = File(directoryHelper.videosDir, downloadRequest.finalFileName)
 
@@ -200,5 +203,5 @@ class VideoDownloadManager @Inject constructor(
   }
 
   private fun DownloadVideoRequest.toDownloadRequest() =
-    DownloadRequest.Builder(id, Uri.parse(url)).build()
+    DownloadRequest.Builder(id, url.toUri()).build()
 }
