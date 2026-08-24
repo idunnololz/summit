@@ -240,8 +240,6 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>(), InboxChildFragment {
       )
     }
 
-    setupBackPressedDispatcher()
-
     viewModel.pageType.observe(viewLifecycleOwner) {
       it ?: return@observe
 
