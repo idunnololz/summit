@@ -26,6 +26,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentReportDetailsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxChildFragment
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.inbox.ReportItem
@@ -82,7 +83,7 @@ import javax.inject.Inject
 import kotlin.getValue
 
 @AndroidEntryPoint
-class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
+class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>(), InboxChildFragment {
 
   private val args: ReportDetailsFragmentArgs by navArgs()
   private val viewModel: ReportDetailsViewModel by viewModels()
@@ -147,6 +148,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, mainContainer)
         insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, fabContainer)
       }
+
+      setupBackPressedDispatcher()
 
       val title = when (reportItem) {
         is InboxItem.ReportCommentInboxItem -> {

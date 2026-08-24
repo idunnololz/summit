@@ -24,6 +24,7 @@ import com.idunnololz.summit.databinding.FragmentConversationBinding
 import com.idunnololz.summit.databinding.ItemConversationHeaderBinding
 import com.idunnololz.summit.databinding.ItemConversationLoadMoreBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxChildFragment
 import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
@@ -55,7 +56,7 @@ import io.noties.markwon.image.AsyncDrawableSpan
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
+class ConversationFragment : BaseFragment<FragmentConversationBinding>(), InboxChildFragment {
   private val args by navArgs<ConversationFragmentArgs>()
   private val viewModel: ConversationViewModel by viewModels()
 
@@ -111,6 +112,8 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
       insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
     }
+
+    setupBackPressedDispatcher()
 
     childFragmentManager.setFragmentResultListener(
       AddOrEditCommentFragment.REQUEST_KEY,

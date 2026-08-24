@@ -61,6 +61,8 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
   private var argsHandled: Boolean = false
 
+  var slidingPaneController: SlidingPaneController? = null
+
   private val onNavigationItemReselectedListener =
     NavigationBarView.OnItemReselectedListener a@{
       if (it.itemId == R.id.inboxTabbedFragment) {
@@ -153,6 +155,8 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
       }
 
       init()
+    }.also {
+      slidingPaneController = it
     }
 
     binding.root.post {

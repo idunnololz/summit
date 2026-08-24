@@ -23,6 +23,7 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.inbox.CommentBackedItem
+import com.idunnololz.summit.inbox.InboxChildFragment
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.inbox.ReportItem
@@ -66,7 +67,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MessageFragment : BaseFragment<FragmentMessageBinding>() {
+class MessageFragment : BaseFragment<FragmentMessageBinding>(), InboxChildFragment {
 
   companion object {
     private const val TAG = "MessageFragment"
@@ -142,6 +143,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       }
     }
 
+    setupBackPressedDispatcher()
+
     binding.toolbar.setNavigationIcon(
       R.drawable.baseline_arrow_back_24,
     )
@@ -150,7 +153,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     )
 
     binding.toolbar.setNavigationOnClickListener {
-      (parentFragment as? InboxTabbedFragment)?.closeMessage()
+      inboxTabbedFragment?.closeMessage()
     }
 
     val inboxItem = args.inboxItem
@@ -276,7 +279,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       when (it.itemId) {
         R.id.toggle_mark_as_read -> {
           inboxViewModel.toggleMarkAsRead(args.inboxItem)
-          (parentFragment as? InboxTabbedFragment)?.closeMessage()
+          inboxTabbedFragment?.closeMessage()
 
           if (preferences.hapticsOnActions) {
             binding.bottomAppBar.performHapticFeedbackCompat(
@@ -341,7 +344,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       binding.fab.setImageResource(R.drawable.baseline_check_24)
       binding.fab.setOnClickListener {
         inboxViewModel.markAsRead(inboxItem, true)
-        (parentFragment as? InboxTabbedFragment)?.closeMessage()
+        inboxTabbedFragment?.closeMessage()
 
         if (preferences.hapticsOnActions) {
           binding.bottomAppBar.performHapticFeedbackCompat(

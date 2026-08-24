@@ -38,6 +38,7 @@ import com.idunnololz.summit.databinding.ItemInboxHeaderBinding
 import com.idunnololz.summit.databinding.ItemInboxWarningBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxChildFragment
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.InboxItem.RegistrationApplicationInboxItem
 import com.idunnololz.summit.inbox.InboxSwipeToActionCallback
@@ -92,7 +93,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class InboxFragment : BaseFragment<FragmentInboxBinding>() {
+class InboxFragment : BaseFragment<FragmentInboxBinding>(), InboxChildFragment {
 
   companion object {
     private const val TAG = "InboxFragment"
@@ -238,6 +239,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
         context.getDimen(R.dimen.padding),
       )
     }
+
+    setupBackPressedDispatcher()
 
     viewModel.pageType.observe(viewLifecycleOwner) {
       it ?: return@observe

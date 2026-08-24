@@ -770,6 +770,13 @@ class CommunityFragment :
             true
           }
 
+          HomeFabQuickActionIds.ScrollToTop -> {
+            createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+              R.id.back_to_the_beginning,
+            )
+            true
+          }
+
           else -> false
         }
       }

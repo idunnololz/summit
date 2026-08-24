@@ -911,6 +911,7 @@ class PostsFeedSettings @Inject constructor(
       HomeFabQuickActionIds.ToggleNsfwMode to context.getString(R.string.toggle_nsfw),
       HomeFabQuickActionIds.ToggleHideReadMode to context.getString(R.string.toggle_hide_read_mode),
       HomeFabQuickActionIds.RefreshPostFeed to context.getString(R.string.refresh_post_feed),
+      HomeFabQuickActionIds.ScrollToTop to context.getString(R.string.scroll_to_top),
     ).toOptions(default = HomeFabQuickActionIds.None),
     relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
   )

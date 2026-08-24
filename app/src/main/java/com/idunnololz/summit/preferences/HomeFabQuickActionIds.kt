@@ -9,4 +9,5 @@ object HomeFabQuickActionIds {
   const val ToggleNsfwMode: HomeFabQuickActionId = 3
   const val ToggleHideReadMode: HomeFabQuickActionId = 4
   const val RefreshPostFeed: HomeFabQuickActionId = 5
+  const val ScrollToTop: HomeFabQuickActionId = 6
 }

@@ -94,7 +94,7 @@ class ConversationsManager @Inject constructor(
     val allMessages = mutableListOf<InboxItem.MessageInboxItem>()
     var oldestMessageTs = System.currentTimeMillis()
 
-    var page = 1
+    var page = 0
     var messagesLoaded = 0
     var earliestMessage: InboxItem.MessageInboxItem? = null
     var messageLimitTriggered = false
