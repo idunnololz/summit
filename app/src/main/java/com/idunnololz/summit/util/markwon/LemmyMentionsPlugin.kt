@@ -1,4 +1,5 @@
 package com.idunnololz.summit.util.markwon
+import android.text.style.URLSpan
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.LinkUtils
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -38,6 +39,17 @@ class LemmyMentionsPlugin : AbstractMarkwonPlugin() {
               !name.contains("]") &&
               !instance.contains("]") /* make sure we are not within a link def */
             ) {
+              val linkStart = start + matcher.start()
+              val linkEnd = start + matcher.end()
+
+              val isInUrlSpan = visitor.builder()
+                .getSpans(linkStart, linkEnd)
+                .any { it.what is URLSpan && linkStart >= it.start && linkEnd <= it.end }
+
+              if (isInUrlSpan) {
+                continue // we are in a link def, continue...
+              }
+
               when (referenceTypeToken.lowercase(Locale.US)) {
                 "!", "c/", "/c/" -> {
                   val communityRef = CommunityRef.CommunityRefByName(name, instance)
@@ -51,8 +63,8 @@ class LemmyMentionsPlugin : AbstractMarkwonPlugin() {
                   SpannableBuilder.setSpans(
                     visitor.builder(),
                     spanFactory.getSpans(visitor.configuration(), visitor.renderProps()),
-                    start + matcher.start(),
-                    start + matcher.end(),
+                    linkStart,
+                    linkEnd,
                   )
                 }
                 "@", "u/", "/u/" -> {
@@ -65,8 +77,8 @@ class LemmyMentionsPlugin : AbstractMarkwonPlugin() {
                   SpannableBuilder.setSpans(
                     visitor.builder(),
                     spanFactory.getSpans(visitor.configuration(), visitor.renderProps()),
-                    start + matcher.start(),
-                    start + matcher.end(),
+                    linkStart,
+                    linkEnd,
                   )
                 }
               }
