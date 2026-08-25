@@ -305,7 +305,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
       val result = when (type) {
         FilteredPostAndCommentsType.Saved -> {
           apiClient.fetchSavedCommentsWithRetry(
-            page = pageIndex.toLemmyPageIndex(),
+            page = pageIndex,
             limit = pageSize,
             force = force,
           )
@@ -316,7 +316,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             sort = CommentSortType.New,
             force = force,
             limit = pageSize,
-            page = pageIndex.toLemmyPageIndex(),
+            page = pageIndex,
             upvotedOnly = true,
           )
         }
@@ -326,7 +326,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             sort = CommentSortType.New,
             force = force,
             limit = pageSize,
-            page = pageIndex.toLemmyPageIndex(),
+            page = pageIndex,
             downvotedOnly = true,
           )
         }
