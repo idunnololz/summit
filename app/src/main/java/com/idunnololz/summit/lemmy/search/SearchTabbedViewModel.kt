@@ -35,6 +35,7 @@ class SearchTabbedViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
   override val postReadManager: PostReadManager,
   private val queryEngineFactory: QueryEngine.Factory,
+  private val searchSuggestionsHelperFactory: SearchSuggestionsHelper.Factory,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 
@@ -66,6 +67,8 @@ class SearchTabbedViewModel @Inject constructor(
   val nextListingTypeFilter = MutableLiveData<ListingType?>(null)
 
   val currentQueryLiveData = currentQueryFlow.asLiveData()
+
+  val searchSuggestionsHelper = searchSuggestionsHelperFactory.create(viewModelScope, context)
 
   init {
     queryEnginesByType[SearchType.All] = queryEngineFactory.create(

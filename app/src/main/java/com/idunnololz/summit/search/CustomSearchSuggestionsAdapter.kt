@@ -1,58 +1,52 @@
 package com.idunnololz.summit.search
 
-import android.app.SearchManager
-import android.app.SearchableInfo
-import android.content.ContentResolver
-import android.content.Context
-import android.database.Cursor
-import android.net.Uri
-import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemCustomSearchSuggestionBinding
-import com.idunnololz.summit.util.INVALID_INDEX
-import com.idunnololz.summit.util.getStringOrNull
+import com.idunnololz.summit.databinding.ItemCustomSearchSuggestionCommunityBinding
+import com.idunnololz.summit.databinding.ItemCustomSearchSuggestionsDividerBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.search.SearchSuggestionsHelper
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
-import kotlinx.coroutines.withContext
 
 class CustomSearchSuggestionsAdapter(
-  private val context: Context,
-  private val searchableInfo: SearchableInfo?,
   private val coroutineScope: CoroutineScope,
+  private val searchSuggestionsHelper: SearchSuggestionsHelper,
+  private val avatarHelper: AvatarHelper,
+  private val onCommunityClick: (CommunityRef) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   companion object {
-
     private val TAG = CustomSearchSuggestionsAdapter::class.java.simpleName
-
-    private const val QUERY_LIMIT = 40
   }
 
   private sealed class Item {
+    data object HeaderItem : Item()
     data class SuggestionItem(
       val suggestion: String,
+    ) : Item()
+    data object DividerItem : Item()
+    data class CommunitySuggestionItem(
+      val communityRef: CommunityRef,
+      val communityView: CommunityView,
     ) : Item()
     data object FooterItem : Item()
   }
 
-  private var query: String? = null
-
-  // Cached column indexes, updated when the cursor changes.
-  private var text1Col = INVALID_INDEX
-
-  private var suggestions: List<String> = ArrayList(QUERY_LIMIT)
+  private var result: SearchSuggestionsHelper.Result? = null
   private var listener: OnSuggestionListener? = null
 
   var copyTextToSearchViewClickedListener: ((String) -> Unit)? = null
-
-  private var refreshSuggestionsJob: Job? = null
 
   private val adapterHelper = AdapterHelper<Item>(
     { old, new ->
@@ -60,10 +54,20 @@ class CustomSearchSuggestionsAdapter(
         when (old) {
           is Item.SuggestionItem ->
             old.suggestion == (new as Item.SuggestionItem).suggestion
+          is Item.CommunitySuggestionItem ->
+            old.communityView.community.id ==
+              (new as Item.CommunitySuggestionItem).communityView.community.id
           Item.FooterItem -> true
+          Item.HeaderItem -> true
+          Item.DividerItem -> true
         }
     },
   ).apply {
+    addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
+    addItemType(
+      clazz = Item.DividerItem::class,
+      inflateFn = ItemCustomSearchSuggestionsDividerBinding::inflate
+    ) { _, _, _ -> }
     addItemType(
       clazz = Item.SuggestionItem::class,
       inflateFn = ItemCustomSearchSuggestionBinding::inflate,
@@ -82,121 +86,70 @@ class CustomSearchSuggestionsAdapter(
         true
       }
     }
+    addItemType(
+      clazz = Item.CommunitySuggestionItem::class,
+      inflateFn = ItemCustomSearchSuggestionCommunityBinding::inflate,
+    ) { item, b, h ->
+      avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.communityView.community.icon)
+
+      b.title.text = item.communityRef.getLocalizedFullNameSpannable(b.title.context)
+
+      b.monthlyActives.visibility = View.VISIBLE
+
+      val mau = item.communityView.counts.users_active_month
+      val mauString = LemmyUtils.abbrevNumber(mau.toLong())
+      @Suppress("SetTextI18n")
+      b.monthlyActives.text = b.monthlyActives.context.getString(R.string.mau_format, mauString)
+
+      h.itemView.setOnClickListener {
+        onCommunityClick(item.communityRef)
+      }
+    }
     addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { _, _, _ -> }
   }
 
-  private fun getSearchManagerSuggestions(
-    searchable: SearchableInfo?,
-    query: String?,
-    limit: Int,
-  ): Cursor? {
-    if (searchable == null) {
-      return null
+  init {
+    coroutineScope.launch {
+      searchSuggestionsHelper.result.collect {
+        result = it
+        refreshItems()
+      }
     }
-    if (query == null) {
-      return null
-    }
-
-    val authority = searchable.suggestAuthority ?: return null
-
-    val uriBuilder = Uri.Builder()
-      .scheme(ContentResolver.SCHEME_CONTENT)
-      .authority(authority)
-      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-
-    // if content path provided, insert it now
-    val contentPath = searchable.suggestPath
-    if (contentPath != null) {
-      uriBuilder.appendEncodedPath(contentPath)
-    }
-
-    // append standard suggestion query path
-    uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
-
-    // get the query selection, may be null
-    val selection = searchable.suggestSelection
-    // inject query, either as selection args or inline
-    var selArgs: Array<String>? = null
-    if (selection != null) { // use selection if provided
-      selArgs = arrayOf(query)
-    } else { // no selection, use REST pattern
-      uriBuilder.appendPath(query)
-    }
-
-    if (limit > 0) {
-      uriBuilder.appendQueryParameter("limit", limit.toString())
-    }
-
-    val uri = uriBuilder.build()
-
-    // finally, make the query
-    return context.contentResolver.query(uri, null, selection, selArgs, null)
   }
 
   fun clearSuggestions() {
-    val searchable = searchableInfo ?: return
-    val authority = searchable.suggestAuthority ?: return
-
-    val uriBuilder = Uri.Builder()
-      .scheme(ContentResolver.SCHEME_CONTENT)
-      .authority(authority)
-      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .appendEncodedPath("suggestions")
-
-    val uri = uriBuilder.build()
-
-    // finally, make the query
-    context.contentResolver.delete(uri, null, null)
-
-    refreshSuggestions()
+    searchSuggestionsHelper.clearSuggestions()
   }
 
   fun setQuery(query: String) {
-    this.query = query
-
-    refreshSuggestions()
-  }
-
-  fun refreshSuggestions() {
-    refreshSuggestionsJob?.cancel()
-    refreshSuggestionsJob = coroutineScope.launch {
-      val seen = mutableSetOf<String>()
-      val newSuggestions = ArrayList<String>()
-      runInterruptible(Dispatchers.IO) {
-        // Query 2x the limit because there might be case sensitive duplicates...
-        getSearchManagerSuggestions(searchableInfo, query, QUERY_LIMIT).use { c ->
-          if (c != null) {
-            try {
-              text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
-            } catch (e: Exception) {
-              Log.e(TAG, "error changing cursor and caching columns", e)
-            }
-
-            while (c.moveToNext()) {
-              c.getStringOrNull(text1Col)?.let {
-                if (seen.add(it.lowercase(Locale.US))) {
-                  newSuggestions.add(it)
-                  Log.d(TAG, "Got suggestion $it")
-                }
-              }
-            }
-          }
-        }
-      }
-
-      withContext(Dispatchers.Main) {
-        suggestions = newSuggestions
-        refreshItems()
-
-        listener?.onSuggestionsChanged(suggestions)
-      }
-    }
+    searchSuggestionsHelper.query.value = query
   }
 
   private fun refreshItems() {
-    setNewItems(suggestions.map { Item.SuggestionItem(it) } + Item.FooterItem)
+    val result = result ?: return
+    val suggestions = result.suggestions ?: return
+
+    setNewItems(
+      buildList {
+        add(Item.HeaderItem)
+
+        suggestions.mapTo(this) { Item.SuggestionItem(it) }
+
+        if (!result.communityResults.isNullOrEmpty()) {
+          if (suggestions.isNotEmpty()) {
+            add(Item.DividerItem)
+          }
+          result.communityResults.mapTo(this) {
+            Item.CommunitySuggestionItem(
+              communityRef = it.community.toCommunityRef(),
+              communityView = it,
+            )
+          }
+        }
+
+        add(Item.FooterItem)
+      }
+    )
   }
 
   private fun setNewItems(newItems: List<Item>) {

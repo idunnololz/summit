@@ -131,33 +131,10 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
 
   private val deleteSuggestionDialogLauncher = newAlertDialogLauncher("delete_suggestion") a@{
     if (it.isOk) {
-      val context = context ?: return@a
-
       val suggestionToDelete = it.extras?.getString(ARG_SUGGESTION_TO_DELETE) ?: return@a
-      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-      val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(
-        requireActivity().componentName,
-      )
-      val searchable = searchableInfo ?: return@a
-      val authority = searchable.suggestAuthority ?: return@a
 
-      val uriBuilder = Uri.Builder()
-        .scheme(ContentResolver.SCHEME_CONTENT)
-        .authority(authority)
-        .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .appendEncodedPath("suggestions")
-
-      val uri = uriBuilder.build()
-
-      // finally, make the query
-      context.contentResolver.delete(
-        uri,
-        "query = ?",
-        arrayOf(suggestionToDelete),
-      )
-
-      searchSuggestionsAdapter?.refreshSuggestions()
+      viewModel.searchSuggestionsHelper.componentName.value = requireActivity().componentName
+      viewModel.searchSuggestionsHelper.deleteSuggestion(suggestionToDelete)
     }
   }
 
@@ -251,19 +228,18 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
           .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
       }
 
-      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-      val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
-        requireActivity().componentName,
-      )
 
-      if (searchableInfo == null) {
-        Log.d(TAG, "searchableInfo is null!")
-      }
-
+      viewModel.searchSuggestionsHelper.componentName.value = requireActivity().componentName
       val searchSuggestionsAdapter = CustomSearchSuggestionsAdapter(
-        context,
-        searchableInfo,
-        viewModel.viewModelScope,
+        coroutineScope = viewModel.viewModelScope,
+        searchSuggestionsHelper = viewModel.searchSuggestionsHelper,
+        avatarHelper = avatarHelper,
+        onCommunityClick = {
+          requireSummitActivity().launchPage(
+            page = it,
+            preferMainFragment = true,
+          )
+        },
       )
 
       this@SearchHomeFragment.searchSuggestionsAdapter = searchSuggestionsAdapter

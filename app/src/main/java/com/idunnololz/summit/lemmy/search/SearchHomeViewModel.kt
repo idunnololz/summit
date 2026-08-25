@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.search
 
+import android.app.Application
 import android.app.SearchManager
 import android.app.SearchableInfo
 import android.content.ComponentName
@@ -19,6 +20,7 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.SummitServerClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
@@ -48,6 +50,7 @@ class SearchHomeViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val savedStateHandle: SavedStateHandle,
   private val preferences: Preferences,
+  private val searchSuggestionsHelperFactory: SearchSuggestionsHelper.Factory,
 ) : ViewModel() {
 
   companion object {
@@ -74,6 +77,8 @@ class SearchHomeViewModel @Inject constructor(
   var subscriptionCommunities: List<AccountSubscription> = listOf()
 
   val model = StatefulLiveData<SearchHomeModel>()
+
+  val searchSuggestionsHelper = searchSuggestionsHelperFactory.create(viewModelScope, context)
 
   private var componentName: ComponentName? = null
   private val seed = savedStateHandle.getStateFlow("seed", Random.nextLong())
@@ -141,7 +146,7 @@ class SearchHomeViewModel @Inject constructor(
 
         runInterruptible(Dispatchers.IO) {
           // Query 2x the limit because there might be case sensitive duplicates...
-          getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
+          searchSuggestionsHelper.runRawSuggestionsQuery(searchableInfo, "", QUERY_LIMIT).use { c ->
             if (c != null) {
               try {
                 text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
@@ -195,7 +200,7 @@ class SearchHomeViewModel @Inject constructor(
 
       runInterruptible(Dispatchers.IO) {
         // Query 2x the limit because there might be case sensitive duplicates...
-        getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
+        searchSuggestionsHelper.runRawSuggestionsQuery(searchableInfo, "", QUERY_LIMIT).use { c ->
           if (c != null) {
             try {
               text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
@@ -260,79 +265,9 @@ class SearchHomeViewModel @Inject constructor(
     }
   }
 
-  private fun getSearchManagerSuggestions(
-    searchable: SearchableInfo?,
-    query: String?,
-    limit: Int,
-  ): Cursor? {
-    if (searchable == null) {
-      return null
-    }
-    if (query == null) {
-      return null
-    }
-
-    val authority = searchable.suggestAuthority ?: return null
-
-    val uriBuilder = Uri.Builder()
-      .scheme(ContentResolver.SCHEME_CONTENT)
-      .authority(authority)
-      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-
-    // if content path provided, insert it now
-    val contentPath = searchable.suggestPath
-    if (contentPath != null) {
-      uriBuilder.appendEncodedPath(contentPath)
-    }
-
-    // append standard suggestion query path
-    uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
-
-    // get the query selection, may be null
-    val selection = searchable.suggestSelection
-    // inject query, either as selection args or inline
-    var selArgs: Array<String>? = null
-    if (selection != null) { // use selection if provided
-      selArgs = arrayOf(query)
-    } else { // no selection, use REST pattern
-      uriBuilder.appendPath(query)
-    }
-
-    if (limit > 0) {
-      uriBuilder.appendQueryParameter("limit", limit.toString())
-    }
-
-    val uri = uriBuilder.build()
-
-    // finally, make the query
-    return context.contentResolver.query(uri, null, selection, selArgs, null)
-  }
-
   fun deleteSuggestion(componentName: ComponentName?, suggestion: String) {
     viewModelScope.launch {
-      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-      val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(componentName)
-      val searchable = searchableInfo ?: return@launch
-      val authority = searchable.suggestAuthority ?: return@launch
-
-      val uriBuilder = Uri.Builder()
-        .scheme(ContentResolver.SCHEME_CONTENT)
-        .authority(authority)
-        .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .appendEncodedPath("suggestions")
-
-      val uri = uriBuilder.build()
-
-      runInterruptible {
-        context.contentResolver.delete(
-          uri,
-          "query = ?",
-          arrayOf(suggestion),
-        )
-      }
-
+      searchSuggestionsHelper.deleteSuggestion(suggestion)
       generateModel(componentName)
     }
   }

@@ -29,6 +29,7 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SearchType
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
@@ -94,6 +95,9 @@ class SearchTabbedFragment :
   @Inject
   lateinit var slidingPaneControllerFactory: SlidingPaneController.Factory
 
+  @Inject
+  lateinit var avatarHelper: AvatarHelper
+
   private var isOnViewCreatedCalled = false
 
   private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
@@ -103,33 +107,10 @@ class SearchTabbedFragment :
   }
 
   private val deleteSuggestionDialogLauncher = newAlertDialogLauncher("delete_suggestion") a@{
-    val context = context ?: return@a
-
     val suggestionToDelete = it.extras?.getString(ARG_SUGGESTION_TO_DELETE) ?: return@a
-    val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-    val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(
-      requireActivity().componentName,
-    )
-    val searchable = searchableInfo ?: return@a
-    val authority = searchable.suggestAuthority ?: return@a
 
-    val uriBuilder = Uri.Builder()
-      .scheme(ContentResolver.SCHEME_CONTENT)
-      .authority(authority)
-      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-      .appendEncodedPath("suggestions")
-
-    val uri = uriBuilder.build()
-
-    // finally, make the query
-    context.contentResolver.delete(
-      uri,
-      "query = ?",
-      arrayOf(suggestionToDelete),
-    )
-
-    searchSuggestionsAdapter?.refreshSuggestions()
+    viewModel.searchSuggestionsHelper.componentName.value = requireActivity().componentName
+    viewModel.searchSuggestionsHelper.deleteSuggestion(suggestionToDelete)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -339,19 +320,17 @@ class SearchTabbedFragment :
         snackbarContainer = binding.coordinatorLayout,
       )
 
-      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-      val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
-        requireActivity().componentName,
-      )
-
-      if (searchableInfo == null) {
-        Log.d(TAG, "searchableInfo is null!")
-      }
-
+      viewModel.searchSuggestionsHelper.componentName.value = requireActivity().componentName
       val searchSuggestionsAdapter = CustomSearchSuggestionsAdapter(
-        context,
-        searchableInfo,
-        viewModel.viewModelScope,
+        coroutineScope = viewModel.viewModelScope,
+        searchSuggestionsHelper = viewModel.searchSuggestionsHelper,
+        avatarHelper = avatarHelper,
+        onCommunityClick = {
+          requireSummitActivity().launchPage(
+            page = it,
+            preferMainFragment = true,
+          )
+        },
       )
 
       this@SearchTabbedFragment.searchSuggestionsAdapter = searchSuggestionsAdapter
