@@ -60,8 +60,9 @@ class LinkResolver @Inject constructor(
     val uri = url.toUri()
     val instance = uri.host ?: return null
     val defaultResult = CommunityRef.Local(instance, url)
+    val pathSegments = uri.pathSegments
 
-    when (uri.pathSegments.firstOrNull()) {
+    when (pathSegments.firstOrNull()) {
       null -> { // This is likely a link to the front page
         val listingType = uri.getQueryParameter("listingType")
         if (listingType != null) {
@@ -104,7 +105,17 @@ class LinkResolver @Inject constructor(
         }
       }
       "c" -> { // link to a community
-        var communityName = uri.pathSegments.getOrNull(1)
+        if (pathSegments.size >= 4 &&
+          pathSegments[2] == "p") {
+
+          // This is a piefed link!
+          pathSegments[3].toIntOrNull()?.let {
+            return PostRef(instance, it)
+          }
+          return null
+        }
+
+        var communityName = pathSegments.getOrNull(1)
           ?: return defaultResult
 
         communityName = communityName.trimEnd { it == '.' }
@@ -117,7 +128,7 @@ class LinkResolver @Inject constructor(
         }
       }
       "u" -> {
-        var personName = uri.pathSegments.getOrNull(1)
+        var personName = pathSegments.getOrNull(1)
           ?: return defaultResult
 
         personName = personName.trimEnd { it == '.' }
@@ -130,17 +141,17 @@ class LinkResolver @Inject constructor(
         }
       }
       "post" -> {
-        val postIdStr = uri.pathSegments.getOrNull(1)
+        val postIdStr = pathSegments.getOrNull(1)
           ?: return defaultResult
         val postId = postIdStr.toIntOrNull()
 
-        if (uri.pathSegments.size == 3) {
-          val commentId = uri.pathSegments.getOrNull(2)?.toIntOrNull()
+        if (pathSegments.size == 3) {
+          val commentId = pathSegments.getOrNull(2)?.toIntOrNull()
 
           if (commentId != null) {
             return CommentRef(instance, commentId)
           }
-        } else if (uri.pathSegments.size > 3) {
+        } else if (pathSegments.size > 3) {
           return null
         }
 
@@ -151,7 +162,7 @@ class LinkResolver @Inject constructor(
         return PostRef(instance, postId ?: return defaultResult)
       }
       "comment" -> {
-        val commentId = uri.pathSegments.getOrNull(1)
+        val commentId = pathSegments.getOrNull(1)
           ?: return defaultResult
         return CommentRef(instance, commentId.toIntOrNull() ?: return defaultResult)
       }
