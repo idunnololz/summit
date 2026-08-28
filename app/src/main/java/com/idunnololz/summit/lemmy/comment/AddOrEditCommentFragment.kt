@@ -850,6 +850,7 @@ class AddOrEditCommentFragment :
       savedInstanceState == null
     ) {
       binding.commentEditText.setText(args.message)
+      binding.commentEditText.setSelection(binding.commentEditText.length())
     }
   }
 
@@ -867,6 +868,7 @@ class AddOrEditCommentFragment :
 
       if (savedInstanceState == null) {
         commentEditor.setText(commentToEdit.comment.content)
+        commentEditor.setSelection(binding.commentEditText.length())
       }
     } else if (commentView != null) {
       binding.replyingTo.text = commentView.comment.content

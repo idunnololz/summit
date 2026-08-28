@@ -528,6 +528,7 @@ class PostViewModel @Inject constructor(
     sortOrder: CommentSortType,
     resolveCompletedPendingComments: Boolean,
   ) {
+    Log.d(TAG, "updatePendingCommentsInternalLocked()")
     val postRef = postRef
       ?: postOrCommentRef.leftOrNull()
       ?: return
@@ -546,10 +547,14 @@ class PostViewModel @Inject constructor(
           // Looks like commits on the server is async. Refreshing a comment immediately
           // after we post it may not get us the latest value.
 
+          Log.d(TAG, "updatePendingCommentsInternalLocked() - checking for updated comment")
+
           result = commentsFetcher.fetchCommentsWithRetry(
             id = Either.Left(postRef.id),
             sort = sortOrder,
-            maxDepth = COMMENTS_DEPTH_MAX,
+            // We use [initialMaxDepth] here to prevent expanding all comments if
+            // [collapseChildCommentsByDefault] is on.
+            maxDepth = initialMaxDepth,
             force = true,
           )
 
@@ -572,15 +577,15 @@ class PostViewModel @Inject constructor(
                 if (oldComment.comment.updated == newComment.comment.updated) {
                   Log.d(
                     TAG,
-                    "1 completed pending comment was not " +
+                    "updatePendingCommentsInternalLocked() - 1 completed pending comment was not " +
                       "updated on the server.",
                   )
                   allCommentsUpdated = false
                 } else {
                   Log.d(
                     TAG,
-                    "1 completed pending comment was updated on the " +
-                      "server. New content: '${newComment.comment.content}'",
+                    "updatePendingCommentsInternalLocked() - 1 completed pending comment was " +
+                      "updated on the server. New content: '${newComment.comment.content}'",
                   )
                 }
               }
@@ -598,6 +603,8 @@ class PostViewModel @Inject constructor(
             break
           }
         }
+
+        Log.d(TAG, "updatePendingCommentsInternalLocked() - comments up-to-date")
 
         requireNotNull(result)
 
