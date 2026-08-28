@@ -39,14 +39,14 @@ class DuplicatePostsDetector @Inject constructor(
     private set
 
   init {
-    isEnabled = preferences.isHiddenPostsEnabled
+    isEnabled = preferences.hideDuplicatePostsOnRead
 
     currentDuplicatePostsDetector =
       accountManager.currentAccount.asAccount?.getDuplicatePostsDetector()
 
     coroutineScope.launch {
       preferences.onPreferenceChangeFlow.collect {
-        isEnabled = preferences.isHiddenPostsEnabled
+        isEnabled = preferences.hideDuplicatePostsOnRead
       }
     }
     coroutineScope.launch {
