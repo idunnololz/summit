@@ -400,7 +400,7 @@ fun CommunityViewV4.toCommunityView(): CommunityView = CommunityView(
   community = community.toCommunity(),
   subscribed = communityActions?.followState?.toSubscribedType() ?: SubscribedType.NotSubscribed,
   blocked = communityActions?.blockedAt != null,
-  counts = toCommunityAggregates(),
+  counts = community.toCommunityAggregates(),
 )
 
 fun CommentViewV4.toCommentView(): CommentView = CommentView(
@@ -655,19 +655,6 @@ internal fun CommentV4.toComment(): Comment = Comment(
   language_id = languageId.toInt(),
 )
 
-private fun CommunityViewV4.toCommunityAggregates(): CommunityAggregates = CommunityAggregates(
-  this.community.id.toInt(),
-  this.community.id.toInt(),
-  this.community.subscribers.toInt(),
-  this.community.posts.toInt(),
-  this.community.comments.toInt(),
-  this.community.publishedAt,
-  this.community.usersActiveDay.toInt(),
-  this.community.usersActiveWeek.toInt(),
-  this.community.usersActiveMonth.toInt(),
-  this.community.usersActiveHalfYear.toInt(),
-)
-
 private fun CommunityFollowerState.toSubscribedType(): SubscribedType = when (this) {
   CommunityFollowerState.accepted -> SubscribedType.Subscribed
   CommunityFollowerState.pending -> SubscribedType.Pending
@@ -832,6 +819,7 @@ fun CommunityV4.toCommunityAggregates(): CommunityAggregates = CommunityAggregat
   id = id,
   community_id = this.id,
   subscribers = this.subscribers,
+  subscribers_local = this.subscribersLocal,
   posts = this.posts,
   comments = this.comments,
   published = this.publishedAt,

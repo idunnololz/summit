@@ -4,6 +4,7 @@ data class CommunityAggregates(
   val id: Int,
   val community_id: CommunityId,
   val subscribers: Int,
+  val subscribers_local: Int,
   val posts: Int,
   val comments: Int,
   val published: String,

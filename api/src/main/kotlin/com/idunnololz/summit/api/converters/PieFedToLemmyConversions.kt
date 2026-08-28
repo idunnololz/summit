@@ -429,7 +429,8 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.CommunityAggregates.toC
   CommunityAggregates(
     id = this.id,
     community_id = this.id,
-    subscribers = this.subscriptionsCount,
+    subscribers = this.totalSubscriptionsCount,
+    subscribers_local = this.subscriptionsCount,
     posts = this.postCount,
     comments = this.postReplyCount,
     published = this.published,
