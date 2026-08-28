@@ -29,10 +29,7 @@ class OnScrollMarkPostAsReadScrollListener(
     cacheRangeEnd = -1
   }
 
-  override fun onScrollStateChanged(
-    recyclerView: RecyclerView,
-    newState: Int,
-  ) {
+  override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
     super.onScrollStateChanged(recyclerView, newState)
 
     userIsScrolling = newState == RecyclerView.SCROLL_STATE_DRAGGING ||
@@ -70,7 +67,7 @@ class OnScrollMarkPostAsReadScrollListener(
 
     previouslyVisiblePositions
       .minus(
-        currentlyVisiblePositions
+        currentlyVisiblePositions,
       )
       .forEach {
         adapter.onItemScrolledOffScreen(it)

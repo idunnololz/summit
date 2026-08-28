@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.util.Base64
+import android.util.Log
 import androidx.core.content.edit
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -145,8 +146,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FAILED_ACTIONS_BADGE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
@@ -229,6 +230,7 @@ class Preferences(
   @Suppress("ObjectLiteralToLambda")
   private val preferenceChangeListener = object : OnSharedPreferenceChangeListener {
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
+      Log.d(TAG, "Preference changed: $p1")
       coroutineScope.launch {
         onPreferenceChangeFlow.emit(Unit)
       }

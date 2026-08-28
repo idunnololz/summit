@@ -147,7 +147,6 @@ class DraftsManager @Inject constructor(
     }
   }
 
-
   suspend fun deleteDraftsWithIds(entryIds: List<Long>) = withContext(dbContext) {
     entryIds.forEach {
       draftsDao.deleteWithId(it)

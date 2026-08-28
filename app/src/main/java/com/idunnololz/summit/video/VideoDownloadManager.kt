@@ -1,8 +1,9 @@
 package com.idunnololz.summit.video
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
+import androidx.media3.common.C
 import androidx.media3.common.MimeTypes
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -31,8 +32,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import androidx.core.net.toUri
-import androidx.media3.common.C
 
 private typealias DownloadId = String
 

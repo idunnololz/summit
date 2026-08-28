@@ -908,7 +908,10 @@ class PostViewModel @Inject constructor(
     switchToNativeInstance: Boolean = false,
     markPostAsRead: Boolean = true,
   ) {
-    Log.d(TAG, "_fetchPostData(): fetchPostData = $fetchPostData fetchCommentData = $fetchCommentData")
+    Log.d(
+      TAG,
+      "_fetchPostData(): fetchPostData = $fetchPostData fetchCommentData = $fetchCommentData",
+    )
     mutex.withLock {
       var fetchPostData = fetchPostData
       var force = force

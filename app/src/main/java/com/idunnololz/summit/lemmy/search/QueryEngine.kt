@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.search
 import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -15,9 +14,7 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.PostHeaderInfo
-import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
-import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.Source.*
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.search.QueryEngine.QueryResultsPage.*
@@ -36,7 +33,6 @@ import com.idunnololz.summit.util.StatefulData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import info.debatty.java.stringsimilarity.NGram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -91,10 +87,7 @@ class QueryEngine @AssistedInject constructor(
 
   @AssistedFactory
   interface Factory {
-    fun create(
-      context: Context,
-      type: SearchType,
-    ): QueryEngine
+    fun create(context: Context, type: SearchType): QueryEngine
   }
 
   class SearchSource(
@@ -137,62 +130,60 @@ class QueryEngine @AssistedInject constructor(
       force: Boolean,
       limit: Int,
       showRead: Boolean?,
-    ): Result<List<SearchResultView>> {
-      return apiClient
-        .searchWithRetry(
-          communityId = communityIdFilter,
-          communityName = null,
-          sortType = currentSortType,
-          listingType = listingTypeFilter ?: ListingType.All,
-          searchType = type,
-          page = page,
-          query = currentQuery,
-          limit = limit,
-          creatorId = personIdFilter,
-          force = force,
-        )
-        .map {
-          val items = mutableListOf<SearchResultView>()
+    ): Result<List<SearchResultView>> = apiClient
+      .searchWithRetry(
+        communityId = communityIdFilter,
+        communityName = null,
+        sortType = currentSortType,
+        listingType = listingTypeFilter ?: ListingType.All,
+        searchType = type,
+        page = page,
+        query = currentQuery,
+        limit = limit,
+        creatorId = personIdFilter,
+        force = force,
+      )
+      .map {
+        val items = mutableListOf<SearchResultView>()
 
-          it.comments.mapTo(items) { CommentResultView(it) }
-          it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
-          it.communities.mapTo(items) { CommunityResultView(it) }
-          it.users.mapTo(items) { UserResultView(it) }
+        it.comments.mapTo(items) { CommentResultView(it) }
+        it.posts.mapTo(items) { PostResultView(FetchedPost(it, StandardSource())) }
+        it.communities.mapTo(items) { CommunityResultView(it) }
+        it.users.mapTo(items) { UserResultView(it) }
 
-          val sortedItems =
-            if (currentSortType == SortType.Active) {
-              items.sortedBy {
-                when (it) {
-                  is CommentResultView ->
-                    trigram.distance(
-                      it.commentView.comment.content,
-                      currentQuery,
-                    )
-                  is CommunityResultView -> {
-                    trigram.distance(
-                      it.communityView.community.name,
-                      currentQuery,
-                    )
-                  }
-                  is PostResultView -> {
-                    val post = it.fetchedPost.postView.post
-                    val toMatch = post.name + " " + post.body
-                    trigram.distance(toMatch, currentQuery)
-                  }
-                  is UserResultView ->
-                    trigram.distance(
-                      it.personView.person.name,
-                      currentQuery,
-                    )
+        val sortedItems =
+          if (currentSortType == SortType.Active) {
+            items.sortedBy {
+              when (it) {
+                is CommentResultView ->
+                  trigram.distance(
+                    it.commentView.comment.content,
+                    currentQuery,
+                  )
+                is CommunityResultView -> {
+                  trigram.distance(
+                    it.communityView.community.name,
+                    currentQuery,
+                  )
                 }
+                is PostResultView -> {
+                  val post = it.fetchedPost.postView.post
+                  val toMatch = post.name + " " + post.body
+                  trigram.distance(toMatch, currentQuery)
+                }
+                is UserResultView ->
+                  trigram.distance(
+                    it.personView.person.name,
+                    currentQuery,
+                  )
               }
-            } else {
-              items
             }
+          } else {
+            items
+          }
 
-          sortedItems
-        }
-    }
+        sortedItems
+      }
   }
 
   class CursorSearchSource(
@@ -278,7 +269,7 @@ class QueryEngine @AssistedInject constructor(
 
     private val lemmyHandleRegex =
       Regex(
-        """^([!@])?([A-Za-z0-9_]+)@([A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?)(?::\d{1,5})?$"""
+        """^([!@])?([A-Za-z0-9_]+)@([A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?)(?::\d{1,5})?$""",
       )
   }
 
@@ -507,25 +498,25 @@ class QueryEngine @AssistedInject constructor(
       val pageResult = searchSource?.getPage(pageIndex, force)
         ?: return@launch
 
-      fun ResolveObjectResponse.toQueryResults(): List<SearchResultView> =
-        when (type) {
-          SearchType.All,
-          SearchType.Comments,
-          SearchType.Posts,
-          SearchType.Communities,
-          SearchType.Users -> {
-            buildList {
-              // We can just add all of the possible results and it will be filtered below...
-              comment?.let { add(CommentResultView(it)) }
-              post?.let { add(PostResultView(it.toFetchedPost())) }
-              community?.let { add(CommunityResultView(it)) }
-              person?.let { add(UserResultView(it)) }
-            }
-          }
-          SearchType.Url -> {
-            listOf()
+      fun ResolveObjectResponse.toQueryResults(): List<SearchResultView> = when (type) {
+        SearchType.All,
+        SearchType.Comments,
+        SearchType.Posts,
+        SearchType.Communities,
+        SearchType.Users,
+        -> {
+          buildList {
+            // We can just add all of the possible results and it will be filtered below...
+            comment?.let { add(CommentResultView(it)) }
+            post?.let { add(PostResultView(it.toFetchedPost())) }
+            community?.let { add(CommunityResultView(it)) }
+            person?.let { add(UserResultView(it)) }
           }
         }
+        SearchType.Url -> {
+          listOf()
+        }
+      }
 
       var prependResults: List<SearchResultView> = listOf()
       if (pageIndex == 0 && lemmyHandleRegex.matches(currentQuery)) {

@@ -82,7 +82,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
             context = context,
             url = originalUrl,
             fragmentManager = fragmentManager,
-            openNewIncognitoTab = true
+            openNewIncognitoTab = true,
           )
         }
         R.id.preview_link -> {

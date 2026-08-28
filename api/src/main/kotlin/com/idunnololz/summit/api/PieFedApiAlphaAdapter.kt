@@ -774,8 +774,8 @@ class PieFedApiAlphaAdapter(
     val unreadCount = j1.await().getOrElse {
       if (it is ClientApiException) {
         GetUnreadCountResponse(
-          replies = 0, 
-          mentions = 0, 
+          replies = 0,
+          mentions = 0,
           private_messages = 0,
         )
       } else {
@@ -797,14 +797,15 @@ class PieFedApiAlphaAdapter(
     val registrationCount = j3.await().getOrElse {
       if (it is ClientApiException || it is NotYetImplemented) {
         GetUnreadRegistrationApplicationCountResponse(
-          registration_applications = 0
+          registration_applications = 0,
         )
       } else {
         return@withContext Result.failure<UnreadCount>(it)
       }
     }
 
-    val notificationCount = unreadCount.replies + unreadCount.mentions + unreadCount.private_messages
+    val notificationCount =
+      unreadCount.replies + unreadCount.mentions + unreadCount.private_messages
 
     Result.success(
       UnreadCount(

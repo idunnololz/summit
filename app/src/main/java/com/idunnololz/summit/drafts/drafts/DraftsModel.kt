@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class DraftsModel(
   val items: List<ViewModelItem> = listOf(ViewModelItem.LoadingItem),
   val isInSelectMode: Boolean = false,
-): Parcelable
+) : Parcelable
 
 sealed interface ViewModelItem : Parcelable {
 

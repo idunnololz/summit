@@ -106,8 +106,8 @@ class LinkResolver @Inject constructor(
       }
       "c" -> { // link to a community
         if (pathSegments.size >= 4 &&
-          pathSegments[2] == "p") {
-
+          pathSegments[2] == "p"
+        ) {
           // This is a piefed link!
           pathSegments[3].toIntOrNull()?.let {
             return PostRef(instance, it)

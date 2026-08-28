@@ -4,27 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
-import com.idunnololz.summit.localTracking.screen.list.LocalStatsListModel
-import com.idunnololz.summit.models.GetPersonDetailsResponse
-import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlin.collections.get
+import kotlin.collections.map
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
-import kotlin.collections.get
-import kotlin.collections.map
 
 @HiltViewModel
 class LocalStatsViewModel @Inject constructor(
@@ -60,8 +54,8 @@ class LocalStatsViewModel @Inject constructor(
               it.copy(
                 personResult = personResolverHelper.personDictionary[it.personId],
               )
-            }
-          )
+            },
+          ),
         )
       }
     }
@@ -124,7 +118,7 @@ class LocalStatsViewModel @Inject constructor(
 
       topUserInteractions.forEach {
         val personId = it.key
-        if (personId!= null) {
+        if (personId != null) {
           personResolverHelper.fetchPerson(personId, force = false)
         }
       }
@@ -145,7 +139,7 @@ class LocalStatsViewModel @Inject constructor(
               UserInteraction(
                 it.key,
                 personResolverHelper.personDictionary[key],
-                it.value
+                it.value,
               )
             },
         ),

@@ -18,6 +18,8 @@ import com.idunnololz.summit.util.getStringOrNull
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -31,8 +33,6 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.util.Locale
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Remember to set [componentName]!!!
@@ -51,10 +51,7 @@ class SearchSuggestionsHelper @AssistedInject constructor(
 
   @AssistedFactory
   interface Factory {
-    fun create(
-      coroutineScope: CoroutineScope,
-      application: Context,
-    ): SearchSuggestionsHelper
+    fun create(coroutineScope: CoroutineScope, application: Context): SearchSuggestionsHelper
   }
 
   private class IntermediateData(
@@ -154,11 +151,7 @@ class SearchSuggestionsHelper @AssistedInject constructor(
     refreshRequest.tryEmit(Unit)
   }
 
-  fun runRawSuggestionsQuery(
-    searchable: SearchableInfo?,
-    query: String?,
-    limit: Int,
-  ): Cursor? =
+  fun runRawSuggestionsQuery(searchable: SearchableInfo?, query: String?, limit: Int): Cursor? =
     getSearchManagerSuggestions(searchable, query, limit)
 
   private fun tryDoWork() {

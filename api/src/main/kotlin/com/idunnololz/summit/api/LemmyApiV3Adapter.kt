@@ -563,7 +563,7 @@ class LemmyApiV3Adapter(
     val registrationCount = j3.await().getOrElse {
       if (it is ClientApiException || it is NotYetImplemented) {
         GetUnreadRegistrationApplicationCountResponse(
-          registration_applications = 0
+          registration_applications = 0,
         )
       } else {
         return@withContext Result.failure<UnreadCount>(it)

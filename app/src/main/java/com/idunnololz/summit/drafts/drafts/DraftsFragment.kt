@@ -20,7 +20,6 @@ import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.DraftsDialogFragmentArgs
 import com.idunnololz.summit.drafts.DraftsManager
-import com.idunnololz.summit.drafts.DraftsTabbedFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
@@ -31,8 +30,8 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DraftsFragment :
@@ -99,7 +98,7 @@ class DraftsFragment :
     viewModel.draftType = args.draftType
 
     val onBackPressedCallback = object : OnBackPressedCallback(
-      enabled = viewModel.model.value?.isInSelectMode == true
+      enabled = viewModel.model.value?.isInSelectMode == true,
     ) {
       override fun handleOnBackPressed() {
         viewModel.isInSelectMode = false
@@ -130,7 +129,7 @@ class DraftsFragment :
         },
         onItemSelected = { draftEntry, isSelected ->
           viewModel.markItemAsSelected(draftEntry.id, isSelected)
-        }
+        },
       )
       val layoutManager = LinearLayoutManager(context)
       recyclerView.adapter = adapter

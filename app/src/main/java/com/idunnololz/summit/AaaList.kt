@@ -1,6 +1,5 @@
 package com.idunnololz.summit
 
-import android.util.Log
 import com.idunnololz.summit.util.Utils
 import kotlin.experimental.xor
 
@@ -110,13 +109,15 @@ z56NUjro1yGeufpUR38zW5d-zu_w_1Z50I0TfeMNV08BH15Sf-vRIvD_55mGfOnkpMX_DsL3r9Vi
 OfGneRPUz0CrED0ihw71s1OsH-zv2w9FiugvbthEvqnIHH1YhfpfG2hpIeVcIfPBsxn4j3k2E_f5
 P1_JbeDPNWu7g_1DFiSvjvM7bxf_jwqu0k4Yz1ew1rsymScL5v5o_H8zQQVN
   """.trimIndent()
+
   // Prevent people from grepping this shit.
   private val sauce = "&&OYNxqTRw%921xi".toByteArray()
-  private val names = unrollString().substring(unrollString().indexOf("names")).split(",").map { it.trim() }
+  private val names = unrollString().substring(unrollString().indexOf("names")).split(",").map {
+    it.trim()
+  }
 
   @Suppress("unused") // Will be used later...
-  fun isInList(name: String) =
-    names.contains(name)
+  fun isInList(name: String) = names.contains(name)
 
   fun unrollString(): String {
     val input = Utils.decompressZlibRaw(aaa.replace("/n", ""), android.util.Base64.URL_SAFE)

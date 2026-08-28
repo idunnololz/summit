@@ -63,13 +63,21 @@ class NotificationsUpdater @AssistedInject constructor(
             val registrationApplicationCount = it.registrationApplicationCount
 
             // Lemmy v1 no longer returns granular notification counts so just refresh everything
-            if (mentions == null && privateMessages == null && replies == null && it.notificationCount > 0) {
+            if (mentions == null &&
+              privateMessages == null &&
+              replies == null &&
+              it.notificationCount > 0
+            ) {
               jobs.add(runMentionsJob(account))
               jobs.add(runPrivateMessagesJob(account))
               jobs.add(runRepliesJob(account))
             }
             // Lemmy v1 no longer returns granular report counts so just refresh everything
-            if (commentReports == null && postReports == null && privateMessageReports == null && it.reportCount > 0) {
+            if (commentReports == null &&
+              postReports == null &&
+              privateMessageReports == null &&
+              it.reportCount > 0
+            ) {
               jobs.add(runCommentReportsJob(account))
               jobs.add(runPostReportsJob(account))
               jobs.add(runPrivateMessageReportsJob(account))

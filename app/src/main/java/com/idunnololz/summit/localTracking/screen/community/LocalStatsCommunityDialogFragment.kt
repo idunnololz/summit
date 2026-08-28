@@ -1,6 +1,5 @@
 package com.idunnololz.summit.localTracking.screen.community
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -47,7 +46,8 @@ import javax.inject.Inject
 import kotlin.getValue
 
 @AndroidEntryPoint
-class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocalStatsCommunityBinding>() {
+class LocalStatsCommunityDialogFragment :
+  BaseDialogFragment<DialogFragmentLocalStatsCommunityBinding>() {
 
   companion object {
     fun show(supportFragmentManager: FragmentManager, communityRef: CommunityRef) {
@@ -200,7 +200,6 @@ class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocal
           binding.loadingView.hideAll()
 
           adapter.data = it.data
-
         }
       }
     }
@@ -267,19 +266,20 @@ class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocal
 
     private val adapterHelper = AdapterHelper<LocalStatsCommunityModel.Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is LocalStatsCommunityModel.CommunityStatsSummaryItem ->
-            true
-          is PostModelItem ->
-            old.postId == (new as PostModelItem).postId
-          LocalStatsCommunityModel.NoPostsModelItem ->
-            true
-        }
-      }
+        old::class == new::class &&
+          when (old) {
+            is LocalStatsCommunityModel.CommunityStatsSummaryItem ->
+              true
+            is PostModelItem ->
+              old.postId == (new as PostModelItem).postId
+            LocalStatsCommunityModel.NoPostsModelItem ->
+              true
+          }
+      },
     ).apply {
       addItemType(
         clazz = LocalStatsCommunityModel.CommunityStatsSummaryItem::class,
-        inflateFn = LocalStatsCommunitySummaryItemBinding::inflate
+        inflateFn = LocalStatsCommunitySummaryItemBinding::inflate,
       ) { item, b, h ->
         @Suppress("SetTextI18n") // positive number sign
         b.score.text =
@@ -309,22 +309,23 @@ class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocal
         } else {
           item.recentUpvotes.toFloat() / recentTotalVotes
         }
-        b.scoreRecentPercent.text = PrettyPrintUtils.defaultPercentFormat.format(recentUpvotePercent)
+        b.scoreRecentPercent.text =
+          PrettyPrintUtils.defaultPercentFormat.format(recentUpvotePercent)
 
         b.views.text = PrettyPrintUtils.defaultDecimalFormat.format(item.totalViewsCount)
         b.recentViews.text = context.getString(
           R.string.last_7_days_format,
-          PrettyPrintUtils.defaultDecimalFormat.format(item.recentViewsCount)
+          PrettyPrintUtils.defaultDecimalFormat.format(item.recentViewsCount),
         )
       }
       addItemType(
         clazz = LocalStatsCommunityModel.NoPostsModelItem::class,
-        inflateFn = LocalStatsCommunityEmptyItemBinding::inflate
+        inflateFn = LocalStatsCommunityEmptyItemBinding::inflate,
       ) { item, b, h ->
       }
       addItemType(
         clazz = PostModelItem::class,
-        inflateFn = LocalStatsCommunityPostListItemBinding::inflate
+        inflateFn = LocalStatsCommunityPostListItemBinding::inflate,
       ) { item, b, h ->
         val h = b.root.getTag(R.id.view_holder) as? ListingItemViewHolder ?: run {
           ListingItemViewHolder.fromBinding(b.content).also {
@@ -421,7 +422,7 @@ class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocal
         } else {
           b.content.root.visibility = View.GONE
           b.loadingView.showDefaultErrorMessageFor(
-            item.fetchedPost.exceptionOrNull() ?: RuntimeException()
+            item.fetchedPost.exceptionOrNull() ?: RuntimeException(),
           )
           b.loadingView.setOnRefreshClickListener {
             fetchPost(item.postId, true)
@@ -430,23 +431,15 @@ class LocalStatsCommunityDialogFragment : BaseDialogFragment<DialogFragmentLocal
       }
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: RecyclerView.ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     private fun refreshItems() {
       adapterHelper.setItems(newItems = data?.items ?: listOf(), adapter = this)

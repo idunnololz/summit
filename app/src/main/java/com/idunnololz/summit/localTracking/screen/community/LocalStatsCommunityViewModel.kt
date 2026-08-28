@@ -13,12 +13,12 @@ import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.resolver.PostResolverHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
 import javax.inject.Inject
 import kotlin.collections.get
 import kotlin.time.Duration.Companion.days
+import kotlinx.coroutines.launch
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
 
 @HiltViewModel
 class LocalStatsCommunityViewModel @Inject constructor(
@@ -46,12 +46,12 @@ class LocalStatsCommunityViewModel @Inject constructor(
                         postView = it,
                         source = Source.StandardSource(),
                       )
-                    }
+                    },
                   )
                 else -> it
               }
-            }
-          )
+            },
+          ),
         )
       }
     }
@@ -206,7 +206,7 @@ class LocalStatsCommunityViewModel @Inject constructor(
                 totalInteractionsCount = totalInteractionsCount,
                 recentViewsCount = recentViewedPostIds.count(),
                 totalViewsCount = allViewedPostIds.count(),
-              )
+              ),
             )
 
             if (allPosts.isEmpty()) {
@@ -221,13 +221,13 @@ class LocalStatsCommunityViewModel @Inject constructor(
                         postView = it,
                         source = Source.StandardSource(),
                       )
-                    }
-                  )
+                    },
+                  ),
                 )
               }
             }
-          }
-        )
+          },
+        ),
       )
     }
   }

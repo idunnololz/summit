@@ -3,15 +3,14 @@ package com.idunnololz.summit.inbox
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.viewbinding.ViewBinding
-import com.idunnololz.summit.lemmy.post.goBack
 import com.idunnololz.summit.util.BaseFragment
 
 interface InboxChildFragment {
 
-  val <T: ViewBinding> BaseFragment<T>.inboxTabbedFragment
+  val <T : ViewBinding> BaseFragment<T>.inboxTabbedFragment
     get() = parentFragment as? InboxTabbedFragment
 
-  fun <T: ViewBinding> BaseFragment<T>.setupBackPressedDispatcher() {
+  fun <T : ViewBinding> BaseFragment<T>.setupBackPressedDispatcher() {
     // DO NOT add back press dispatchers in Fragment.onCreate(). For some reason it doesn't work
     // when the activity is killed and recreated.
     requireSummitActivity().onBackPressedDispatcher

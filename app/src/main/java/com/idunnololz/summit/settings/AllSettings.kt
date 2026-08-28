@@ -129,8 +129,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FAILED_ACTIONS_BADGE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS

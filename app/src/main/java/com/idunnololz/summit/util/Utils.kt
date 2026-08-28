@@ -22,7 +22,6 @@ import android.text.Spanned
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.util.Log
-import android.util.TypedValue
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
@@ -30,6 +29,7 @@ import androidx.annotation.DrawableRes
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.window.layout.WindowMetricsCalculator
@@ -54,7 +54,6 @@ import java.util.LinkedList
 import java.util.zip.DataFormatException
 import java.util.zip.Deflater
 import java.util.zip.Inflater
-import androidx.core.net.toUri
 
 object Utils {
   private val TAG = Utils::class.java.simpleName
@@ -172,7 +171,6 @@ object Utils {
     fragmentManager: FragmentManager?,
     openNewIncognitoTab: Boolean = false,
   ) {
-
     fun showErrorMessageDialog(e: Throwable) {
       if (fragmentManager == null) return
 

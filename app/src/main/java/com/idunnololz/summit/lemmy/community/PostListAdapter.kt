@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -510,7 +509,8 @@ class PostListAdapter(
       is PostListEngineItem.ManualLoadItem,
       is PostListEngineItem.PageTitle,
       is PostListEngineItem.PersistentErrorItem,
-      null -> null
+      null,
+      -> null
     }?.let { fetchedPost ->
       onPostRead(
         fetchedPost.source.accountId,

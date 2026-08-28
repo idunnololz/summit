@@ -7,7 +7,6 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.util.arrow.Either
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CommentsFetcher(

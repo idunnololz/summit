@@ -25,7 +25,6 @@ import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.inbox.InboxChildFragment
 import com.idunnololz.summit.inbox.InboxItem
-import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.lemmy.CommentRef
@@ -67,7 +66,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MessageFragment : BaseFragment<FragmentMessageBinding>(), InboxChildFragment {
+class MessageFragment :
+  BaseFragment<FragmentMessageBinding>(),
+  InboxChildFragment {
 
   companion object {
     private const val TAG = "MessageFragment"

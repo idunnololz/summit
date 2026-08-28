@@ -66,7 +66,7 @@ class CustomSearchSuggestionsAdapter(
     addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
     addItemType(
       clazz = Item.DividerItem::class,
-      inflateFn = ItemCustomSearchSuggestionsDividerBinding::inflate
+      inflateFn = ItemCustomSearchSuggestionsDividerBinding::inflate,
     ) { _, _, _ -> }
     addItemType(
       clazz = Item.SuggestionItem::class,
@@ -148,7 +148,7 @@ class CustomSearchSuggestionsAdapter(
         }
 
         add(Item.FooterItem)
-      }
+      },
     )
   }
 

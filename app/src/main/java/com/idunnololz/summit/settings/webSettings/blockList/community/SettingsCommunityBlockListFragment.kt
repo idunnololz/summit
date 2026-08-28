@@ -77,7 +77,7 @@ class SettingsCommunityBlockListFragment :
         },
         onCommunityClick = {
           getMainActivity()?.showCommunityLocalStats(it)
-        }
+        },
       )
       binding.recyclerView.setup(animationsHelper)
       binding.recyclerView.setHasFixedSize(true)

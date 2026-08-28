@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import kotlin.io.path.Path
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -258,7 +257,7 @@ class AccountManager @Inject constructor(
         val isCurrentAccount = account.id == currentAccount.value.id
         val newAccount = account.copy(
           displayName = displayName,
-          current = isCurrentAccount
+          current = isCurrentAccount,
         )
 
         accountDao.update(newAccount)

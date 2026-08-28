@@ -2,7 +2,6 @@ package com.idunnololz.summit.inbox.message
 
 import android.app.Application
 import androidx.core.content.ContextCompat
-import androidx.datastore.preferences.core.preferencesOf
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentsManager

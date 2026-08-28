@@ -9,7 +9,6 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
-import com.idunnololz.summit.api.toLemmyPageIndex
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.lemmy.utils.listSource.CursorBackedSingleDataSource
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource

@@ -1,10 +1,6 @@
 package com.idunnololz.summit.lemmy.search
 
-import android.app.SearchManager
-import android.app.SearchableInfo
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.util.Log

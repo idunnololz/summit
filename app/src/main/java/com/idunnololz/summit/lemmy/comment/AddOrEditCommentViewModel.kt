@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.comment
 
 import android.app.Application
 import androidx.core.content.ContextCompat
-import androidx.datastore.preferences.core.preferencesOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

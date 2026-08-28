@@ -23,7 +23,6 @@ import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.models.PostView
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils

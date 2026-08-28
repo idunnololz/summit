@@ -140,8 +140,8 @@ class DraftsViewModel @Inject constructor(
                 draftEntry = draft,
                 commentData = draft.data,
                 isSelectable = isInSelectMode,
-                isSelected = selectedItems.contains(draft.id)
-              )
+                isSelected = selectedItems.contains(draft.id),
+              ),
             )
 
           is DraftData.PostDraftData ->
@@ -151,7 +151,7 @@ class DraftsViewModel @Inject constructor(
                 postData = draft.data,
                 isSelectable = isInSelectMode,
                 isSelected = selectedItems.contains(draft.id),
-              )
+              ),
             )
 
           is DraftData.MessageDraftData -> {
@@ -174,7 +174,7 @@ class DraftsViewModel @Inject constructor(
       model.value?.copy(
         items = items,
         isInSelectMode = isInSelectMode,
-      )
+      ),
     )
   }
 

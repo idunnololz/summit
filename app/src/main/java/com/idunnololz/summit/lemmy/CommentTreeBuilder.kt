@@ -259,13 +259,13 @@ class CommentTreeBuilder(
             listView = PostListItem.PendingCommentListView(
               pendingCommentView = pendingComment,
               author =
-                accountManager.getAccountById(pendingComment.accountId)?.let {
-                  if (preferences.preferUserDisplayName) {
-                    it.displayName ?: it.name
-                  } else {
-                    it.name
-                  }
-                },
+              accountManager.getAccountById(pendingComment.accountId)?.let {
+                if (preferences.preferUserDisplayName) {
+                  it.displayName ?: it.name
+                } else {
+                  it.name
+                }
+              },
             ),
             children = mutableListOf(),
             depth = 0,

@@ -485,7 +485,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         context = context,
         url = url,
         fragmentManager = fragmentManager,
-        openNewIncognitoTab = true
+        openNewIncognitoTab = true,
       )
     }
     R.id.preview_link -> {

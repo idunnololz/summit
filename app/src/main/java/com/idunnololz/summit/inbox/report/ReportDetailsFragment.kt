@@ -83,7 +83,9 @@ import javax.inject.Inject
 import kotlin.getValue
 
 @AndroidEntryPoint
-class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>(), InboxChildFragment {
+class ReportDetailsFragment :
+  BaseFragment<FragmentReportDetailsBinding>(),
+  InboxChildFragment {
 
   private val args: ReportDetailsFragmentArgs by navArgs()
   private val viewModel: ReportDetailsViewModel by viewModels()

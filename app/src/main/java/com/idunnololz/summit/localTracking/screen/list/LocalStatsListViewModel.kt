@@ -4,34 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
-import com.idunnololz.summit.models.GetPersonDetailsResponse
-import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.resolver.PersonResolverHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
 import javax.inject.Inject
 import kotlin.collections.get
+import kotlinx.coroutines.launch
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
 
 @HiltViewModel
 class LocalStatsListViewModel @Inject constructor(
   private val accountManager: AccountManager,
   private val trackingEventsDao: TrackingEventsDao,
   private val personResolverHelperFactory: PersonResolverHelper.Factory,
-): ViewModel() {
+) : ViewModel() {
 
   private val personResolverHelper = personResolverHelperFactory.create(viewModelScope)
 
@@ -50,8 +41,8 @@ class LocalStatsListViewModel @Inject constructor(
                   personResult = personResolverHelper.personDictionary[it.personId],
                 )
               }
-            }
-          )
+            },
+          ),
         )
       }
     }
@@ -117,7 +108,7 @@ class LocalStatsListViewModel @Inject constructor(
                 .map {
                   LocalStatsListModel.Item.CommunityStatItem(
                     communityRef = it.key,
-                    count = it.value
+                    count = it.value,
                   )
                 }
             }
@@ -127,7 +118,7 @@ class LocalStatsListViewModel @Inject constructor(
                 .map {
                   LocalStatsListModel.Item.CommunityStatItem(
                     communityRef = it.key,
-                    count = it.value
+                    count = it.value,
                   )
                 }
             }
@@ -138,20 +129,17 @@ class LocalStatsListViewModel @Inject constructor(
                   LocalStatsListModel.Item.PersonStatItem(
                     personId = it.key,
                     personResult = personResolverHelper.personDictionary[it.key],
-                    count = it.value
+                    count = it.value,
                   )
                 }
             }
-          }
+          },
         ),
       )
     }
   }
 
-  fun fetchPerson(
-    personId: Long,
-    force: Boolean,
-  ) {
+  fun fetchPerson(personId: Long, force: Boolean) {
     personResolverHelper.fetchPerson(personId, force)
   }
 }

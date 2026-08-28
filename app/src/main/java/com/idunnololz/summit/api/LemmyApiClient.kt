@@ -1251,7 +1251,10 @@ class LemmyApiClient @Inject constructor(
       getApi().saveUserSettings(authorization = account.bearer, settings)
     }.map { Unit }
 
-  suspend fun resolveObject(q: String, account: Account): Result<com.idunnololz.summit.models.ResolveObjectResponse> {
+  suspend fun resolveObject(
+    q: String,
+    account: Account,
+  ): Result<com.idunnololz.summit.models.ResolveObjectResponse> {
     val form = ResolveObject(
       q = q,
     )

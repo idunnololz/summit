@@ -3,7 +3,7 @@ package com.idunnololz.summit.localTracking.screen.community
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 
 data class LocalStatsCommunityModel(
-  val items: List<Item>
+  val items: List<Item>,
 ) {
 
   sealed interface Item
@@ -11,7 +11,7 @@ data class LocalStatsCommunityModel(
   data class PostModelItem(
     val postId: Long?,
     val fetchedPost: Result<FetchedPost>?,
-  ): Item
+  ) : Item
 
   data class CommunityStatsSummaryItem(
     val totalScore: Int,
@@ -24,7 +24,7 @@ data class LocalStatsCommunityModel(
     val totalInteractionsCount: Int,
     val recentViewsCount: Int,
     val totalViewsCount: Int,
-  ): Item
+  ) : Item
 
   data object NoPostsModelItem : Item
 }

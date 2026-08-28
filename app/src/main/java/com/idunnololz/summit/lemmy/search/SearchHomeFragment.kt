@@ -1,14 +1,9 @@
 package com.idunnololz.summit.lemmy.search
 
-import android.app.SearchManager
-import android.app.SearchableInfo
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Rect
-import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -227,7 +222,6 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
         AccountsAndSettingsDialogFragment.newInstance()
           .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
       }
-
 
       viewModel.searchSuggestionsHelper.componentName.value = requireActivity().componentName
       val searchSuggestionsAdapter = CustomSearchSuggestionsAdapter(

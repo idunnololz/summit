@@ -93,7 +93,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class InboxFragment : BaseFragment<FragmentInboxBinding>(), InboxChildFragment {
+class InboxFragment :
+  BaseFragment<FragmentInboxBinding>(),
+  InboxChildFragment {
 
   companion object {
     private const val TAG = "InboxFragment"

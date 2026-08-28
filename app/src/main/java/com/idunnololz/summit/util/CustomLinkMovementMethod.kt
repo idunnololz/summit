@@ -196,7 +196,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
           Utils.openExternalLink(
             context = textView.context,
             url = clickableSpanWithText.url,
-            fragmentManager = null
+            fragmentManager = null,
           )
         }
       } else {

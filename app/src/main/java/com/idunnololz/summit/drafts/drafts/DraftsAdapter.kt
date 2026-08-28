@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.core.text.buildSpannedString
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.CommentDraftItemBinding
@@ -30,24 +29,24 @@ class DraftsAdapter(
     private set
 
   private val adapterHelper = AdapterHelper<ViewModelItem>(
-      areItemsTheSame = { old, new ->
-          old::class == new::class &&
-                  when (old) {
-                      is ViewModelItem.PostDraftItem -> {
-                          old.draftEntry.id ==
-                                  (new as ViewModelItem.PostDraftItem).draftEntry.id
-                      }
+    areItemsTheSame = { old, new ->
+      old::class == new::class &&
+        when (old) {
+          is ViewModelItem.PostDraftItem -> {
+            old.draftEntry.id ==
+              (new as ViewModelItem.PostDraftItem).draftEntry.id
+          }
 
-                      is ViewModelItem.CommentDraftItem -> {
-                          old.draftEntry.id ==
-                                  (new as ViewModelItem.CommentDraftItem).draftEntry.id
-                      }
+          is ViewModelItem.CommentDraftItem -> {
+            old.draftEntry.id ==
+              (new as ViewModelItem.CommentDraftItem).draftEntry.id
+          }
 
-                      ViewModelItem.LoadingItem -> true
-                      ViewModelItem.EmptyItem -> true
-                      ViewModelItem.HeaderItem -> true
-                  }
-      },
+          ViewModelItem.LoadingItem -> true
+          ViewModelItem.EmptyItem -> true
+          ViewModelItem.HeaderItem -> true
+        }
+    },
   ).apply {
     addItemType(
       clazz = ViewModelItem.HeaderItem::class,
@@ -58,18 +57,18 @@ class DraftsAdapter(
       inflateFn = PostDraftItemBinding::inflate,
     ) { item, b, h ->
       b.title.text = if (item.postData.name.isNullOrBlank()) {
-          buildSpannedString {
-              append(b.title.context.getString(R.string.empty))
-              setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
-          }
+        buildSpannedString {
+          append(b.title.context.getString(R.string.empty))
+          setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+        }
       } else {
         item.postData.name
       }
       b.text.text = if (item.postData.body.isNullOrBlank()) {
-          buildSpannedString {
-              append(b.title.context.getString(R.string.empty))
-              setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
-          }
+        buildSpannedString {
+          append(b.title.context.getString(R.string.empty))
+          setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+        }
       } else {
         item.postData.body
       }
@@ -123,7 +122,6 @@ class DraftsAdapter(
     select: CheckBox,
     root: View,
   ) {
-
     if (isSelectable) {
       select.visibility = View.VISIBLE
 

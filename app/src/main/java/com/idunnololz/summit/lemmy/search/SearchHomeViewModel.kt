@@ -1,13 +1,9 @@
 package com.idunnololz.summit.lemmy.search
 
-import android.app.Application
 import android.app.SearchManager
 import android.app.SearchableInfo
 import android.content.ComponentName
-import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -20,7 +16,6 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.SummitServerClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
-import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter

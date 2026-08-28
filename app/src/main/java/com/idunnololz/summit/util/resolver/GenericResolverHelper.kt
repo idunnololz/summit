@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util.resolver
 
-import com.idunnololz.summit.api.dto.lemmy.Person
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,10 +19,7 @@ class GenericResolverHelper<T>(
 
   private val mutex = Mutex()
 
-  fun fetchObject(
-    objectId: Long,
-    force: Boolean,
-  ) {
+  fun fetchObject(objectId: Long, force: Boolean) {
     coroutineScope.launch(Dispatchers.IO) {
       if (fetchingObject.contains(objectId) || objectDictionary.contains(objectId)) {
         return@launch

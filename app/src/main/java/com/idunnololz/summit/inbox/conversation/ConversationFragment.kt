@@ -56,7 +56,9 @@ import io.noties.markwon.image.AsyncDrawableSpan
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ConversationFragment : BaseFragment<FragmentConversationBinding>(), InboxChildFragment {
+class ConversationFragment :
+  BaseFragment<FragmentConversationBinding>(),
+  InboxChildFragment {
   private val args by navArgs<ConversationFragmentArgs>()
   private val viewModel: ConversationViewModel by viewModels()
 

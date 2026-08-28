@@ -111,22 +111,21 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
         },
         onFrequentedCommunitiesClick = {
           val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
-            LocalStatsListType.FrequentedCommunities
+            LocalStatsListType.FrequentedCommunities,
           )
           findNavController().navigateSafe(direction)
         },
         onFavoriteCommunitiesClick = {
           val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
-            LocalStatsListType.FavoriteCommunities
+            LocalStatsListType.FavoriteCommunities,
           )
           findNavController().navigateSafe(direction)
         },
         onUserInteractionsClick = {
           val direction = LocalStatsFragmentDirections.actionLocalStatsFragmentToLocalStatsListFragment(
-            LocalStatsListType.UserInteractions
+            LocalStatsListType.UserInteractions,
           )
           findNavController().navigateSafe(direction)
-
         },
       )
       recyclerView.adapter = adapter
@@ -338,13 +337,14 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           } else {
             item.person.fold(
               { person ->
-                b.title.text = "${(person.display_name ?: person.name).toBidiSafe()}@${person.instance}"
+                b.title.text =
+                  "${(person.display_name ?: person.name).toBidiSafe()}@${person.instance}"
                 b.card.setOnClickListener { onPersonClick(person.toPersonRef()) }
               },
               {
                 b.title.text = it.toErrorMessage(context)
                 b.card.setOnClickListener(null)
-              }
+              },
             )
           }
         } else {
