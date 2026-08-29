@@ -969,9 +969,8 @@ class CommunityFragment :
   fun navBarPercentShown(): Float = if (viewModel.lockBottomBar) {
     1f
   } else {
-    (communityAppBarController?.percentShown?.value ?: 1f) *
-      (slidingPaneController?.getNavUiOpenPercent() ?: 1f)
-  }
+    (communityAppBarController?.percentShown?.value ?: 1f)
+  } * (slidingPaneController?.getNavUiOpenPercent() ?: 1f)
 
   fun scrollToTop() {
     if (!isBindingAvailable()) return
