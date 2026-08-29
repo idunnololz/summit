@@ -27,7 +27,7 @@ class CommentTreeBuilder(
   private val context: Context,
   private val accountManager: AccountManager,
   private val contentFiltersManager: ContentFiltersManager,
-  private val preferences: Preferences,
+  private val preferUserDisplayName: Boolean,
 ) {
 
   suspend fun buildCommentsTreeListView(
@@ -260,7 +260,7 @@ class CommentTreeBuilder(
               pendingCommentView = pendingComment,
               author =
               accountManager.getAccountById(pendingComment.accountId)?.let {
-                if (preferences.preferUserDisplayName) {
+                if (preferUserDisplayName) {
                   it.displayName ?: it.name
                 } else {
                   it.name
@@ -283,7 +283,7 @@ class CommentTreeBuilder(
                 author = accountManager.getAccountById(
                   pendingComment.accountId,
                 )?.let {
-                  if (preferences.preferUserDisplayName) {
+                  if (preferUserDisplayName) {
                     it.displayName ?: it.name
                   } else {
                     it.name

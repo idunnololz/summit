@@ -228,7 +228,7 @@ class PostFragment :
     preferences = viewModel.preferences
 
     if (savedInstanceState == null) {
-      viewModel.updatePostViewIfNeeded(initialPostView)
+      viewModel.initialPostView = initialPostView
       viewModel.updateOriginalPostOrCommentRef(args.postOrCommentRef())
       viewModel.updatePostOrCommentRef(args.postOrCommentRef())
     }

@@ -310,7 +310,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         context = ContextCompat.getContextForLanguage(application),
         accountManager = accountManager,
         contentFiltersManager = contentFiltersManager,
-        preferences = preferences,
+        preferUserDisplayName = preferences.preferUserDisplayName,
       ).buildCommentsTreeListView(
         post = null,
         comments = commentResult?.getOrNull(),
