@@ -33,6 +33,10 @@ class SettingsPeopleFragment :
         { preferences.showPerUserScores },
         { preferences.showPerUserScores = it },
       ),
+      settings.showBotLabel.asOnOffSwitch(
+        { preferences.showBotLabel },
+        { preferences.showBotLabel = it },
+      ),
       settings.showPronounsIfAvailable.asOnOffSwitch(
         { preferences.showPronounsIfAvailable },
         { preferences.showPronounsIfAvailable = it },

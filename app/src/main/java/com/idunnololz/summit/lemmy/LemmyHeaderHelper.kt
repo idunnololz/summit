@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.api.utils.isSpoiler
@@ -348,6 +349,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       sb.appendPersonScore(postView.creator.id)
 
       sb.appendNewUserWarningIfNeeded(postHeaderInfo)
+      sb.appendBotAccountTagIfNeeded(context, postView.creator)
 
       if (postHeaderInfo.isAuthorCakeDay) {
         sb.appendSeparatorIfNeeded()
@@ -718,6 +720,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     sb.appendPersonScore(commentView.creator.id)
 
     sb.appendNewUserWarningIfNeeded(commentHeaderInfo)
+    sb.appendBotAccountTagIfNeeded(context, commentView.creator)
 
     val tag = userTagsManager.getUserTag(commentView.creator.fullName)
     if (tag != null) {
@@ -865,26 +868,59 @@ class LemmyHeaderHelper @AssistedInject constructor(
   }
 
   private fun SpannableStringBuilder.appendNewUserWarningIfNeeded(headerInfo: HeaderInfo) {
-    if (preferences.warnNewPerson) {
-      val newUserTsString = headerInfo.newUserTsString
-
-      if (newUserTsString != null) {
-        append(" ")
-        val s = length
-        append(newUserTsString)
-        val e = length
-        setSpan(
-          RoundedBackgroundSpan(
-            backgroundColor = newPersonColor,
-            textColor = blackTextColor,
-          ),
-          s,
-          e,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-        append(" ")
-      }
+    if (!preferences.warnNewPerson) {
+      return
     }
+
+    val newUserTsString = headerInfo.newUserTsString
+
+    if (newUserTsString != null) {
+      append(" ")
+      val s = length
+      append(newUserTsString)
+      val e = length
+      setSpan(
+        RoundedBackgroundSpan(
+          backgroundColor = newPersonColor,
+          textColor = blackTextColor,
+        ),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
+      append(" ")
+    }
+  }
+
+  private fun SpannableStringBuilder.appendBotAccountTagIfNeeded(
+    context: Context,
+    person: Person
+  ) {
+    if (!preferences.showBotLabel) {
+      return
+    }
+
+    if (!person.bot_account) {
+      return
+    }
+
+    if (isNotEmpty() && get(length - 1) != ' ') {
+      append(" ")
+    }
+
+    val s = length
+    append("BOT")
+    val e = length
+    setSpan(
+      RoundedBackgroundSpan(
+        backgroundColor = newPersonColor,
+        textColor = blackTextColor,
+      ),
+      s,
+      e,
+      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
+    append(" ")
   }
 
   private fun SpannableStringBuilder.appendPersonScore(personId: Long) {

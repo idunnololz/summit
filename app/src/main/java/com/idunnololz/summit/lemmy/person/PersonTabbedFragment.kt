@@ -37,6 +37,7 @@ import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonBinding
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.appendPronounsIfAvailable
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.getAccountAgeString
@@ -685,6 +686,7 @@ class PersonTabbedFragment :
   }
 
   private fun onUserTagChanged() {
+    val context = requireContext()
     val data = viewModel.personData.valueOrNull ?: return
 
     binding.subtitle.text = buildSpannedString {
@@ -704,6 +706,8 @@ class PersonTabbedFragment :
           Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
       }
+
+      appendPronounsIfAvailable(context, data.personView.person.pronouns)
     }
   }
 

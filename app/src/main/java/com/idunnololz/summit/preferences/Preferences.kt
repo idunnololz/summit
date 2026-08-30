@@ -143,6 +143,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_BOT_LABEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PRONOUNS_IF_AVAILABLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
@@ -709,6 +710,8 @@ class Preferences(
     by booleanPreference(KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED, false)
   var preferUserDisplayName: Boolean
     by booleanPreference(KEY_PREFER_USER_DISPLAY_NAME, false)
+  var showBotLabel: Boolean
+    by booleanPreference(KEY_SHOW_BOT_LABEL, true)
   var showPronounsIfAvailable: Boolean
     by booleanPreference(KEY_SHOW_PRONOUNS_IF_AVAILABLE, true)
   var preferCommunityDisplayName: Boolean

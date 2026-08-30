@@ -161,7 +161,7 @@ fun SpannableStringBuilder.appendPronounsIfAvailable(
 
   val start = length
 
-  append("[${pronouns}]")
+  append(" [${pronouns}]")
 
   val end = length
 

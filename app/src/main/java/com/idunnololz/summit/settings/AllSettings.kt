@@ -127,6 +127,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_RECENT_COMMUNIT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_BOT_LABEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
@@ -1909,6 +1910,11 @@ class PeopleSettings @Inject constructor(
     title = context.getString(R.string.show_per_user_scores),
     description = context.getString(R.string.show_per_user_scores_desc),
     relatedKeys = listOf(KEY_SHOW_PER_USER_SCORES),
+  )
+  val showBotLabel = OnOffSettingItem(
+    title = context.getString(R.string.show_bot_label),
+    description = context.getString(R.string.show_bot_label_desc),
+    relatedKeys = listOf(KEY_SHOW_BOT_LABEL),
   )
   val showPronounsIfAvailable = OnOffSettingItem(
     null,
