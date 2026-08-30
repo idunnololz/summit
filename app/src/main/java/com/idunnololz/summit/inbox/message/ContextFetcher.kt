@@ -132,6 +132,7 @@ class ContextFetcher @Inject constructor(
       fullyLoadedCommentIds = setOf(),
       targetCommentRef = null,
       singleCommentChain = null,
+      commentsBeingFetched = listOf(),
     )
 
     Result.success(

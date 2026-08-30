@@ -37,6 +37,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -97,6 +98,7 @@ class PostViewModel @Inject constructor(
   val findInPageVisible = MutableLiveData<Boolean>(false)
   val findInPageQuery = MutableLiveData<String>("")
   val screenshotMode = MutableLiveData<Boolean>(false)
+  val errorFlow = MutableSharedFlow<PostAndCommentsLoader.ActionError>()
 
   var initialPostView: PostView? = null
 
@@ -183,6 +185,14 @@ class PostViewModel @Inject constructor(
       val postOrCommentRef = postOrCommentRef ?: return@launch
       var getPostResponse: GetPostResponse? = postAndCommentsLoader?.getPostResponse
 
+      lemmyApiClient.changeInstance(
+        postOrCommentRef
+          .fold(
+            { it.instance },
+            { it.instance },
+          ),
+      )
+
       val postResult: Result<GetPostResponse?> =
         if (!markPostAsRead) {
           Result.failure(RuntimeException("Can't fetch post or else it will be marked as read!"))
@@ -207,14 +217,6 @@ class PostViewModel @Inject constructor(
         } else {
           Result.success(getPostResponse)
         }
-
-      lemmyApiClient.changeInstance(
-        postOrCommentRef
-          .fold(
-            { it.instance },
-            { it.instance },
-          ),
-      )
 
       getPostResponse = if (force) {
         postResult.getOrNull()
@@ -271,41 +273,37 @@ class PostViewModel @Inject constructor(
       lemmyApiClient = lemmyApiClient,
       getPostResponse = getPostResponse,
       currentAccountView = currentAccountView,
+      selectedCommentId = selectedCommentId.value,
       callback = object : PostAndCommentsLoader.Callback {
         override fun onPostViewLoaded(postView: PostView) {
           trackVisitIfNeeded(postView)
         }
 
         override fun onPostModelChanged(postModel: StatefulData<PostModel>) {
+          Log.d(TAG, "onPostModelChanged() - ${postModel::class.simpleName}")
           when (postModel) {
             is StatefulData.Error<*> -> {
-              this@PostViewModel.postModel.setError(postModel.error)
+              this@PostViewModel.postModel.postError(postModel.error)
             }
             is StatefulData.Loading<*> -> {
-              this@PostViewModel.postModel.setIsLoading()
+              this@PostViewModel.postModel.postIsLoading()
             }
             is StatefulData.NotStarted<*> -> {
-              this@PostViewModel.postModel.setIdle()
+              this@PostViewModel.postModel.postIdle()
             }
             is StatefulData.Success -> {
-              this@PostViewModel.postModel.setValue(postModel.data)
+              this@PostViewModel.postModel.postValue(postModel.data)
             }
+          }
+        }
+
+        override fun onError(error: PostAndCommentsLoader.ActionError) {
+          viewModelScope.launch {
+            errorFlow.emit(error)
           }
         }
       }
     )
-  }
-
-  private suspend fun onAccountChanged(account: Account?) {
-    withContext(Dispatchers.Main) {
-      preferences = preferenceManager.currentPreferences
-
-      if (account != null) {
-        currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
-      } else {
-        currentAccountView.value = null
-      }
-    }
   }
 
   val apiInstance: String
@@ -327,14 +325,20 @@ class PostViewModel @Inject constructor(
     postAndCommentsLoader?.selectedCommentId = commentId
   }
 
-  fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
-    this.postOrCommentRef = postOrCommentRef
+  fun updatePostOrCommentRef(newPostOrCommentRef: Either<PostRef, CommentRef>) {
+    this.postOrCommentRef = newPostOrCommentRef
 
-    postOrCommentRef.leftOrNull()?.let {
+    newPostOrCommentRef.leftOrNull()?.let {
       this.postRef = it
     }
 
-    onPostOrCommentRefChange.postValue(postOrCommentRef)
+    onPostOrCommentRefChange.postValue(newPostOrCommentRef)
+    clearPostAndCommentsLoader()
+  }
+
+  private fun clearPostAndCommentsLoader() {
+    postAndCommentsLoader?.cancel()
+    postAndCommentsLoader = null
   }
 
   fun switchToNativeInstance() {
@@ -451,7 +455,7 @@ class PostViewModel @Inject constructor(
               updatePostOrCommentRef(newPostOrCommentRef)
 
               if (didInstanceChange) {
-                postAndCommentsLoader = null
+                clearPostAndCommentsLoader()
               }
 
               withContext(Dispatchers.Main) {
@@ -555,8 +559,7 @@ class PostViewModel @Inject constructor(
 
           if (newPostOrCommentRef != null) {
             updatePostOrCommentRef(newPostOrCommentRef)
-
-            postAndCommentsLoader = null
+            clearPostAndCommentsLoader()
           }
 
           Result.success(Unit)
@@ -619,15 +622,16 @@ class PostViewModel @Inject constructor(
       return
     } ?: return
 
-    this.postOrCommentRef = Either.Right(CommentRef(instance, topCommentId))
-
-    onPostOrCommentRefChange.postValue(postOrCommentRef)
+    updatePostOrCommentRef(Either.Right(CommentRef(instance, topCommentId)))
     fetchPostData()
   }
 
+  fun fetchMoreComments(commentId: CommentId, maxDepth: Int? = null, force: Boolean = false) {
+    postAndCommentsLoader?.fetchMoreComments(commentId, maxDepth, force)
+  }
 
-  fun fetchMoreComments(parentId: CommentId?, maxDepth: Int? = null, force: Boolean = false) {
-    postAndCommentsLoader?.fetchMoreComments(parentId, maxDepth, force)
+  fun resetNewlyPostedComment() {
+    postAndCommentsLoader?.resetNewlyPostedComment()
   }
 
   private fun trackVisitIfNeeded(postView: PostView) {
@@ -646,8 +650,16 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  fun resetNewlyPostedComment() {
-    postAndCommentsLoader?.resetNewlyPostedComment()
+  private suspend fun onAccountChanged(account: Account?) {
+    withContext(Dispatchers.Main) {
+      preferences = preferenceManager.currentPreferences
+
+      if (account != null) {
+        currentAccountView.value = accountInfoManager.getAccountViewForAccount(account)
+      } else {
+        currentAccountView.value = null
+      }
+    }
   }
 
   class ObjectResolverFailedException : Exception()

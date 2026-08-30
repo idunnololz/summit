@@ -66,6 +66,7 @@ interface PostListItem {
     val parentCommentId: CommentId?,
     val depth: Int,
     val moreCount: Int,
+    val isBeingFetched: Boolean,
     override val id: Long = (parentCommentId?.toLong() ?: 0L) or MORE_COMMENTS_FLAG,
   ) : PostListItem
 

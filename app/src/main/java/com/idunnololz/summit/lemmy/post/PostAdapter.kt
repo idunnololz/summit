@@ -2,10 +2,12 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
@@ -116,6 +118,10 @@ class PostAdapter(
   private val onPendingCommentActionInfoClick: (actionId: Long) -> Unit,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
+  companion object {
+    private const val TAG = "PostAdapter"
+  }
+
   interface ScreenshotOptions
 
   private sealed class Item(
@@ -221,6 +227,7 @@ class PostAdapter(
       val depth: Int,
       val baseDepth: Int,
       val screenshotMode: Boolean,
+      val isBeingFetched: Boolean,
     ) : Item(
       "more_comments_$parentId",
     ),
@@ -306,6 +313,10 @@ class PostAdapter(
   var isLoaded: Boolean = false
   var error: Throwable? = null
     set(value) {
+      if (value == field) {
+        return
+      }
+
       field = value
 
       refreshItems()
@@ -875,13 +886,15 @@ class PostAdapter(
           baseDepth = item.baseDepth,
           maxDepth = maxDepth,
         )
-        b.moreButton.text = context.resources.getQuantityString(
+        b.moreText.text = context.resources.getQuantityString(
           R.plurals.more_replies_format,
           item.moreCount,
           item.moreCount,
         )
 
-        b.moreButton.setOnClickListener {
+        b.progressView.isVisible = item.isBeingFetched
+
+        b.moreContainer.setOnClickListener {
           if (item.parentId != null) {
             onFetchComments(item.parentId)
           }
@@ -1059,6 +1072,7 @@ class PostAdapter(
     forceRefresh: Boolean = false,
     cb: () -> Unit = {},
   ) {
+    Log.d(TAG, "refreshItems() animate - $animate forceRefresh - $forceRefresh")
     val oldItems = items
 
     val topLevelCommentIndices = mutableListOf<Int>()
@@ -1101,17 +1115,11 @@ class PostAdapter(
 
     this.items = newItems
 
-    if (forceRefresh) {
-      @Suppress("NotifyDataSetChanged")
-      notifyDataSetChanged()
-    } else {
-      diff.dispatchUpdatesTo(this)
-
-      if (refreshHeader) {
-        val headerIndex = newItems.indexOfFirst { it is HeaderItem }
-        if (headerIndex != -1) {
-          notifyItemChanged(headerIndex, Unit)
-        }
+    diff.dispatchUpdatesTo(this)
+    if (refreshHeader || forceRefresh) {
+      val headerIndex = newItems.indexOfFirst { it is HeaderItem }
+      if (headerIndex != -1) {
+        notifyItemChanged(headerIndex, Unit)
       }
     }
 
@@ -1365,7 +1373,8 @@ class PostAdapter(
               moreCount = commentView.moreCount,
               depth = commentItem.depth,
               baseDepth = 0,
-              screenshotMode,
+              screenshotMode = screenshotMode,
+              isBeingFetched = commentView.isBeingFetched,
             )
             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
 

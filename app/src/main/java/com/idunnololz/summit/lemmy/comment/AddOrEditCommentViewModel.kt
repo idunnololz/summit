@@ -320,6 +320,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         fullyLoadedCommentIds = setOf(),
         targetCommentRef = null,
         singleCommentChain = null,
+        commentsBeingFetched = listOf(),
       )
 
       contextModel.postValue(

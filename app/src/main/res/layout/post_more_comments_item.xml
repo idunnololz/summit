@@ -22,15 +22,37 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <Button
-        android:id="@+id/more_button"
+    <LinearLayout
+        android:id="@+id/more_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="start|center_vertical"
-        android:paddingHorizontal="@dimen/content_horizontal_padding"
-        style="@style/Widget.Material3.Button.TextButton"
+        android:orientation="horizontal"
+        android:background="@drawable/selectable_item_bg"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/more_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:textAppearance="?textAppearanceTitleSmall"
+            android:textColor="?colorPrimary"
+            android:layout_margin="@dimen/padding_half"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            app:indicatorSize="12dp"
+            app:indicatorInset="0dp"
+            app:trackThickness="2dp"/>
+    </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,6 +39,7 @@ class CommentTreeBuilder(
     fullyLoadedCommentIds: Set<Int>,
     targetCommentRef: CommentRef?,
     singleCommentChain: CommentRef?,
+    commentsBeingFetched: List<Int>,
   ): List<CommentNodeData> {
     val isSingleCommentChain = singleCommentChain != null
     val targetCommentId = targetCommentRef?.id
@@ -231,7 +232,12 @@ class CommentTreeBuilder(
     }
 
     if (post != null) {
-      addMoreItems(post, topNodes, fullyLoadedCommentIds)
+      addMoreItems(
+        post = post,
+        topNodes = topNodes,
+        fullyLoadedCommentIds = fullyLoadedCommentIds,
+        commentsBeingFetched = commentsBeingFetched
+      )
     }
 
     pendingComments?.forEach { pendingComment ->
@@ -305,6 +311,7 @@ class CommentTreeBuilder(
     post: PostView,
     topNodes: MutableList<CommentNodeData>,
     fullyLoadedCommentIds: Set<Int>,
+    commentsBeingFetched: List<Int>,
   ) {
     val toVisit = LinkedList<CommentNodeData>()
     toVisit.addAll(topNodes)
@@ -364,9 +371,10 @@ class CommentTreeBuilder(
           node.children.add(
             CommentNodeData(
               PostListItem.MoreCommentsItem(
-                commentView.commentView.comment.id,
-                node.depth + 1,
-                expectedCount - childrenCount,
+                parentCommentId = commentView.commentView.comment.id,
+                depth = node.depth + 1,
+                moreCount = expectedCount - childrenCount,
+                isBeingFetched = commentsBeingFetched.contains(commentView.commentView.comment.id)
               ),
               node.depth + 1,
             ),
@@ -398,9 +406,12 @@ class CommentTreeBuilder(
       topNodes.add(
         CommentNodeData(
           PostListItem.MoreCommentsItem(
-            null,
-            0,
-            expectedCount - childrenCount,
+            parentCommentId = null,
+            depth = 0,
+            moreCount = expectedCount - childrenCount,
+            // TODO: Maybe find a way to tell if we are fetching a page of comments from the top
+            // level?
+            isBeingFetched = false,
           ),
           0,
         ),

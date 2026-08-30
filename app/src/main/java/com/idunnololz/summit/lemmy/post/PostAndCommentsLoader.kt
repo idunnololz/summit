@@ -30,6 +30,7 @@ import com.idunnololz.summit.models.GetPostResponse
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.arrow.Either
+import com.idunnololz.summit.util.coroutines.newChildScope
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -37,7 +38,9 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -51,8 +54,12 @@ class PostAndCommentsLoader @AssistedInject constructor(
   private val postReadManager: PostReadManager,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   @Assisted private val context: Application,
-  @Assisted private val coroutineScope: CoroutineScope,
-  @Assisted var initialMaxDepth: Int,
+  @Assisted coroutineScope: CoroutineScope,
+
+  /**
+   * This value only applies when loading a post. Ignored when loading a specific comment chain.
+   */
+  @Assisted("initialMaxDepth") var initialMaxDepth: Int,
   @Assisted defaultSortOrder: CommentsSortOrder,
   @Assisted private val postRef: PostRef,
   @Assisted private val commentRef: CommentRef?,
@@ -62,6 +69,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
   @Assisted var getPostResponse: GetPostResponse?,
   @Assisted private val currentAccountView: MutableLiveData<AccountView?>,
   @Assisted private val callback: Callback,
+  @Assisted("selectedCommentId") var selectedCommentId: Int? = null
 ) {
 
   @AssistedFactory
@@ -69,7 +77,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
     fun create(
       context: Application,
       coroutineScope: CoroutineScope,
-      initialMaxDepth: Int,
+      @Assisted("initialMaxDepth") initialMaxDepth: Int,
       defaultSortOrder: CommentsSortOrder,
       postRef: PostRef,
       commentRef: CommentRef?,
@@ -78,6 +86,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
       lemmyApiClient: AccountAwareLemmyClient,
       getPostResponse: GetPostResponse?,
       currentAccountView: MutableLiveData<AccountView?>,
+      @Assisted("selectedCommentId") selectedCommentId: Int?,
       callback: Callback,
     ): PostAndCommentsLoader
   }
@@ -85,15 +94,22 @@ class PostAndCommentsLoader @AssistedInject constructor(
   interface Callback {
     fun onPostViewLoaded(postView: PostView)
     fun onPostModelChanged(postModel: StatefulData<PostModel>)
+    fun onError(error: ActionError)
   }
 
   companion object {
     private const val TAG = "PostAndCommentsLoader"
   }
 
-  val postModel = MutableStateFlow<StatefulData<PostModel>>(StatefulData.NotStarted())
+  sealed interface ActionError {
+    val cause: Throwable
 
-  var selectedCommentId: Int? = null
+    class LoadCommentsError(
+      override val cause: Throwable
+    ): ActionError
+  }
+
+  val postModel = MutableStateFlow<StatefulData<PostModel>>(StatefulData.NotStarted())
 
   val mutex = Mutex()
 
@@ -117,6 +133,8 @@ class PostAndCommentsLoader @AssistedInject constructor(
   private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
   private val removedCommentIds = mutableSetOf<CommentId>()
 
+  private var commentsBeingFetched: List<Int> = listOf()
+
   /**
    * Comments that didn't load by default but were loaded by the user requesting additional comments
    */
@@ -129,12 +147,18 @@ class PostAndCommentsLoader @AssistedInject constructor(
    */
   private val fullyLoadedCommentIds = mutableSetOf<CommentId>()
 
+  private val coroutineScope = coroutineScope.newChildScope()
+
   init {
     coroutineScope.launch {
       postModel.collect {
         callback.onPostModelChanged(it)
       }
     }
+  }
+
+  fun cancel() {
+    coroutineScope.cancel()
   }
 
   fun updatePendingComments(
@@ -213,7 +237,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
                   Log.d(
                     TAG,
                     "updatePendingCommentsInternalLocked() - 1 completed pending comment was " +
-                      "updated on the server. New content: '${newComment.comment.content}'",
+                      "updated on the server.'",
                   )
                 }
               }
@@ -293,8 +317,10 @@ class PostAndCommentsLoader @AssistedInject constructor(
   private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
     Log.d(
       TAG,
-      "updateData() - pendingComments: ${pendingComments?.size ?: 0} comments: ${commentsFlow.value}",
+      "updateData() - wasUpdateForced: $wasUpdateForced pendingComments: ${pendingComments?.size ?: 0}",
     )
+
+    Log.d(TAG, "selectedCommentId = $selectedCommentId")
 
     val context = ContextCompat.getContextForLanguage(context)
     val postResult = postViewFlow.value ?: return@withContext
@@ -330,6 +356,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
         fullyLoadedCommentIds = fullyLoadedCommentIds,
         targetCommentRef = commentRef,
         singleCommentChain = commentRef,
+        commentsBeingFetched = commentsBeingFetched,
       ),
       crossPosts = crossPosts ?: listOf(),
       newlyPostedCommentId = newlyPostedCommentId,
@@ -396,6 +423,8 @@ class PostAndCommentsLoader @AssistedInject constructor(
         if (it is ClientApiException && it.errorCode == 404) {
           // comment has been removed...
           removedCommentIds.add(parentId)
+        } else {
+          callback.onError(ActionError.LoadCommentsError(it))
         }
       }
 
@@ -426,19 +455,27 @@ class PostAndCommentsLoader @AssistedInject constructor(
     }
   }
 
-  fun fetchMoreComments(parentId: CommentId?, maxDepth: Int? = null, force: Boolean = false) {
+  fun fetchMoreComments(commentId: CommentId, maxDepth: Int? = null, force: Boolean = false) {
     val sortOrder = commentsSortOrder.toApiSortOrder()
 
     coroutineScope.launch {
-      if (parentId != null) {
+      if (commentsBeingFetched.contains(commentId)) {
+        return@launch
+      }
+
+      commentsBeingFetched += commentId
+
+      updateData(wasUpdateForced = force)
+
+      try {
         fetchMoreCommentsInternal(
-          parentId = parentId,
+          parentId = commentId,
           sortOrder = sortOrder,
           maxDepth = maxDepth,
           force = force,
         )
-      } else {
-        // TODO maybe?
+      } finally {
+        commentsBeingFetched -= commentId
       }
 
       updateData(wasUpdateForced = force)
@@ -520,12 +557,22 @@ class PostAndCommentsLoader @AssistedInject constructor(
       updateData(wasUpdateForced = false)
 
       val commentsResult = if (fetchCommentData) {
-        commentsFetcher.fetchCommentsWithRetry(
-          id = Either.Left(postRef.id),
-          sort = sortOrder,
-          maxDepth = initialMaxDepth,
-          force = force,
-        )
+        if (commentRef != null) {
+          // If we are loading a specific comment ignore the initial max depth
+          commentsFetcher.fetchCommentsWithRetry(
+            id = Either.Right(commentRef.id),
+            sort = sortOrder,
+            maxDepth = 6,
+            force = force,
+          )
+        } else {
+          commentsFetcher.fetchCommentsWithRetry(
+            id = Either.Left(postRef.id),
+            sort = sortOrder,
+            maxDepth = initialMaxDepth,
+            force = force,
+          )
+        }
       } else {
         commentsFlow.value
       }

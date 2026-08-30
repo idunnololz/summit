@@ -39,6 +39,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -613,7 +614,7 @@ class PostFragment :
           )
         },
         onCommentUpdated = {
-          viewModel.fetchMoreComments(parentId = it, maxDepth = 1, force = true)
+          viewModel.fetchMoreComments(commentId = it, maxDepth = 1, force = true)
         },
       )
 
@@ -860,6 +861,25 @@ class PostFragment :
       viewLifecycleOwner.lifecycleScope.launch {
         personTracker.onChangedFlow.collect {
           adapter?.notifyDataSetChanged()
+        }
+      }
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.errorFlow.collect { error ->
+          when (error) {
+            is PostAndCommentsLoader.ActionError.LoadCommentsError -> {
+              Snackbar.make(
+                fabSnackbarCoordinatorLayout,
+                R.string.error_loading_comments,
+                Snackbar.LENGTH_SHORT
+              ).setAction(R.string.error_details) {
+                ErrorDialogFragment.show(
+                  getString(R.string.error_loading_comments),
+                  error.cause,
+                  childFragmentManager,
+                )
+              }.show()
+            }
+          }
         }
       }
     }
