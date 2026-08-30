@@ -206,10 +206,6 @@ class SettingsMiscFragment :
         { preferences.showLabelsInNavBar },
         { preferences.showLabelsInNavBar = it },
       ),
-      settings.showNewPersonWarning.asOnOffSwitch(
-        { preferences.warnNewPerson },
-        { preferences.warnNewPerson = it },
-      ),
       settings.communitySelectorShowCommunitySuggestions.asOnOffSwitch(
         { preferences.communitySelectorShowCommunitySuggestions },
         { preferences.communitySelectorShowCommunitySuggestions = it },
@@ -239,10 +235,6 @@ class SettingsMiscFragment :
       settings.delayWhenLoadingData.asOnOffSwitch(
         { preferences.delayWhenLoadingData },
         { preferences.delayWhenLoadingData = it },
-      ),
-      settings.preferUserDisplayNames.asOnOffSwitch(
-        { preferences.preferUserDisplayName },
-        { preferences.preferUserDisplayName = it },
       ),
       settings.preferCommunityDisplayNames.asOnOffSwitch(
         { preferences.preferCommunityDisplayName },
@@ -315,10 +307,6 @@ class SettingsMiscFragment :
       settings.generateMissingVideoThumbnails.asOnOffSwitch(
         { preferences.generateMissingVideoThumbnails },
         { preferences.generateMissingVideoThumbnails = it },
-      ),
-      settings.showPerUserScores.asOnOffSwitch(
-        { preferences.showPerUserScores },
-        { preferences.showPerUserScores = it },
       ),
       settings.useLemmyV4.asOnOffSwitch(
         { preferences.useLemmyV4 },

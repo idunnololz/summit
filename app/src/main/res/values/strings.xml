@@ -2126,6 +2126,8 @@
     <string name="do_not_blur_nsfw_posts_in_nsfw_communities_desc">Disable the NSFW blur, within a NSFW community.</string>
     <string name="prefer_user_display_names">Prefer user display names</string>
     <string name="prefer_user_display_names_desc">When enabled, a user\'s display name will be used when possible instead of their name.</string>
+    <string name="show_pronouns_if_available">Show pronouns when available</string>
+    <string name="show_pronouns_if_available_desc">Show a user\'s pronouns when they are provided.</string>
     <string name="prefer_community_display_names">Prefer community titles over community names</string>
     <string name="op_tag_style">Choose what the OP (original poster) is labeled with</string>
     <string name="blue_microphone">Blue microphone</string>
@@ -2440,6 +2442,8 @@
     <string name="show_failed_actions_badge">Show failed actions badge</string>
     <string name="show_failed_actions_badge_desc">When enabled a badge is displayed on the bottom bar when certain actions fail (eg. comments fail to send).</string>
     <string name="error_loading_comments">Error loading comments.</string>
+    <string name="people">People</string>
+    <string name="people_desc">Control how information about a person is displayed</string>
 
 
     <plurals name="warn_delete_drafts_format">

@@ -151,6 +151,28 @@ fun SpannableStringBuilder.appendNameWithInstance(
   )
 }
 
+fun SpannableStringBuilder.appendPronounsIfAvailable(
+  context: Context,
+  pronouns: String?
+) {
+  pronouns ?: return
+
+  if (pronouns.isBlank()) return
+
+  val start = length
+
+  append("[${pronouns}]")
+
+  val end = length
+
+  setSpan(
+    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorTextFaint)),
+    start,
+    end,
+    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+  )
+}
+
 fun Person.getAccountAgeString(): String {
   val ts = published?.let { dateStringToTs(it) } ?: 0
   val accountCreationTime = LocalDateTime

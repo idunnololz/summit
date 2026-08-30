@@ -292,6 +292,15 @@ class LemmyHeaderHelper @AssistedInject constructor(
       }
       val e = sb.length
 
+      sb.appendPronounsIfAvailable(
+        context = context,
+        pronouns = if (preferences.showPronounsIfAvailable) {
+          postView.creator.pronouns
+        } else {
+          null
+        }
+      )
+
       if (postView.creator_is_admin == true) {
         sb.setSpan(
           ForegroundColorSpan(adminColor),
@@ -590,6 +599,15 @@ class LemmyHeaderHelper @AssistedInject constructor(
         underline = false,
       )
     }
+
+    sb.appendPronounsIfAvailable(
+      context = context,
+      pronouns = if (preferences.showPronounsIfAvailable) {
+        commentView.creator.pronouns
+      } else {
+        null
+      }
+    )
 
     if (commentView.creator_is_admin == true) {
       sb.setSpan(

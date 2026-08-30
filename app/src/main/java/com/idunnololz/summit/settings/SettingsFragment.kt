@@ -310,6 +310,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
               findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
+            is PeopleSettings -> {
+              val directions = SettingsFragmentDirections
+                .actionSettingsFragmentToSettingsPeopleFragment()
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
+            }
+
             is CommunitySelectorCommunitiesListSettings -> {
               SettingsCommunitiesListDialogFragment.show(childFragmentManager)
             }
@@ -514,6 +520,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
           settings.inboxSettings.asCustomItem {
             val directions = SettingsFragmentDirections
               .actionSettingsFragmentToSettingsInboxFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.peopleSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsPeopleFragment()
             findNavController().navigateSafe(directions)
           },
           settings.miscSettings.asCustomItem {

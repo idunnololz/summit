@@ -213,6 +213,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_settingsLocalTrackingEventsFragment"
             app:destination="@id/settingsLocalTrackingEventsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsPeopleFragment"
+            app:destination="@id/settingsPeopleFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -541,4 +544,8 @@
         android:name="com.idunnololz.summit.settings.localTrackingEvents.SettingsLocalTrackingEventsFragment"
         android:label="SettingsLocalTrackingEventsFragment" />
     <action android:id="@+id/action_global_settingsFilterListFragment" app:destination="@id/settingsFilterListFragment"/>
+    <fragment
+        android:id="@+id/settingsPeopleFragment"
+        android:name="com.idunnololz.summit.settings.people.SettingsPeopleFragment"
+        android:label="SettingsPeopleFragment" />
 </navigation>

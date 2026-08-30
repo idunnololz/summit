@@ -116,6 +116,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_SHOW_UP_AND_DOW
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFERRED_LOCALE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_COMMUNITY_DISPLAY_NAME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_USER_DISPLAY_NAME
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PRONOUNS_IF_AVAILABLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SESSIONS
@@ -290,6 +291,9 @@ object SettingPath {
     InboxSettings::class ->
       context.getString(R.string.inbox_settings)
 
+    PeopleSettings::class ->
+      context.getString(R.string.people)
+
     LocalTrackingEventsSettings::class ->
       context.getString(R.string.local_tracking_events)
 
@@ -392,6 +396,11 @@ class MainSettings @Inject constructor(
     R.drawable.outline_inbox_24,
     context.getString(R.string.inbox),
     context.getString(R.string.inbox_desc),
+  )
+  val peopleSettings = BasicSettingItem(
+    R.drawable.id_card_24,
+    context.getString(R.string.people),
+    context.getString(R.string.people_desc),
   )
   val miscSettings = BasicSettingItem(
     R.drawable.baseline_miscellaneous_services_24,
@@ -1877,6 +1886,38 @@ class InboxSettings @Inject constructor(
   )
 }
 
+class PeopleSettings @Inject constructor(
+  @ActivityContext private val context: Context,
+) : SearchableSettings {
+  override val parents: List<KClass<out SearchableSettings>> = listOf(
+    MainSettings::class,
+  )
+
+  val preferUserDisplayNames = OnOffSettingItem(
+    null,
+    context.getString(R.string.prefer_user_display_names),
+    context.getString(R.string.prefer_user_display_names_desc),
+    relatedKeys = listOf(KEY_PREFER_USER_DISPLAY_NAME),
+  )
+  val showNewPersonWarning = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_new_person_tag),
+    context.getString(R.string.show_new_person_tag_desc),
+    relatedKeys = listOf(KEY_WARN_NEW_PERSON),
+  )
+  val showPerUserScores = OnOffSettingItem(
+    title = context.getString(R.string.show_per_user_scores),
+    description = context.getString(R.string.show_per_user_scores_desc),
+    relatedKeys = listOf(KEY_SHOW_PER_USER_SCORES),
+  )
+  val showPronounsIfAvailable = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_pronouns_if_available),
+    context.getString(R.string.show_pronouns_if_available_desc),
+    relatedKeys = listOf(KEY_SHOW_PRONOUNS_IF_AVAILABLE),
+  )
+}
+
 class MiscSettings @Inject constructor(
   @ActivityContext private val context: Context,
 ) : SearchableSettings {
@@ -2084,12 +2125,6 @@ class MiscSettings @Inject constructor(
     null,
     relatedKeys = listOf(KEY_SHOW_LABELS_IN_NAV_BAR),
   )
-  val showNewPersonWarning = OnOffSettingItem(
-    null,
-    context.getString(R.string.show_new_person_tag),
-    context.getString(R.string.show_new_person_tag_desc),
-    relatedKeys = listOf(KEY_WARN_NEW_PERSON),
-  )
   val preferredLocale = TextValueSettingItem(
     title = context.getString(R.string.preferred_locale),
     description = null,
@@ -2147,12 +2182,6 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.delay_when_loading_data),
     context.getString(R.string.delay_when_loading_data_desc),
     relatedKeys = listOf(KEY_PERF_DELAY_WHEN_LOADING_DATA),
-  )
-  val preferUserDisplayNames = OnOffSettingItem(
-    null,
-    context.getString(R.string.prefer_user_display_names),
-    context.getString(R.string.prefer_user_display_names_desc),
-    relatedKeys = listOf(KEY_PREFER_USER_DISPLAY_NAME),
   )
   val preferCommunityDisplayNames = OnOffSettingItem(
     null,
@@ -2229,11 +2258,6 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.generate_missing_video_thumbnails),
     description = context.getString(R.string.generate_missing_video_thumbnails_desc),
     relatedKeys = listOf(KEY_GENERATE_MISSING_VIDEO_THUMBNAILS),
-  )
-  val showPerUserScores = OnOffSettingItem(
-    title = context.getString(R.string.show_per_user_scores),
-    description = context.getString(R.string.show_per_user_scores_desc),
-    relatedKeys = listOf(KEY_SHOW_PER_USER_SCORES),
   )
   val useLemmyV4 = OnOffSettingItem(
     title = context.getString(R.string.use_lemmy_api_v4),
@@ -2851,6 +2875,7 @@ class AllSettings @Inject constructor(
   videoPlayerSettings: VideoPlayerSettings,
   defaultAppsSettings: DefaultAppsSettings,
   inboxSettings: InboxSettings,
+  peopleSettings: PeopleSettings,
   localTrackingEventsSettings: LocalTrackingEventsSettings,
   communitySelectorCommunitiesListSettings: CommunitySelectorCommunitiesListSettings,
 ) {
@@ -2881,6 +2906,7 @@ class AllSettings @Inject constructor(
     videoPlayerSettings,
     defaultAppsSettings,
     inboxSettings,
+    peopleSettings,
     localTrackingEventsSettings,
     communitySelectorCommunitiesListSettings,
   )

@@ -109,6 +109,7 @@ private fun Person.toPerson(): com.idunnololz.summit.api.dto.lemmy.Person =
     bot_account = this.bot,
     ban_expires = null,
     instance_id = this.instanceId,
+    pronouns = extraFields?.firstOrNull { it.label.equals("pronouns", ignoreCase = true) }?.text,
   )
 
 private fun PersonAggregates.toPersonAggregates(): com.idunnololz.summit.api.dto.lemmy.PersonAggregates =

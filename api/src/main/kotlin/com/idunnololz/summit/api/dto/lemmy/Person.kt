@@ -24,4 +24,5 @@ data class Person(
   val bot_account: Boolean,
   val ban_expires: String? = null,
   val instance_id: InstanceId,
+  val pronouns: String? = null
 ) : Parcelable
