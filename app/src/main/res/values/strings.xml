@@ -2127,7 +2127,7 @@
     <string name="prefer_user_display_names">Prefer user display names</string>
     <string name="prefer_user_display_names_desc">When enabled, a user\'s display name will be used when possible instead of their name.</string>
     <string name="show_bot_label">Show bot label</string>
-    <string name="show_bot_label_desc">When enabled a "BOT" label is shown on a post/comment if the author's account is marked as a bot.</string>
+    <string name="show_bot_label_desc">When enabled a \"BOT\" label is shown on a post/comment if the author\'s account is marked as a bot.</string>
     <string name="show_pronouns_if_available">Show pronouns when available</string>
     <string name="show_pronouns_if_available_desc">Show a user\'s pronouns when they are provided.</string>
     <string name="prefer_community_display_names">Prefer community titles over community names</string>

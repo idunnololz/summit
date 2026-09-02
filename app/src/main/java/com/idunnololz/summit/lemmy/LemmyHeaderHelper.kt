@@ -88,6 +88,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
   private val colorOnSecondary: Int = context.getColorFromAttribute(
     com.google.android.material.R.attr.colorOnSecondary,
   )
+  private val botLabelColor: Int = context.getColorFromAttribute(
+    com.google.android.material.R.attr.colorTertiaryContainer,
+  )
+  private val botLabelTextColor: Int = context.getColorFromAttribute(
+    com.google.android.material.R.attr.colorOnTertiaryContainer,
+  )
 
   fun populateHeaderSpan(
     lemmyHeaderView: LemmyHeaderView,
@@ -349,7 +355,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       sb.appendPersonScore(postView.creator.id)
 
       sb.appendNewUserWarningIfNeeded(postHeaderInfo)
-      sb.appendBotAccountTagIfNeeded(context, postView.creator)
+      sb.appendBotAccountTagIfNeeded(postView.creator)
 
       if (postHeaderInfo.isAuthorCakeDay) {
         sb.appendSeparatorIfNeeded()
@@ -720,7 +726,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     sb.appendPersonScore(commentView.creator.id)
 
     sb.appendNewUserWarningIfNeeded(commentHeaderInfo)
-    sb.appendBotAccountTagIfNeeded(context, commentView.creator)
+    sb.appendBotAccountTagIfNeeded(commentView.creator)
 
     val tag = userTagsManager.getUserTag(commentView.creator.fullName)
     if (tag != null) {
@@ -893,7 +899,6 @@ class LemmyHeaderHelper @AssistedInject constructor(
   }
 
   private fun SpannableStringBuilder.appendBotAccountTagIfNeeded(
-    context: Context,
     person: Person
   ) {
     if (!preferences.showBotLabel) {
@@ -913,8 +918,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
     val e = length
     setSpan(
       RoundedBackgroundSpan(
-        backgroundColor = newPersonColor,
-        textColor = blackTextColor,
+        backgroundColor = botLabelColor,
+        textColor = botLabelTextColor,
       ),
       s,
       e,

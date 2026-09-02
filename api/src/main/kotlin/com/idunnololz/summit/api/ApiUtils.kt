@@ -68,18 +68,9 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
       return Result.failure(RateLimitException(0L))
     }
 
-    val errMsg = try {
-      errorBody?.let {
-        JSONObject(it).getString("error")
-      } ?: run {
-        res.code().toString()
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "Exception parsing body", e)
-      errorBody
-    }
+    val errMsg = getErrorMessage(errorBody) ?: res.code().toString()
 
-    if (errMsg?.equals("incorrect_login", ignoreCase = true) == true) {
+    if (errMsg.equals("incorrect_login", ignoreCase = true)) {
       return Result.failure(IncorrectLoginException())
     }
 
@@ -87,7 +78,7 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
       return Result.failure(NotAuthenticatedException())
     }
 
-    if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {
+    if (errMsg.contains("not_logged_in", ignoreCase = true)) {
       return Result.failure(NotAuthenticatedException())
     }
     if (errMsg == "rate_limit_error") { // might be safe to delete
@@ -111,12 +102,6 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
     if (errMsg == "language_not_allowed") {
       return Result.failure(LanguageNotAllowed())
     }
-    // TODO: Remove these checks once v0.19 is out for everyone.
-    if (errMsg?.contains("unknown variant") == true ||
-      (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))
-    ) {
-      return Result.failure(NewApiException("v0.19"))
-    }
 
     if (errorCode == 403) {
       return Result.failure(ForbiddenException())
@@ -130,20 +115,47 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
       )
     }
 
-    if (errMsg?.contains("timeout", ignoreCase = true) == true) {
+    if (errMsg.contains("timeout", ignoreCase = true) == true) {
       return Result.failure(ServerTimeoutException(errorCode))
     }
-    if (errMsg?.contains(
+    if (errorBody?.contains(
         "the database system is not yet accepting connections",
         ignoreCase = true,
-      ) ==
-      true
+      ) == true
     ) {
       // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
       return Result.failure(ServerApiException(null, 503))
     }
 
     return Result.failure(ClientApiException(errorMessage = errMsg, errorCode = errorCode))
+  }
+}
+
+private fun getErrorMessage(errorBody: String?): String? {
+  if (errorBody == null) {
+    return null
+  }
+
+  try {
+    val json = JSONObject(errorBody)
+
+    if (json.has("error")) {
+      return json.getString("error")
+    }
+
+    if (json.has("message")) {
+      val message = json.getString("message")
+      val errorMessage = message.takeWhile { it.isLetterOrDigit() || it == '_' }
+
+      if (errorMessage.isNotBlank()) {
+        return errorMessage
+      }
+    }
+
+    return errorBody
+  } catch (e: Exception) {
+    Log.e(TAG, "Exception parsing body", e)
+    return errorBody
   }
 }
 

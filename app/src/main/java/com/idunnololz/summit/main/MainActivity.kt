@@ -95,14 +95,18 @@ import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.coroutines.newChildScope
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManagerManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -256,6 +260,7 @@ class MainActivity : SummitActivity() {
             supportFragmentManager,
           )
         }
+
         is StatefulData.Loading -> {}
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {}

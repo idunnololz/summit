@@ -76,9 +76,6 @@ class AccountManager @Inject constructor(
       }
       updateNumAccounts()
     }
-    coroutineScope.launch {
-      Log.d("dbdb", "accountDao: ${_numAccounts.value}")
-    }
   }
 
   fun addAccountAndSetCurrent(account: Account) {
