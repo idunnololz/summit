@@ -13,6 +13,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.animation.DecelerateInterpolator
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ScaleGestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,6 +21,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.preferences.ImageViewerControlStyleId
 import com.idunnololz.summit.preferences.ImageViewerControlStyleIds
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -220,6 +222,12 @@ class GalleryImageView : ShapeableImageView {
         }
 
         override fun onLongPress(e: MotionEvent) {
+          if (controlStyle == ImageViewerControlStyleIds.SINGLE_TAP_TO_CLOSE) {
+            performHapticFeedbackCompat(
+              HapticFeedbackConstantsCompat.LONG_PRESS,
+            )
+            callback?.toggleUi()
+          }
         }
       },
     )
@@ -227,31 +235,21 @@ class GalleryImageView : ShapeableImageView {
     detector.setOnDoubleTapListener(
       object : GestureDetector.OnDoubleTapListener {
         override fun onDoubleTap(e: MotionEvent): Boolean {
-          if (controlStyle == ImageViewerControlStyleIds.SINGLE_TAP_TO_CLOSE) {
-            callback?.toggleUi()
-          } else {
-            e.let {
-              // Store quick scale params. This will become either a double tap zoom or a
-              // quick scale depending on whether the user swipes.
+          e.let {
+            // Store quick scale params. This will become either a double tap zoom or a
+            // quick scale depending on whether the user swipes.
 
-              // Store quick scale params. This will become either a double tap zoom or a
-              // quick scale depending on whether the user swipes.
-//                        vCenterStart = PointF(e.x, e.y)
-//                        vTranslateStart = PointF(vTranslate.x, vTranslate.y)
-              startZoom = curZoom
-              isQuickScaling = true
-              isZooming = true
-              quickScaleLastDistance = -1f
-              quickScaleCenter.set(it.x, it.y)
-//                        quickScaleSCenter = viewToSourceCoord(vCenterStart)
-//                        quickScaleVStart = PointF(e.x, e.y)
-              quickScaleVLastPoint.set(quickScaleCenter.x, quickScaleCenter.y)
-              quickScaleMoved = false
-              // We need to get events in onTouchEvent after this.
-//                        zoomInToAnimated(it.x, it.y)
-            }
-            // We need to get events in onTouchEvent after this.
+            // Store quick scale params. This will become either a double tap zoom or a
+            // quick scale depending on whether the user swipes.
+            startZoom = curZoom
+            isQuickScaling = true
+            isZooming = true
+            quickScaleLastDistance = -1f
+            quickScaleCenter.set(it.x, it.y)
+            quickScaleVLastPoint.set(quickScaleCenter.x, quickScaleCenter.y)
+            quickScaleMoved = false
           }
+          // We need to get events in onTouchEvent after this.
           return false
         }
 
