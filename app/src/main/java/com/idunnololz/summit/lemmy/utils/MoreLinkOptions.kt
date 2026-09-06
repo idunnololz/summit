@@ -14,6 +14,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.linkEditor.LinkEditorDialogFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkResolver
@@ -24,6 +25,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.UrlUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -317,7 +319,6 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                 getString(R.string.instance_info_format, pageRef.instance),
                 R.drawable.baseline_web_24,
               )
-              addDivider()
             }
           }
           is PostRef ->
@@ -366,6 +367,14 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         R.string.preview_link,
         R.drawable.baseline_preview_24,
       )
+      addDivider()
+      if (LinkUtils.isImageProxyUrl(url)) {
+        addItemWithIcon(
+          id = R.id.unwrap_image_proxy_url,
+          R.string.unwrap_proxied_image_url,
+          R.drawable.baseline_code_24,
+        )
+      }
       addItemWithIcon(
         R.id.view_in_link_editor,
         R.string.view_in_link_editor,
@@ -378,6 +387,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         advancedLink = advancedLink,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
+        linkResolver = linkResolver,
         textOrFileName = textOrFileName,
         mimeType = mimeType,
         downloadContext = downloadContext,
@@ -401,6 +411,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance, linkResolver),
   moreActionsHelper = moreActionsHelper,
   fragmentManager = fragmentManager,
+  linkResolver = linkResolver,
   textOrFileName = textOrFileName,
   mimeType = mimeType,
   downloadContext = downloadContext,
@@ -410,6 +421,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   advancedLink: AdvancedLink,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
+  linkResolver: LinkResolver,
   textOrFileName: String? = null,
   mimeType: String? = null,
   downloadContext: FileDownloadContext? = null,
@@ -603,8 +615,19 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         }
       }
     }
+    R.id.unwrap_image_proxy_url -> {
+      showAdvancedLinkOptions(
+        url = LinkUtils.unwrapImageProxyUrl(url) ?: url,
+        moreActionsHelper = moreActionsHelper,
+        fragmentManager = fragmentManager,
+        linkResolver = linkResolver,
+        textOrFileName = textOrFileName,
+        mimeType = mimeType,
+        downloadContext = downloadContext,
+      )
+    }
     R.id.view_in_link_editor -> {
-      mainActivity?.openLinkEditor(url)
+      LinkEditorDialogFragment.show(fragmentManager, url)
     }
   }
 }

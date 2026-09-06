@@ -2446,6 +2446,7 @@
     <string name="error_loading_comments">Error loading comments.</string>
     <string name="people">People</string>
     <string name="people_desc">Control how information about a person is displayed</string>
+    <string name="unwrap_proxied_image_url">Unwrap proxied image url</string>
 
 
     <plurals name="warn_delete_drafts_format">

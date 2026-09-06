@@ -16,6 +16,7 @@ import com.idunnololz.summit.databinding.LinkPartBinding
 import com.idunnololz.summit.databinding.LinkPartParamBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.VerticalSpaceItemDecoration
@@ -62,7 +63,7 @@ class LinkEditorDialogFragment :
     val context = requireContext()
 
     with(binding) {
-      requireSummitActivity().apply {
+      (activity as? InsetsProvider)?.apply {
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
         insetViewAutomaticallyByPadding(
           viewLifecycleOwner,

@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.net.Uri
 import android.util.Patterns
+import androidx.core.net.toUri
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -24,6 +25,41 @@ object LinkUtils {
     } else {
       return uri.toString()
     }
+  }
+
+  fun isImageProxyUrl(url: String): Boolean =
+    unwrapImageProxyUrl(url = url, maxLayers = 1) != null
+
+  /**
+   * @return null if the url is not an image proxy url. Returns the unwrapped url if the image is an
+   * image proxy url.
+   */
+  fun unwrapImageProxyUrl(url: String, maxLayers: Int = Int.MAX_VALUE): String? {
+    var currentUrl = url
+    var unwrapped: String? = null
+    var layer = 0
+
+    while (true) {
+      try {
+        val uri = currentUrl.toUri()
+
+        if (uri.path != "/api/v3/image_proxy") {
+          break
+        }
+
+        currentUrl = uri.getQueryParameter("url") ?: break
+        unwrapped = currentUrl
+        layer++
+
+        if (layer >= maxLayers) {
+          break
+        }
+      } catch (_: Exception) {
+        return null
+      }
+    }
+
+    return unwrapped
   }
 
   fun analyzeLink(url: String, instance: String, linkResolver: LinkResolver): AdvancedLink {
