@@ -12,7 +12,9 @@ import androidx.hilt.work.HiltWorkerFactory
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.gif.AnimatedImageDecoder
+import coil3.gif.AnimatedImageDecoder.Companion.ENCODED_LOOP_COUNT
 import coil3.gif.GifDecoder
+import coil3.gif.repeatCount
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
@@ -141,6 +143,9 @@ class MainApplication :
         .apply {
           if (BuildConfig.DEBUG) {
             logger(BetterDebugLogger())
+          }
+          if (SDK_INT >= 28) {
+            repeatCount(ENCODED_LOOP_COUNT)
           }
         }
         .build()
