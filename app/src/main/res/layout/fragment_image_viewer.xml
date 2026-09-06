@@ -57,7 +57,8 @@
                     android:id="@+id/button_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center">
+                    android:layout_gravity="center"
+                    android:theme="@style/ThemeOverlay.MyApp.MaterialButtonGroup">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/share_button"

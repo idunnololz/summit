@@ -481,4 +481,16 @@
         <item name="overlapAnchor">false</item>
         <item name="android:overlapAnchor">false</item>
     </style>
+
+    <!--
+    Workaround for a crash on some Android levels when using a MaterialButtonGroup. The
+    MaterialButtonGroup's children seems to inherit the background from it's parent which can cause
+    them to override the MaterialButton's background cause a crash in MaterialButtonGroup.
+
+    MaterialButtonGroup requires that it's children use the MaterialButton's shape appearance
+    background so that it can calculate and animate the children button sizes.
+     -->
+    <style name="ThemeOverlay.MyApp.MaterialButtonGroup" parent="">
+        <item name="android:background">@null</item>
+    </style>
 </resources>
