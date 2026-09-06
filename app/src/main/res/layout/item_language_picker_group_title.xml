@@ -10,7 +10,7 @@
         android:id="@+id/title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceTitleMedium"
+        android:textAppearance="?textAppearanceTitleSmall"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"

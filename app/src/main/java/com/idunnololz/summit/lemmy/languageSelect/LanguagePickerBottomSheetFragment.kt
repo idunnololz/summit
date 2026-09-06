@@ -21,6 +21,7 @@ import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.FragmentLanguagePickerBottomSheetBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemLanguagePickerChoiceBinding
+import com.idunnololz.summit.databinding.ItemLanguagePickerDividerItemBinding
 import com.idunnololz.summit.databinding.ItemLanguagePickerGroupTitleBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
@@ -157,6 +158,8 @@ class LanguagePickerBottomSheetFragment :
         val languageId: LanguageId?,
         val isSelected: Boolean,
       ) : Item
+
+      data object DividerItem : Item
     }
 
     private enum class Section {
@@ -175,6 +178,7 @@ class LanguagePickerBottomSheetFragment :
               old.section == new.section && old.languageId == new.languageId
             }
             Item.FirstItem -> true
+            Item.DividerItem -> false
           }
       },
     ).apply {
@@ -202,6 +206,10 @@ class LanguagePickerBottomSheetFragment :
         b.selected.isVisible = item.isSelected
         b.root.setOnClickListener { onLanguageSelected(item.languageId) }
       }
+      addItemType(
+        Item.DividerItem::class,
+        ItemLanguagePickerDividerItemBinding::inflate
+      ) { _, _, _ -> }
     }
 
     private var query = ""
@@ -228,35 +236,49 @@ class LanguagePickerBottomSheetFragment :
 
       if (filteredRecentLanguages.isNotEmpty()) {
         items += Item.Header(context.getString(R.string.recents))
-        items += filteredRecentLanguages.map {
+
+        for ((index, filteredRecentLanguage) in filteredRecentLanguages.withIndex()) {
           resultsCount++
-          Item.LanguageChoice(
+
+          items += Item.LanguageChoice(
             section = Section.RECENT,
-            name = it.name.toBidiSafe(),
-            languageId = it.id,
-            isSelected = it.id == selectedLanguageId,
+            name = filteredRecentLanguage.name.toBidiSafe(),
+            languageId = filteredRecentLanguage.id,
+            isSelected = filteredRecentLanguage.id == selectedLanguageId,
           )
+          if (index != filteredRecentLanguages.lastIndex) {
+            items += Item.DividerItem
+          }
         }
       }
 
       if (showUnspecified || filteredLanguages.isNotEmpty()) {
         items += Item.Header(context.getString(R.string.all_languages))
         if (showUnspecified) {
+          resultsCount++
           items += Item.LanguageChoice(
             section = Section.ALL,
             name = context.getString(R.string.unspecified),
             languageId = null,
             isSelected = selectedLanguageId == null,
           )
+
+          if (filteredLanguages.isNotEmpty()) {
+            items += Item.DividerItem
+          }
         }
-        items += filteredLanguages.map {
+
+        for ((index, filteredLanguage) in filteredLanguages.withIndex()) {
           resultsCount++
-          Item.LanguageChoice(
+          items += Item.LanguageChoice(
             section = Section.ALL,
-            name = it.name.toBidiSafe(),
-            languageId = it.id,
-            isSelected = it.id == selectedLanguageId,
+            name = filteredLanguage.name.toBidiSafe(),
+            languageId = filteredLanguage.id,
+            isSelected = filteredLanguage.id == selectedLanguageId,
           )
+          if (index != filteredLanguages.lastIndex) {
+            items += Item.DividerItem
+          }
         }
       }
 

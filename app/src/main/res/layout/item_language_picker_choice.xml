@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="?selectableItemBackground">
+    android:background="@color/colorSurface"
+    android:foreground="?selectableItemBackground">
+<!--    android:background="?selectableItemBackground">-->
 
     <TextView
         android:id="@+id/text"

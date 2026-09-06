@@ -740,16 +740,16 @@ class AddOrEditPostFragment :
         showSearchBackPressedHandler.isEnabled = showSearch
       }
 
-      languageTitle.visibility = View.GONE
-      languagePicker.visibility = View.GONE
-      saveLanguageAsDefault.visibility = View.GONE
+      languagePicker.isVisible = false
+      languagePicker.isVisible = false
+      saveLanguageAsDefault.isVisible = false
       viewModel.languageOptions.observe(viewLifecycleOwner) { languageOptions ->
         if (languageOptions.isNullOrEmpty()) {
           return@observe
         }
 
-        languageTitle.visibility = View.VISIBLE
-        languagePickerText.visibility = View.VISIBLE
+        languagePicker.isVisible = true
+        languagePicker.isVisible = true
         val selectedLanguage = viewModel.languageId.value?.let { languageId ->
           languageOptions.firstOrNull { it.id == languageId }
         }

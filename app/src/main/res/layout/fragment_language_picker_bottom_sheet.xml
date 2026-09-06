@@ -6,25 +6,12 @@
     android:layout_height="wrap_content"
     style="@style/Widget.Material3.BottomSheet.Modal">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/dialog_padding"
-        android:layout_marginTop="@dimen/dialog_padding"
-        android:layout_marginBottom="@dimen/padding"
-        android:text="@string/language"
-        android:textAppearance="?textAppearanceTitleLarge"
-        app:layout_constraintBottom_toTopOf="@+id/search_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding_half"
         android:background="@drawable/search_bar_bg"
         app:boxStrokeWidth="0dp"
@@ -35,7 +22,7 @@
         app:layout_constraintBottom_toTopOf="@+id/recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintTop_toTopOf="parent"
         app:startIconDrawable="@drawable/baseline_search_24"
         app:startIconTint="?colorControlNormal">
 
