@@ -24,6 +24,7 @@ import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.arrow.Either
@@ -47,6 +48,7 @@ class AddOrEditPostViewModel @Inject constructor(
   val draftsManager: DraftsManager,
   private val recentCommunityManager: RecentCommunityManager,
   private val localTracker: LocalTracker,
+  private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
 
   companion object {
@@ -65,7 +67,14 @@ class AddOrEditPostViewModel @Inject constructor(
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
   val languageOptions = state.getLiveData<List<Language>>("languages")
-  val languageId = state.getLiveData<LanguageId?>("language")
+  val languageId = state.getLiveData<LanguageId?>(
+    "language",
+    accountManager.currentAccount.asAccount?.let {
+      preferenceManager.getOnlyPreferencesForAccount(it)
+        .defaultLanguageId
+        .takeIf { it != -1 }
+    }
+  )
 
   val currentAccount: Account?
     get() = accountManager.currentAccount.asAccount
@@ -277,6 +286,13 @@ class AddOrEditPostViewModel @Inject constructor(
         .onFailure {
           searchResults.setError(it)
         }
+    }
+  }
+
+  fun saveCurrentLanguageAsDefault() {
+    currentAccount?.let {
+      preferenceManager.getOnlyPreferencesForAccount(it)
+        .defaultLanguageId = languageId.value ?: -1
     }
   }
 

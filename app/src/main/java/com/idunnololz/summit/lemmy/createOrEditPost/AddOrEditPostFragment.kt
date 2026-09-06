@@ -20,6 +20,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
@@ -777,6 +778,14 @@ class AddOrEditPostFragment :
         languagePickerText.setOnItemClickListener { _, _, position, _ ->
           viewModel.languageId.value = options[position].language?.id
         }
+      }
+      if (viewModel.currentAccount != null) {
+        saveLanguageAsDefault.isVisible = true
+        saveLanguageAsDefault.setOnClickListener {
+          viewModel.saveCurrentLanguageAsDefault()
+        }
+      } else {
+        saveLanguageAsDefault.isVisible = false
       }
       viewModel.languageId.observe(viewLifecycleOwner) {
         val options = viewModel.languageOptions.value ?: return@observe

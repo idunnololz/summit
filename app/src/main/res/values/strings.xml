@@ -2447,6 +2447,8 @@
     <string name="people">People</string>
     <string name="people_desc">Control how information about a person is displayed</string>
     <string name="unwrap_proxied_image_url">Unwrap proxied image url</string>
+    <string name="set_as_default_language">Set as default language for current account</string>
+    <string name="save_language_as_default">Save language as default</string>
 
 
     <plurals name="warn_delete_drafts_format">

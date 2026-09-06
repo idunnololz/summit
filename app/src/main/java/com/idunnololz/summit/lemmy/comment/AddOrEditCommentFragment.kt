@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
@@ -61,6 +62,7 @@ import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalSettings
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
@@ -655,8 +657,16 @@ class AddOrEditCommentFragment :
           false,
         )
         languagePickerText.setOnItemClickListener { _, _, position, _ ->
-          viewModel.languageId.value = options[position].language?.id
+          languagePickerText.tag = options[position].language?.id
         }
+
+        if (viewModel.currentAccount.value != null) {
+          setLanguageAsDefault.isVisible = true
+          setLanguageAsDefault.text = getString(R.string.set_as_default_language)
+        } else {
+          setLanguageAsDefault.isVisible = false
+        }
+
       } ?: run {
         languagePickerText.visibility = View.GONE
       }
@@ -665,7 +675,13 @@ class AddOrEditCommentFragment :
     MaterialAlertDialogBuilder(context)
       .setTitle(R.string.configure_comment)
       .setView(binding.root)
-      .setPositiveButton(android.R.string.ok) { dialog, which -> }
+      .setPositiveButton(android.R.string.ok) { dialog, which ->
+        val selectedLanguageId = binding.languagePickerText.tag as? Int
+        if (binding.setLanguageAsDefault.isChecked) {
+          viewModel.setDefaultLanguage(selectedLanguageId)
+        }
+        viewModel.languageId.value = selectedLanguageId
+      }
       .show()
   }
 

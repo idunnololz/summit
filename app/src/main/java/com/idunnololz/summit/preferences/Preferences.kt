@@ -57,6 +57,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_APP_WEB_BROWSER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_LANGUAGE_ID
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_PAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DISPLAY_DELETED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DISPLAY_INSTANCE_STYLE
@@ -776,6 +777,8 @@ class Preferences(
     by booleanPreference(KEY_USE_LEMMY_V4, false)
   var showFailedActionsBadge: Boolean
     by booleanPreference(KEY_SHOW_FAILED_ACTIONS_BADGE, true)
+  var defaultLanguageId: Int
+    by intPreference(KEY_DEFAULT_LANGUAGE_ID, -1)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

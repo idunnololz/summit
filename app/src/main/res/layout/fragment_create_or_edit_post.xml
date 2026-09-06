@@ -350,6 +350,17 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/language_picker"/>
 
+                        <Button
+                            android:id="@+id/save_language_as_default"
+                            android:text="@string/save_language_as_default"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/padding"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            app:layout_constraintTop_toBottomOf="@+id/language_picker"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"/>
+
                         <Space
                             android:id="@+id/bottom_spacer"
                             android:layout_width="0dp"

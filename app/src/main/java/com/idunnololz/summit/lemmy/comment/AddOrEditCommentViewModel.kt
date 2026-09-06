@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -30,6 +31,7 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.arrow.Either
@@ -48,6 +50,7 @@ class AddOrEditCommentViewModel @Inject constructor(
   private val contentFiltersManager: ContentFiltersManager,
   val draftsManager: DraftsManager,
   private val preferences: Preferences,
+  private val preferenceManager: PreferenceManager
 ) : ViewModel() {
 
   companion object {
@@ -77,7 +80,14 @@ class AddOrEditCommentViewModel @Inject constructor(
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
   val languageOptions = state.getLiveData<List<Language>>("languages")
-  val languageId = state.getLiveData<LanguageId?>("language")
+  val languageId = state.getLiveData<LanguageId?>(
+    "language",
+    accountManager.currentAccount.asAccount?.let {
+      preferenceManager.getOnlyPreferencesForAccount(it)
+        .defaultLanguageId
+        .takeIf { it != -1 }
+    }
+  )
 
   val messages = MutableLiveData<List<Message>>(listOf())
 
@@ -94,6 +104,13 @@ class AddOrEditCommentViewModel @Inject constructor(
             site.all_languages
           }
         }
+    }
+  }
+
+  fun setDefaultLanguage(languageId: Int?) {
+    accountManager.currentAccount.asAccount?.let {
+      preferenceManager.getOnlyPreferencesForAccount(it)
+        .defaultLanguageId = languageId ?: -1
     }
   }
 
