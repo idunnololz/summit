@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnPreDrawListener
-import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
@@ -40,7 +39,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
-import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
@@ -60,6 +58,7 @@ import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.lemmy.languageSelect.LanguagePickerBottomSheetFragment
 import com.idunnololz.summit.lemmy.setMarkdown
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.offline.OfflineManager
@@ -122,13 +121,6 @@ class AddOrEditPostFragment :
           "CreateOrEditPostFragment",
         )
     }
-  }
-
-  data class LanguageOption(
-    val name: String,
-    val language: Language?,
-  ) {
-    override fun toString(): String = name
   }
 
   private val args by navArgs<AddOrEditPostFragmentArgs>()
@@ -254,6 +246,17 @@ class AddOrEditPostFragment :
       )
       if (result != null) {
         uploadImageViewModel.uploadImageForUrl(result.fileUri)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      LanguagePickerBottomSheetFragment.REQUEST_KEY,
+      this,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
+        LanguagePickerBottomSheetFragment.RESULT_KEY,
+      )
+      if (result != null) {
+        viewModel.languageId.value = result.languageId
       }
     }
   }
@@ -739,45 +742,31 @@ class AddOrEditPostFragment :
 
       languageTitle.visibility = View.GONE
       languagePickerText.visibility = View.GONE
-      viewModel.languageOptions.observe(viewLifecycleOwner) {
-        if (it.isNullOrEmpty()) {
+      viewModel.languageOptions.observe(viewLifecycleOwner) { languageOptions ->
+        if (languageOptions.isNullOrEmpty()) {
           return@observe
         }
 
         languageTitle.visibility = View.VISIBLE
         languagePickerText.visibility = View.VISIBLE
-
-        val options =
-          listOf(
-            LanguageOption(
-              name = context.getString(R.string.unspecified),
-              language = null,
-            ),
-          ) + it.map { language ->
-            LanguageOption(
-              name = language.name.toBidiSafe(),
-              language = language,
-            )
-          }
-
-        languagePickerText.setAdapter(
-          ArrayAdapter(
-            context,
-            R.layout.auto_complete_simple_item,
-            options,
-          ),
-        )
-        val languageOption = viewModel.languageId.value?.let { languageId ->
-          options.firstOrNull { it.language?.id == languageId }
+        val selectedLanguage = viewModel.languageId.value?.let { languageId ->
+          languageOptions.firstOrNull { it.id == languageId }
         }
         languagePickerText.setText(
-          languageOption?.name
+          selectedLanguage?.name?.toBidiSafe()
             ?: context.getString(R.string.unspecified),
-          false,
         )
-        languagePickerText.setOnItemClickListener { _, _, position, _ ->
-          viewModel.languageId.value = options[position].language?.id
+
+        val showLanguagePicker = {
+          LanguagePickerBottomSheetFragment.show(
+            fragmentManager = childFragmentManager,
+            languages = languageOptions,
+            selectedLanguageId = viewModel.languageId.value,
+          )
         }
+        languagePickerText.setOnClickListener { showLanguagePicker() }
+        languagePicker.setOnClickListener { showLanguagePicker() }
+        languagePicker.setEndIconOnClickListener { showLanguagePicker() }
       }
       if (viewModel.currentAccount != null) {
         saveLanguageAsDefault.isVisible = true
@@ -793,9 +782,8 @@ class AddOrEditPostFragment :
           options.firstOrNull { it.id == languageId }
         }
         languagePickerText.setText(
-          languageOption?.name
+          languageOption?.name?.toBidiSafe()
             ?: context.getString(R.string.unspecified),
-          false,
         )
       }
 

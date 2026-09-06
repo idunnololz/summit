@@ -495,4 +495,16 @@ safeargs.
             android:name="communityRef"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef" />
     </dialog>
+    <dialog
+        android:id="@+id/languagePickerBottomSheetFragment"
+        android:name="com.idunnololz.summit.lemmy.languageSelect.LanguagePickerBottomSheetFragment"
+        android:label="LanguagePickerBottomSheetFragment" >
+        <argument
+            android:name="languages"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.Language[]" />
+        <argument
+            android:name="selectedLanguageId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </dialog>
 </navigation>

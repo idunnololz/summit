@@ -7,21 +7,24 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/language_picker"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding"
         android:hint="@string/language"
+        app:endIconDrawable="@drawable/baseline_arrow_drop_down_24"
+        app:endIconMode="custom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/language_picker_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none"/>
+            android:inputType="none"
+            android:focusable="false"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <CheckBox

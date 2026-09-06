@@ -11,7 +11,6 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.HapticFeedbackConstantsCompat
@@ -52,7 +51,7 @@ import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
-import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment.LanguageOption
+import com.idunnololz.summit.lemmy.languageSelect.LanguagePickerBottomSheetFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostListItem
@@ -197,6 +196,7 @@ class AddOrEditCommentFragment :
   private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
 
   private var isSent: Boolean = false
+  private var configureCommentBinding: ConfigureCommentBinding? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -235,6 +235,17 @@ class AddOrEditCommentFragment :
       )
       if (result != null) {
         uploadImageViewModel.uploadImage(result.fileUri)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      LanguagePickerBottomSheetFragment.REQUEST_KEY,
+      this,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
+        LanguagePickerBottomSheetFragment.RESULT_KEY,
+      )
+      if (result != null) {
+        updateConfigureCommentLanguage(result.languageId)
       }
     }
   }
@@ -627,38 +638,26 @@ class AddOrEditCommentFragment :
     with(binding) {
       viewModel.languageOptions.value?.let {
         languagePickerText.visibility = View.VISIBLE
-
-        val options =
-          listOf(
-            LanguageOption(
-              name = context.getString(R.string.unspecified),
-              language = null,
-            ),
-          ) + it.map { language ->
-            LanguageOption(
-              name = language.name.toBidiSafe(),
-              language = language,
-            )
-          }
-
-        languagePickerText.setAdapter(
-          ArrayAdapter(
-            context,
-            R.layout.auto_complete_simple_item,
-            options,
-          ),
-        )
-        val languageOption = viewModel.languageId.value?.let { languageId ->
-          options.firstOrNull { it.language?.id == languageId }
+        val selectedLanguageId = viewModel.languageId.value
+        val languageOption = selectedLanguageId?.let { languageId ->
+          it.firstOrNull { language -> language.id == languageId }
         }
+        languagePickerText.tag = selectedLanguageId
         languagePickerText.setText(
-          languageOption?.name
+          languageOption?.name?.toBidiSafe()
             ?: context.getString(R.string.unspecified),
-          false,
         )
-        languagePickerText.setOnItemClickListener { _, _, position, _ ->
-          languagePickerText.tag = options[position].language?.id
+
+        val showLanguagePicker = {
+          LanguagePickerBottomSheetFragment.show(
+            fragmentManager = childFragmentManager,
+            languages = it,
+            selectedLanguageId = languagePickerText.tag as? Int,
+          )
         }
+        languagePicker.setOnClickListener { showLanguagePicker() }
+        languagePickerText.setOnClickListener { showLanguagePicker() }
+        languagePicker.setEndIconOnClickListener { showLanguagePicker() }
 
         if (viewModel.currentAccount.value != null) {
           setLanguageAsDefault.isVisible = true
@@ -672,7 +671,7 @@ class AddOrEditCommentFragment :
       }
     }
 
-    MaterialAlertDialogBuilder(context)
+    val dialog = MaterialAlertDialogBuilder(context)
       .setTitle(R.string.configure_comment)
       .setView(binding.root)
       .setPositiveButton(android.R.string.ok) { dialog, which ->
@@ -683,6 +682,22 @@ class AddOrEditCommentFragment :
         viewModel.languageId.value = selectedLanguageId
       }
       .show()
+    configureCommentBinding = binding
+    dialog.setOnDismissListener {
+      if (configureCommentBinding === binding) {
+        configureCommentBinding = null
+      }
+    }
+  }
+
+  private fun updateConfigureCommentLanguage(languageId: Int?) {
+    val binding = configureCommentBinding ?: return
+    val language = viewModel.languageOptions.value?.firstOrNull { it.id == languageId }
+
+    binding.languagePickerText.tag = languageId
+    binding.languagePickerText.setText(
+      language?.name?.toBidiSafe() ?: getString(R.string.unspecified),
+    )
   }
 
   private fun showFullContext(force: Boolean = false) {

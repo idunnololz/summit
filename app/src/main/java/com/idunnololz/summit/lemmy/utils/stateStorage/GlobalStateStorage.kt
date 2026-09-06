@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.idunnololz.summit.preferences.SharedPreferencesPreferences
 import com.idunnololz.summit.preferences.booleanPreference
 import com.idunnololz.summit.preferences.floatPreference
+import com.idunnololz.summit.preferences.jsonPreference
 import com.idunnololz.summit.preferences.stringPreference
 import kotlinx.serialization.json.Json
 
@@ -25,4 +26,6 @@ class GlobalStateStorage(
 
   var migratedTrackingDataToPersonData: Boolean
     by booleanPreference("MIGRATED_TRACKING_DATA_TO_PERSON_DATA")
+  var recentLanguageIds: List<Int>
+    by jsonPreference("KEY_RECENT_LANGUAGE_IDS") { emptyList() }
 }

@@ -323,18 +323,21 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/language_picker"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="@dimen/padding"
+                            app:endIconDrawable="@drawable/baseline_arrow_drop_down_24"
+                            app:endIconMode="custom"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/nsfw_switch">
 
-                            <AutoCompleteTextView
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/language_picker_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="none"/>
+                                android:inputType="none"
+                                android:focusable="false"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <TextView
@@ -353,10 +356,11 @@
                         <Button
                             android:id="@+id/save_language_as_default"
                             android:text="@string/save_language_as_default"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="@dimen/padding"
                             style="@style/Widget.Material3.Button.TextButton"
+                            app:layout_constraintHorizontal_bias="1"
                             app:layout_constraintTop_toBottomOf="@+id/language_picker"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"/>
