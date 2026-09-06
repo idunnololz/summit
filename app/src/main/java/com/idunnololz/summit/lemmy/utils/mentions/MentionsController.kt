@@ -186,8 +186,14 @@ class MentionsController @AssistedInject constructor(
       adapterFactory = mentionsAdapterFactory,
       animationsHelper = animationsHelper,
       onItemSelected = { onItemSelected(it) },
-      onItemLongClick = { resultItem ->
-        PopupMenu(anchor.context, editText.rootView)
+      onItemLongClick = { resultItem, view ->
+        PopupMenu(
+          anchor.context,
+          view,
+          Gravity.NO_GRAVITY,
+          0,
+          R.style.MentionsPopupMenu,
+        )
           .apply {
             menu.add(0, R.id.insert_link, 0, R.string.insert_link)
 

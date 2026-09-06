@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.utils.mentions
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -25,7 +26,7 @@ class MentionsResultAdapter @AssistedInject constructor(
   }
 
   var onResultSelected: ((ResultItem) -> Unit)? = null
-  var onResultLongClick: ((ResultItem) -> Unit)? = null
+  var onResultLongClick: ((ResultItem, View) -> Unit)? = null
 
   private var items: List<MentionsAutoCompleteItem> = listOf()
 
@@ -64,7 +65,7 @@ class MentionsResultAdapter @AssistedInject constructor(
         onResultSelected?.invoke(item)
       }
       b.root.setOnLongClickListener {
-        onResultLongClick?.invoke(item)
+        onResultLongClick?.invoke(item, b.root)
         true
       }
     }
@@ -85,7 +86,7 @@ class MentionsResultAdapter @AssistedInject constructor(
         onResultSelected?.invoke(item)
       }
       b.root.setOnLongClickListener {
-        onResultLongClick?.invoke(item)
+        onResultLongClick?.invoke(item, b.root)
         true
       }
     }

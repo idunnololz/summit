@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.utils.mentions
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +16,7 @@ class MentionsAutoCompletePopupWindow(
   adapterFactory: MentionsResultAdapter.Factory,
   animationsHelper: AnimationsHelper,
   val onItemSelected: (String) -> Unit,
-  val onItemLongClick: (ResultItem) -> Unit,
+  val onItemLongClick: (ResultItem, View) -> Unit,
 ) : PopupWindow(context) {
 
   val adapter = adapterFactory.create()
@@ -48,8 +49,8 @@ class MentionsAutoCompletePopupWindow(
         }
       }
     }
-    adapter.onResultLongClick = {
-      onItemLongClick(it)
+    adapter.onResultLongClick = { result, view ->
+      onItemLongClick(result, view)
     }
 
     setBackgroundDrawable(null)

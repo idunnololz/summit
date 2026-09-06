@@ -364,7 +364,7 @@
     </style>
 
     <style name="MyApp.Widget.MaterialComponents.PopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">
-        <item name="android:popupBackground">@color/colorSurface</item>
+        <item name="android:popupBackground">@drawable/popup_background2</item>
     </style>
 
     <style name="MyApp.Widget.MaterialComponents.AppBarLayout.Primary" parent="Widget.MaterialComponents.AppBarLayout.Primary">
@@ -475,5 +475,10 @@
     <style name="SettingsDivider">
         <item name="android:layout_marginTop">@dimen/padding_half</item>
         <item name="android:layout_marginBottom">@dimen/padding_half</item>
+    </style>
+
+    <style name="MentionsPopupMenu" parent="MyApp.Widget.MaterialComponents.PopupMenu">
+        <item name="overlapAnchor">false</item>
+        <item name="android:overlapAnchor">false</item>
     </style>
 </resources>
