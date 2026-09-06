@@ -277,7 +277,7 @@ class AddOrEditPostViewModel @Inject constructor(
           sortType = SortType.TopMonth,
           listingType = ListingType.All,
           searchType = SearchType.Communities,
-          query = query.toString(),
+          query = query,
           limit = 20,
         )
         .onSuccess {

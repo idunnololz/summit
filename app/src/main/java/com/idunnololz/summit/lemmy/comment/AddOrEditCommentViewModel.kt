@@ -107,10 +107,10 @@ class AddOrEditCommentViewModel @Inject constructor(
     }
   }
 
-  fun setDefaultLanguage(languageId: Int?) {
-    accountManager.currentAccount.asAccount?.let {
+  fun saveCurrentLanguageAsDefault() {
+    currentAccount.value?.let {
       preferenceManager.getOnlyPreferencesForAccount(it)
-        .defaultLanguageId = languageId ?: -1
+        .defaultLanguageId = languageId.value ?: -1
     }
   }
 

@@ -741,7 +741,8 @@ class AddOrEditPostFragment :
       }
 
       languageTitle.visibility = View.GONE
-      languagePickerText.visibility = View.GONE
+      languagePicker.visibility = View.GONE
+      saveLanguageAsDefault.visibility = View.GONE
       viewModel.languageOptions.observe(viewLifecycleOwner) { languageOptions ->
         if (languageOptions.isNullOrEmpty()) {
           return@observe
@@ -767,14 +768,15 @@ class AddOrEditPostFragment :
         languagePickerText.setOnClickListener { showLanguagePicker() }
         languagePicker.setOnClickListener { showLanguagePicker() }
         languagePicker.setEndIconOnClickListener { showLanguagePicker() }
-      }
-      if (viewModel.currentAccount != null) {
-        saveLanguageAsDefault.isVisible = true
-        saveLanguageAsDefault.setOnClickListener {
-          viewModel.saveCurrentLanguageAsDefault()
+
+        if (viewModel.currentAccount != null) {
+          saveLanguageAsDefault.isVisible = true
+        } else {
+          saveLanguageAsDefault.isVisible = false
         }
-      } else {
-        saveLanguageAsDefault.isVisible = false
+      }
+      saveLanguageAsDefault.setOnClickListener {
+        viewModel.saveCurrentLanguageAsDefault()
       }
       viewModel.languageId.observe(viewLifecycleOwner) {
         val options = viewModel.languageOptions.value ?: return@observe

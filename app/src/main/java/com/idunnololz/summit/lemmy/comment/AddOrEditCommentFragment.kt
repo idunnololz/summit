@@ -656,14 +656,11 @@ class AddOrEditCommentFragment :
           )
         }
         languagePicker.setOnClickListener { showLanguagePicker() }
-        languagePickerText.setOnClickListener { showLanguagePicker() }
         languagePicker.setEndIconOnClickListener { showLanguagePicker() }
+        languagePickerText.setOnClickListener { showLanguagePicker() }
 
-        if (viewModel.currentAccount.value != null) {
-          setLanguageAsDefault.isVisible = true
-          setLanguageAsDefault.text = getString(R.string.set_as_default_language)
-        } else {
-          setLanguageAsDefault.isVisible = false
+        saveLanguageAsDefault.setOnClickListener {
+          viewModel.saveCurrentLanguageAsDefault()
         }
 
       } ?: run {
@@ -674,13 +671,6 @@ class AddOrEditCommentFragment :
     val dialog = MaterialAlertDialogBuilder(context)
       .setTitle(R.string.configure_comment)
       .setView(binding.root)
-      .setPositiveButton(android.R.string.ok) { dialog, which ->
-        val selectedLanguageId = binding.languagePickerText.tag as? Int
-        if (binding.setLanguageAsDefault.isChecked) {
-          viewModel.setDefaultLanguage(selectedLanguageId)
-        }
-        viewModel.languageId.value = selectedLanguageId
-      }
       .show()
     configureCommentBinding = binding
     dialog.setOnDismissListener {
@@ -698,6 +688,7 @@ class AddOrEditCommentFragment :
     binding.languagePickerText.setText(
       language?.name?.toBidiSafe() ?: getString(R.string.unspecified),
     )
+    viewModel.languageId.value = languageId
   }
 
   private fun showFullContext(force: Boolean = false) {
