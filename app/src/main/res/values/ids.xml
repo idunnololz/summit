@@ -325,4 +325,5 @@
     <item name="local_community_stats" type="id" />
     <item name="unwrap_image_proxy_url" type="id" />
     <item name="transfer_community" type="id" />
+    <item name="transfer_community_error_user_not_a_mod" type="id" />
 </resources>

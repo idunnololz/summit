@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -51,7 +52,6 @@ import com.idunnololz.summit.util.BottomMenu.ModifierIds
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -143,12 +143,13 @@ class ModActionsDialogFragment :
     }
   }
 
-  private val confirmTransferOwnershipDialogLauncher = newAlertDialogLauncher("transform_ownership") {
-    val communityId = viewModel.currentModState.valueOrNull?.communityId ?: args.communityId
-    if (it.isOk) {
-      actionsViewModel.transferOwnership(communityId = communityId, personId = args.personId)
+  private val confirmTransferOwnershipDialogLauncher =
+    newAlertDialogLauncher("transform_ownership") {
+      val communityId = viewModel.currentModState.valueOrNull?.communityId ?: args.communityId
+      if (it.isOk) {
+        actionsViewModel.transferOwnership(communityId = communityId, personId = args.personId)
+      }
     }
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -237,6 +238,11 @@ class ModActionsDialogFragment :
             R.id.unmod -> {
               actionsViewModel.mod(communityId, args.personId, false)
             }
+            R.id.transfer_community_error_user_not_a_mod -> {
+              launchAlertDialog("transfer_community_error_user_not_a_mod") {
+                messageResId = R.string.error_transfer_community_user_not_a_mod
+              }
+            }
             R.id.transfer_community -> {
               val colorPrimary =
                 context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
@@ -265,7 +271,7 @@ class ModActionsDialogFragment :
                       e,
                       Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
-                  }
+                  },
                 )
                 positionButtonResId = R.string.transfer_community_ownership
                 negativeButtonResId = R.string.cancel
@@ -541,7 +547,7 @@ class ModActionsDialogFragment :
           } else {
             null
           }
-        }
+        },
       )
       actionsViewModel.distinguishCommentResult.handleStateChange(
         { getString(R.string.error_unable_to_update_comment) },
@@ -672,9 +678,13 @@ class ModActionsDialogFragment :
                 icon = R.drawable.outline_add_moderator_24,
               )
             }
-            if (modState.isCurrentPersonHeadMod == true && modState.isMod == true) {
+            if (modState.isCurrentPersonHeadMod == true) {
               adapter?.addItemWithIcon(
-                id = R.id.transfer_community,
+                id = if (modState.isMod == true) {
+                  R.id.transfer_community
+                } else {
+                  R.id.transfer_community_error_user_not_a_mod
+                },
                 title = R.string.transfer_community_ownership,
                 icon = R.drawable.baseline_swap_horiz_24,
                 modifier = ModifierIds.DANGER,
