@@ -151,17 +151,14 @@ fun SpannableStringBuilder.appendNameWithInstance(
   )
 }
 
-fun SpannableStringBuilder.appendPronounsIfAvailable(
-  context: Context,
-  pronouns: String?
-) {
+fun SpannableStringBuilder.appendPronounsIfAvailable(context: Context, pronouns: String?) {
   pronouns ?: return
 
   if (pronouns.isBlank()) return
 
   val start = length
 
-  append(" [${pronouns}]")
+  append(" [$pronouns]")
 
   val end = length
 

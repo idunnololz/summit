@@ -116,7 +116,6 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_SHOW_UP_AND_DOW
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFERRED_LOCALE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_COMMUNITY_DISPLAY_NAME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_USER_DISPLAY_NAME
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PRONOUNS_IF_AVAILABLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SESSIONS
@@ -126,8 +125,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_DRAFTS_AUTOMATI
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_RECENT_COMMUNITIES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHAKE_TO_SEND_FEEDBACK
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_BOT_LABEL
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_EDITED_DATE
@@ -142,6 +141,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PER_USER_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PROFILE_ICONS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PRONOUNS_IF_AVAILABLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_STRING_FOR_NULL_SCORE

@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.people
 
 import com.idunnololz.summit.settings.BaseSettingsFragment
-import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.PeopleSettings
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
@@ -45,6 +44,5 @@ class SettingsPeopleFragment :
   }
 
   override fun updateValue(key: Int, value: Any?) {
-
   }
 }

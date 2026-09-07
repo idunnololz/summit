@@ -352,7 +352,7 @@ class LemmyApiV3Adapter(
 
   override suspend fun transferCommunity(
     authorization: String?,
-    args: TransferCommunity
+    args: TransferCommunity,
   ): Result<CommunityResponse> =
     retrofitErrorHandler { api.transferCommunity(generateHeaders(authorization, false), args) }
 

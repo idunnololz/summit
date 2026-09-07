@@ -25,7 +25,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.UrlUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss

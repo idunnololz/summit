@@ -633,7 +633,7 @@ class LemmyApiV4Adapter(
       com.idunnololz.summit.api.dto.lemmy.v4.models.TransferCommunity(
         args.person_id,
         args.community_id,
-      )
+      ),
     )
   }.map {
     CommunityResponse(

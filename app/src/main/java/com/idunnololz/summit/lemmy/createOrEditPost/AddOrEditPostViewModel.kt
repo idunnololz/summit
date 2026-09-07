@@ -73,7 +73,7 @@ class AddOrEditPostViewModel @Inject constructor(
       preferenceManager.getOnlyPreferencesForAccount(it)
         .defaultLanguageId
         .takeIf { it != -1 }
-    }
+    },
   )
 
   val currentAccount: Account?

@@ -305,7 +305,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
           postView.creator.pronouns
         } else {
           null
-        }
+        },
       )
 
       if (postView.creator_is_admin == true) {
@@ -614,7 +614,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         commentView.creator.pronouns
       } else {
         null
-      }
+      },
     )
 
     if (commentView.creator_is_admin == true) {
@@ -898,9 +898,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
   }
 
-  private fun SpannableStringBuilder.appendBotAccountTagIfNeeded(
-    person: Person
-  ) {
+  private fun SpannableStringBuilder.appendBotAccountTagIfNeeded(person: Person) {
     if (!preferences.showBotLabel) {
       return
     }

@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -69,7 +68,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
   @Assisted var getPostResponse: GetPostResponse?,
   @Assisted private val currentAccountView: MutableLiveData<AccountView?>,
   @Assisted private val callback: Callback,
-  @Assisted("selectedCommentId") var selectedCommentId: Int? = null
+  @Assisted("selectedCommentId") var selectedCommentId: Int? = null,
 ) {
 
   @AssistedFactory
@@ -105,8 +104,8 @@ class PostAndCommentsLoader @AssistedInject constructor(
     val cause: Throwable
 
     class LoadCommentsError(
-      override val cause: Throwable
-    ): ActionError
+      override val cause: Throwable,
+    ) : ActionError
   }
 
   val postModel = MutableStateFlow<StatefulData<PostModel>>(StatefulData.NotStarted())
@@ -127,7 +126,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
   private val postViewFlow = MutableStateFlow<Result<PostView>?>(
     initialPostView?.let {
       Result.success(initialPostView)
-    }
+    },
   )
   private var newlyPostedCommentId: CommentId? = null
   private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
@@ -161,9 +160,7 @@ class PostAndCommentsLoader @AssistedInject constructor(
     coroutineScope.cancel()
   }
 
-  fun updatePendingComments(
-    resolveCompletedPendingComments: Boolean,
-  ) {
+  fun updatePendingComments(resolveCompletedPendingComments: Boolean) {
     val sortOrder = commentsSortOrder.toApiSortOrder()
 
     coroutineScope.launch {

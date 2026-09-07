@@ -34,6 +34,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -42,7 +43,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -57,7 +57,7 @@ class PostViewModel @Inject constructor(
   private val unauthedApiClient: LemmyApiClient,
   val queryMatchHelper: QueryMatchHelper,
   private val tracker: LocalTracker,
-  private val postAndCommentsLoaderFactory: PostAndCommentsLoader.Factory
+  private val postAndCommentsLoaderFactory: PostAndCommentsLoader.Factory,
 ) : ViewModel() {
 
   companion object {
@@ -302,7 +302,7 @@ class PostViewModel @Inject constructor(
             errorFlow.emit(error)
           }
         }
-      }
+      },
     )
   }
 

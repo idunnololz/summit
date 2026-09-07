@@ -54,7 +54,7 @@ class LanguagePickerBottomSheetFragment :
         .apply {
           arguments = LanguagePickerBottomSheetFragmentArgs(
             languages = languages.toTypedArray(),
-            selectedLanguageId = selectedLanguageId ?: NO_LANGUAGE_ID
+            selectedLanguageId = selectedLanguageId ?: NO_LANGUAGE_ID,
           ).toBundle()
         }
         .show(fragmentManager, "LanguagePickerBottomSheetFragment")
@@ -148,7 +148,9 @@ class LanguagePickerBottomSheetFragment :
     private sealed interface Item {
       data object FirstItem : Item
 
-      data class Header(val title: String) : Item
+      data class Header(
+        val title: String,
+      ) : Item
 
       data object NoResults : Item
 
@@ -184,7 +186,7 @@ class LanguagePickerBottomSheetFragment :
     ).apply {
       addItemType(
         Item.FirstItem::class,
-        ItemGenericHeaderBinding::inflate
+        ItemGenericHeaderBinding::inflate,
       ) { _, _, _ -> }
       addItemType(
         Item.Header::class,
@@ -208,7 +210,7 @@ class LanguagePickerBottomSheetFragment :
       }
       addItemType(
         Item.DividerItem::class,
-        ItemLanguagePickerDividerItemBinding::inflate
+        ItemLanguagePickerDividerItemBinding::inflate,
       ) { _, _, _ -> }
     }
 
@@ -289,10 +291,9 @@ class LanguagePickerBottomSheetFragment :
       adapterHelper.setItems(items, this, cb)
     }
 
-    private fun Language.matches(query: String): Boolean =
-      query.isEmpty() ||
-        name.contains(query, ignoreCase = true) ||
-        code.contains(query, ignoreCase = true)
+    private fun Language.matches(query: String): Boolean = query.isEmpty() ||
+      name.contains(query, ignoreCase = true) ||
+      code.contains(query, ignoreCase = true)
 
     override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 

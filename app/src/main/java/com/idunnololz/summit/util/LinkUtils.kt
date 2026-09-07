@@ -27,8 +27,7 @@ object LinkUtils {
     }
   }
 
-  fun isImageProxyUrl(url: String): Boolean =
-    unwrapImageProxyUrl(url = url, maxLayers = 1) != null
+  fun isImageProxyUrl(url: String): Boolean = unwrapImageProxyUrl(url = url, maxLayers = 1) != null
 
   /**
    * @return null if the url is not an image proxy url. Returns the unwrapped url if the image is an

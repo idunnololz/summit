@@ -61,7 +61,6 @@ import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.GlobalSettings
-import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
@@ -662,7 +661,6 @@ class AddOrEditCommentFragment :
         saveLanguageAsDefault.setOnClickListener {
           viewModel.saveCurrentLanguageAsDefault()
         }
-
       } ?: run {
         languagePickerText.visibility = View.GONE
       }

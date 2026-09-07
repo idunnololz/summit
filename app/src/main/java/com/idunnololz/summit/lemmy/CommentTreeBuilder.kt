@@ -11,7 +11,6 @@ import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostListItem
 import com.idunnololz.summit.lemmy.post.PostListItem.CommentListView
 import com.idunnololz.summit.models.PostView
-import com.idunnololz.summit.preferences.Preferences
 import java.util.LinkedHashMap
 import java.util.LinkedList
 
@@ -236,7 +235,7 @@ class CommentTreeBuilder(
         post = post,
         topNodes = topNodes,
         fullyLoadedCommentIds = fullyLoadedCommentIds,
-        commentsBeingFetched = commentsBeingFetched
+        commentsBeingFetched = commentsBeingFetched,
       )
     }
 
@@ -374,7 +373,7 @@ class CommentTreeBuilder(
                 parentCommentId = commentView.commentView.comment.id,
                 depth = node.depth + 1,
                 moreCount = expectedCount - childrenCount,
-                isBeingFetched = commentsBeingFetched.contains(commentView.commentView.comment.id)
+                isBeingFetched = commentsBeingFetched.contains(commentView.commentView.comment.id),
               ),
               node.depth + 1,
             ),

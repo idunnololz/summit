@@ -50,7 +50,7 @@ class AddOrEditCommentViewModel @Inject constructor(
   private val contentFiltersManager: ContentFiltersManager,
   val draftsManager: DraftsManager,
   private val preferences: Preferences,
-  private val preferenceManager: PreferenceManager
+  private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
 
   companion object {
@@ -86,7 +86,7 @@ class AddOrEditCommentViewModel @Inject constructor(
       preferenceManager.getOnlyPreferencesForAccount(it)
         .defaultLanguageId
         .takeIf { it != -1 }
-    }
+    },
   )
 
   val messages = MutableLiveData<List<Message>>(listOf())

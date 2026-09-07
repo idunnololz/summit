@@ -870,7 +870,7 @@ class PostFragment :
               Snackbar.make(
                 fabSnackbarCoordinatorLayout,
                 R.string.error_loading_comments,
-                Snackbar.LENGTH_SHORT
+                Snackbar.LENGTH_SHORT,
               ).setAction(R.string.error_details) {
                 ErrorDialogFragment.show(
                   getString(R.string.error_loading_comments),
