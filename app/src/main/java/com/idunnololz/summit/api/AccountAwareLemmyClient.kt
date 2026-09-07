@@ -410,6 +410,22 @@ class AccountAwareLemmyClient @Inject constructor(
     createAccountErrorResult()
   }
 
+  suspend fun transferOwnership(
+    communityId: Int,
+    personId: Long,
+    account: Account? = accountForInstance(),
+  ): Result<CommunityResponse> = if (account != null) {
+    apiClient
+      .transferOwnership(
+        communityId = communityId,
+        personId = personId,
+        account = account,
+      )
+      .autoSignOut(account)
+  } else {
+    createAccountErrorResult()
+  }
+
   suspend fun distinguishComment(
     commentId: CommentId,
     distinguish: Boolean,

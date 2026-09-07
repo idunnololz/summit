@@ -117,6 +117,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
 import com.idunnololz.summit.api.local.toModEvents
@@ -348,6 +349,12 @@ class LemmyApiV3Adapter(
     args: EditCommunity,
   ): Result<CommunityResponse> =
     retrofitErrorHandler { api.updateCommunity(generateHeaders(authorization, false), args) }
+
+  override suspend fun transferCommunity(
+    authorization: String?,
+    args: TransferCommunity
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.transferCommunity(generateHeaders(authorization, false), args) }
 
   override suspend fun deleteCommunity(
     authorization: String?,

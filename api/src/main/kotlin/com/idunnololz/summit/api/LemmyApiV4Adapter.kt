@@ -144,6 +144,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.dto.lemmy.v4.models.DeleteImageParamsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetCommentsI
 import com.idunnololz.summit.api.dto.lemmy.v4.models.GetModlogI
@@ -615,6 +616,24 @@ class LemmyApiV4Adapter(
         null,
         args.title,
       ),
+    )
+  }.map {
+    CommunityResponse(
+      it.communityView.toCommunityView(),
+      it.discussionLanguages.map { it },
+    )
+  }
+
+  override suspend fun transferCommunity(
+    authorization: String?,
+    args: TransferCommunity,
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.transferCommunity(
+      generateHeaders(authorization, false),
+      com.idunnololz.summit.api.dto.lemmy.v4.models.TransferCommunity(
+        args.person_id,
+        args.community_id,
+      )
     )
   }.map {
     CommunityResponse(

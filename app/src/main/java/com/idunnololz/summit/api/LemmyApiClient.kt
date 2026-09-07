@@ -117,6 +117,7 @@ import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
@@ -643,6 +644,21 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().modUser(authorization = account.bearer, form)
+    }
+  }
+
+  suspend fun transferOwnership(
+    communityId: Int,
+    personId: Long,
+    account: Account,
+  ): Result<CommunityResponse> {
+    val form = TransferCommunity(
+      communityId,
+      personId,
+    )
+
+    return onApiClient {
+      getApi().transferCommunity(authorization = account.bearer, form)
     }
   }
 

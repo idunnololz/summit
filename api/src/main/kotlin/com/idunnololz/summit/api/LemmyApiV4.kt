@@ -77,6 +77,7 @@ import com.idunnololz.summit.api.dto.lemmy.v4.models.SavePost
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.v4.models.TransferCommunity
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UnreadCountsResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UploadImageResponse
 import com.idunnololz.summit.api.dto.lemmy.v4.models.UserBlockInstanceCommunitiesParams
@@ -250,6 +251,12 @@ interface LemmyApiV4 {
   fun updateCommunity(
     @HeaderMap headers: Map<String, String>,
     @Body editCommunity: EditCommunity,
+  ): Call<CommunityResponse>
+
+  @POST("community/transfer")
+  fun transferCommunity(
+    @HeaderMap headers: Map<String, String>,
+    @Body transferCommunity: TransferCommunity,
   ): Call<CommunityResponse>
 
   /**

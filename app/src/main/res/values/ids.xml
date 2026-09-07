@@ -324,4 +324,5 @@
     <item name="image_info" type="id" />
     <item name="local_community_stats" type="id" />
     <item name="unwrap_image_proxy_url" type="id" />
+    <item name="transfer_community" type="id" />
 </resources>

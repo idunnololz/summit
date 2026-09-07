@@ -1,9 +1,13 @@
 package com.idunnololz.summit.lemmy.mod
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -43,9 +47,12 @@ import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.BottomMenu.ModifierIds
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.fixBottomSheetFling
@@ -136,6 +143,13 @@ class ModActionsDialogFragment :
     }
   }
 
+  private val confirmTransferOwnershipDialogLauncher = newAlertDialogLauncher("transform_ownership") {
+    val communityId = viewModel.currentModState.valueOrNull?.communityId ?: args.communityId
+    if (it.isOk) {
+      actionsViewModel.transferOwnership(communityId = communityId, personId = args.personId)
+    }
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -222,6 +236,40 @@ class ModActionsDialogFragment :
             }
             R.id.unmod -> {
               actionsViewModel.mod(communityId, args.personId, false)
+            }
+            R.id.transfer_community -> {
+              val colorPrimary =
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
+              confirmTransferOwnershipDialogLauncher.launchDialog {
+                title = getString(R.string.confirm_transfer_ownership)
+                message = TextUtils.expandTemplate(
+                  getString(R.string.confirm_transfer_ownership_desc),
+                  buildSpannedString {
+                    val s = length
+                    append(viewModel.community?.fullName ?: communityId.toString())
+                    val e = length
+                    setSpan(
+                      ForegroundColorSpan(colorPrimary),
+                      s,
+                      e,
+                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                  },
+                  buildSpannedString {
+                    val s = length
+                    append(viewModel.person?.fullName ?: args.personId.toString())
+                    val e = length
+                    setSpan(
+                      ForegroundColorSpan(colorPrimary),
+                      s,
+                      e,
+                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                  }
+                )
+                positionButtonResId = R.string.transfer_community_ownership
+                negativeButtonResId = R.string.cancel
+              }
             }
             R.id.ban -> {
               val accountId = viewModel.currentAccount?.id
@@ -480,6 +528,21 @@ class ModActionsDialogFragment :
           }
         },
       )
+      actionsViewModel.transferOwnershipResult.handleStateChange(
+        { getString(R.string.error_unable_to_transfer_ownership) },
+        {
+          if (args.postId != -1) {
+            UpdatedObject.PostObject(
+              args.postId,
+              accountId,
+            )
+          } else if (args.commentId != -1) {
+            UpdatedObject.CommentObject(args.commentId)
+          } else {
+            null
+          }
+        }
+      )
       actionsViewModel.distinguishCommentResult.handleStateChange(
         { getString(R.string.error_unable_to_update_comment) },
         { UpdatedObject.CommentObject(args.commentId) },
@@ -607,6 +670,14 @@ class ModActionsDialogFragment :
                 id = R.id.mod,
                 title = R.string.mod_user,
                 icon = R.drawable.outline_add_moderator_24,
+              )
+            }
+            if (modState.isCurrentPersonHeadMod == true && modState.isMod == true) {
+              adapter?.addItemWithIcon(
+                id = R.id.transfer_community,
+                title = R.string.transfer_community_ownership,
+                icon = R.drawable.baseline_swap_horiz_24,
+                modifier = ModifierIds.DANGER,
               )
             }
             adapter?.addDividerIfNeeded()

@@ -108,6 +108,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.local.GetModlogResponse
 import com.idunnololz.summit.api.local.PagedResponseRegistrationApplicationView
 import com.idunnololz.summit.api.local.UnreadCount
@@ -218,6 +219,11 @@ class ErrorApiAdapter(
   override suspend fun updateCommunity(
     authorization: String?,
     args: EditCommunity,
+  ): Result<CommunityResponse> = Result.failure(error)
+
+  override suspend fun transferCommunity(
+    authorization: String?,
+    args: TransferCommunity,
   ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun deleteCommunity(

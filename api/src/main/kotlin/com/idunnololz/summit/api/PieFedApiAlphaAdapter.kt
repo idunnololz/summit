@@ -159,6 +159,7 @@ import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.dto.piefed.GetComment
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
@@ -510,6 +511,11 @@ class PieFedApiAlphaAdapter(
       editCommunity = args,
     )
   }.map { it.toCommunityResponse() }
+
+  override suspend fun transferCommunity(
+    authorization: String?,
+    args: TransferCommunity,
+  ): Result<CommunityResponse> = Result.failure(NotYetImplemented())
 
   override suspend fun deleteCommunity(
     authorization: String?,

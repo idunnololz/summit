@@ -2450,6 +2450,10 @@
     <string name="set_as_default_language">Set as default language for current account</string>
     <string name="save_language_as_default">Save language as default</string>
     <string name="all_languages">All languages</string>
+    <string name="transfer_community_ownership">Transfer community ownership</string>
+    <string name="error_unable_to_transfer_ownership">Unable to transfer ownership of this community</string>
+    <string name="confirm_transfer_ownership">Transfer ownership of community?</string>
+    <string name="confirm_transfer_ownership_desc">You are about to transfer ownership of ^1 to ^2. This action cannot be reversed.</string>
 
 
     <plurals name="warn_delete_drafts_format">

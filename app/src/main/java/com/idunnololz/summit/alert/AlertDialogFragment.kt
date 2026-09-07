@@ -3,6 +3,7 @@ package com.idunnololz.summit.alert
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -95,10 +96,10 @@ class AlertDialogFragment : DialogFragment() {
     private val args = Bundle()
 
     var requestKey: String = ""
-    var title: String = ""
+    var title: CharSequence = ""
 
     @StringRes var titleResId: Int = 0
-    var message: String = ""
+    var message: CharSequence = ""
 
     @StringRes var messageResId: Int = 0
 
@@ -116,12 +117,12 @@ class AlertDialogFragment : DialogFragment() {
       args.apply {
         putString(EXTRA_REQUEST_KEY, requestKey)
         if (title.isNotBlank()) {
-          putString(EXTRA_TITLE, title)
+          putCharSequence(EXTRA_TITLE, title)
         } else if (titleResId != 0) {
           putInt(EXTRA_TITLE, titleResId)
         }
         if (message.isNotBlank()) {
-          putString(EXTRA_MESSAGE, message)
+          putCharSequence(EXTRA_MESSAGE, message)
         } else if (messageResId != 0) {
           putInt(EXTRA_MESSAGE, messageResId)
         }
@@ -171,10 +172,12 @@ class AlertDialogFragment : DialogFragment() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val activity = activity ?: throw RuntimeException("Activity is null")
 
-    val args = arguments
-    val title = args!!.getInt(EXTRA_TITLE)
+    val args = requireArguments()
+    val title = args.get(EXTRA_TITLE)
     val icon = args.getInt(EXTRA_ICON)
     val message = args.get(EXTRA_MESSAGE)
+
+    Log.d("TEST1", "title: $title")
 
     var positiveTextId = args.getInt(EXTRA_POSITIVE_TEXT, 0)
     val negativeTextId = args.getInt(EXTRA_NEGATIVE_TEXT, 0)
@@ -183,8 +186,12 @@ class AlertDialogFragment : DialogFragment() {
 
     val builder = MaterialAlertDialogBuilder(activity).setIcon(icon)
 
-    if (title != 0) {
+    if (title == null) {
+      // do nothing
+    } else if (title is Int) {
       builder.setTitle(title)
+    } else {
+      builder.setTitle(title as CharSequence)
     }
 
     if (!args.getBoolean(EXTRA_CANCELABLE, true)) {
@@ -193,6 +200,7 @@ class AlertDialogFragment : DialogFragment() {
     }
 
     if (message == null) {
+      // do nothing
     } else if (message is Int) {
       builder.setMessage(message)
     } else {

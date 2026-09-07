@@ -36,6 +36,7 @@ class AdminOrModActionsViewModel @Inject constructor(
 
   val banUserResult = StatefulLiveData<Unit>()
   val modUserResult = StatefulLiveData<Unit>()
+  val transferOwnershipResult = StatefulLiveData<Unit>()
   val distinguishCommentResult = StatefulLiveData<Unit>()
   val removeCommentResult = StatefulLiveData<Unit>()
 
@@ -153,6 +154,24 @@ class AdminOrModActionsViewModel @Inject constructor(
           communityId,
           personId,
           mod,
+        )
+      }
+        .onSuccess {
+          modUserResult.postValue(Unit)
+        }
+        .onFailure {
+          modUserResult.postError(it)
+        }
+    }
+  }
+
+  fun transferOwnership(communityId: Int, personId: Long) {
+    transferOwnershipResult.setIsLoading()
+    viewModelScope.launch {
+      ensureRightInstance {
+        apiClient.transferOwnership(
+          communityId,
+          personId,
         )
       }
         .onSuccess {

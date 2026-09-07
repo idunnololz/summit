@@ -92,6 +92,7 @@ import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -261,6 +262,12 @@ interface LemmyApiV3 {
   fun updateCommunity(
     @HeaderMap headers: Map<String, String>,
     @Body editCommunity: EditCommunity,
+  ): Call<CommunityResponse>
+
+  @POST("community/transfer")
+  fun transferCommunity(
+    @HeaderMap headers: Map<String, String>,
+    @Body transferCommunity: TransferCommunity,
   ): Call<CommunityResponse>
 
   /**
