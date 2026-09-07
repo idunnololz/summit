@@ -891,6 +891,7 @@ class AddOrEditCommentFragment :
       if (savedInstanceState == null) {
         commentEditor.setText(commentToEdit.comment.content)
         commentEditor.setSelection(binding.commentEditText.length())
+        viewModel.languageId.value = commentToEdit.comment.language_id
       }
     } else if (commentView != null) {
       binding.replyingTo.text = commentView.comment.content

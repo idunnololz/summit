@@ -898,6 +898,7 @@ class AddOrEditPostFragment :
           title.editText?.setText(post.name)
           postEditor.editText?.setText(post.body)
           nsfwSwitch.isChecked = post.nsfw
+          viewModel.languageId.value = post.language_id
 
           if (post.thumbnail_url != null) {
             showMore = true
