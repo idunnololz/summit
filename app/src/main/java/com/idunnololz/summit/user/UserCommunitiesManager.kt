@@ -31,8 +31,10 @@ class UserCommunitiesManager @Inject constructor(
   var isLoading: Boolean = true
     private set
 
-  private val idToUserCommunity = HashMap<Long, UserCommunityItem>()
-  private val userCommunityItems = arrayListOf<UserCommunityItem>()
+  @Volatile
+  private var idToUserCommunity = mapOf<Long, UserCommunityItem>()
+  @Volatile
+  private var userCommunityItems = listOf<UserCommunityItem>()
 
   private val coroutineScope = coroutineScopeFactory.create()
 
@@ -139,13 +141,15 @@ class UserCommunitiesManager @Inject constructor(
       newCommunityItem = newCommunityItem.copy(id = newId)
     }
 
-    idToUserCommunity[newCommunityItem.id] = newCommunityItem
+    idToUserCommunity += newCommunityItem.id to newCommunityItem
 
     val oldTabIndex = userCommunityItems.indexOfFirst { it.id == newCommunityItem.id }
     if (oldTabIndex == -1) {
-      userCommunityItems.add(newCommunityItem)
+      userCommunityItems += newCommunityItem
     } else {
-      userCommunityItems[oldTabIndex] = newCommunityItem
+      userCommunityItems = userCommunityItems.toMutableList().apply {
+        this[oldTabIndex] = newCommunityItem
+      }
     }
 
     newCommunityItem
@@ -157,8 +161,8 @@ class UserCommunitiesManager @Inject constructor(
         return@withContext
       }
 
-      idToUserCommunity.remove(community.id)
-      userCommunityItems.remove(community)
+      idToUserCommunity -= community.id
+      userCommunityItems -= community
 
       userCommunitiesDao.delete(community.id)
 
@@ -166,8 +170,8 @@ class UserCommunitiesManager @Inject constructor(
     }
 
   private fun resetTabsDataInternal() {
-    idToUserCommunity.clear()
-    userCommunityItems.clear()
+    idToUserCommunity = mapOf()
+    userCommunityItems = listOf()
   }
 
   private fun makeHomeTab(): UserCommunityItem = UserCommunityItem(

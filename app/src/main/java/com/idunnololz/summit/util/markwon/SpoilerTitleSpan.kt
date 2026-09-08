@@ -16,6 +16,7 @@ import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
 import org.commonmark.parser.Parser
+import kotlin.math.max
 
 abstract class DetailsClickableSpan : ClickableSpan()
 
@@ -136,12 +137,15 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         }
 
         if (detailsStartSpan.spoilerText == null) {
+          val spoilerContentStart = spanned.getSpanEnd(detailsStartSpan) + 1
           val spoilerContent =
             spanned.subSequence(
-              spanned.getSpanEnd(detailsStartSpan) + 1,
+              spoilerContentStart,
               // -5 because -4 for the spoiler end tag and then we remove the newline character
               // added by LemmyTextHelper. See LemmyPlugin.processAll()
-              spoilerEnd - 5,
+              //
+              // max() because this can error if the spoiler is blank.
+              max(spoilerEnd - 5, spoilerContentStart),
             ) as SpannableStringBuilder
 
           spoilerContent.setSpan(
@@ -210,9 +214,9 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         updateHighlightTextData(textView)
       }
     } catch (e: Exception) {
-      Log.d(TAG, "Spoiler error", e)
+      Log.d(TAG, "Spoiler error: ${e.message}", e)
       crashLogger?.recordException(
-        RuntimeException("Spoiler error", e),
+        RuntimeException("Spoiler error: ${e.message}", e),
       )
     }
   }

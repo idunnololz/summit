@@ -668,6 +668,10 @@ class CommunityFragment :
 
       communityAppBarController.setup(
         communitySelectedListener = { controller, communityRef ->
+          if (!isAdded || !isBindingAvailable()) {
+            return@setup
+          }
+
           val action =
             CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
               communityRef = communityRef,
@@ -2384,7 +2388,7 @@ class CommunityFragment :
       }
     }
     if (index >= 0) {
-      (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+      (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
         index,
         communityAppBarController?.appBarRoot?.height ?: 0,
       )

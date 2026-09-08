@@ -59,6 +59,7 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
@@ -773,7 +774,7 @@ class PostListViewBuilder @Inject constructor(
             listCommunity = true
             compact = false
           }
-          else -> {
+          else -> { // V2
             lemmyHeaderView.showTextView2 = false
             lemmyHeaderView.showTextView3 = false
 
@@ -832,18 +833,34 @@ class PostListViewBuilder @Inject constructor(
               Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
             }
           }
+
           val iconImageView = lemmyHeaderView.getIconImageView()
-          avatarHelper.loadCommunityIcon(iconImageView, postView.community)
-          iconImageView.setOnClickListener {
-            onPageClick(accountId, "", postView.community.toCommunityRef())
-          }
-          iconImageView.setOnLongClickListener {
-            onLinkLongClick(
-              accountId,
-              LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
-              null,
-            )
-            true
+          if (!listCommunity && listAuthor) {
+            avatarHelper.loadAvatar(iconImageView, postView.creator)
+            iconImageView.setOnClickListener {
+              onPageClick(accountId, "", postView.creator.toPersonRef())
+            }
+            iconImageView.setOnLongClickListener {
+              onLinkLongClick(
+                accountId,
+                LinkUtils.getLinkForPerson(postView.creator.toPersonRef()),
+                null,
+              )
+              true
+            }
+          } else {
+            avatarHelper.loadCommunityIcon(iconImageView, postView.community)
+            iconImageView.setOnClickListener {
+              onPageClick(accountId, "", postView.community.toCommunityRef())
+            }
+            iconImageView.setOnLongClickListener {
+              onLinkLongClick(
+                accountId,
+                LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+                null,
+              )
+              true
+            }
           }
         } else {
           lemmyHeaderView.ensureNoIconImageView()

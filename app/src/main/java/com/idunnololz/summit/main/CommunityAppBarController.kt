@@ -602,7 +602,9 @@ class CommunityAppBarController(
       is CommunityRef.MultiCommunity -> {
         vh.updateBanner(url = null, isLoading = false)
         vh.icon.forCoil()
-        vh.icon.load(currentCommunity.icon)
+        vh.icon.load(currentCommunity.icon) {
+          allowHardware(false)
+        }
 
         if (vh.subtitle != null) {
           currentCommunity.communities.joinToString {
