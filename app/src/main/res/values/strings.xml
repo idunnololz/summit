@@ -2455,6 +2455,7 @@
     <string name="confirm_transfer_ownership">Transfer ownership of community?</string>
     <string name="confirm_transfer_ownership_desc">You are about to transfer ownership of ^1 to ^2. This action cannot be reversed.</string>
     <string name="error_transfer_community_user_not_a_mod">Ownership can only be transferred to another moderator.</string>
+    <string name="drafts_and_templates"><![CDATA[Drafts & Templates]]></string>
 
 
     <plurals name="warn_delete_drafts_format">

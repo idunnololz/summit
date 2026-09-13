@@ -351,8 +351,8 @@
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_youFragment_to_draftsTabbedFragment"
-            app:destination="@id/draftsTabbedFragment"
+            android:id="@+id/action_youFragment_to_draftsAndTemplatesTabbedFragment"
+            app:destination="@id/draftsAndTemplatesTabbedFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
@@ -395,9 +395,9 @@
             app:argType="integer" />
     </fragment>
     <fragment
-        android:id="@+id/draftsTabbedFragment"
-        android:name="com.idunnololz.summit.drafts.DraftsTabbedFragment"
-        android:label="DraftsTabbedFragment" />
+        android:id="@+id/draftsAndTemplatesTabbedFragment"
+        android:name="com.idunnololz.summit.drafts.DraftsAndTemplatesTabbedFragment"
+        android:label="DraftsAndTemplatesTabbedFragment" />
     <fragment
         android:id="@+id/userTagsFragment"
         android:name="com.idunnololz.summit.lemmy.userTags.UserTagsFragment"

@@ -12,17 +12,19 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentDraftsTabbedBinding
 import com.idunnololz.summit.drafts.drafts.DraftsFragment
 import com.idunnololz.summit.drafts.drafts.DraftsFragmentArgs
+import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DraftsTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
+class DraftsAndTemplatesTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
 
   companion object {
     const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -63,14 +65,7 @@ class DraftsTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
         )
       }
 
-      toolbar.title = getString(R.string.drafts)
-      toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
-      toolbar.setNavigationOnClickListener {
-        findNavController().navigateUp()
-      }
-      toolbar.setNavigationIconTint(
-        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-      )
+      setupToolbar(toolbar, getString(R.string.drafts_and_templates))
       toolbar.inflateMenu(R.menu.menu_drafts2)
 
       toolbar.setOnMenuItemClickListener { item ->
@@ -84,14 +79,18 @@ class DraftsTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
         val adapter =
           ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
         adapter.addFrag(
-          DraftsFragment::class.java,
-          getString(R.string.posts),
-          DraftsFragmentArgs(DraftTypes.Post).toBundle(),
+          clazz = DraftsFragment::class.java,
+          title = getString(R.string.posts),
+          args = DraftsFragmentArgs(DraftTypes.Post).toBundle(),
         )
         adapter.addFrag(
-          DraftsFragment::class.java,
-          getString(R.string.comments),
-          DraftsFragmentArgs(DraftTypes.Comment).toBundle(),
+          clazz = DraftsFragment::class.java,
+          title = getString(R.string.comments),
+          args = DraftsFragmentArgs(DraftTypes.Comment).toBundle(),
+        )
+        adapter.addFrag(
+          clazz = PostAndCommentTemplatesFragment::class.java,
+          title = getString(R.string.templates),
         )
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
           override fun onPageSelected(position: Int) {

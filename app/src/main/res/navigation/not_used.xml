@@ -463,9 +463,9 @@ safeargs.
             app:argType="string" />
     </dialog>
     <dialog
-        android:id="@+id/addOrEditTemplateFragmentDialog"
-        android:name="com.idunnololz.summit.templates.AddOrEditTemplateFragmentDialog"
-        android:label="AddOrEditTemplateFragmentDialog" >
+        android:id="@+id/addOrEditRegistrationApplicationRejectionTemplateDialogFragment"
+        android:name="com.idunnololz.summit.templates.AddOrEditRegistrationApplicationRejectionTemplateDialogFragment"
+        android:label="AddOrEditRegistrationApplicationRejectionTemplateDialogFragment" >
         <argument
             android:name="template"
             app:argType="com.idunnololz.summit.templates.db.TemplateEntry"

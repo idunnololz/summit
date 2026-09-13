@@ -16,7 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentReasonBinding
-import com.idunnololz.summit.templates.AddOrEditTemplateFragmentDialog
+import com.idunnololz.summit.templates.AddOrEditRegistrationApplicationRejectionTemplateDialogFragment
 import com.idunnololz.summit.templates.TemplatesAdapter
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -133,13 +133,13 @@ class ReasonDialogFragment :
           }
         },
         onAddTemplateClick = {
-          AddOrEditTemplateFragmentDialog.show(
+          AddOrEditRegistrationApplicationRejectionTemplateDialogFragment.show(
             template = null,
             fragmentManager = parentFragmentManager,
           )
         },
         onEditTemplateClick = {
-          AddOrEditTemplateFragmentDialog.show(
+          AddOrEditRegistrationApplicationRejectionTemplateDialogFragment.show(
             template = it,
             fragmentManager = parentFragmentManager,
           )

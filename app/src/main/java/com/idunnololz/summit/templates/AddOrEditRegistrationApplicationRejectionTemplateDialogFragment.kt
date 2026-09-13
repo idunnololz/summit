@@ -24,22 +24,23 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AddOrEditTemplateFragmentDialog :
+class AddOrEditRegistrationApplicationRejectionTemplateDialogFragment :
   BaseDialogFragment<DialogFragmentAddOrEditTemplateBinding>(),
   FullscreenDialogFragment {
 
   companion object {
     fun show(template: TemplateEntry?, fragmentManager: FragmentManager) {
-      AddOrEditTemplateFragmentDialog()
+      AddOrEditRegistrationApplicationRejectionTemplateDialogFragment()
         .apply {
-          arguments = AddOrEditTemplateFragmentDialogArgs(template).toBundle()
+          arguments =
+            AddOrEditRegistrationApplicationRejectionTemplateDialogFragmentArgs(template).toBundle()
         }
-        .show(fragmentManager, "AddOrEditTemplateFragmentDialog")
+        .show(fragmentManager, "AddOrEditRegistrationApplicationRejectionTemplateDialogFragment")
     }
   }
 
-  private val args: AddOrEditTemplateFragmentDialogArgs by navArgs()
-  private val viewModel: AddOrEditTemplateViewModel by viewModels()
+  private val args: AddOrEditRegistrationApplicationRejectionTemplateDialogFragmentArgs by navArgs()
+  private val viewModel: AddOrEditRegistrationApplicationRejectionTemplateViewModel by viewModels()
 
   private var onViewCreated: Boolean = false
 

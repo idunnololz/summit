@@ -199,7 +199,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
           }
           R.id.drafts -> {
             val direction = YouFragmentDirections
-              .actionYouFragmentToDraftsTabbedFragment()
+              .actionYouFragmentToDraftsAndTemplatesTabbedFragment()
             findNavController().navigateSafe(direction)
           }
           R.id.uploads -> {
@@ -535,7 +535,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
           newItems += Item.MenuItem(
             R.id.drafts,
             R.drawable.ic_draft_24,
-            R.string.drafts,
+            R.string.drafts_and_templates,
           )
           if (model.supportsUploads) {
             newItems += Item.MenuItem(

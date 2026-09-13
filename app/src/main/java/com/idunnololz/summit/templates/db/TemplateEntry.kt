@@ -8,6 +8,11 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.idunnololz.summit.api.dto.lemmy.LanguageId
+import com.idunnololz.summit.drafts.DraftData
+import com.idunnololz.summit.drafts.OriginalCommentData
+import com.idunnololz.summit.drafts.OriginalPostData
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -61,12 +66,18 @@ class TemplateConverters(
 
 object TemplateTypes {
   const val RegistrationApplicationRejection = 1
+  const val Post = 2
+  const val Comment = 2
 }
 
 val TemplateData.type
   get() = when (this) {
     is TemplateData.RegistrationApplicationRejectionTemplateData ->
       TemplateTypes.RegistrationApplicationRejection
+    is TemplateData.CommentTemplateData ->
+      TemplateTypes.Comment
+    is TemplateData.PostTemplateData ->
+      TemplateTypes.Post
   }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -86,5 +97,36 @@ sealed interface TemplateData : Parcelable {
     override val accountId: Long,
     override val title: String,
     override val accountInstance: String,
+  ) : TemplateData
+
+
+  @Parcelize
+  @Serializable
+  @SerialName("2")
+  data class PostTemplateData(
+    val url: String?,
+    val isNsfw: Boolean,
+    override val title: String,
+    override val content: String,
+    override val accountId: Long,
+    override val accountInstance: String,
+    val targetCommunityFullName: String,
+    val thumbnailUrl: String? = null,
+    val altText: String? = null,
+    val languageId: LanguageId? = null,
+  ) : TemplateData
+
+  @Parcelize
+  @Serializable
+  @SerialName("3")
+  data class CommentTemplateData(
+    val originalComment: OriginalCommentData?,
+    val postRef: PostRef?,
+    val parentCommentId: Int?,
+    override val title: String,
+    override val content: String,
+    override val accountId: Long,
+    override val accountInstance: String,
+    val languageId: LanguageId? = null,
   ) : TemplateData
 }
