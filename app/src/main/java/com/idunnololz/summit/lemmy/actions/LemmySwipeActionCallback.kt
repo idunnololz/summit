@@ -107,7 +107,7 @@ class LemmySwipeActionCallback(
 
   override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int =
     if (viewHolder.isSwipeable()) {
-      if (startX < gestureInsetLeft || startX > gestureInsetRight) {
+      if (startX <= gestureInsetLeft || startX >= gestureInsetRight) {
         0
       } else {
         when (swipeDirection) {

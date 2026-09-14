@@ -41,12 +41,6 @@ class DraftsFragment :
   companion object {
     const val REQUEST_KEY = "DraftsDialogFragment_req_key"
     const val REQUEST_KEY_RESULT = "result"
-
-    fun show(fragmentManager: FragmentManager, draftType: Int) {
-      DraftsDialogFragment().apply {
-        arguments = DraftsDialogFragmentArgs(draftType).toBundle()
-      }.showAllowingStateLoss(fragmentManager, "DraftsDialogFragment")
-    }
   }
 
   private val args by navArgs<DraftsFragmentArgs>()

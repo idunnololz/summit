@@ -48,6 +48,7 @@ import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalPostData
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
+import com.idunnololz.summit.editTextToolbar.TextFieldToolbarHelper
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -168,8 +169,6 @@ class AddOrEditPostFragment :
 
   private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
-  private val floatingLocation = Point()
-
   private val launcher =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
       if (it.resultCode == Activity.RESULT_OK) {
@@ -199,6 +198,8 @@ class AddOrEditPostFragment :
   }
 
   private var isSent: Boolean = false
+
+  private var textFieldToolbarHelper: TextFieldToolbarHelper? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -395,22 +396,7 @@ class AddOrEditPostFragment :
       }
 
       mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.postEditText)
-      postEditText.addTextChangedListener {
-        root.postDelayed(
-          {
-            onScrollUpdated()
-          },
-          10,
-        )
-      }
       titleEditText.addTextChangedListener {
-        root.postDelayed(
-          {
-            onScrollUpdated()
-          },
-          10,
-        )
-
         if ((it?.length ?: 0) > 200) {
           title.isCounterEnabled = true
           title.updatePadding(bottom = Utils.convertDpToPixel(16f).toInt())
@@ -419,14 +405,24 @@ class AddOrEditPostFragment :
           title.updatePadding(bottom = 0)
         }
       }
-      urlEditText.addTextChangedListener {
-        root.postDelayed(
-          {
-            onScrollUpdated()
-          },
-          10,
-        )
-      }
+
+      textFieldToolbarHelper = TextFieldToolbarHelper(
+        root = root,
+        postBodyToolbar = postBodyToolbar,
+        postBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
+        postBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
+        bodyEditText = postEditText,
+        postTextDivider = postTextDivider,
+        scrollView = scrollView,
+        getInsetsProvider = { getMainActivity() },
+        editTextsThatUseToolbar = listOf(
+          postEditText,
+          titleEditText,
+          urlEditText,
+        ),
+        lifecycleOwner = viewLifecycleOwner,
+      )
+      textFieldToolbarHelper?.registerListeners()
 
       textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
         postBodyToolbar.removeAllViews()
@@ -648,40 +644,6 @@ class AddOrEditPostFragment :
         onLinkMetadataChanged()
       }
 
-      scrollView.setOnScrollChangeListener(
-        NestedScrollView.OnScrollChangeListener { _, _, _, _, _ ->
-          onScrollUpdated()
-        },
-      )
-
-      getMainActivity()?.insets?.observe(viewLifecycleOwner) { insets ->
-        val isImeOpen = (insets?.imeHeight ?: 0) > 0
-
-        root.post {
-          onImeChange(isImeOpen)
-        }
-      }
-      root.viewTreeObserver.addOnPreDrawListener(
-        object : OnPreDrawListener {
-          override fun onPreDraw(): Boolean {
-            root.viewTreeObserver.removeOnPreDrawListener(this)
-
-            postBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
-              height = postBodyToolbar.height
-            }
-            postBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
-              height = postBodyToolbar.height
-            }
-
-            root.post {
-              onScrollUpdated()
-            }
-
-            return false // discard frame
-          }
-        },
-      )
-
       communityEditText.setOnClickListener {
         viewModel.showSearch.value = true
       }
@@ -735,7 +697,7 @@ class AddOrEditPostFragment :
         } else {
           hideSearch()
         }
-        updateToolbar()
+        textFieldToolbarHelper?.show = !viewModel.showSearch.value
 
         showSearchBackPressedHandler.isEnabled = showSearch
       }
@@ -836,16 +798,11 @@ class AddOrEditPostFragment :
 
         transitionAnimation.addListener(object : Transition.TransitionListener {
           override fun onTransitionStart(transition: Transition) {
-            postBodyToolbar.animate()
-              .alpha(0f)
+            textFieldToolbarHelper?.onTransitionStart()
           }
 
           override fun onTransitionEnd(transition: Transition) {
-            root.post {
-              onScrollUpdated()
-              postBodyToolbar.animate()
-                .alpha(1f)
-            }
+            textFieldToolbarHelper?.onTransitionEnd()
           }
 
           override fun onTransitionCancel(transition: Transition) {
@@ -1025,97 +982,6 @@ class AddOrEditPostFragment :
     )
   }
 
-  private var isImeOpen: Boolean = false
-  private val outLocation = IntArray(2)
-
-  private fun onImeChange(isImeOpen: Boolean) {
-    this.isImeOpen = isImeOpen
-
-    updateToolbar()
-  }
-
-  private fun updateToolbar() {
-    if (viewModel.showSearch.value) {
-      hidePostToolbar()
-    } else if (isImeOpen) {
-      binding.postBodyToolbarPlaceholder.visibility = View.GONE
-      binding.postBodyToolbarPlaceholder2.visibility = View.VISIBLE
-      binding.postTextDivider.visibility = View.VISIBLE
-      binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
-        gravity = Gravity.BOTTOM
-      }
-      binding.postBodyToolbar.translationY = 0f
-
-      showPostToolbar()
-    } else {
-      binding.postBodyToolbarPlaceholder.visibility = View.VISIBLE
-      binding.postBodyToolbarPlaceholder2.visibility = View.GONE
-      binding.postTextDivider.visibility = View.GONE
-      binding.postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
-        gravity = Gravity.TOP or Gravity.LEFT
-      }
-
-      onPositionChanged()
-    }
-  }
-
-  private fun onPositionChanged() {
-    if (isImeOpen || !isBindingAvailable()) {
-      return
-    }
-
-    val scrollBounds = Rect()
-    binding.scrollView.getHitRect(scrollBounds)
-    val anyPartVisible = binding.postBodyToolbarPlaceholder.getLocalVisibleRect(scrollBounds)
-    val visiblePercent = scrollBounds.height().toFloat() / binding.postBodyToolbarPlaceholder.height
-
-    if (anyPartVisible && visiblePercent > 0.9f && !viewModel.showSearch.value) {
-      showPostToolbar()
-    } else {
-      hidePostToolbar()
-    }
-
-    binding.postBodyToolbar.translationY = floatingLocation.y.toFloat() -
-      (getMainActivity()?.insets?.value?.topInset ?: 0)
-  }
-
-  var hiding = false
-  var showing = true
-  private fun hidePostToolbar() {
-    if (hiding) {
-      return
-    }
-
-    hiding = true
-    showing = false
-
-    binding.postBodyToolbar.clearAnimation()
-    binding.postBodyToolbar.animate()
-      .alpha(0f)
-  }
-
-  private fun showPostToolbar() {
-    if (showing) {
-      return
-    }
-
-    hiding = false
-    showing = true
-
-    binding.postBodyToolbar.clearAnimation()
-    binding.postBodyToolbar.animate()
-      .alpha(1f)
-  }
-
-  private fun onScrollUpdated() {
-    binding.postEditText.getLocationOnScreen(outLocation)
-
-    floatingLocation.y = outLocation[1] +
-      binding.postEditText.height
-
-    onPositionChanged()
-  }
-
   private fun createPost() {
     val fieldsValid = validateFields()
 
@@ -1219,7 +1085,7 @@ class AddOrEditPostFragment :
         }
 
         binding.root.post {
-          onScrollUpdated()
+          textFieldToolbarHelper?.onScrollUpdated()
         }
       }
     }

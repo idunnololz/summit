@@ -110,7 +110,6 @@ sealed interface TemplateData : Parcelable {
     override val content: String,
     override val accountId: Long,
     override val accountInstance: String,
-    val targetCommunityFullName: String,
     val thumbnailUrl: String? = null,
     val altText: String? = null,
     val languageId: LanguageId? = null,

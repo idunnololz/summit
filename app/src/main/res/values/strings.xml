@@ -2456,6 +2456,10 @@
     <string name="confirm_transfer_ownership_desc">You are about to transfer ownership of ^1 to ^2. This action cannot be reversed.</string>
     <string name="error_transfer_community_user_not_a_mod">Ownership can only be transferred to another moderator.</string>
     <string name="drafts_and_templates"><![CDATA[Drafts & Templates]]></string>
+    <string name="create_post_template">Create post template</string>
+    <string name="create_comment_template">Create comment template</string>
+    <string name="new_template">New template</string>
+    <string name="template_name">Template name</string>
 
 
     <plurals name="warn_delete_drafts_format">

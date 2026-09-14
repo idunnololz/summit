@@ -507,4 +507,12 @@ safeargs.
             app:argType="integer"
             android:defaultValue="-1" />
     </dialog>
+    <dialog
+        android:id="@+id/addOrEditPostTemplateFragment"
+        android:name="com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment"
+        android:label="AddOrEditPostTemplateFragment" >
+        <argument
+            android:name="instance"
+            app:argType="string" />
+    </dialog>
 </navigation>

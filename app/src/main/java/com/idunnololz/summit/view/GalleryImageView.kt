@@ -299,10 +299,10 @@ class GalleryImageView : ShapeableImageView {
   @SuppressLint("ClickableViewAccessibility")
   override fun onTouchEvent(event: MotionEvent): Boolean {
     if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-      if (event.x < gestureRegion.left ||
-        event.x > (width - gestureRegion.right) ||
-        event.y < gestureRegion.top ||
-        event.y > (height - gestureRegion.bottom)
+      if (event.x <= gestureRegion.left ||
+        event.x >= (width - gestureRegion.right) ||
+        event.y <= gestureRegion.top ||
+        event.y >= (height - gestureRegion.bottom)
       ) {
         return false
       }

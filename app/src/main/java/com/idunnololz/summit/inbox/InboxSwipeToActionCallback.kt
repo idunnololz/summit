@@ -77,7 +77,7 @@ class InboxSwipeToActionCallback(
 
   override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int =
     if (viewHolder.isSwipeEnabled()) {
-      if (startX < gestureInsetLeft || startX > gestureInsetRight) {
+      if (startX <= gestureInsetLeft || startX >= gestureInsetRight) {
         0
       } else {
         makeMovementFlags(0, ItemTouchHelper.LEFT)

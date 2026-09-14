@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/dialog_padding"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Button
+        android:id="@+id/create_post_template"
+        style="@style/Widget.Material3Expressive.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_post_template"
+        app:icon="@drawable/ic_post_24"
+        app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.Small.Square"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/create_comment_template"
+        style="@style/Widget.Material3Expressive.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_comment_template"
+        android:layout_marginTop="@dimen/padding"
+        app:icon="@drawable/outline_comment_24"
+        app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.Small.Square"
+        app:layout_constraintTop_toBottomOf="@+id/create_post_template"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

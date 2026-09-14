@@ -233,7 +233,7 @@ open class OverlappingPanelsLayout : FrameLayout {
     }
 
     if (systemGestureRegion.left != 0 || systemGestureRegion.right != 0) {
-      if (event.x < systemGestureRegion.left || event.x > (width - systemGestureRegion.right)) {
+      if (event.x <= systemGestureRegion.left || event.x >= (width - systemGestureRegion.right)) {
         return false
       }
     }
