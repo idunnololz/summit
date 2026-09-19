@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -223,7 +224,7 @@ class AddOrEditPostTemplateFragment  :
 
       textFieldToolbarHelper = TextFieldToolbarHelper(
         root = root,
-        postBodyToolbar = postBodyToolbar,
+        postBodyToolbar = postBodyToolbarContainer,
         postBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
         postBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
         bodyEditText = bodyEditText,
@@ -235,6 +236,19 @@ class AddOrEditPostTemplateFragment  :
           titleEditText,
         ),
         lifecycleOwner = viewLifecycleOwner,
+        onPositionChange = { isSticky ->
+          if (isSticky) {
+            postBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              marginStart = 0
+              marginEnd = 0
+            }
+          } else {
+            postBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              marginStart = context.resources.getDimensionPixelOffset(R.dimen.padding)
+              marginEnd = context.resources.getDimensionPixelOffset(R.dimen.padding)
+            }
+          }
+        },
       )
       textFieldToolbarHelper?.registerListeners()
     }

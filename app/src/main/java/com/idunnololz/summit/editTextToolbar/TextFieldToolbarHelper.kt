@@ -29,6 +29,7 @@ class TextFieldToolbarHelper(
   val getInsetsProvider: () -> InsetsProvider?,
   val editTextsThatUseToolbar: List<TextView>,
   val lifecycleOwner: LifecycleOwner,
+  val onPositionChange: (isSticky: Boolean) -> Unit = {},
 ) {
 
   private var isImeOpen: Boolean = false
@@ -43,6 +44,10 @@ class TextFieldToolbarHelper(
 
       updateToolbar()
     }
+
+  init {
+    onImeChange(isImeOpen = isImeOpen, force = true)
+  }
 
   fun registerListeners() {
     root.viewTreeObserver.addOnPreDrawListener(
@@ -111,10 +116,15 @@ class TextFieldToolbarHelper(
     }
   }
 
-  private fun onImeChange(isImeOpen: Boolean) {
+  private fun onImeChange(isImeOpen: Boolean, force: Boolean = false) {
+    if (this.isImeOpen == isImeOpen && !force) {
+      return
+    }
+
     this.isImeOpen = isImeOpen
 
     updateToolbar()
+    onPositionChange(isImeOpen)
   }
 
   private fun updateToolbar() {
@@ -144,6 +154,10 @@ class TextFieldToolbarHelper(
 
   private fun onPositionChanged() {
     if (isImeOpen) {
+      return
+    }
+
+    if (!postBodyToolbar.isLaidOut) {
       return
     }
 

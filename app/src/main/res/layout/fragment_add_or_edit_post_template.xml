@@ -156,13 +156,19 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <HorizontalScrollView
-            android:id="@+id/post_body_toolbar"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/post_body_toolbar_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorSurface"
             android:layout_gravity="top|left">
-        </HorizontalScrollView>
+
+            <HorizontalScrollView
+                android:id="@+id/post_body_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </HorizontalScrollView>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <com.idunnololz.summit.view.LoadingView
             android:id="@+id/loading_view"
