@@ -86,6 +86,7 @@ val TemplateData.type
 sealed interface TemplateData : Parcelable {
   val accountId: Long
   val accountInstance: String
+  val name: String? // Added in v1.87.0
   val title: String
   val content: String
 
@@ -93,6 +94,7 @@ sealed interface TemplateData : Parcelable {
   @Serializable
   @SerialName("1")
   data class RegistrationApplicationRejectionTemplateData(
+    override val name: String?,
     override val content: String,
     override val accountId: Long,
     override val title: String,
@@ -106,6 +108,7 @@ sealed interface TemplateData : Parcelable {
   data class PostTemplateData(
     val url: String?,
     val isNsfw: Boolean,
+    override val name: String?,
     override val title: String,
     override val content: String,
     override val accountId: Long,
@@ -122,6 +125,7 @@ sealed interface TemplateData : Parcelable {
     val originalComment: OriginalCommentData?,
     val postRef: PostRef?,
     val parentCommentId: Int?,
+    override val name: String?,
     override val title: String,
     override val content: String,
     override val accountId: Long,

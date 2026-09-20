@@ -96,6 +96,7 @@ class AddOrEditRegistrationApplicationRejectionTemplateDialogFragment :
                 accountId = account.id,
                 title = titleEditText.text.toString(),
                 accountInstance = account.instance,
+                name = null,
               )
 
               if (template != null) {

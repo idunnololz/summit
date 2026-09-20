@@ -2460,6 +2460,7 @@
     <string name="create_comment_template">Create comment template</string>
     <string name="new_template">New template</string>
     <string name="template_name">Template name</string>
+    <string name="save_template">Save template</string>
 
 
     <plurals name="warn_delete_drafts_format">

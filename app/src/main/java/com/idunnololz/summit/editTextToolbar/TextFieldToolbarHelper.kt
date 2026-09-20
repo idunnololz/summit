@@ -29,6 +29,7 @@ class TextFieldToolbarHelper(
   val getInsetsProvider: () -> InsetsProvider?,
   val editTextsThatUseToolbar: List<TextView>,
   val lifecycleOwner: LifecycleOwner,
+  val toolbarTopMargin: Int = 0,
   val onPositionChange: (isSticky: Boolean) -> Unit = {},
 ) {
 
@@ -207,7 +208,7 @@ class TextFieldToolbarHelper(
   fun onScrollUpdated() {
     bodyEditText.getLocationOnScreen(outLocation)
 
-    floatingLocation.y = outLocation[1] + bodyEditText.height
+    floatingLocation.y = outLocation[1] + bodyEditText.height + toolbarTopMargin
 
     onPositionChanged()
   }

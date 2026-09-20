@@ -6,10 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
+import androidx.transition.ChangeBounds
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentAddOrEditPostTemplateBinding
@@ -30,10 +38,13 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getSelectedText
+import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.getValue
 
@@ -52,6 +63,7 @@ class AddOrEditPostTemplateFragment  :
 
   private val args by navArgs<AddOrEditPostTemplateFragmentArgs>()
 
+  private val viewModel: AddOrEditPostTemplateViewModel by viewModels()
   private val uploadImageViewModel: UploadImageViewModel by viewModels()
 
   @Inject
@@ -95,6 +107,34 @@ class AddOrEditPostTemplateFragment  :
         setupToolbar(
           toolbar,
           getString(R.string.new_template)
+        )
+      }
+
+      // ButtonGroup takes a snapshot of its children on init and then uses that for all layout
+      // calculations. That means if we want to hide a button by default we need to let ButtonGroup
+      // measure out everything first and then hide the button. Otherwise, ButtonGroup will not
+      // be able to show the button later if needed.
+      //
+      // Thus we hide the button on predraw (after layout) and then register the template ID
+      // listener after that otherwise the template id listener will hide the button.
+      if (viewModel.templateId.value == null) {
+        deleteTemplateButton.runPredrawDiscardingFrame {
+          deleteTemplateButton.isVisible = false
+
+          deleteTemplateButton.runPredrawDiscardingFrame {
+            registerTemplateIdListener()
+          }
+        }
+      } else {
+        registerTemplateIdListener()
+      }
+
+      saveTemplateButton.setOnClickListener {
+        viewModel.save(
+          name = templateNameEditText.text.toString(),
+          title = titleEditText.text.toString(),
+          body = bodyEditText.text.toString(),
+          isNsfw = nsfwSwitch.isChecked,
         )
       }
 
@@ -221,6 +261,9 @@ class AddOrEditPostTemplateFragment  :
         )
       }
 
+      nsfwToggleContainer.setOnClickListener {
+        nsfwSwitch.isChecked = !nsfwSwitch.isChecked
+      }
 
       textFieldToolbarHelper = TextFieldToolbarHelper(
         root = root,
@@ -236,22 +279,58 @@ class AddOrEditPostTemplateFragment  :
           titleEditText,
         ),
         lifecycleOwner = viewLifecycleOwner,
+        toolbarTopMargin = context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),
         onPositionChange = { isSticky ->
           if (isSticky) {
             postBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
               marginStart = 0
               marginEnd = 0
             }
+            postBodyToolbarContainer.radius = 0f
           } else {
             postBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
               marginStart = context.resources.getDimensionPixelOffset(R.dimen.padding)
               marginEnd = context.resources.getDimensionPixelOffset(R.dimen.padding)
             }
+            postBodyToolbarContainer.radius =
+              context.resources.getDimensionPixelOffset(R.dimen.padding_half).toFloat()
           }
         },
       )
       textFieldToolbarHelper?.registerListeners()
     }
 
+  }
+
+  fun registerTemplateIdListener() {
+    if (!isBindingAvailable()) return
+
+    with(binding) {
+      viewLifecycleOwner.lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          viewModel.templateId.collect { templateId ->
+            val transition = TransitionSet()
+              .addTransition(Fade())
+              .addTransition(ChangeBounds())
+              .setOrdering(TransitionSet.ORDERING_TOGETHER)
+              .setDuration(200)
+
+            TransitionManager.beginDelayedTransition(buttonGroup, transition)
+
+            if (templateId == null) {
+              deleteTemplateButton.visibility = View.GONE
+            } else {
+              deleteTemplateButton.visibility = View.VISIBLE
+              deleteTemplateButton.setOnClickListener {
+                viewModel.deleteTemplate(templateId)
+                dismiss()
+              }
+            }
+
+            buttonGroup.requestLayout()
+          }
+        }
+      }
+    }
   }
 }
