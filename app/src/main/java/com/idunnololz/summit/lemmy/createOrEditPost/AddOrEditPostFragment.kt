@@ -2,27 +2,19 @@ package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Activity
 import android.content.DialogInterface
-import android.graphics.Point
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver.OnPreDrawListener
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentManager
@@ -408,11 +400,11 @@ class AddOrEditPostFragment :
 
       textFieldToolbarHelper = TextFieldToolbarHelper(
         root = root,
-        postBodyToolbar = postBodyToolbar,
-        postBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
-        postBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
+        textBodyToolbar = postBodyToolbar,
+        textBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
+        textBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
         bodyEditText = postEditText,
-        postTextDivider = postTextDivider,
+        textDivider = postTextDivider,
         scrollView = scrollView,
         getInsetsProvider = { getMainActivity() },
         editTextsThatUseToolbar = listOf(

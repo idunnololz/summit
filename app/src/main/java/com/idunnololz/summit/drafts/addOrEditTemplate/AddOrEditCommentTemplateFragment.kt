@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,20 +23,31 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
+import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonGroup
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.StateListSizeChange
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentTemplateBinding
-import com.idunnololz.summit.databinding.FragmentAddOrEditPostTemplateBinding
+import com.idunnololz.summit.drafts.DraftTypes
+import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarHelper
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.lemmy.UploadImageViewModel
+import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
+import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
+import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.setupToolbar
@@ -111,13 +123,191 @@ class AddOrEditCommentTemplateFragment :
 
         setupToolbar(
           toolbar,
-          getString(R.string.new_template)
+          if (args.templateToEdit.entryId != null) {
+            getString(R.string.edit_template)
+          } else {
+            getString(R.string.new_template)
+          },
         )
       }
 
       viewModel.loadTemplateIfNeeded(args.templateToEdit)
 
       registerTemplateIdListener()
+
+      textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
+        commentBodyToolbar.removeAllViews()
+
+        textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+          context,
+          binding.commentBodyToolbar,
+        )
+
+        textFormatToolbar?.setupTextFormatterToolbar(
+          editText = bodyEditText,
+          referenceTextView = null,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = childFragmentManager,
+          onChooseImageClick = {
+            val bottomMenu = BottomMenu(context).apply {
+              setTitle(R.string.insert_image)
+              addItemWithIcon(
+                R.id.from_camera,
+                R.string.take_a_photo,
+                R.drawable.baseline_photo_camera_24,
+              )
+              addItemWithIcon(
+                R.id.from_gallery,
+                R.string.choose_from_gallery,
+                R.drawable.baseline_image_24,
+              )
+              addItemWithIcon(
+                R.id.from_camera_with_editor,
+                R.string.take_a_photo_with_editor,
+                R.drawable.baseline_photo_camera_24,
+              )
+              addItemWithIcon(
+                R.id.from_gallery_with_editor,
+                R.string.choose_from_gallery_with_editor,
+                R.drawable.baseline_image_24,
+              )
+              addItemWithIcon(
+                R.id.use_a_saved_image,
+                R.string.use_a_saved_image,
+                R.drawable.baseline_save_24,
+              )
+
+              setOnMenuItemClickListener {
+                when (it.id) {
+                  R.id.from_camera -> {
+                    val intent = ImagePicker.with(requireActivity())
+                      .cameraOnly()
+                      .createIntent()
+                    launcher.launch(intent)
+                  }
+                  R.id.from_gallery -> {
+                    val intent = ImagePicker.with(requireActivity())
+                      .galleryOnly()
+                      .createIntent()
+                    launcher.launch(intent)
+                  }
+                  R.id.from_camera_with_editor -> {
+                    val intent = ImagePicker.with(requireActivity())
+                      .cameraOnly()
+                      .crop()
+                      .cropFreeStyle()
+                      .createIntent()
+                    launcher.launch(intent)
+                  }
+                  R.id.from_gallery_with_editor -> {
+                    val intent = ImagePicker.with(requireActivity())
+                      .galleryOnly()
+                      .crop()
+                      .cropFreeStyle()
+                      .createIntent()
+                    launcher.launch(intent)
+                  }
+                  R.id.use_a_saved_image -> {
+                    ChooseSavedImageDialogFragment()
+                      .apply {
+                        arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
+                      }
+                      .showAllowingStateLoss(
+                        childFragmentManager,
+                        "ChooseSavedImageDialogFragment",
+                      )
+                  }
+                }
+              }
+            }
+
+            bottomMenu.show(
+              bottomMenuContainer = requireMainActivity(),
+              bottomSheetContainer = binding.root,
+              expandFully = true,
+              handleBackPress = false,
+            )
+          },
+          onAddLinkClick = {
+            AddLinkDialogFragment.show(
+              bodyEditText.getSelectedText(),
+              childFragmentManager,
+            )
+          },
+          onPreviewClick = {
+            val commentStr = buildString {
+              appendLine(bodyEditText.text.toString())
+            }
+            PreviewCommentDialogFragment()
+              .apply {
+                arguments = PreviewCommentDialogFragmentArgs(
+                  args.instance,
+                  commentStr,
+                ).toBundle()
+              }
+              .showAllowingStateLoss(childFragmentManager, "AA")
+          },
+          onDraftsClick = {
+            DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
+          },
+          onSettingsClick = {
+            EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
+          },
+        )
+      }
+
+      textFieldToolbarHelper = TextFieldToolbarHelper(
+        root = root,
+        textBodyToolbar = commentBodyToolbarContainer,
+        textBodyToolbarPlaceholder = commentBodyToolbarPlaceholder,
+        textBodyToolbarPlaceholder2 = commentBodyToolbarPlaceholder2,
+        bodyEditText = bodyEditText,
+        textDivider = null,
+        scrollView = scrollView,
+        getInsetsProvider = { getMainActivity() },
+        editTextsThatUseToolbar = listOf(
+          bodyEditText,
+        ),
+        lifecycleOwner = viewLifecycleOwner,
+        toolbarTopMargin = context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),
+        onPositionChange = { isSticky ->
+          if (isSticky) {
+            commentBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              marginStart = 0
+              marginEnd = 0
+            }
+            commentBodyToolbarContainer.radius = 0f
+          } else {
+            commentBodyToolbarContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              marginStart = context.resources.getDimensionPixelOffset(R.dimen.padding)
+              marginEnd = context.resources.getDimensionPixelOffset(R.dimen.padding)
+            }
+            commentBodyToolbarContainer.radius =
+              context.resources.getDimensionPixelOffset(R.dimen.padding_half).toFloat()
+          }
+        },
+      )
+      textFieldToolbarHelper?.registerListeners()
+
+      viewModel.templateToEditData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error<*> -> {
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading<*> -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted<*> -> {
+            loadingView.hideAll()
+          }
+          is StatefulData.Success -> {
+            loadingView.hideAll()
+
+            templateNameEditText.setText(it.data.name)
+            bodyEditText.setText(it.data.content)
+          }
+        }
+      }
     }
   }
 
@@ -191,9 +381,7 @@ class AddOrEditCommentTemplateFragment :
         viewLifecycleOwner.lifecycleScope.launch {
           viewModel.save(
             name = templateNameEditText.text.toString(),
-            title = titleEditText.text.toString(),
             body = bodyEditText.text.toString(),
-            isNsfw = nsfwSwitch.isChecked,
           )
 
           dismiss()

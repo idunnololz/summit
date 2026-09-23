@@ -1,6 +1,5 @@
 package com.idunnololz.summit.drafts.addOrEditTemplate
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.doOnNextLayout
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -45,20 +43,16 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getSelectedText
-import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import kotlin.getValue
 
@@ -129,7 +123,11 @@ class AddOrEditPostTemplateFragment :
 
         setupToolbar(
           toolbar,
-          getString(R.string.new_template)
+          if (args.templateToEdit.entryId != null) {
+            getString(R.string.edit_template)
+          } else {
+            getString(R.string.new_template)
+          },
         )
       }
 
@@ -266,11 +264,11 @@ class AddOrEditPostTemplateFragment :
 
       textFieldToolbarHelper = TextFieldToolbarHelper(
         root = root,
-        postBodyToolbar = postBodyToolbarContainer,
-        postBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
-        postBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
+        textBodyToolbar = postBodyToolbarContainer,
+        textBodyToolbarPlaceholder = postBodyToolbarPlaceholder,
+        textBodyToolbarPlaceholder2 = postBodyToolbarPlaceholder2,
         bodyEditText = bodyEditText,
-        postTextDivider = null,
+        textDivider = null,
         scrollView = scrollView,
         getInsetsProvider = { getMainActivity() },
         editTextsThatUseToolbar = listOf(

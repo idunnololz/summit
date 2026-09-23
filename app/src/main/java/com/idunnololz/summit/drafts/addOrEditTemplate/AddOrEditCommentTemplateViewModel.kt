@@ -50,9 +50,7 @@ class AddOrEditCommentTemplateViewModel @Inject constructor(
 
   suspend fun save(
     name: String,
-    title: String,
     body: String,
-    isNsfw: Boolean,
   ) {
     val job = viewModelScope.launch {
       val templateData = CommentTemplateData(
@@ -60,7 +58,7 @@ class AddOrEditCommentTemplateViewModel @Inject constructor(
         postRef = null,
         parentCommentId = null,
         name = name,
-        title = title,
+        title = "",
         content = body,
         accountId = accountManager.currentAccount.value.id,
         accountInstance = accountManager.currentAccount.value.instance,

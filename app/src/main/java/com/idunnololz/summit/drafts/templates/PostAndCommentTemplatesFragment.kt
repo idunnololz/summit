@@ -129,6 +129,18 @@ class PostAndCommentTemplatesFragment  :
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.setHasFixedSize(true)
       recyclerView.adapter = adapter
+      recyclerView.addOnScrollListener(
+        object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            when {
+              dy > 0 && addTemplateFab.isExtended -> addTemplateFab.shrink()
+              dy < 0 && !addTemplateFab.isExtended -> addTemplateFab.extend()
+            }
+          }
+        },
+      )
 
       viewModel.model.observe(viewLifecycleOwner) {
         when (it) {

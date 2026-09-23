@@ -7,24 +7,21 @@ import android.view.View
 import android.view.ViewTreeObserver.OnPreDrawListener
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.util.InsetsProvider
-import com.idunnololz.summit.util.Utils
 
 class TextFieldToolbarHelper(
   val root: View,
-  val postBodyToolbar: View,
-  val postBodyToolbarPlaceholder: View,
-  val postBodyToolbarPlaceholder2: View,
+  val textBodyToolbar: View,
+  val textBodyToolbarPlaceholder: View,
+  val textBodyToolbarPlaceholder2: View,
   val bodyEditText: View,
-  val postTextDivider: View?,
+  val textDivider: View?,
   val scrollView: NestedScrollView,
   val getInsetsProvider: () -> InsetsProvider?,
   val editTextsThatUseToolbar: List<TextView>,
@@ -56,11 +53,11 @@ class TextFieldToolbarHelper(
         override fun onPreDraw(): Boolean {
           root.viewTreeObserver.removeOnPreDrawListener(this)
 
-          postBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            height = postBodyToolbar.height
+          textBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            height = textBodyToolbar.height
           }
-          postBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
-            height = postBodyToolbar.height
+          textBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
+            height = textBodyToolbar.height
           }
 
           root.post {
@@ -102,7 +99,7 @@ class TextFieldToolbarHelper(
    * Call this if an animation has started that will result in the toolbar moving locations.
    */
   fun onTransitionStart() {
-    postBodyToolbar.animate()
+    textBodyToolbar.animate()
       .alpha(0f)
   }
 
@@ -112,7 +109,7 @@ class TextFieldToolbarHelper(
   fun onTransitionEnd() {
     root.post {
       onScrollUpdated()
-      postBodyToolbar.animate()
+      textBodyToolbar.animate()
         .alpha(1f)
     }
   }
@@ -132,20 +129,20 @@ class TextFieldToolbarHelper(
     if (!show) {
       hidePostToolbar()
     } else if (isImeOpen) {
-      postBodyToolbarPlaceholder.visibility = View.GONE
-      postBodyToolbarPlaceholder2.visibility = View.VISIBLE
-      postTextDivider?.visibility = View.VISIBLE
-      postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
+      textBodyToolbarPlaceholder.visibility = View.GONE
+      textBodyToolbarPlaceholder2.visibility = View.VISIBLE
+      textDivider?.visibility = View.VISIBLE
+      textBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
         gravity = Gravity.BOTTOM
       }
-      postBodyToolbar.translationY = 0f
+      textBodyToolbar.translationY = 0f
 
       showPostToolbar()
     } else {
-      postBodyToolbarPlaceholder.visibility = View.VISIBLE
-      postBodyToolbarPlaceholder2.visibility = View.GONE
-      postTextDivider?.visibility = View.GONE
-      postBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
+      textBodyToolbarPlaceholder.visibility = View.VISIBLE
+      textBodyToolbarPlaceholder2.visibility = View.GONE
+      textDivider?.visibility = View.GONE
+      textBodyToolbar.updateLayoutParams<FrameLayout.LayoutParams> {
         gravity = Gravity.TOP or Gravity.LEFT
       }
 
@@ -158,14 +155,14 @@ class TextFieldToolbarHelper(
       return
     }
 
-    if (!postBodyToolbar.isLaidOut) {
+    if (!textBodyToolbar.isLaidOut) {
       return
     }
 
     val scrollBounds = Rect()
     scrollView.getHitRect(scrollBounds)
-    val anyPartVisible = postBodyToolbarPlaceholder.getLocalVisibleRect(scrollBounds)
-    val visiblePercent = scrollBounds.height().toFloat() / postBodyToolbarPlaceholder.height
+    val anyPartVisible = textBodyToolbarPlaceholder.getLocalVisibleRect(scrollBounds)
+    val visiblePercent = scrollBounds.height().toFloat() / textBodyToolbarPlaceholder.height
 
     if (anyPartVisible && visiblePercent > 0.9f && show) {
       showPostToolbar()
@@ -173,7 +170,7 @@ class TextFieldToolbarHelper(
       hidePostToolbar()
     }
 
-    postBodyToolbar.translationY = floatingLocation.y.toFloat() -
+    textBodyToolbar.translationY = floatingLocation.y.toFloat() -
       (getInsetsProvider()?.insets?.value?.topInset ?: 0)
   }
 
@@ -187,8 +184,8 @@ class TextFieldToolbarHelper(
     hiding = true
     showing = false
 
-    postBodyToolbar.clearAnimation()
-    postBodyToolbar.animate()
+    textBodyToolbar.clearAnimation()
+    textBodyToolbar.animate()
       .alpha(0f)
   }
 
@@ -200,8 +197,8 @@ class TextFieldToolbarHelper(
     hiding = false
     showing = true
 
-    postBodyToolbar.clearAnimation()
-    postBodyToolbar.animate()
+    textBodyToolbar.clearAnimation()
+    textBodyToolbar.animate()
       .alpha(1f)
   }
 
