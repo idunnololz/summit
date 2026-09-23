@@ -185,31 +185,31 @@
                 android:theme="@style/ThemeOverlay.MyApp.MaterialButtonGroup"
                 android:padding="@dimen/padding">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/delete_template_button"
-                    style="@style/Widget.Material3Expressive.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    app:iconGravity="textStart"
-                    app:backgroundTint="?attr/colorErrorContainer"
-                    app:iconTint="?attr/colorOnErrorContainer"
-                    app:icon="@drawable/outline_delete_24"
-                    app:iconSize="24dp"
-                    app:iconPadding="0dp" />
+<!--                <com.google.android.material.button.MaterialButton-->
+<!--                    android:id="@+id/delete_template_button"-->
+<!--                    style="@style/Widget.Material3Expressive.Button"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:gravity="center"-->
+<!--                    app:iconGravity="textStart"-->
+<!--                    app:backgroundTint="?attr/colorErrorContainer"-->
+<!--                    app:iconTint="?attr/colorOnErrorContainer"-->
+<!--                    app:icon="@drawable/outline_delete_24"-->
+<!--                    app:iconSize="24dp"-->
+<!--                    app:iconPadding="0dp" />-->
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/save_template_button"
-                    style="@style/Widget.Material3Expressive.Button"
-                    android:text="@string/save_template"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    app:iconGravity="textStart"
-                    app:icon="@drawable/outline_save_24"
-                    app:iconSize="24dp"/>
+<!--                <com.google.android.material.button.MaterialButton-->
+<!--                    android:id="@+id/save_template_button"-->
+<!--                    style="@style/Widget.Material3Expressive.Button"-->
+<!--                    android:text="@string/save_template"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="2"-->
+<!--                    android:gravity="center"-->
+<!--                    app:iconGravity="textStart"-->
+<!--                    app:icon="@drawable/outline_save_24"-->
+<!--                    app:iconSize="24dp"/>-->
             </com.google.android.material.button.MaterialButtonGroup>
 
             <Space

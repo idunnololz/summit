@@ -2461,6 +2461,8 @@
     <string name="new_template">New template</string>
     <string name="template_name">Template name</string>
     <string name="save_template">Save template</string>
+    <string name="no_name">(no name)</string>
+    <string name="no_content">(no content)</string>
 
 
     <plurals name="warn_delete_drafts_format">

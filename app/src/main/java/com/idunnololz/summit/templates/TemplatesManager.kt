@@ -107,7 +107,11 @@ class TemplatesManager @Inject constructor(
     }
   }
 
-  suspend fun getTemplatesByType(templateType: Int) = templatesDao.getTemplatesByType(templateType)
+  suspend fun getTemplatesByType(templateType: Int) =
+    templatesDao.getTemplatesByType(templateType)
+
+  suspend fun getTemplateById(id: Long): TemplateEntry? =
+    templatesDao.getTemplateById(id).firstOrNull()
 
   fun deleteTemplateWithIdAsync(id: Long?) {
     id ?: return

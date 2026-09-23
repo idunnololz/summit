@@ -514,5 +514,8 @@ safeargs.
         <argument
             android:name="instance"
             app:argType="string" />
+        <argument
+            android:name="templateToEdit"
+            app:argType="com.idunnololz.summit.drafts.addOrEditTemplate.TemplateToEdit" />
     </dialog>
 </navigation>

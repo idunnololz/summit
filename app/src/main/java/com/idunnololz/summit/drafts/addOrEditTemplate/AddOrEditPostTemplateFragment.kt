@@ -1,11 +1,18 @@
 package com.idunnololz.summit.drafts.addOrEditTemplate
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
@@ -19,6 +26,10 @@ import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.github.drjacky.imagepicker.ImagePicker
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonGroup
+import com.google.android.material.color.MaterialColors
+import com.google.android.material.shape.StateListSizeChange
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentAddOrEditPostTemplateBinding
 import com.idunnololz.summit.drafts.DraftTypes
@@ -37,6 +48,8 @@ import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -45,6 +58,7 @@ import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import kotlin.getValue
 
@@ -54,9 +68,18 @@ class AddOrEditPostTemplateFragment  :
   FullscreenDialogFragment {
 
   companion object {
-    fun show(fragmentManager: FragmentManager, instance: String) {
+    fun show(
+      fragmentManager: FragmentManager,
+      instance: String,
+      templateToEditId: Long? = null,
+    ) {
       AddOrEditPostTemplateFragment().apply {
-        arguments = AddOrEditPostTemplateFragmentArgs(instance).toBundle()
+        arguments = AddOrEditPostTemplateFragmentArgs(
+          instance = instance,
+          templateToEdit = TemplateToEdit(
+            templateToEditId
+          ),
+        ).toBundle()
       }.showAllowingStateLoss(fragmentManager, "PostsAndCommentsTemplatesFragment")
     }
   }
@@ -110,6 +133,8 @@ class AddOrEditPostTemplateFragment  :
         )
       }
 
+      viewModel.loadTemplateIfNeeded(args.templateToEdit)
+
       // ButtonGroup takes a snapshot of its children on init and then uses that for all layout
       // calculations. That means if we want to hide a button by default we need to let ButtonGroup
       // measure out everything first and then hide the button. Otherwise, ButtonGroup will not
@@ -117,26 +142,18 @@ class AddOrEditPostTemplateFragment  :
       //
       // Thus we hide the button on predraw (after layout) and then register the template ID
       // listener after that otherwise the template id listener will hide the button.
-      if (viewModel.templateId.value == null) {
-        deleteTemplateButton.runPredrawDiscardingFrame {
-          deleteTemplateButton.isVisible = false
-
-          deleteTemplateButton.runPredrawDiscardingFrame {
-            registerTemplateIdListener()
-          }
-        }
-      } else {
-        registerTemplateIdListener()
-      }
-
-      saveTemplateButton.setOnClickListener {
-        viewModel.save(
-          name = templateNameEditText.text.toString(),
-          title = titleEditText.text.toString(),
-          body = bodyEditText.text.toString(),
-          isNsfw = nsfwSwitch.isChecked,
-        )
-      }
+//      if (viewModel.templateId.value == null) {
+//        deleteTemplateButton.runPredrawDiscardingFrame {
+//          deleteTemplateButton.isVisible = false
+//
+//          deleteTemplateButton.runPredrawDiscardingFrame {
+//            registerTemplateIdListener()
+//          }
+//        }
+//      } else {
+//        registerTemplateIdListener()
+//      }
+      registerTemplateIdListener()
 
       textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
         postBodyToolbar.removeAllViews()
@@ -298,6 +315,28 @@ class AddOrEditPostTemplateFragment  :
         },
       )
       textFieldToolbarHelper?.registerListeners()
+
+      viewModel.templateToEditData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error<*> -> {
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading<*> -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted<*> -> {
+            loadingView.hideAll()
+          }
+          is StatefulData.Success -> {
+            loadingView.hideAll()
+
+            templateNameEditText.setText(it.data.name)
+            titleEditText.setText(it.data.title)
+            bodyEditText.setText(it.data.content)
+            nsfwSwitch.isChecked = it.data.isNsfw
+          }
+        }
+      }
     }
 
   }
@@ -317,20 +356,124 @@ class AddOrEditPostTemplateFragment  :
 
             TransitionManager.beginDelayedTransition(buttonGroup, transition)
 
-            if (templateId == null) {
-              deleteTemplateButton.visibility = View.GONE
-            } else {
-              deleteTemplateButton.visibility = View.VISIBLE
-              deleteTemplateButton.setOnClickListener {
-                viewModel.deleteTemplate(templateId)
-                dismiss()
-              }
-            }
+            updateButtonGroup(templateId = templateId)
 
             buttonGroup.requestLayout()
           }
         }
       }
     }
+  }
+
+  private fun setFormEnabled(enabled: Boolean) {
+    if (!isBindingAvailable()) return
+
+    with(binding) {
+      templateNameEditText.isEnabled = enabled
+      titleEditText.isEnabled = enabled
+      bodyEditText.isEnabled = enabled
+      nsfwSwitch.isEnabled = enabled
+      nsfwToggleContainer.isEnabled = enabled
+    }
+  }
+
+  /**
+   * We set the buttons up programmatically because [ButtonGroup] is finicky and buggy when
+   * buttons are show/hid. By populating the [ButtonGroup] via code, we can dodge most of these
+   * bugs.
+   */
+  private fun updateButtonGroup(
+    templateId: Long?
+  ) {
+    if (!isBindingAvailable()) return
+
+    with(binding) {
+      buttonGroup.removeAllViews()
+
+      if (templateId != null) {
+        val deleteButton = newButtonGroupButton(
+          context = buttonGroup.context,
+          id = R.id.delete_template_button
+        ).apply {
+          icon = AppCompatResources.getDrawable(context, R.drawable.outline_delete_24)
+          iconPadding = 0
+          backgroundTintList = ColorStateList.valueOf(
+            MaterialColors.getColor(this, com.google.android.material.R.attr.colorErrorContainer),
+          )
+          iconTint = ColorStateList.valueOf(
+            MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnErrorContainer),
+          )
+        }
+        deleteButton.setOnClickListener {
+          viewModel.deleteTemplate(templateId)
+          dismiss()
+        }
+        buttonGroup.addView(deleteButton)
+      }
+
+      val saveButton = newButtonGroupButton(
+        context = buttonGroup.context,
+        id = R.id.save_template_button
+      ).apply {
+        text = context.getString(R.string.save_template)
+        icon = AppCompatResources.getDrawable(context, R.drawable.outline_save_24)
+      }
+
+      saveButton.setOnClickListener {
+        viewModel.save(
+          name = templateNameEditText.text.toString(),
+          title = titleEditText.text.toString(),
+          body = bodyEditText.text.toString(),
+          isNsfw = nsfwSwitch.isChecked,
+        )
+      }
+      buttonGroup.addView(saveButton)
+      buttonGroup.enableDefaultButtonSizeChange()
+    }
+  }
+
+  private fun newButtonGroupButton(context: Context, id: Int): MaterialButton {
+    val themedContext = ContextThemeWrapper(
+      context,
+      com.google.android.material.R.style.Widget_Material3Expressive_Button
+    )
+    return MaterialButton(themedContext).apply {
+      this.id = id
+      layoutParams = MaterialButtonGroup.LayoutParams(
+        0,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        2f,
+      )
+      gravity = Gravity.CENTER
+      iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+      iconSize = Utils.convertDpToPixel(24f).toInt()
+    }
+  }
+
+  private fun MaterialButtonGroup.enableDefaultButtonSizeChange() {
+    doOnNextLayout {
+      val attributes = context.obtainStyledAttributes(
+        com.google.android.material.R.style.Widget_Material3_MaterialButtonGroup,
+        intArrayOf(com.google.android.material.R.attr.buttonSizeChange),
+      )
+
+      val sizeChange = try {
+        @Suppress("RestrictedApi")
+        StateListSizeChange.create(
+          context,
+          attributes,
+          0,
+        )
+      } finally {
+        attributes.recycle()
+      }
+
+      if (sizeChange != null) {
+        @Suppress("RestrictedApi")
+        setButtonSizeChange(sizeChange)
+      }
+    }
+
+    requestLayout()
   }
 }

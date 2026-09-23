@@ -8,6 +8,8 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.templates.TemplatesManager
 import com.idunnololz.summit.templates.db.TemplateData
+import com.idunnololz.summit.templates.db.TemplateData.PostTemplateData
+import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -21,6 +23,29 @@ class AddOrEditPostTemplateViewModel @Inject constructor(
 ) : ViewModel() {
 
   val templateId = savedStateHandle.getMutableStateFlow<Long?>("template_id", null)
+  val templateToEditData = StatefulLiveData<PostTemplateData>()
+
+  fun loadTemplateIfNeeded(templateToEdit: TemplateToEdit) {
+    val entryId = templateToEdit.entryId
+
+    if (templateId.value == entryId) {
+      return
+    }
+
+    templateId.value = entryId
+
+    if (entryId != null) {
+      templateToEditData.setIsLoading()
+
+      viewModelScope.launch {
+        val templateData = templatesManager.getTemplateById(entryId)?.data as? PostTemplateData
+
+        if (templateData != null) {
+          templateToEditData.postValue(templateData)
+        }
+      }
+    }
+  }
 
   fun save(
     name: String,
@@ -29,7 +54,7 @@ class AddOrEditPostTemplateViewModel @Inject constructor(
     isNsfw: Boolean,
   ) {
     viewModelScope.launch {
-      val templateData = TemplateData.PostTemplateData(
+      val templateData = PostTemplateData(
         name = name,
         url = null,
         isNsfw = isNsfw,

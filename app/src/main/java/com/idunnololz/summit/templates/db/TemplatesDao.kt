@@ -16,6 +16,11 @@ interface TemplatesDao {
   )
   suspend fun getTemplatesByType(type: Int): List<TemplateEntry>
 
+  @Query(
+    "SELECT * FROM templates WHERE id = :id",
+  )
+  suspend fun getTemplateById(id: Long): List<TemplateEntry>
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(entry: TemplateEntry): Long
 

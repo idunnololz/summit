@@ -326,4 +326,6 @@
     <item name="unwrap_image_proxy_url" type="id" />
     <item name="transfer_community" type="id" />
     <item name="transfer_community_error_user_not_a_mod" type="id" />
+    <item name="delete_template_button" type="id" />
+    <item name="save_template_button" type="id" />
 </resources>
