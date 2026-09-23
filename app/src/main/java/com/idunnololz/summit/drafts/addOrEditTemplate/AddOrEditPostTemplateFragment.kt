@@ -63,7 +63,7 @@ import javax.inject.Inject
 import kotlin.getValue
 
 @AndroidEntryPoint
-class AddOrEditPostTemplateFragment  :
+class AddOrEditPostTemplateFragment :
   BaseDialogFragment<FragmentAddOrEditPostTemplateBinding>(),
   FullscreenDialogFragment {
 
@@ -80,7 +80,7 @@ class AddOrEditPostTemplateFragment  :
             templateToEditId
           ),
         ).toBundle()
-      }.showAllowingStateLoss(fragmentManager, "PostsAndCommentsTemplatesFragment")
+      }.showAllowingStateLoss(fragmentManager, "AddOrEditPostTemplateFragment")
     }
   }
 
@@ -135,24 +135,6 @@ class AddOrEditPostTemplateFragment  :
 
       viewModel.loadTemplateIfNeeded(args.templateToEdit)
 
-      // ButtonGroup takes a snapshot of its children on init and then uses that for all layout
-      // calculations. That means if we want to hide a button by default we need to let ButtonGroup
-      // measure out everything first and then hide the button. Otherwise, ButtonGroup will not
-      // be able to show the button later if needed.
-      //
-      // Thus we hide the button on predraw (after layout) and then register the template ID
-      // listener after that otherwise the template id listener will hide the button.
-//      if (viewModel.templateId.value == null) {
-//        deleteTemplateButton.runPredrawDiscardingFrame {
-//          deleteTemplateButton.isVisible = false
-//
-//          deleteTemplateButton.runPredrawDiscardingFrame {
-//            registerTemplateIdListener()
-//          }
-//        }
-//      } else {
-//        registerTemplateIdListener()
-//      }
       registerTemplateIdListener()
 
       textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
@@ -338,7 +320,6 @@ class AddOrEditPostTemplateFragment  :
         }
       }
     }
-
   }
 
   fun registerTemplateIdListener() {
@@ -420,12 +401,16 @@ class AddOrEditPostTemplateFragment  :
       }
 
       saveButton.setOnClickListener {
-        viewModel.save(
-          name = templateNameEditText.text.toString(),
-          title = titleEditText.text.toString(),
-          body = bodyEditText.text.toString(),
-          isNsfw = nsfwSwitch.isChecked,
-        )
+        viewLifecycleOwner.lifecycleScope.launch {
+          viewModel.save(
+            name = templateNameEditText.text.toString(),
+            title = titleEditText.text.toString(),
+            body = bodyEditText.text.toString(),
+            isNsfw = nsfwSwitch.isChecked,
+          )
+
+          dismiss()
+        }
       }
       buttonGroup.addView(saveButton)
       buttonGroup.enableDefaultButtonSizeChange()

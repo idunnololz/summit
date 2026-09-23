@@ -22,6 +22,7 @@ import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemPostAndCommentTemplatePostBinding
 import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item.CommentTemplateItem
@@ -79,6 +80,11 @@ class PostAndCommentTemplatesFragment  :
     val context = requireContext()
 
     with(binding) {
+
+      swipeRefreshLayout.setOnRefreshListener {
+        viewModel.load(force = true)
+      }
+
       addTemplateFab.setOnClickListener {
         val dialogBinding = DialogChooseTemplateTypeBinding.inflate(LayoutInflater.from(context))
         val dialog = MaterialAlertDialogBuilder(context)
@@ -95,6 +101,10 @@ class PostAndCommentTemplatesFragment  :
           dialog.dismiss()
         }
         dialogBinding.createCommentTemplate.setOnClickListener {
+          AddOrEditCommentTemplateFragment.show(
+            fragmentManager = childFragmentManager,
+            instance = accountAwareLemmyClient.instance,
+          )
           dialog.dismiss()
         }
       }
@@ -108,7 +118,13 @@ class PostAndCommentTemplatesFragment  :
             templateToEditId = it.entryId,
           )
         },
-        onCommentTemplateClick = {}
+        onCommentTemplateClick = {
+          AddOrEditCommentTemplateFragment.show(
+            fragmentManager = childFragmentManager,
+            instance = accountAwareLemmyClient.instance,
+            templateToEditId = it.entryId,
+          )
+        }
       )
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.setHasFixedSize(true)
@@ -124,9 +140,11 @@ class PostAndCommentTemplatesFragment  :
           }
           is StatefulData.NotStarted<*> -> {
             loadingView.hideAll()
+            swipeRefreshLayout.isRefreshing = false
           }
           is StatefulData.Success -> {
             loadingView.hideAll()
+            swipeRefreshLayout.isRefreshing = false
 
             adapter.data = it.data.items
           }

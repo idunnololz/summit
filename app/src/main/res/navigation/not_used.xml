@@ -518,4 +518,15 @@ safeargs.
             android:name="templateToEdit"
             app:argType="com.idunnololz.summit.drafts.addOrEditTemplate.TemplateToEdit" />
     </dialog>
+    <dialog
+        android:id="@+id/addOrEditCommentTemplateFragment"
+        android:name="com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment"
+        android:label="AddOrEditCommentTemplateFragment">
+        <argument
+            android:name="instance"
+            app:argType="string" />
+        <argument
+            android:name="templateToEdit"
+            app:argType="com.idunnololz.summit.drafts.addOrEditTemplate.TemplateToEdit" />
+    </dialog>
 </navigation>

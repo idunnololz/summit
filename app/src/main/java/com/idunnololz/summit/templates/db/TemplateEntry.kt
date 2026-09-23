@@ -67,7 +67,7 @@ class TemplateConverters(
 object TemplateTypes {
   const val RegistrationApplicationRejection = 1
   const val Post = 2
-  const val Comment = 2
+  const val Comment = 3
 }
 
 val TemplateData.type

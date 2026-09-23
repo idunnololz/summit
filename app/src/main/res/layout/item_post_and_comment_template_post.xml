@@ -50,6 +50,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBodyMedium"
         android:layout_marginStart="@dimen/padding"
+        android:maxLines="4"
+        android:ellipsize="end"
         app:layout_constraintTop_toTopOf="@+id/desc_placeholder"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintEnd_toEndOf="parent"/>
