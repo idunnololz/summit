@@ -781,7 +781,7 @@
     <string name="instance_info">Instanzinformationen</string>
     <string name="subscribers_format">%1$s Abonnenten</string>
     <string name="save_draft">Entwurf speichern</string>
-    <string name="community_actions">Gemeinschaftsaktionen</string>
+    <string name="community_actions">Community-Aktionen</string>
     <string name="view_mod_logs">Mod-Logs anzeigen</string>
     <string name="mod_logs">Moderations-Logs</string>
     <string name="mod_action_format">%1$s Aktion</string>
@@ -1409,4 +1409,16 @@
     <string name="advanced">Erweiterte Einstellungen</string>
     <string name="account_created_on_format">Konto erstellt in %1$s (Kuchentag in %2$s Tagen)</string>
     <string name="hide_posts_like_this">Solche Beiträge verstecken…</string>
+    <string name="show_bot_label">Bot-Markierung anzeigen</string>
+    <string name="unlocked_comment_format">Sperrung von Kommentar %1$s unter Beitrag %2$s in Community %3$s aufgehoben.</string>
+    <string name="warn_pii_value_ip">Wert ähnelt einer IP-Adresse. Wert: `%1$s`</string>
+    <string name="warn_pii_value_address">Wert ähnelt einer Postanschrift. Wert: `%1$s`</string>
+    <string name="warn_pii_value_phone">Wert ähnelt einer Telefonnummer. Wert: `%1$s`</string>
+    <string name="error_downloading_video">Es gab einen Fehler beim Herunterladen des Videos.</string>
+    <string name="locked_comment_format">Kommentar %1$s unter Beitrag %2$s in Community %3$s gesperrt.</string>
+    <string name="warn_pii_value_date_time">Wert ähnelt einer Datums- oder Zeitangabe. Wert: `%1$s`</string>
+    <string name="warn_pii_value_credit_card">Wert ähnelt einer Kreditkartennummer. Wert: `%1$s`</string>
+    <string name="delay_when_loading_data_desc">Wenn aktiviert, wird Summit eine kleine Pause vor dem Laden großer Datenmengen einfügen. Dies hilft dabei, das Bedienerlebnis bei leistungsschwächeren Geräten flüssig zu halten.</string>
+    <string name="show_bot_label_desc">Wenn aktiviert, werden Beiträge/Kommentare mit einer \"BOT\" Marke versehen wenn das Konto des Autors als Bot gekennzeichnet ist.</string>
+    <string name="warn_pii_value_email">Wert ähnelt einer E-Mail-Adresse. Wert: `%1$s`</string>
 </resources>
