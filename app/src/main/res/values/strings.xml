@@ -2463,6 +2463,8 @@
     <string name="save_template">Save template</string>
     <string name="no_name">(no name)</string>
     <string name="no_content">(no content)</string>
+    <string name="local_person_stats">Local person stats</string>
+    <string name="check_ai_usage">Check AI usage</string>
 
 
     <plurals name="warn_delete_drafts_format">

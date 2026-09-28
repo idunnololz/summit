@@ -1,6 +1,7 @@
 package com.idunnololz.summit.drafts
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,9 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +21,7 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
 import com.idunnololz.summit.drafts.drafts.DraftsAdapter
 import com.idunnololz.summit.drafts.drafts.DraftsViewModel
+import com.idunnololz.summit.drafts.drafts.Filter
 import com.idunnololz.summit.drafts.drafts.ViewModelItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -25,7 +30,9 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,46 +97,15 @@ class DraftsDialogFragment :
 
     viewModel.draftType = args.draftType
 
-    requireMainActivity().apply {
-      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-    }
-
-    binding.toolbar.title = getString(R.string.drafts)
-    binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-    binding.toolbar.setNavigationOnClickListener {
-      dismiss()
-    }
-    binding.toolbar.setNavigationIconTint(
-      context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-    )
-    binding.toolbar.inflateMenu(R.menu.menu_drafts)
-    binding.toolbar.setOnMenuItemClickListener {
-      when (it.itemId) {
-        R.id.delete_all -> {
-          deleteAllDialogLauncher.launchDialog {
-            messageResId = R.string.warn_delete_all_drafts
-            positionButtonResId = R.string.delete_all
-            negativeButtonResId = R.string.cancel
-          }
-          true
-        }
-        R.id.show_all_drafts -> {
-          if (viewModel.draftType == null) {
-            viewModel.draftType = args.draftType
-            it.setIcon(R.drawable.baseline_filter_list_off_24)
-          } else {
-            viewModel.draftType = null
-            it.setIcon(R.drawable.baseline_filter_list_24)
-          }
-          viewModel.loadMoreDrafts(force = true)
-          true
-        }
-        else -> false
-      }
-    }
-
     with(binding) {
+      requireMainActivity().apply {
+        insetViewAutomaticallyByPadding(viewLifecycleOwner, root)
+      }
+
+      setupToolbar(toolbar, "")
+
       val adapter = DraftsAdapter(
+        context = context,
         onDraftClick = {
           // Convert the draft data to the correct type (eg. if comment draft was requested
           // but the draft selected was a post then convert the post to a comment)
@@ -197,6 +173,8 @@ class DraftsDialogFragment :
             extras.putLong("draft_id", it.id)
           }
         },
+        onPostTemplateClick = {},
+        onCommentTemplateClick = {},
       )
       val layoutManager = LinearLayoutManager(context)
       recyclerView.adapter = adapter
@@ -207,7 +185,7 @@ class DraftsDialogFragment :
       fun fetchPageIfLoadItem(position: Int) {
         (adapter.model.items.getOrNull(position) as? ViewModelItem.LoadingItem)
           ?.let {
-            viewModel.loadMoreDrafts()
+            viewModel.loadData()
           }
       }
 
@@ -220,7 +198,22 @@ class DraftsDialogFragment :
         }
       }
 
+      viewLifecycleOwner.lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          viewModel.filter.collect {
+            updateToolbarMenu(it)
+          }
+        }
+      }
+
       viewModel.model.observe(viewLifecycleOwner) {
+        buttonGroup.check(
+          when (it.filter) {
+            Filter.Drafts -> R.id.drafts_button
+            Filter.Templates -> R.id.templates_button
+          }
+        )
+
         val wasAtTop = layoutManager.findFirstVisibleItemPosition() == 0
 
         adapter.setModel(it) {
@@ -241,6 +234,59 @@ class DraftsDialogFragment :
           }
         },
       )
+
+      buttonGroup.addOnButtonCheckedListener { group, i, bool ->
+        when (buttonGroup.checkedButtonId) {
+          R.id.drafts_button -> {
+            viewModel.filter.value = Filter.Drafts
+          }
+          R.id.templates_button -> {
+            viewModel.filter.value = Filter.Templates
+          }
+        }
+      }
+    }
+  }
+
+  fun updateToolbarMenu(filter: Filter) {
+    if (!isBindingAvailable()) {
+      return
+    }
+
+    with(binding) {
+      toolbar.menu.clear()
+
+      when (filter) {
+        Filter.Drafts -> {
+          toolbar.inflateMenu(R.menu.menu_drafts)
+          toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+              R.id.delete_all -> {
+                deleteAllDialogLauncher.launchDialog {
+                  messageResId = R.string.warn_delete_all_drafts
+                  positionButtonResId = R.string.delete_all
+                  negativeButtonResId = R.string.cancel
+                }
+                true
+              }
+              R.id.show_all_drafts -> {
+                if (viewModel.draftType == null) {
+                  viewModel.draftType = args.draftType
+                  it.setIcon(R.drawable.baseline_filter_list_off_24)
+                } else {
+                  viewModel.draftType = null
+                  it.setIcon(R.drawable.baseline_filter_list_24)
+                }
+                viewModel.loadData(force = true)
+                true
+              }
+              else -> false
+            }
+          }
+        }
+        Filter.Templates -> {
+        }
+      }
     }
   }
 }

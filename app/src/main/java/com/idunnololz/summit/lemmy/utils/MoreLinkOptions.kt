@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.utils
 
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isCommunityBlocked
@@ -312,6 +313,14 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
 //                                icon = R.drawable.baseline_more_horiz_24
 //                            )
 
+              if (preferences.localTrackingEnabled) {
+                addItemWithIcon(
+                  id = R.id.local_person_stats,
+                  getString(R.string.local_person_stats),
+                  R.drawable.outline_bar_chart_24,
+                )
+              }
+
               addDivider()
               addItemWithIcon(
                 id = R.id.instance_info,
@@ -393,6 +402,8 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
       )(it.id)
     }
   }
+
+  Log.d("BottomMenu", "showAdvancedLinkOptions()")
   showBottomMenu(bottomMenu, expandFully = false)
 
   return bottomMenu
@@ -513,6 +524,13 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
       (advancedLink as? AdvancedLink.PageLink)?.let {
         (it.pageRef as? CommunityRef)?.let {
           mainActivity?.showCommunityLocalStats(it)
+        }
+      }
+    }
+    R.id.local_person_stats -> {
+      (advancedLink as? AdvancedLink.PageLink)?.let {
+        (it.pageRef as? PersonRef)?.let {
+          mainActivity?.showPersonLocalStats(it)
         }
       }
     }

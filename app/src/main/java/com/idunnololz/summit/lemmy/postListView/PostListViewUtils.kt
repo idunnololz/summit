@@ -1,12 +1,16 @@
 package com.idunnololz.summit.lemmy.postListView
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.GUEST_ACCOUNT_ID
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
+import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesFragment
 import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -23,6 +27,7 @@ import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -288,6 +293,11 @@ fun Fragment.showMorePostOptions(
       R.string.detailed_view,
       R.drawable.baseline_open_in_full_24,
     )
+    addItemWithIcon(
+      R.id.pa_create_post_template,
+      R.string.create_post_template,
+      R.drawable.ic_post_24,
+    )
 
     setOnMenuItemClickListener {
       createPostActionHandler(
@@ -304,6 +314,7 @@ fun Fragment.showMorePostOptions(
     }
   }
 
+  Log.d("BottomMenu", "showMorePostOptions()")
   getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 }
 
@@ -541,6 +552,24 @@ fun Fragment.createPostActionHandler(
     }
     R.id.hide_posts_like_this -> {
       FilterPostsHelperFragment.show(childFragmentManager, postView)
+    }
+    R.id.pa_create_post_template -> {
+      AddOrEditPostTemplateFragment.show(
+        fragmentManager = childFragmentManager,
+        instance = instance,
+        prefill = TemplateData.PostTemplateData(
+          url = null,
+          isNsfw = postView.post.nsfw,
+          name = "",
+          title = postView.post.name,
+          content = postView.post.body ?: "",
+          accountId = accountId ?: GUEST_ACCOUNT_ID,
+          accountInstance = instance,
+          thumbnailUrl = null,
+          altText = null,
+          languageId = null,
+        )
+      )
     }
   }
 }

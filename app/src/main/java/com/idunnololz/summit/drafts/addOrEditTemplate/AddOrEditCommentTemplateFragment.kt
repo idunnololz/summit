@@ -42,6 +42,7 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
+import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -66,6 +67,7 @@ class AddOrEditCommentTemplateFragment :
       fragmentManager: FragmentManager,
       instance: String,
       templateToEditId: Long? = null,
+      prefill: TemplateData.CommentTemplateData? = null,
     ) {
       AddOrEditCommentTemplateFragment().apply {
         arguments = AddOrEditCommentTemplateFragmentArgs(
@@ -73,12 +75,15 @@ class AddOrEditCommentTemplateFragment :
           templateToEdit = TemplateToEdit(
             templateToEditId
           ),
+          prefill = prefill,
         ).toBundle()
       }.showAllowingStateLoss(fragmentManager, "AddOrEditCommentTemplateFragment")
     }
   }
 
   private val args by navArgs<AddOrEditCommentTemplateFragmentArgs>()
+
+  private var isArgsHandled = false
 
   private val viewModel: AddOrEditCommentTemplateViewModel by viewModels()
   private val uploadImageViewModel: UploadImageViewModel by viewModels()
@@ -306,6 +311,15 @@ class AddOrEditCommentTemplateFragment :
             templateNameEditText.setText(it.data.name)
             bodyEditText.setText(it.data.content)
           }
+        }
+      }
+
+      if (savedInstanceState == null && !isArgsHandled) {
+        isArgsHandled = true
+
+        args.prefill?.let {
+          templateNameEditText.setText(it.name)
+          bodyEditText.setText(it.content)
         }
       }
     }

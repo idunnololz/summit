@@ -107,6 +107,7 @@ class DraftsFragment :
 
     with(binding) {
       val adapter = DraftsAdapter(
+        context = context,
         onDraftClick = {
           openDraft(it)
         },
@@ -118,6 +119,8 @@ class DraftsFragment :
             extras.putLong("draft_id", it.id)
           }
         },
+        onPostTemplateClick = {},
+        onCommentTemplateClick = {},
         onStartSelectionMode = {
           viewModel.isInSelectMode = true
         },
@@ -134,7 +137,7 @@ class DraftsFragment :
       fun fetchPageIfLoadItem(position: Int) {
         (adapter.model.items.getOrNull(position) as? ViewModelItem.LoadingItem)
           ?.let {
-            viewModel.loadMoreDrafts()
+            viewModel.loadData()
           }
       }
 
@@ -180,7 +183,7 @@ class DraftsFragment :
       )
 
       swipeRefreshLayout.setOnRefreshListener {
-        viewModel.loadMoreDrafts(force = true)
+        viewModel.loadData(force = true)
       }
 
       addFab.setOnClickListener {

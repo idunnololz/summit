@@ -517,6 +517,10 @@ safeargs.
         <argument
             android:name="templateToEdit"
             app:argType="com.idunnololz.summit.drafts.addOrEditTemplate.TemplateToEdit" />
+        <argument
+            android:name="prefill"
+            app:argType="com.idunnololz.summit.templates.db.TemplateData$PostTemplateData"
+            app:nullable="true" />
     </dialog>
     <dialog
         android:id="@+id/addOrEditCommentTemplateFragment"
@@ -528,5 +532,17 @@ safeargs.
         <argument
             android:name="templateToEdit"
             app:argType="com.idunnololz.summit.drafts.addOrEditTemplate.TemplateToEdit" />
+        <argument
+            android:name="prefill"
+            app:argType="com.idunnololz.summit.templates.db.TemplateData$CommentTemplateData"
+            app:nullable="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/localStatsPersonDialogFragment"
+        android:name="com.idunnololz.summit.localTracking.screen.person.LocalStatsPersonDialogFragment"
+        android:label="LocalStatsPersonDialogFragment" >
+        <argument
+            android:name="personRef"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef" />
     </dialog>
 </navigation>

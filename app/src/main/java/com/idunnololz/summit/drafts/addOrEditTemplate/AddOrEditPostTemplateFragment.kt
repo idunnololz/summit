@@ -42,6 +42,7 @@ import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
+import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -66,6 +67,7 @@ class AddOrEditPostTemplateFragment :
       fragmentManager: FragmentManager,
       instance: String,
       templateToEditId: Long? = null,
+      prefill: TemplateData.PostTemplateData? = null,
     ) {
       AddOrEditPostTemplateFragment().apply {
         arguments = AddOrEditPostTemplateFragmentArgs(
@@ -73,12 +75,15 @@ class AddOrEditPostTemplateFragment :
           templateToEdit = TemplateToEdit(
             templateToEditId
           ),
+          prefill = prefill,
         ).toBundle()
       }.showAllowingStateLoss(fragmentManager, "AddOrEditPostTemplateFragment")
     }
   }
 
   private val args by navArgs<AddOrEditPostTemplateFragmentArgs>()
+
+  private var isArgsHandled = false
 
   private val viewModel: AddOrEditPostTemplateViewModel by viewModels()
   private val uploadImageViewModel: UploadImageViewModel by viewModels()
@@ -315,6 +320,17 @@ class AddOrEditPostTemplateFragment :
             bodyEditText.setText(it.data.content)
             nsfwSwitch.isChecked = it.data.isNsfw
           }
+        }
+      }
+
+      if (savedInstanceState == null && !isArgsHandled) {
+        isArgsHandled = true
+
+        args.prefill?.let {
+          templateNameEditText.setText(it.name)
+          titleEditText.setText(it.title)
+          bodyEditText.setText(it.content)
+          nsfwSwitch.isChecked = it.isNsfw
         }
       }
     }

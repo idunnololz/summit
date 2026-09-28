@@ -1,11 +1,14 @@
 package com.idunnololz.summit.drafts.drafts
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
@@ -13,14 +16,21 @@ import com.idunnololz.summit.databinding.CommentDraftItemBinding
 import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
+import com.idunnololz.summit.databinding.ItemPostAndCommentTemplatePostBinding
+import com.idunnololz.summit.databinding.ItemPostAndCommentTemplatePostBinding.inflate
 import com.idunnololz.summit.databinding.PostDraftItemBinding
 import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.imageTintListCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.tsToShortDate
 
 class DraftsAdapter(
+  private val context: Context,
   private val onDraftClick: (DraftEntry) -> Unit,
   private val onDeleteClick: (DraftEntry) -> Unit,
+  private val onPostTemplateClick: (ViewModelItem.PostTemplateItem) -> Unit,
+  private val onCommentTemplateClick: (ViewModelItem.CommentTemplateItem) -> Unit,
   private val onStartSelectionMode: (() -> Unit)? = null,
   private val onItemSelected: ((DraftEntry, Boolean) -> Unit)? = null,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -32,15 +42,20 @@ class DraftsAdapter(
     areItemsTheSame = { old, new ->
       old::class == new::class &&
         when (old) {
-          is ViewModelItem.PostDraftItem -> {
-            old.draftEntry.id ==
-              (new as ViewModelItem.PostDraftItem).draftEntry.id
-          }
-
           is ViewModelItem.CommentDraftItem -> {
             old.draftEntry.id ==
               (new as ViewModelItem.CommentDraftItem).draftEntry.id
           }
+          is ViewModelItem.PostDraftItem -> {
+            old.draftEntry.id ==
+              (new as ViewModelItem.PostDraftItem).draftEntry.id
+          }
+          is ViewModelItem.CommentTemplateItem ->
+            old.entryId ==
+              (new as ViewModelItem.CommentTemplateItem).entryId
+          is ViewModelItem.PostTemplateItem ->
+            old.entryId ==
+              (new as ViewModelItem.PostTemplateItem).entryId
 
           ViewModelItem.LoadingItem -> true
           ViewModelItem.EmptyItem -> true
@@ -101,6 +116,50 @@ class DraftsAdapter(
         select = b.select,
         root = b.root,
       )
+    }
+    addItemType(
+      clazz = ViewModelItem.CommentTemplateItem::class,
+      inflateFn = ItemPostAndCommentTemplatePostBinding::inflate,
+    ) { item, b, h ->
+      b.icon.apply {
+        val iconColor = context.getColorCompat(R.color.style_amber)
+        setImageResource(R.drawable.outline_comment_24)
+        this.imageTintListCompat = ColorStateList.valueOf(iconColor)
+        setBackgroundColor(ColorUtils.setAlphaComponent(iconColor, 77))
+      }
+      b.title.text = if (item.commentTemplateData.name.isNullOrBlank()) {
+        context.getString(R.string.no_name)
+      } else {
+        item.commentTemplateData.name
+      }
+      b.desc.text = item.description.ifBlank {
+        context.getString(R.string.no_content)
+      }
+      b.root.setOnClickListener {
+        onCommentTemplateClick(item)
+      }
+    }
+    addItemType(
+      clazz = ViewModelItem.PostTemplateItem::class,
+      inflateFn = ItemPostAndCommentTemplatePostBinding::inflate,
+    ) { item, b, h ->
+      b.icon.apply {
+        val iconColor = context.getColorCompat(R.color.style_blue)
+        setImageResource(R.drawable.ic_post_24)
+        this.imageTintListCompat = ColorStateList.valueOf(iconColor)
+        setBackgroundColor(ColorUtils.setAlphaComponent(iconColor, 77))
+      }
+      b.title.text = if (item.postTemplateData.name.isNullOrBlank()) {
+        context.getString(R.string.no_name)
+      } else {
+        item.postTemplateData.name
+      }
+      b.desc.text = item.description.ifBlank {
+        context.getString(R.string.no_content)
+      }
+      b.root.setOnClickListener {
+        onPostTemplateClick(item)
+      }
     }
     addItemType(
       clazz = ViewModelItem.LoadingItem::class,

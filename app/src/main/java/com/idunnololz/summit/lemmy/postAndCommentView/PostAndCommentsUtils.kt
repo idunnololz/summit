@@ -1,15 +1,19 @@
 package com.idunnololz.summit.lemmy.postAndCommentView
 
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.GUEST_ACCOUNT_ID
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment
+import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -26,6 +30,7 @@ import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.LinkUtils
@@ -185,6 +190,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
       R.string.detailed_view,
       R.drawable.baseline_open_in_full_24,
     )
+    addItemWithIcon(
+      R.id.ca_create_comment_template,
+      R.string.create_comment_template,
+      R.drawable.outline_comment_24,
+    )
 
     setOnMenuItemClickListener {
       createCommentActionHandler(
@@ -197,6 +207,8 @@ fun BaseFragment<*>.showMoreCommentOptions(
       )(it.id)
     }
   }
+
+  Log.d("BottomMenu", "showMoreCommentOptions()")
   getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 
   return bottomMenu
@@ -364,6 +376,23 @@ fun BaseFragment<*>.createCommentActionHandler(
         instance = apiInstance,
         filterByMod = null,
         filterByUser = commentView.creator.toPersonRef(),
+      )
+    }
+    R.id.ca_create_comment_template -> {
+      AddOrEditCommentTemplateFragment.show(
+        fragmentManager = childFragmentManager,
+        instance = apiInstance,
+        prefill = TemplateData.CommentTemplateData(
+          originalComment = null,
+          postRef = null,
+          parentCommentId = null,
+          name = "",
+          title = "",
+          content = commentView.comment.content,
+          accountId = currentAccount?.id ?: GUEST_ACCOUNT_ID,
+          accountInstance = apiInstance,
+          languageId = null,
+        )
       )
     }
   }

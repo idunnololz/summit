@@ -328,4 +328,8 @@
     <item name="transfer_community_error_user_not_a_mod" type="id" />
     <item name="delete_template_button" type="id" />
     <item name="save_template_button" type="id" />
+    <item name="local_person_stats" type="id" />
+    <item name="pa_create_post_template" type="id" />
+    <item name="ca_create_comment_template" type="id" />
+    <item name="check_ai_usage" type="id" />
 </resources>

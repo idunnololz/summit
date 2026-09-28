@@ -15,7 +15,31 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/button_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@id/drafts_button">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/drafts_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drafts"
+                    style="@style/Widget.Material3Expressive.Button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/templates_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/templates"
+                    style="@style/Widget.Material3Expressive.Button" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
