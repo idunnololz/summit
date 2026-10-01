@@ -106,6 +106,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_AI_API_KEY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OP_TAG_STYLE
@@ -779,6 +780,8 @@ class Preferences(
     by booleanPreference(KEY_SHOW_FAILED_ACTIONS_BADGE, true)
   var defaultLanguageId: Int
     by intPreference(KEY_DEFAULT_LANGUAGE_ID, -1)
+  var openAiApiKey: String?
+    by sensitiveStringPreference(KEY_OPEN_AI_API_KEY)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

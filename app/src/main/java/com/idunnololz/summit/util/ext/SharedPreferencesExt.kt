@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.preferences.ComposedPreferences
 import com.idunnololz.summit.preferences.PreferenceKeys
+import com.idunnololz.summit.preferences.SENSITIVE_DATA_PREFIX
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
@@ -99,7 +100,15 @@ fun SharedPreferences.asJson(): JSONObject {
 
   for ((key, value) in this.all.entries) {
     when (value) {
-      is String -> json.put(key, value)
+      is String -> {
+        if (!value.startsWith(SENSITIVE_DATA_PREFIX)) {
+          json.put(key, value)
+        } else {
+          if (value.isNotBlank()) {
+            json.put(key, "") // this will tell us something is there but won't tell us what
+          }
+        }
+      }
       is Boolean -> json.put(key, value)
       is Number -> json.put(key, value)
       null -> json.put(key, null)

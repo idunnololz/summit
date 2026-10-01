@@ -1,10 +1,16 @@
 package com.idunnololz.summit.settings.util
 
+import android.content.Context
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.idunnololz.summit.R
+import com.idunnololz.summit.databinding.DialogSensitiveTextEditorBinding
+import com.idunnololz.summit.lemmy.setMarkdown
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.ColorSettingItem
 import com.idunnololz.summit.settings.DescriptionSettingItem
@@ -17,7 +23,10 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import io.noties.markwon.Markwon
+import io.noties.markwon.linkify.LinkifyPlugin
 
 fun RadioGroupSettingItem.asRadioGroup(
   getCurrentValue: () -> Int,
@@ -208,6 +217,65 @@ fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
       resetValue = defaultValue,
       supportsRichText = setting.supportsRichText,
     ).showAllowingStateLoss(fragmentManager, "asdf")
+  },
+)
+
+fun TextValueSettingItem.asCustomItemWithSensitiveTextEditorDialog(
+  context: Context,
+  descriptionMd: String,
+  hint: String,
+  getCurrentValue: () -> String,
+  onValueChanged: SettingsAdapter.(String) -> Unit,
+  showResetButton: Boolean = false,
+  defaultValue: String? = null,
+): SettingModelItem.CustomItem = SettingModelItem.CustomItem(
+  setting = this,
+  title = title,
+  description = description,
+  icon = 0,
+  clickable = true,
+  getCurrentValue = {
+    val value = getCurrentValue()
+
+    if (value.isBlank()) {
+      value
+    } else {
+      "\u2022 \u2022 \u2022 \u2022 \u2022"
+    }
+  },
+  onValueChanged = {
+    MaterialAlertDialogBuilder(context)
+      .apply {
+        val binding = DialogSensitiveTextEditorBinding.inflate(LayoutInflater.from(context))
+        setTitle(title)
+        setView(binding.root)
+
+        val markwon = Markwon.builder(context)
+          .usePlugin(
+            LinkifyPlugin.create(
+              mask = Linkify.WEB_URLS,
+              useCompat = true,
+            ),
+          )
+          .build()
+        markwon.setMarkdown(binding.desc, descriptionMd)
+
+        binding.textInput.setEndIconOnClickListener {
+          binding.textEditor.setText(Utils.getFromClipboard(context))
+        }
+        binding.textEditor.hint = hint
+
+        setPositiveButton(android.R.string.ok) { _, _ ->
+          onValueChanged(binding.textEditor.text.toString())
+        }
+        setNegativeButton(android.R.string.cancel) { _, _ -> }
+        if (showResetButton) {
+          setNeutralButton(R.string.reset) { _, _ ->
+            onValueChanged(defaultValue ?: "")
+          }
+        }
+      }
+      .show()
   },
 )
 

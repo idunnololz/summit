@@ -15,6 +15,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.NavBarController
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.VideoState
@@ -123,6 +124,7 @@ abstract class SummitActivity :
   abstract var navBarController: NavBarController
   abstract var moreActionsHelper: MoreActionsHelper
   abstract var linkResolver: LinkResolver
+  abstract var preferences: Preferences
   protected abstract var currentNavController: NavController?
 
   abstract fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit)

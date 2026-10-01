@@ -35,7 +35,9 @@ class ViewCurrentSettingsViewModel @Inject constructor(
 
       val currentSettingsJson = preferences.asJson()
 
-      val allKeys = currentSettingsJson.keys().asSequence()
+      val allKeys = currentSettingsJson
+        .keys()
+        .asSequence()
 
       // diff current vs the json we are importing
       val diffs = mutableListOf<Diff>()
@@ -44,8 +46,14 @@ class ViewCurrentSettingsViewModel @Inject constructor(
         diffs.add(Diff(DiffType.Added, "null", currentValue.toString()))
       }
 
-      val settingsPreview = currentSettingsJson.keys().asSequence()
+      val sortedSettingsPreview = LinkedHashMap<String, String>()
+      currentSettingsJson.keys().asSequence()
         .associateWith { (currentSettingsJson.opt(it)?.toString() ?: "null") }
+        .entries
+        .sortedBy { it.key }
+        .associateTo(sortedSettingsPreview) {
+          it.key to it.value
+        }
       val keyToType = currentSettingsJson.keys().asSequence()
         .associateWith { (currentSettingsJson.opt(it)?.javaClass?.simpleName ?: "?") }
 
@@ -66,7 +74,7 @@ class ViewCurrentSettingsViewModel @Inject constructor(
           SettingsDataPreview(
             keys = currentSettingsJson.keys().asSequence().toList(),
             diffs = diffs,
-            settingsPreview = settingsPreview,
+            settingsPreview = sortedSettingsPreview,
             keyToType = keyToType,
             rawData = currentSettingsJson.toString(),
             tablePath = null,

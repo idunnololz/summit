@@ -169,7 +169,7 @@ class MainActivity : SummitActivity() {
   lateinit var userCommunitiesManager: UserCommunitiesManager
 
   @Inject
-  lateinit var preferences: Preferences
+  override lateinit var preferences: Preferences
 
   @Inject
   lateinit var accountManager: AccountManager

@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.account.info.isPersonBlocked
+import com.idunnololz.summit.aiDetector.AiDetectorDialogFragment
 import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -21,6 +22,7 @@ import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AdvancedLink
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
@@ -35,6 +37,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
   linkResolver: LinkResolver,
+  preferences: Preferences,
   textOrFileName: String? = null,
   mimeType: String? = null,
   downloadContext: FileDownloadContext? = null,
@@ -86,6 +89,14 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
           R.string.image_info,
           R.drawable.outline_info_24,
         )
+
+        if (!preferences.openAiApiKey.isNullOrBlank()) {
+          addItemWithIcon(
+            R.id.check_ai_usage,
+            R.string.check_ai_usage,
+            R.drawable.baseline_check_24,
+          )
+        }
 
         addDivider()
       }
@@ -396,6 +407,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
         linkResolver = linkResolver,
+        preferences = preferences,
         textOrFileName = textOrFileName,
         mimeType = mimeType,
         downloadContext = downloadContext,
@@ -414,6 +426,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
   linkResolver: LinkResolver,
+  preferences: Preferences,
   textOrFileName: String? = null,
   mimeType: String? = null,
   downloadContext: FileDownloadContext? = null,
@@ -422,6 +435,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   moreActionsHelper = moreActionsHelper,
   fragmentManager = fragmentManager,
   linkResolver = linkResolver,
+  preferences = preferences,
   textOrFileName = textOrFileName,
   mimeType = mimeType,
   downloadContext = downloadContext,
@@ -432,6 +446,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
   linkResolver: LinkResolver,
+  preferences: Preferences,
   textOrFileName: String? = null,
   mimeType: String? = null,
   downloadContext: FileDownloadContext? = null,
@@ -638,6 +653,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
         linkResolver = linkResolver,
+        preferences = preferences,
         textOrFileName = textOrFileName,
         mimeType = mimeType,
         downloadContext = downloadContext,
@@ -645,6 +661,9 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
     }
     R.id.view_in_link_editor -> {
       LinkEditorDialogFragment.show(fragmentManager, url)
+    }
+    R.id.check_ai_usage -> {
+      AiDetectorDialogFragment.show(fragmentManager, url)
     }
   }
 }

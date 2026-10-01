@@ -21,6 +21,8 @@ import kotlinx.serialization.serializer
 
 private const val TAG = "SPP"
 
+internal const val SENSITIVE_DATA_PREFIX = "!@sense@!#"
+
 interface SharedPreferencesPreferences {
   val sharedPreferences: SharedPreferences
   val json: Json
@@ -29,13 +31,32 @@ interface SharedPreferencesPreferences {
     val prefs: SharedPreferencesPreferences,
     val key: String,
     val defaultValue: String? = "",
+    val isSensitive: Boolean = false,
   ) : ReadWriteProperty<Any, String?> {
 
     override fun getValue(thisRef: Any, property: KProperty<*>) =
-      prefs.sharedPreferences.getString(key, defaultValue)
+      if (isSensitive) {
+        prefs.sharedPreferences.getString(key, defaultValue)
+          ?.takeIf { it.startsWith(SENSITIVE_DATA_PREFIX) }
+          ?.drop(SENSITIVE_DATA_PREFIX.length)
+      } else {
+        prefs.sharedPreferences.getString(key, defaultValue)
+      }
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: String?) =
-      prefs.sharedPreferences.edit { putString(key, value) }
+      prefs.sharedPreferences.edit {
+        putString(
+          key,
+          if (isSensitive) {
+            buildString {
+              append(SENSITIVE_DATA_PREFIX)
+              append(value)
+            }
+          } else {
+            value
+          }
+        )
+      }
   }
 
   class FloatPreferenceDelegate(
@@ -171,6 +192,11 @@ interface SharedPreferencesPreferences {
 @Suppress("NOTHING_TO_INLINE")
 inline fun SharedPreferencesPreferences.stringPreference(key: String, defaultValue: String? = "") =
   StringPreferenceDelegate(this, key, defaultValue)
+
+// Sensitive data probably shouldn't have a default value other than "".
+@Suppress("NOTHING_TO_INLINE")
+inline fun SharedPreferencesPreferences.sensitiveStringPreference(key: String) =
+  StringPreferenceDelegate(prefs = this, key = key, isSensitive = true)
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun SharedPreferencesPreferences.floatPreference(key: String, defaultValue: Float = 0.0f) =

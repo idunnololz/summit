@@ -622,6 +622,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 moreActionsHelper = it.moreActionsHelper,
                 fragmentManager = childFragmentManager,
                 linkResolver = linkResolver,
+                preferences = preferences,
               )
             }
           }
@@ -666,6 +667,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
               moreActionsHelper = it.moreActionsHelper,
               fragmentManager = childFragmentManager,
               linkResolver = linkResolver,
+              preferences = preferences,
             )
           }
         }

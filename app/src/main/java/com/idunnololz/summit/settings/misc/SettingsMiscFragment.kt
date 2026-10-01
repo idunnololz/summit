@@ -18,9 +18,11 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItemWithSensitiveTextEditorDialog
 import com.idunnololz.summit.settings.util.asCustomItemWithTextEditorDialog
 import com.idunnololz.summit.settings.util.asOnOffSwitch
 import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
@@ -28,6 +30,7 @@ import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
@@ -315,6 +318,14 @@ class SettingsMiscFragment :
       settings.showFailedActionsBadge.asOnOffSwitch(
         { preferences.showFailedActionsBadge },
         { preferences.showFailedActionsBadge = it },
+      ),
+      settings.enableOpenAiTools.asCustomItemWithSensitiveTextEditorDialog(
+        context = context,
+        descriptionMd = getString(R.string.open_ai_api_key_instructions),
+        hint = getString(R.string.open_ai_api_key_hint),
+        getCurrentValue = { preferences.openAiApiKey ?: "" },
+        onValueChanged = { preferences.openAiApiKey = it },
+        showResetButton = true,
       ),
       *if (BuildConfig.DEBUG) {
         arrayOf(

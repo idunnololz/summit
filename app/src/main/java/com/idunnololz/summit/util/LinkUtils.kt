@@ -11,6 +11,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.Preferences
 
 object LinkUtils {
 
@@ -136,6 +137,7 @@ fun SummitActivity.showMoreLinkOptions(
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
     linkResolver = linkResolver,
+    preferences = preferences,
     textOrFileName = text,
     downloadContext = downloadContext,
   )
@@ -147,6 +149,7 @@ fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefByName, text: 
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
     linkResolver = linkResolver,
+    preferences = preferences,
     textOrFileName = text,
   )
 }
@@ -157,6 +160,7 @@ fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefComplete, text
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
     linkResolver = linkResolver,
+    preferences = preferences,
     textOrFileName = text,
   )
 }

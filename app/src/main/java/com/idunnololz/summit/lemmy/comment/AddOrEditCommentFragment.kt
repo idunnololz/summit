@@ -197,6 +197,8 @@ class AddOrEditCommentFragment :
   private var isSent: Boolean = false
   private var configureCommentBinding: ConfigureCommentBinding? = null
 
+  private var isEditCommentRestored = false
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -471,9 +473,6 @@ class AddOrEditCommentFragment :
         toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
         toolbar.menu.findItem(R.id.save_comment)?.isVisible = false
       }
-
-      val commentView = args.commentView ?: args.editCommentView
-      val postView = args.postView
 
       toolbar.setNavigationIcon(R.drawable.baseline_close_24)
       toolbar.setNavigationIconTint(
@@ -886,7 +885,8 @@ class AddOrEditCommentFragment :
       binding.contextContainer.visibility = View.GONE
       binding.divider.visibility = View.GONE
 
-      if (savedInstanceState == null) {
+      if (savedInstanceState == null && !isEditCommentRestored) {
+        isEditCommentRestored = true
         commentEditor.setText(commentToEdit.comment.content)
         commentEditor.setSelection(binding.commentEditText.length())
         viewModel.languageId.value = commentToEdit.comment.language_id

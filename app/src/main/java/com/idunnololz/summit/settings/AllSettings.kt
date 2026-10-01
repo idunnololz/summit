@@ -92,6 +92,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_O
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_AI_API_KEY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OP_TAG_STYLE
@@ -2274,6 +2275,11 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.show_failed_actions_badge),
     description = context.getString(R.string.show_failed_actions_badge_desc),
     relatedKeys = listOf(KEY_SHOW_FAILED_ACTIONS_BADGE),
+  )
+  val enableOpenAiTools = TextValueSettingItem(
+    title = context.getString(R.string.enable_open_ai_tools),
+    description = context.getString(R.string.enable_open_ai_tools_desc),
+    relatedKeys = listOf(KEY_OPEN_AI_API_KEY),
   )
 }
 

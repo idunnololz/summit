@@ -545,4 +545,12 @@ safeargs.
             android:name="personRef"
             app:argType="com.idunnololz.summit.lemmy.PersonRef" />
     </dialog>
+    <dialog
+        android:id="@+id/aiDetectorDialogFragment"
+        android:name="com.idunnololz.summit.aiDetector.AiDetectorDialogFragment"
+        android:label="AiDetectorDialogFragment" >
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
 </navigation>

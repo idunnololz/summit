@@ -407,6 +407,13 @@ class CreatePresetFragment : BaseFragment<FragmentCreatePresetBinding>() {
                   )
 
                 null -> {}
+                PiiDetector.ValuePiiIssue.SensitiveData ->
+                  append(
+                    getString(
+                      R.string.warn_pii_sensitive_data,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
               }
             }
           }

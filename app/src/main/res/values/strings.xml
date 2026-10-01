@@ -2465,7 +2465,29 @@
     <string name="no_content">(no content)</string>
     <string name="local_person_stats">Local person stats</string>
     <string name="check_ai_usage">Check AI usage</string>
-
+    <string name="ai_detector_detected">AI signals detected</string>
+    <string name="ai_detector_not_detected">No AI signals detected</string>
+    <string name="ai_detector_not_detected_disclaimer">This does not prove the image is human-made. AI signals may be missing, removed, degraded, or unsupported.</string>
+    <string name="ai_detector_no_applicable_checks">The response did not contain any applicable checks.</string>
+    <string name="ai_detector_missing_api_key">Set your OpenAI API key in settings, then try again.</string>
+    <string name="ai_detector_unsupported_format">OpenAI provenance checks support PNG, JPEG, and WebP images. Detected format: %1$s</string>
+    <string name="ai_detector_image_too_large">The image exceeds OpenAI’s 50 MiB upload limit.</string>
+    <string name="ai_detector_request_failed">The OpenAI provenance check failed.</string>
+    <string name="validation">Validation</string>
+    <string name="issuer">Issuer</string>
+    <string name="model">Model</string>
+    <string name="generated_at">Generated at</string>
+    <string name="close">Close</string>
+    <string name="ai_detector_not_detected_desc">We did not find evidence that the content was generated using AI tools.</string>
+    <string name="ai_detector_detected_desc">This content was generated using AI tools. See below for details.</string>
+    <string name="content_credentials">Content credentials (C2PA)</string>
+    <string name="ai_detector_detected_format">%1$s detected</string>
+    <string name="ai_detector_not_detected_format">%1$s not detected</string>
+    <string name="enable_open_ai_tools">Enable OpenAI tools</string>
+    <string name="enable_open_ai_tools_desc">Enable OpenAI tools by setting your OpenAI API key here. OpenAI tools currently only compose of the AI image detector. More tools may be added in the future.</string>
+    <string name="open_ai_api_key_instructions">Paste your OpenAI API key below to enable AI tools in the app.\n\nYou can create an OpenAI API key free of charge. Guide here (you only need to get the API key, you can ignore the rest of the instructions): https://developers.openai.com/api/docs/quickstart.</string>
+    <string name="open_ai_api_key_hint">sk-…</string>
+    <string name="warn_pii_sensitive_data">Value has the sensitive data marker. Value: `%1$s`</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>

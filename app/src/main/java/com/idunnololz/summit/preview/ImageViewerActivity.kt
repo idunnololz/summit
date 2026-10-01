@@ -530,6 +530,7 @@ class ImageViewerActivity :
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
         linkResolver = linkResolver,
+        preferences = preferences,
         downloadContext = args.downloadContext,
       )(R.id.share_image)
     }
@@ -541,6 +542,7 @@ class ImageViewerActivity :
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
         linkResolver = linkResolver,
+        preferences = preferences,
         downloadContext = args.downloadContext,
       )(R.id.download)
     }
@@ -555,6 +557,7 @@ class ImageViewerActivity :
         moreActionsHelper = moreActionsHelper,
         fragmentManager = supportFragmentManager,
         linkResolver = linkResolver,
+        preferences = preferences,
         textOrFileName = args.mimeType,
       )
     }

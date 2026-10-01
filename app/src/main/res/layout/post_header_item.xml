@@ -36,7 +36,7 @@
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <HorizontalScrollView
+    <com.idunnololz.summit.view.AutoHorizontalScrollView
         android:id="@+id/badges_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-    </HorizontalScrollView>
+    </com.idunnololz.summit.view.AutoHorizontalScrollView>
 
     <LinearLayout
         android:id="@+id/full_content"

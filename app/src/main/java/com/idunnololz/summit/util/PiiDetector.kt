@@ -1,5 +1,6 @@
 package com.idunnololz.summit.util
 
+import com.idunnololz.summit.preferences.SENSITIVE_DATA_PREFIX
 import java.util.regex.Pattern
 
 class PiiDetector {
@@ -106,6 +107,9 @@ class PiiDetector {
     val jwtTokenRegex: Pattern = Pattern.compile(
       """e[yw][A-Za-z0-9-_]+\.(?:e[yw][A-Za-z0-9-_]+)?\.[A-Za-z0-9-_]{2,}(?:(?:\.[A-Za-z0-9-_]{2,}){2})?""",
     )
+    val sensitiveDataRegex: Pattern = Pattern.compile(
+      """^$SENSITIVE_DATA_PREFIX""",
+    )
   }
 
   private val columnRegexes = ColumnRegexes()
@@ -197,6 +201,9 @@ class PiiDetector {
       if (jwtTokenRegex.matcher(value).matches()) {
         return ValuePiiIssue.AuthToken
       }
+      if (sensitiveDataRegex.matcher(value).matches()) {
+        return ValuePiiIssue.SensitiveData
+      }
     }
 
     return null
@@ -226,5 +233,6 @@ class PiiDetector {
     CreditCard,
     Phone,
     AuthToken,
+    SensitiveData,
   }
 }

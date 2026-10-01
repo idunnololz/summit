@@ -46,6 +46,7 @@ class ClientFactory @Inject constructor(
     SummitApiClient,
     BrowserLike,
     BrowserLikeUnauthed,
+    GenericApiClient,
   }
 
   private fun getUserAgent(purpose: Purpose): String {
@@ -57,6 +58,7 @@ class ClientFactory @Inject constructor(
       Purpose.BrowserLike,
       Purpose.BrowserLikeUnauthed,
       -> "bl"
+      Purpose.GenericApiClient -> "generic"
     }
 
     if (purpose == Purpose.BrowserLike) {

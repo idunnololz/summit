@@ -52,6 +52,18 @@ class NetworkModule {
 
   @Provides
   @Singleton
+  @GenericApi
+  fun provideGenericApiOkHttpClient(
+    clientFactory: ClientFactory,
+    directoryHelper: DirectoryHelper,
+  ): OkHttpClient = clientFactory.newClient(
+    debugName = "GenericApi",
+    cacheDir = directoryHelper.okHttpCacheDir2,
+    purpose = ClientFactory.Purpose.GenericApiClient,
+  )
+
+  @Provides
+  @Singleton
   @SummitApi
   fun provideSummitApiOkHttpClient(
     clientFactory: ClientFactory,
@@ -98,3 +110,10 @@ annotation class LemmyApi
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class SummitApi
+
+/**
+ * Used to make API calls for misc things.
+ */
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class GenericApi

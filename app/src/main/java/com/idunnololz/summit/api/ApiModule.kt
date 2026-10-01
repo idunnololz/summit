@@ -1,6 +1,8 @@
 package com.idunnololz.summit.api
 
 import com.idunnololz.summit.BuildConfig
+import com.idunnololz.summit.api.openai.OpenAiApi
+import com.idunnololz.summit.network.GenericApi
 import com.idunnololz.summit.network.SummitApi
 import dagger.Module
 import dagger.Provides
@@ -35,4 +37,18 @@ class ApiModule {
       .client(okHttpClient)
       .build()
       .create(SummitServerApi::class.java)
+
+  @Provides
+  @Singleton
+  fun provideOpenAiApi(@GenericApi okHttpClient: OkHttpClient, json: Json): OpenAiApi =
+    Retrofit.Builder()
+      .baseUrl("https://api.openai.com")
+      .addConverterFactory(
+        json.asConverterFactory(
+          "application/json; charset=UTF8".toMediaType(),
+        ),
+      )
+      .client(okHttpClient)
+      .build()
+      .create(OpenAiApi::class.java)
 }

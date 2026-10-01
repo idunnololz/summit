@@ -23,10 +23,12 @@ class DirectoryHelper @Inject constructor(
 
   val cacheDir = context.cacheDir
   val okHttpCacheDir = File(context.cacheDir, "okhttp_cache")
+  val okHttpCacheDir2 = File(context.cacheDir, "okhttp_cache2")
   val videoCacheDir = File(context.cacheDir, "videos")
   val miscCacheDir = File(context.cacheDir, "misc")
   val apiInfoCacheDir = File(context.cacheDir, "api_info")
   val listsCacheDir = File(context.cacheDir, "lists")
+  val openAiCacheDir = File(context.cacheDir, "openai")
 
   val settingBackupsDir = File(context.filesDir, "sb")
   val saveForLaterDir = File(context.filesDir, "sfl")

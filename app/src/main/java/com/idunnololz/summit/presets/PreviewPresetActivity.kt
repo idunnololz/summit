@@ -109,7 +109,7 @@ class PreviewPresetActivity : SummitActivity() {
     set(value) {}
 
   @Inject
-  lateinit var preferences: Preferences
+  override lateinit var preferences: Preferences
 
   @Inject
   lateinit var sharedPreferencesManager: SharedPreferencesManager
