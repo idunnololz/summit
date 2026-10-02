@@ -45,6 +45,8 @@ sealed interface ViewModelItem : Parcelable {
     val entryId: Long,
     val postTemplateData: TemplateData.PostTemplateData,
     val description: String,
+    val isSelectable: Boolean,
+    val isSelected: Boolean,
   ): ViewModelItem
 
   @Parcelize
@@ -52,6 +54,8 @@ sealed interface ViewModelItem : Parcelable {
     val entryId: Long,
     val commentTemplateData: TemplateData.CommentTemplateData,
     val description: String,
+    val isSelectable: Boolean,
+    val isSelected: Boolean,
   ): ViewModelItem
 
   @Parcelize

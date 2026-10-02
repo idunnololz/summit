@@ -195,63 +195,6 @@ class AddOrEditPostFragment :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    childFragmentManager.setFragmentResultListener(
-      AddLinkDialogFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
-        AddLinkDialogFragment.REQUEST_KEY_RESULT,
-      )
-      if (result != null) {
-        textFormatToolbar?.onLinkAdded(result.text, result.url)
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      DraftsDialogFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<DraftEntry>(
-        DraftsDialogFragment.REQUEST_KEY_RESULT,
-      )
-      if (result != null) {
-        viewModel.currentDraftEntry.value = result
-        viewModel.currentDraftId.value = result.id
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      ChooseSavedImageDialogFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
-        ChooseSavedImageDialogFragment.REQUEST_RESULT,
-      )
-      if (result != null) {
-        uploadImageViewModel.uploadImage(result.fileUri)
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      "for_link",
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
-        ChooseSavedImageDialogFragment.REQUEST_RESULT,
-      )
-      if (result != null) {
-        uploadImageViewModel.uploadImageForUrl(result.fileUri)
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      LanguagePickerBottomSheetFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
-        LanguagePickerBottomSheetFragment.RESULT_KEY,
-      )
-      if (result != null) {
-        viewModel.languageId.value = result.languageId
-      }
-    }
   }
 
   override fun onStart() {
@@ -277,6 +220,8 @@ class AddOrEditPostFragment :
     super.onViewCreated(view, savedInstanceState)
 
     val context = requireContext()
+
+    registerListeners()
 
     with(binding) {
       requireMainActivity().apply {
@@ -887,6 +832,76 @@ class AddOrEditPostFragment :
         viewLifecycleOwner,
         showSearchBackPressedHandler,
       )
+    }
+  }
+
+  private fun registerListeners() {
+    childFragmentManager.setFragmentResultListener(
+      AddLinkDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
+        AddLinkDialogFragment.REQUEST_KEY_RESULT,
+      )
+      if (result != null) {
+        textFormatToolbar?.onLinkAdded(result.text, result.url)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      DraftsDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<DraftsDialogFragment.Result>(
+        DraftsDialogFragment.REQUEST_KEY_RESULT,
+      )
+      if (result != null) {
+        if (result.draft != null) {
+          viewModel.currentDraftEntry.value = result.draft
+          viewModel.currentDraftId.value = result.draft.id
+        } else if (result.postTemplate != null) {
+          viewModel.currentDraftId.value = null
+          viewModel.currentDraftEntry.value = null
+
+          with(binding) {
+            titleEditText.setText(result.postTemplate.title)
+            postEditText.setText(result.postTemplate.content)
+            nsfwSwitch.isChecked = result.postTemplate.isNsfw
+          }
+        }
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      ChooseSavedImageDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
+        ChooseSavedImageDialogFragment.REQUEST_RESULT,
+      )
+      if (result != null) {
+        uploadImageViewModel.uploadImage(result.fileUri)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      "for_link",
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
+        ChooseSavedImageDialogFragment.REQUEST_RESULT,
+      )
+      if (result != null) {
+        uploadImageViewModel.uploadImageForUrl(result.fileUri)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      LanguagePickerBottomSheetFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
+        LanguagePickerBottomSheetFragment.RESULT_KEY,
+      )
+      if (result != null) {
+        viewModel.languageId.value = result.languageId
+      }
     }
   }
 

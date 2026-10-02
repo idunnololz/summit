@@ -33,6 +33,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
+/**
+ * This also holds templates as well now but renaming is a pain so...
+ */
 @AndroidEntryPoint
 class DraftsFragment :
   BaseFragment<FragmentDraftsBinding>(),

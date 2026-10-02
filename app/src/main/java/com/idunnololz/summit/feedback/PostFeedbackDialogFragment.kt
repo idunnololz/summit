@@ -104,12 +104,14 @@ class PostFeedbackDialogFragment :
       DraftsDialogFragment.REQUEST_KEY,
       this,
     ) { _, bundle ->
-      val result = bundle.getParcelableCompat<DraftEntry>(
+      val result = bundle.getParcelableCompat<DraftsDialogFragment.Result>(
         DraftsDialogFragment.REQUEST_KEY_RESULT,
       )
       if (result != null) {
-        viewModel.currentDraftEntry.value = result
-        viewModel.currentDraftId.value = result.id
+        if (result.draft != null) {
+          viewModel.currentDraftEntry.value = result.draft
+          viewModel.currentDraftId.value = result.draft.id
+        }
       }
     }
     childFragmentManager.setFragmentResultListener(

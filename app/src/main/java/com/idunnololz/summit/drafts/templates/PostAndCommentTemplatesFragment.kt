@@ -34,11 +34,9 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.imageTintListCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.you.YouFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -199,7 +197,7 @@ class PostAndCommentTemplatesFragment  :
       addItemType(
         clazz = CommentTemplateItem::class,
         inflateFn = ItemPostAndCommentTemplatePostBinding::inflate,
-      ) { item, b, h ->
+      ) { item, b, _ ->
         b.icon.apply {
           val iconColor = context.getColorCompat(R.color.style_amber)
           setImageResource(R.drawable.outline_comment_24)

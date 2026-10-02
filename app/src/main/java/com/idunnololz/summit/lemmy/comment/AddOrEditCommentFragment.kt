@@ -203,52 +203,6 @@ class AddOrEditCommentFragment :
     super.onCreate(savedInstanceState)
 
     setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-
-    childFragmentManager.setFragmentResultListener(
-      AddLinkDialogFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
-        AddLinkDialogFragment.REQUEST_KEY_RESULT,
-      )
-      if (result != null) {
-        textFormatterToolbar?.onLinkAdded(result.text, result.url)
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      DraftsDialogFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<DraftEntry>(
-        DraftsDialogFragment.REQUEST_KEY_RESULT,
-      )
-      if (result != null) {
-        viewModel.currentDraftEntry.value = result
-        viewModel.currentDraftId.value = result.id
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      ChooseSavedImageDialogFragment.REQUEST_KEY,
-      this,
-    ) { key, bundle ->
-      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
-        ChooseSavedImageDialogFragment.REQUEST_RESULT,
-      )
-      if (result != null) {
-        uploadImageViewModel.uploadImage(result.fileUri)
-      }
-    }
-    childFragmentManager.setFragmentResultListener(
-      LanguagePickerBottomSheetFragment.REQUEST_KEY,
-      this,
-    ) { _, bundle ->
-      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
-        LanguagePickerBottomSheetFragment.RESULT_KEY,
-      )
-      if (result != null) {
-        updateConfigureCommentLanguage(result.languageId)
-      }
-    }
   }
 
   override fun onStart() {
@@ -279,6 +233,8 @@ class AddOrEditCommentFragment :
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
       insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomBar)
     }
+
+    registerListeners()
 
     textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
       binding.bottomBar.removeAllViews()
@@ -625,6 +581,62 @@ class AddOrEditCommentFragment :
         commentEditText.requestFocus()
       }
       setup(savedInstanceState)
+    }
+  }
+
+  private fun registerListeners() {
+    childFragmentManager.setFragmentResultListener(
+      AddLinkDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
+        AddLinkDialogFragment.REQUEST_KEY_RESULT,
+      )
+      if (result != null) {
+        textFormatterToolbar?.onLinkAdded(result.text, result.url)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      DraftsDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<DraftsDialogFragment.Result>(
+        DraftsDialogFragment.REQUEST_KEY_RESULT,
+      )
+      if (result != null) {
+        if (result.draft != null) {
+          viewModel.currentDraftEntry.value = result.draft
+          viewModel.currentDraftId.value = result.draft.id
+        } else if (result.commentTemplate != null) {
+          viewModel.currentDraftId.value = null
+          viewModel.currentDraftEntry.value = null
+
+          binding.commentEditText.setText(result.commentTemplate.content)
+          binding.commentEditText.setSelection(binding.commentEditText.length())
+        }
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      ChooseSavedImageDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { key, bundle ->
+      val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
+        ChooseSavedImageDialogFragment.REQUEST_RESULT,
+      )
+      if (result != null) {
+        uploadImageViewModel.uploadImage(result.fileUri)
+      }
+    }
+    childFragmentManager.setFragmentResultListener(
+      LanguagePickerBottomSheetFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      val result = bundle.getParcelableCompat<LanguagePickerBottomSheetFragment.Result>(
+        LanguagePickerBottomSheetFragment.RESULT_KEY,
+      )
+      if (result != null) {
+        updateConfigureCommentLanguage(result.languageId)
+      }
     }
   }
 

@@ -29,6 +29,7 @@ import com.google.android.material.button.MaterialButtonGroup
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.StateListSizeChange
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentTemplateBinding
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
@@ -104,6 +105,15 @@ class AddOrEditCommentTemplateFragment :
         }
       }
     }
+
+  private val deleteTemplateDialogLauncher = newAlertDialogLauncher("delete_template") {
+    if (it.isOk) {
+      it.extras?.getLong("template_id")?.let { templateId ->
+        viewModel.deleteTemplate(templateId)
+        dismiss()
+      }
+    }
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -377,8 +387,12 @@ class AddOrEditCommentTemplateFragment :
           )
         }
         deleteButton.setOnClickListener {
-          viewModel.deleteTemplate(templateId)
-          dismiss()
+          deleteTemplateDialogLauncher.launchDialog {
+            messageResId = R.string.confirm_delete_template
+            positionButtonResId = R.string.delete
+            negativeButtonResId = R.string.cancel
+            extras.putLong("template_id", templateId)
+          }
         }
         buttonGroup.addView(deleteButton)
       }

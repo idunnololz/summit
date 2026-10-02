@@ -1,10 +1,12 @@
 package com.idunnololz.summit.drafts
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
@@ -23,9 +25,11 @@ import com.idunnololz.summit.drafts.drafts.DraftsAdapter
 import com.idunnololz.summit.drafts.drafts.DraftsViewModel
 import com.idunnololz.summit.drafts.drafts.Filter
 import com.idunnololz.summit.drafts.drafts.ViewModelItem
+import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -33,6 +37,7 @@ import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,6 +56,13 @@ class DraftsDialogFragment :
     }
   }
 
+  @Parcelize
+  data class Result(
+    val draft: DraftEntry?,
+    val commentTemplate: TemplateData.CommentTemplateData?,
+    val postTemplate: TemplateData.PostTemplateData?,
+  ): Parcelable
+
   private val args by navArgs<DraftsDialogFragmentArgs>()
 
   private val viewModel: DraftsViewModel by viewModels()
@@ -68,6 +80,11 @@ class DraftsDialogFragment :
       it.extras?.getLong("draft_id")?.let { draftId ->
         viewModel.deleteDraft(draftId)
       }
+    }
+  }
+  private val deleteSelectedDialogLauncher = newAlertDialogLauncher("delete_selected") {
+    if (it.isOk) {
+      viewModel.deleteAllSelectedDrafts()
     }
   }
 
@@ -94,6 +111,19 @@ class DraftsDialogFragment :
     super.onViewCreated(view, savedInstanceState)
 
     val context = requireContext()
+
+    val onBackPressedCallback = object : OnBackPressedCallback(
+      enabled = viewModel.model.value?.isInSelectMode == true,
+    ) {
+      override fun handleOnBackPressed() {
+        viewModel.isInSelectMode = false
+      }
+    }
+    requireSummitActivity().onBackPressedDispatcher
+      .addCallback(
+        viewLifecycleOwner,
+        onBackPressedCallback,
+      )
 
     viewModel.draftType = args.draftType
 
@@ -161,7 +191,16 @@ class DraftsDialogFragment :
 
           setFragmentResult(
             REQUEST_KEY,
-            bundleOf(REQUEST_KEY_RESULT to draft),
+            Bundle().apply {
+              putParcelable(
+                REQUEST_KEY_RESULT,
+                Result(
+                  draft = draft,
+                  commentTemplate = null,
+                  postTemplate = null,
+                ),
+              )
+            }
           )
           dismiss()
         },
@@ -173,8 +212,44 @@ class DraftsDialogFragment :
             extras.putLong("draft_id", it.id)
           }
         },
-        onPostTemplateClick = {},
-        onCommentTemplateClick = {},
+        onPostTemplateClick = {
+          setFragmentResult(
+            REQUEST_KEY,
+            Bundle().apply {
+              putParcelable(
+                REQUEST_KEY_RESULT,
+                Result(
+                  draft = null,
+                  commentTemplate = null,
+                  postTemplate = it.postTemplateData,
+                ),
+              )
+            }
+          )
+          dismiss()
+        },
+        onCommentTemplateClick = {
+          setFragmentResult(
+            REQUEST_KEY,
+            Bundle().apply {
+              putParcelable(
+                REQUEST_KEY_RESULT,
+                Result(
+                  draft = null,
+                  commentTemplate = it.commentTemplateData,
+                  postTemplate = null,
+                ),
+              )
+            }
+          )
+          dismiss()
+        },
+        onStartSelectionMode = {
+          viewModel.isInSelectMode = true
+        },
+        onItemSelected = { draftEntry, isSelected ->
+          viewModel.markItemAsSelected(draftEntry.id, isSelected)
+        },
       )
       val layoutManager = LinearLayoutManager(context)
       recyclerView.adapter = adapter
@@ -223,6 +298,18 @@ class DraftsDialogFragment :
             layoutManager.scrollToPosition(0)
           }
         }
+
+        onBackPressedCallback.isEnabled = it.isInSelectMode
+
+        if (it.isInSelectMode) {
+          if (!deleteFab.isShown) {
+            deleteFab.show()
+          }
+        } else {
+          if (deleteFab.isShown) {
+            deleteFab.hide()
+          }
+        }
       }
 
       recyclerView.addOnScrollListener(
@@ -243,6 +330,18 @@ class DraftsDialogFragment :
           R.id.templates_button -> {
             viewModel.filter.value = Filter.Templates
           }
+        }
+      }
+
+      deleteFab.setOnClickListener {
+        deleteSelectedDialogLauncher.launchDialog {
+          message = resources.getQuantityString(
+            R.plurals.warn_delete_drafts_format,
+            viewModel.selectedItemsCount,
+            PrettyPrintUtils.defaultDecimalFormat.format(viewModel.selectedItemsCount),
+          )
+          positionButtonResId = R.string.delete
+          negativeButtonResId = R.string.cancel
         }
       }
     }

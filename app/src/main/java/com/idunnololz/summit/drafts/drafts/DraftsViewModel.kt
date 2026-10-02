@@ -39,7 +39,7 @@ class DraftsViewModel @Inject constructor(
     private const val LIMIT = 500
   }
 
-  var draftType: Int? = DraftTypes.Post
+  var draftType: Int? = null
 
   val apiInstance: String
     get() = lemmyClient.instance
@@ -65,6 +65,8 @@ class DraftsViewModel @Inject constructor(
 
   var isInSelectMode: Boolean = false
     set(value) {
+      if (value == field) return
+
       field = value
 
       if (!value) {
@@ -86,6 +88,7 @@ class DraftsViewModel @Inject constructor(
     }
     viewModelScope.launch {
       filter.collect {
+        isInSelectMode = false
         loadData()
       }
     }
@@ -100,6 +103,9 @@ class DraftsViewModel @Inject constructor(
 
   private fun loadMoreDrafts(force: Boolean = false) {
     if (isLoading && !force) {
+      return
+    }
+    if (draftType == null) {
       return
     }
 
@@ -239,6 +245,8 @@ class DraftsViewModel @Inject constructor(
                   entryId = template.id,
                   commentTemplateData = template.data,
                   description = template.data.content,
+                  isSelectable = isInSelectMode,
+                  isSelected = selectedItems.contains(template.id),
                 ),
               )
             is TemplateData.PostTemplateData ->
@@ -247,6 +255,8 @@ class DraftsViewModel @Inject constructor(
                   entryId = template.id,
                   postTemplateData = template.data,
                   description = template.data.content,
+                  isSelectable = isInSelectMode,
+                  isSelected = selectedItems.contains(template.id),
                 ),
               )
             is TemplateData.RegistrationApplicationRejectionTemplateData,

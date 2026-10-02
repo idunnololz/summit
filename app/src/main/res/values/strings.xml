@@ -2488,6 +2488,7 @@
     <string name="open_ai_api_key_instructions">Paste your OpenAI API key below to enable AI tools in the app.\n\nYou can create an OpenAI API key free of charge. Guide here (you only need to get the API key, you can ignore the rest of the instructions): https://developers.openai.com/api/docs/quickstart.</string>
     <string name="open_ai_api_key_hint">sk-…</string>
     <string name="warn_pii_sensitive_data">Value has the sensitive data marker. Value: `%1$s`</string>
+    <string name="confirm_delete_template">Delete template?</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>
