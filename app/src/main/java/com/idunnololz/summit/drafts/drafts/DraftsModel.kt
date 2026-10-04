@@ -3,13 +3,13 @@ package com.idunnololz.summit.drafts.drafts
 import android.os.Parcelable
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
-import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item
 import com.idunnololz.summit.templates.db.TemplateData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DraftsModel(
-  val items: List<ViewModelItem> = listOf(ViewModelItem.LoadingItem),
+  val draftItems: List<ViewModelItem> = listOf(ViewModelItem.LoadingItem),
+  val templateItems: List<ViewModelItem> = listOf(ViewModelItem.LoadingItem),
   val isInSelectMode: Boolean = false,
   val filter: Filter = Filter.Drafts,
 ) : Parcelable

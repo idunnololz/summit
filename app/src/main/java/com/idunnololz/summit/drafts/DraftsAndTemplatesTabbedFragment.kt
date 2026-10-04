@@ -10,6 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentDraftsTabbedBinding
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragmentArgs
 import com.idunnololz.summit.drafts.drafts.DraftsFragment
 import com.idunnololz.summit.drafts.drafts.DraftsFragmentArgs
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesFragment

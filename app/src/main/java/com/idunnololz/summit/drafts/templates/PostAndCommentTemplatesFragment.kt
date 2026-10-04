@@ -21,7 +21,7 @@ import com.idunnololz.summit.databinding.FragmentPostAndCommentTemplatesBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemPostAndCommentTemplatePostBinding
-import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item

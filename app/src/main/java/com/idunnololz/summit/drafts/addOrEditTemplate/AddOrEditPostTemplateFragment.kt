@@ -32,7 +32,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentAddOrEditPostTemplateBinding
 import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarHelper
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager

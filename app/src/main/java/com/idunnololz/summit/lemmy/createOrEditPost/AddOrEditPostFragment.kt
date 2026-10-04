@@ -37,7 +37,7 @@ import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalPostData
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarHelper

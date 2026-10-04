@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="@dimen/padding"
-    android:paddingBottom="@dimen/padding"
     android:background="@drawable/selectable_item_bg">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -14,8 +13,10 @@
         android:layout_height="56dp"
         android:layout_marginVertical="@dimen/padding"
         style="@style/RoundImageView"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:tint="?colorControlNormal"
         app:contentPadding="@dimen/padding"/>
 
@@ -29,7 +30,7 @@
         app:layout_constraintTop_toTopOf="@+id/icon"
         app:layout_constraintBottom_toTopOf="@+id/desc_placeholder"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@+id/more"/>
 
     <com.idunnololz.summit.view.LinkifyTextView
         android:id="@+id/desc_placeholder"
@@ -41,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="@+id/icon"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@+id/more"/>
 
 
     <com.idunnololz.summit.view.LinkifyTextView
@@ -54,6 +55,18 @@
         android:ellipsize="end"
         app:layout_constraintTop_toTopOf="@+id/desc_placeholder"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@+id/more"/>
+
+    <ImageButton
+        android:id="@+id/more"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_more_vert_24"
+        android:background="@drawable/selectable_item_bg"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="?colorControlNormal"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

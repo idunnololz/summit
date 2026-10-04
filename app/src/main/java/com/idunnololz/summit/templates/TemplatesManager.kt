@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -122,6 +123,16 @@ class TemplatesManager @Inject constructor(
 
   suspend fun deleteTemplateWithId(entryId: Long) = withContext(dbContext) {
     templatesDao.deleteWithId(entryId)
+
+    coroutineScope.launch {
+      _onTemplateChanged.emit(Unit)
+    }
+  }
+
+  suspend fun deleteTemplateWithIds(entryIds: List<Long>) = withContext(dbContext) {
+    for (entryId in entryIds) {
+      templatesDao.deleteWithId(entryId)
+    }
 
     coroutineScope.launch {
       _onTemplateChanged.emit(Unit)

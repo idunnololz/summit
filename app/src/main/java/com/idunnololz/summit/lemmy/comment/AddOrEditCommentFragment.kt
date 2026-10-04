@@ -41,7 +41,7 @@ import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.OriginalCommentData
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager

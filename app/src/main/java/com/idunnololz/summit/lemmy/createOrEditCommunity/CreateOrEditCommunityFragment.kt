@@ -24,7 +24,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.databinding.FragmentCreateOrEditCommunityBinding
 import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.FloatingToolbarController
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager

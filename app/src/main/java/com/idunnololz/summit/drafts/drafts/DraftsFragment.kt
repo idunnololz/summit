@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -17,9 +16,9 @@ import com.idunnololz.summit.databinding.FragmentDraftsBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
-import com.idunnololz.summit.drafts.DraftsDialogFragmentArgs
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.drafts.drafts.ViewModelItem.CommentTemplateItem
+import com.idunnololz.summit.drafts.drafts.ViewModelItem.PostTemplateItem
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
@@ -66,7 +65,7 @@ class DraftsFragment :
 
   private val deleteSelectedDialogLauncher = newAlertDialogLauncher("delete_selected") {
     if (it.isOk) {
-      viewModel.deleteAllSelectedDrafts()
+      viewModel.deleteAllSelectedEntries()
     }
   }
   private val deleteAllDialogLauncher = newAlertDialogLauncher("delete_all") {
@@ -111,6 +110,7 @@ class DraftsFragment :
     with(binding) {
       val adapter = DraftsAdapter(
         context = context,
+        filter = Filter.Drafts,
         onDraftClick = {
           openDraft(it)
         },
@@ -124,11 +124,13 @@ class DraftsFragment :
         },
         onPostTemplateClick = {},
         onCommentTemplateClick = {},
+        onEditPostTemplateClick = {},
+        onEditCommentTemplateClick = {},
         onStartSelectionMode = {
           viewModel.isInSelectMode = true
         },
-        onItemSelected = { draftEntry, isSelected ->
-          viewModel.markItemAsSelected(draftEntry.id, isSelected)
+        onItemSelected = { itemId, isSelected ->
+          viewModel.markItemAsSelected(itemId, isSelected)
         },
       )
       val layoutManager = LinearLayoutManager(context)
@@ -138,7 +140,7 @@ class DraftsFragment :
       recyclerView.setHasFixedSize(true)
 
       fun fetchPageIfLoadItem(position: Int) {
-        (adapter.model.items.getOrNull(position) as? ViewModelItem.LoadingItem)
+        (adapter.model.draftItems.getOrNull(position) as? ViewModelItem.LoadingItem)
           ?.let {
             viewModel.loadData()
           }

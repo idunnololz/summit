@@ -188,7 +188,7 @@ safeargs.
     </dialog>
     <dialog
         android:id="@+id/draftsDialogFragment"
-        android:name="com.idunnololz.summit.drafts.DraftsDialogFragment"
+        android:name="com.idunnololz.summit.drafts.drafts.DraftsDialogFragment"
         android:label="DraftsDialogFragment" >
         <argument
             android:name="draftType"

@@ -87,8 +87,17 @@ class DraftsViewModel @Inject constructor(
       }
     }
     viewModelScope.launch {
+      templatesManager.onTemplateChanged.collect {
+        if (filter.value == Filter.Templates) {
+          loadData(force = true)
+        }
+      }
+    }
+    viewModelScope.launch {
       filter.collect {
         isInSelectMode = false
+        loadingJob?.cancel()
+        isLoading = false
         loadData()
       }
     }
@@ -164,16 +173,18 @@ class DraftsViewModel @Inject constructor(
         reset()
       }
 
-      val templates = templatesManager.getTemplatesByType(
-        when (draftType) {
-          DraftTypes.Post -> {
-            TemplateTypes.Post
+      val templates = templatesManager
+        .getTemplatesByType(
+          when (draftType) {
+            DraftTypes.Post -> {
+              TemplateTypes.Post
+            }
+            else -> {
+              TemplateTypes.Comment
+            }
           }
-          else -> {
-            TemplateTypes.Comment
-          }
-        }
-      )
+        )
+        .sortedByDescending { it.updatedTs }
       templateEntries.clear()
       for (template in templates) {
         templateEntries.add(template)
@@ -192,76 +203,52 @@ class DraftsViewModel @Inject constructor(
   }
 
   private suspend fun generateItems(filter: Filter) {
+    model.postValue(
+      model.value?.copy(
+        draftItems = generateDraftItems(),
+        templateItems = generateTemplateItems(),
+        isInSelectMode = isInSelectMode,
+        filter = filter,
+      ),
+    )
+  }
+
+  private fun generateDraftItems(): MutableList<ViewModelItem> {
     val items = mutableListOf<ViewModelItem>()
     var isEmpty = false
 
     items += ViewModelItem.HeaderItem
 
-    when (filter) {
-      Filter.Drafts -> {
-        withContext(draftEntriesContext) {
-          isEmpty = draftEntries.isEmpty()
+    isEmpty = draftEntries.isEmpty()
 
-          for (draft in draftEntries) {
-            when (draft.data) {
-              is DraftData.CommentDraftData ->
-                items.add(
-                  ViewModelItem.CommentDraftItem(
-                    draftEntry = draft,
-                    commentData = draft.data,
-                    isSelectable = isInSelectMode,
-                    isSelected = selectedItems.contains(draft.id),
-                  ),
-                )
+    for (draft in draftEntries) {
+      when (draft.data) {
+        is DraftData.CommentDraftData ->
+          items.add(
+            ViewModelItem.CommentDraftItem(
+              draftEntry = draft,
+              commentData = draft.data,
+              isSelectable = isInSelectMode,
+              isSelected = selectedItems.contains(draft.id),
+            ),
+          )
 
-              is DraftData.PostDraftData ->
-                items.add(
-                  ViewModelItem.PostDraftItem(
-                    draftEntry = draft,
-                    postData = draft.data,
-                    isSelectable = isInSelectMode,
-                    isSelected = selectedItems.contains(draft.id),
-                  ),
-                )
+        is DraftData.PostDraftData ->
+          items.add(
+            ViewModelItem.PostDraftItem(
+              draftEntry = draft,
+              postData = draft.data,
+              isSelectable = isInSelectMode,
+              isSelected = selectedItems.contains(draft.id),
+            ),
+          )
 
-              is DraftData.MessageDraftData -> {
-                /* do nothing */
-              }
-
-              null -> {
-                /* do nothing */
-              }
-            }
-          }
+        is DraftData.MessageDraftData -> {
+          /* do nothing */
         }
-      }
-      Filter.Templates -> {
-        isEmpty = templateEntries.isEmpty()
-        for (template in templateEntries) {
-          when (template.data) {
-            is TemplateData.CommentTemplateData ->
-              items.add(
-                ViewModelItem.CommentTemplateItem(
-                  entryId = template.id,
-                  commentTemplateData = template.data,
-                  description = template.data.content,
-                  isSelectable = isInSelectMode,
-                  isSelected = selectedItems.contains(template.id),
-                ),
-              )
-            is TemplateData.PostTemplateData ->
-              items.add(
-                ViewModelItem.PostTemplateItem(
-                  entryId = template.id,
-                  postTemplateData = template.data,
-                  description = template.data.content,
-                  isSelectable = isInSelectMode,
-                  isSelected = selectedItems.contains(template.id),
-                ),
-              )
-            is TemplateData.RegistrationApplicationRejectionTemplateData,
-            null -> {}
-          }
+
+        null -> {
+          /* do nothing */
         }
       }
     }
@@ -272,13 +259,50 @@ class DraftsViewModel @Inject constructor(
       items.add(ViewModelItem.EmptyItem)
     }
 
-    model.postValue(
-      model.value?.copy(
-        items = items,
-        isInSelectMode = isInSelectMode,
-        filter = filter,
-      ),
-    )
+    return items
+  }
+
+  private fun generateTemplateItems(): MutableList<ViewModelItem> {
+    val items = mutableListOf<ViewModelItem>()
+    var isEmpty = false
+
+    items += ViewModelItem.HeaderItem
+
+    isEmpty = templateEntries.isEmpty()
+    for (template in templateEntries) {
+      when (template.data) {
+        is TemplateData.CommentTemplateData ->
+          items.add(
+            ViewModelItem.CommentTemplateItem(
+              entryId = template.id,
+              commentTemplateData = template.data,
+              description = template.data.content,
+              isSelectable = isInSelectMode,
+              isSelected = selectedItems.contains(template.id),
+            ),
+          )
+        is TemplateData.PostTemplateData ->
+          items.add(
+            ViewModelItem.PostTemplateItem(
+              entryId = template.id,
+              postTemplateData = template.data,
+              description = template.data.content,
+              isSelectable = isInSelectMode,
+              isSelected = selectedItems.contains(template.id),
+            ),
+          )
+        is TemplateData.RegistrationApplicationRejectionTemplateData,
+        null -> {}
+      }
+    }
+
+    if (hasMore) {
+      items.add(ViewModelItem.LoadingItem)
+    } else if (isEmpty) {
+      items.add(ViewModelItem.EmptyItem)
+    }
+
+    return items
   }
 
   fun deleteDraft(draftId: Long) {
@@ -287,10 +311,18 @@ class DraftsViewModel @Inject constructor(
     }
   }
 
-  fun deleteAllSelectedDrafts() {
+  fun deleteAllSelectedEntries() {
     viewModelScope.launch {
       val selectedItems = selectedItems
-      draftsManager.deleteDraftsWithIds(selectedItems.toList())
+
+      when (filter.value) {
+        Filter.Drafts -> {
+          draftsManager.deleteDraftsWithIds(selectedItems.toList())
+        }
+        Filter.Templates -> {
+          templatesManager.deleteTemplateWithIds(selectedItems.toList())
+        }
+      }
 
       isInSelectMode = false
     }
