@@ -2224,7 +2224,6 @@
 
 
     <!-- ImagePicker string resource start -->
-    <string name="image_picker_provider_authority_suffix" translatable="false">.imagepicker.provider</string>
 
     <string name="title_choose_image_provider">Choose</string>
     <string name="action_cancel">Cancel</string>
@@ -2491,6 +2490,9 @@
     <string name="confirm_delete_template">Delete template?</string>
     <string name="how_ai_image_detector_works">AI image detector works by looking for watermarks (SynthID) and metadata (C2PA) in the image. SynthID is a special type of watermark that is added to an image at the time of generation. C2PA is a type of image metadata; some AI tools use C2PA to document an image\'s provenance.\n\nWhether these signals are present depends on the software used to generate the image. At the time of writing, OpenAI, Google and Meta all add SynthID watermarks to the images they generate. C2PA metadata is also added in some, but not all cases.\n\nEach AI image generator embeds a different SynthID watermark on their image. Currently, OpenAI, Google and Meta\'s public AI detectors are only capable of detecting their own SynthID watermark.\n\nFor more information about SynthID, see https://deepmind.google/models/synthid/.\n\nFor more information about C2PA, see https://c2pa.org/.</string>
     <string name="learn_more">Learn more</string>
+    <string name="sensitive_information_detected">Sensitive information detected</string>
+    <string name="sensitive_information_detected_desc">Sensitive information was detected encoded in the text copied. Please be careful if you plan to share this code. You can view the list of issues detected below.</string>
+    <string name="sensitive_data_format">Sensitive data was detected with the key \'%1$s\' and value \'%2$s\'.</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>

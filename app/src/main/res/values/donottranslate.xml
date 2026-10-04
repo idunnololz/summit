@@ -42,6 +42,7 @@
 
     <string name="handle_format">Hi %1$s@%2$s welcome!</string>
 
+    <string name="image_picker_provider_authority_suffix">.imagepicker.provider</string>
 
     <string-array name="theme_type_values">
         <item>day</item>
