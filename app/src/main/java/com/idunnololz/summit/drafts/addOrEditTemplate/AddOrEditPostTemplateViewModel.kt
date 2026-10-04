@@ -1,19 +1,15 @@
 package com.idunnololz.summit.drafts.addOrEditTemplate
 
-import android.view.View
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.templates.TemplatesManager
-import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.templates.db.TemplateData.PostTemplateData
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddOrEditPostTemplateViewModel @Inject constructor(
@@ -47,12 +43,7 @@ class AddOrEditPostTemplateViewModel @Inject constructor(
     }
   }
 
-  suspend fun save(
-    name: String,
-    title: String,
-    body: String,
-    isNsfw: Boolean,
-  ) {
+  suspend fun save(name: String, title: String, body: String, isNsfw: Boolean) {
     val job = viewModelScope.launch {
       val templateData = PostTemplateData(
         name = name,
@@ -71,14 +62,14 @@ class AddOrEditPostTemplateViewModel @Inject constructor(
       if (templateEntryId == null) {
         val id = templatesManager.saveTemplate(
           templateData = templateData,
-          showToast = false
+          showToast = false,
         )
         templateId.value = id
       } else {
         templatesManager.updateTemplate(
           entryId = templateEntryId,
           templateData = templateData,
-          showToast = false
+          showToast = false,
         )
       }
     }

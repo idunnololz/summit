@@ -1,29 +1,25 @@
 package com.idunnololz.summit.localTracking.screen.person
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
-import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
-import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityModel
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.resolver.PostResolverHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
 import javax.inject.Inject
 import kotlin.collections.get
 import kotlin.time.Duration.Companion.days
+import kotlinx.coroutines.launch
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
 
 @HiltViewModel
 class LocalStatsPersonViewModel @Inject constructor(

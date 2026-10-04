@@ -18,7 +18,6 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.asCustomItem
@@ -30,7 +29,6 @@ import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint

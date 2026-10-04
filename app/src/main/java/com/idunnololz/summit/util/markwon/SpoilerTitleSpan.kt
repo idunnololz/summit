@@ -15,8 +15,8 @@ import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
-import org.commonmark.parser.Parser
 import kotlin.math.max
+import org.commonmark.parser.Parser
 
 abstract class DetailsClickableSpan : ClickableSpan()
 

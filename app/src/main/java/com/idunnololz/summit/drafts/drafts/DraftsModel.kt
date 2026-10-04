@@ -16,7 +16,7 @@ data class DraftsModel(
 
 enum class Filter {
   Drafts,
-  Templates
+  Templates,
 }
 
 sealed interface ViewModelItem : Parcelable {
@@ -47,7 +47,7 @@ sealed interface ViewModelItem : Parcelable {
     val description: String,
     val isSelectable: Boolean,
     val isSelected: Boolean,
-  ): ViewModelItem
+  ) : ViewModelItem
 
   @Parcelize
   data class CommentTemplateItem(
@@ -56,7 +56,7 @@ sealed interface ViewModelItem : Parcelable {
     val description: String,
     val isSelectable: Boolean,
     val isSelected: Boolean,
-  ): ViewModelItem
+  ) : ViewModelItem
 
   @Parcelize
   data object LoadingItem : ViewModelItem

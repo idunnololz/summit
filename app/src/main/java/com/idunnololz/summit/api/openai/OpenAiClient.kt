@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api.openai
 import com.idunnololz.summit.cache.CborDiskCache
-import com.idunnololz.summit.network.GenericApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Utils.hashSha256
@@ -13,7 +12,6 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 
@@ -35,7 +33,7 @@ class OpenAiClient @Inject constructor(
     file: File,
     force: Boolean,
   ): Result<ContentProvenanceCheck> = withContext(Dispatchers.IO) {
-    val cacheKey = hashSha256("img-key:${imageKey}")
+    val cacheKey = hashSha256("img-key:$imageKey")
 
     if (!force) {
       diskCache.getCachedObject<ContentProvenanceCheck>(cacheKey)?.let {
@@ -78,7 +76,7 @@ class OpenAiClient @Inject constructor(
       Result.success(
         requireNotNull(response.body()).also {
           diskCache.cacheObject(cacheKey, it)
-        }
+        },
       )
     } else {
       val responseBody = response.errorBody()?.string().orEmpty()
@@ -86,7 +84,7 @@ class OpenAiClient @Inject constructor(
         ContentProvenanceApiException(
           statusCode = response.code(),
           message = parseErrorMessage(responseBody, response.code()),
-        )
+        ),
       )
     }
   }

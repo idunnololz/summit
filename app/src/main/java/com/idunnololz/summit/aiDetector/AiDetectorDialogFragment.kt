@@ -62,7 +62,6 @@ class AiDetectorDialogFragment : BaseDialogFragment<DialogFragmentAiDetectorBind
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-
     with(binding) {
       close.setOnClickListener { dismiss() }
       loadingView.setOnRefreshClickListener {
@@ -89,8 +88,9 @@ class AiDetectorDialogFragment : BaseDialogFragment<DialogFragmentAiDetectorBind
                 state.error.mimeType ?: getString(R.string.unknown),
               )
               is ProvenanceImageTooLargeException -> getString(R.string.ai_detector_image_too_large)
-              is ContentProvenanceApiException -> state.error.message
-                ?: getString(R.string.ai_detector_request_failed)
+              is ContentProvenanceApiException ->
+                state.error.message
+                  ?: getString(R.string.ai_detector_request_failed)
               else -> null
             }
             binding.loadingView.showDefaultErrorMessageFor(state.error, message)
@@ -125,7 +125,7 @@ class AiDetectorDialogFragment : BaseDialogFragment<DialogFragmentAiDetectorBind
             getString(R.string.ai_detector_detected)
           } else {
             getString(R.string.ai_detector_not_detected)
-          }
+          },
         )
 
         setSpan(
@@ -192,7 +192,7 @@ class AiDetectorDialogFragment : BaseDialogFragment<DialogFragmentAiDetectorBind
                   appendLine()
                 }
               }
-            }
+            },
           )
         }
         disclaimer.isVisible = false

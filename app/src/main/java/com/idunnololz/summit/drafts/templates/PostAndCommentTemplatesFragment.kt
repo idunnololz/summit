@@ -21,9 +21,9 @@ import com.idunnololz.summit.databinding.FragmentPostAndCommentTemplatesBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemPostAndCommentTemplatePostBinding
-import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
+import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item.CommentTemplateItem
 import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesViewModel.Item.EmptyItem
@@ -41,7 +41,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostAndCommentTemplatesFragment  :
+class PostAndCommentTemplatesFragment :
   BaseFragment<FragmentPostAndCommentTemplatesBinding>(),
   FullscreenDialogFragment {
 
@@ -78,7 +78,6 @@ class PostAndCommentTemplatesFragment  :
     val context = requireContext()
 
     with(binding) {
-
       swipeRefreshLayout.setOnRefreshListener {
         viewModel.load(force = true)
       }
@@ -122,7 +121,7 @@ class PostAndCommentTemplatesFragment  :
             instance = accountAwareLemmyClient.instance,
             templateToEditId = it.entryId,
           )
-        }
+        },
       )
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.setHasFixedSize(true)
@@ -171,20 +170,21 @@ class PostAndCommentTemplatesFragment  :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is CommentTemplateItem ->
-            old.entryId == (new as CommentTemplateItem).entryId
-          is PostTemplateItem ->
-            old.entryId == (new as PostTemplateItem).entryId
-          HeaderItem -> true
-          EmptyItem -> true
-          FooterItem -> true
-        }
-      }
+        old::class == new::class &&
+          when (old) {
+            is CommentTemplateItem ->
+              old.entryId == (new as CommentTemplateItem).entryId
+            is PostTemplateItem ->
+              old.entryId == (new as PostTemplateItem).entryId
+            HeaderItem -> true
+            EmptyItem -> true
+            FooterItem -> true
+          }
+      },
     ).apply {
       addItemType(
         clazz = HeaderItem::class,
-        inflateFn = ItemGenericHeaderBinding::inflate
+        inflateFn = ItemGenericHeaderBinding::inflate,
       ) { _, _, _ -> }
       addItemType(
         clazz = FooterItem::class,
@@ -261,5 +261,4 @@ class PostAndCommentTemplatesFragment  :
       adapterHelper.setItems(data, this)
     }
   }
-
 }

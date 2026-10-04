@@ -36,14 +36,14 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DraftsDialogFragment :
   BaseDialogFragment<DialogFragmentDraftsBinding>(),
-    FullscreenDialogFragment {
+  FullscreenDialogFragment {
 
   companion object {
     const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -58,10 +58,10 @@ class DraftsDialogFragment :
 
   @Parcelize
   data class Result(
-      val draft: DraftEntry?,
-      val commentTemplate: TemplateData.CommentTemplateData?,
-      val postTemplate: TemplateData.PostTemplateData?,
-  ): Parcelable
+    val draft: DraftEntry?,
+    val commentTemplate: TemplateData.CommentTemplateData?,
+    val postTemplate: TemplateData.PostTemplateData?,
+  ) : Parcelable
 
   private val args by navArgs<DraftsDialogFragmentArgs>()
 
@@ -96,9 +96,9 @@ class DraftsDialogFragment :
   }
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?,
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
 
@@ -183,7 +183,7 @@ class DraftsDialogFragment :
           when (model.filter) {
             Filter.Drafts -> R.id.drafts_button
             Filter.Templates -> R.id.templates_button
-          }
+          },
         )
 
         onBackPressedCallback.isEnabled = model.isInSelectMode
@@ -296,7 +296,7 @@ class DraftsDialogFragment :
                 postTemplate = null,
               ),
             )
-          }
+          },
         )
         dismiss()
       },
@@ -320,7 +320,7 @@ class DraftsDialogFragment :
                 postTemplate = it.postTemplateData,
               ),
             )
-          }
+          },
         )
         dismiss()
       },
@@ -336,7 +336,7 @@ class DraftsDialogFragment :
                 postTemplate = null,
               ),
             )
-          }
+          },
         )
         dismiss()
       },
@@ -344,14 +344,14 @@ class DraftsDialogFragment :
         AddOrEditPostTemplateFragment.show(
           fragmentManager = childFragmentManager,
           instance = viewModel.apiInstance,
-          templateToEditId = it.entryId
+          templateToEditId = it.entryId,
         )
       },
       onEditCommentTemplateClick = {
         AddOrEditCommentTemplateFragment.show(
           fragmentManager = childFragmentManager,
           instance = viewModel.apiInstance,
-          templateToEditId = it.entryId
+          templateToEditId = it.entryId,
         )
       },
       onStartSelectionMode = {

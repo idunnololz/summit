@@ -54,9 +54,9 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.getValue
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddOrEditPostTemplateFragment :
@@ -74,7 +74,7 @@ class AddOrEditPostTemplateFragment :
         arguments = AddOrEditPostTemplateFragmentArgs(
           instance = instance,
           templateToEdit = TemplateToEdit(
-            templateToEditId
+            templateToEditId,
           ),
           prefill = prefill,
         ).toBundle()
@@ -387,9 +387,7 @@ class AddOrEditPostTemplateFragment :
    * buttons are show/hid. By populating the [ButtonGroup] via code, we can dodge most of these
    * bugs.
    */
-  private fun updateButtonGroup(
-    templateId: Long?
-  ) {
+  private fun updateButtonGroup(templateId: Long?) {
     if (!isBindingAvailable()) return
 
     with(binding) {
@@ -398,7 +396,7 @@ class AddOrEditPostTemplateFragment :
       if (templateId != null) {
         val deleteButton = newButtonGroupButton(
           context = buttonGroup.context,
-          id = R.id.delete_template_button
+          id = R.id.delete_template_button,
         ).apply {
           icon = AppCompatResources.getDrawable(context, R.drawable.outline_delete_24)
           iconPadding = 0
@@ -422,7 +420,7 @@ class AddOrEditPostTemplateFragment :
 
       val saveButton = newButtonGroupButton(
         context = buttonGroup.context,
-        id = R.id.save_template_button
+        id = R.id.save_template_button,
       ).apply {
         text = context.getString(R.string.save_template)
         icon = AppCompatResources.getDrawable(context, R.drawable.outline_save_24)
@@ -448,7 +446,7 @@ class AddOrEditPostTemplateFragment :
   private fun newButtonGroupButton(context: Context, id: Int): MaterialButton {
     val themedContext = ContextThemeWrapper(
       context,
-      com.google.android.material.R.style.Widget_Material3Expressive_Button
+      com.google.android.material.R.style.Widget_Material3Expressive_Button,
     )
     return MaterialButton(themedContext).apply {
       this.id = id

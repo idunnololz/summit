@@ -5,5 +5,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TemplateToEdit(
-  val entryId: Long?
-): Parcelable
+  val entryId: Long?,
+) : Parcelable

@@ -13,7 +13,6 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditCommentTemplateFragment
-import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -392,7 +391,7 @@ fun BaseFragment<*>.createCommentActionHandler(
           accountId = currentAccount?.id ?: GUEST_ACCOUNT_ID,
           accountInstance = apiInstance,
           languageId = null,
-        )
+        ),
       )
     }
   }

@@ -324,7 +324,7 @@ class DraftsAdapter(
         Filter.Templates -> model.templateItems
       },
       adapter = this,
-      cb = cb
+      cb = cb,
     )
   }
 }

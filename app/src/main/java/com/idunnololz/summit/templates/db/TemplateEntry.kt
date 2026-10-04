@@ -9,9 +9,7 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
-import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.OriginalCommentData
-import com.idunnololz.summit.drafts.OriginalPostData
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize
@@ -100,7 +98,6 @@ sealed interface TemplateData : Parcelable {
     override val title: String,
     override val accountInstance: String,
   ) : TemplateData
-
 
   @Parcelize
   @Serializable

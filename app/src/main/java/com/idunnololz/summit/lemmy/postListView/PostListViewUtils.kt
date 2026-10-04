@@ -10,7 +10,6 @@ import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.drafts.addOrEditTemplate.AddOrEditPostTemplateFragment
-import com.idunnololz.summit.drafts.templates.PostAndCommentTemplatesFragment
 import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -568,7 +567,7 @@ fun Fragment.createPostActionHandler(
           thumbnailUrl = null,
           altText = null,
           languageId = null,
-        )
+        ),
       )
     }
   }

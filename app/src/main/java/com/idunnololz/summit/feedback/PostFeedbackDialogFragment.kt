@@ -15,7 +15,6 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentPostFeedbackBinding
 import com.idunnololz.summit.drafts.DraftData
-import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.drafts.DraftsDialogFragment
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment

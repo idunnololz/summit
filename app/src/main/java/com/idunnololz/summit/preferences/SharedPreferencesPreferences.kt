@@ -34,14 +34,13 @@ interface SharedPreferencesPreferences {
     val isSensitive: Boolean = false,
   ) : ReadWriteProperty<Any, String?> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-      if (isSensitive) {
-        prefs.sharedPreferences.getString(key, defaultValue)
-          ?.takeIf { it.startsWith(SENSITIVE_DATA_PREFIX) }
-          ?.drop(SENSITIVE_DATA_PREFIX.length)
-      } else {
-        prefs.sharedPreferences.getString(key, defaultValue)
-      }
+    override fun getValue(thisRef: Any, property: KProperty<*>) = if (isSensitive) {
+      prefs.sharedPreferences.getString(key, defaultValue)
+        ?.takeIf { it.startsWith(SENSITIVE_DATA_PREFIX) }
+        ?.drop(SENSITIVE_DATA_PREFIX.length)
+    } else {
+      prefs.sharedPreferences.getString(key, defaultValue)
+    }
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: String?) =
       prefs.sharedPreferences.edit {
@@ -54,7 +53,7 @@ interface SharedPreferencesPreferences {
             }
           } else {
             value
-          }
+          },
         )
       }
   }

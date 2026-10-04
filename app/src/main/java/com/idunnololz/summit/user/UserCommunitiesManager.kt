@@ -8,7 +8,6 @@ import com.idunnololz.summit.tabs.isHomeTab
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.HashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +32,7 @@ class UserCommunitiesManager @Inject constructor(
 
   @Volatile
   private var idToUserCommunity = mapOf<Long, UserCommunityItem>()
+
   @Volatile
   private var userCommunityItems = listOf<UserCommunityItem>()
 

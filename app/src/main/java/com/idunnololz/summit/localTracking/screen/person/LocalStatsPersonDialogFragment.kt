@@ -31,8 +31,6 @@ import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityDialogFragment
-import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityModel
 import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityModel.PostModelItem
 import com.idunnololz.summit.localTracking.screen.person.LocalStatsPersonViewModel.Model
 import com.idunnololz.summit.models.PostView

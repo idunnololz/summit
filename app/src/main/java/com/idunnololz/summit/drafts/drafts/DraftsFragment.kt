@@ -17,8 +17,6 @@ import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsManager
-import com.idunnololz.summit.drafts.drafts.ViewModelItem.CommentTemplateItem
-import com.idunnololz.summit.drafts.drafts.ViewModelItem.PostTemplateItem
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment

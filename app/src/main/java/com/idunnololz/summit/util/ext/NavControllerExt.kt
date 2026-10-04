@@ -30,4 +30,3 @@ fun NavController.navigateSafe(navDirections: NavDirections? = null, extras: Nav
     Log.e(TAG, "", e)
   }
 }
-

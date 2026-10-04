@@ -182,7 +182,7 @@ class DraftsViewModel @Inject constructor(
             else -> {
               TemplateTypes.Comment
             }
-          }
+          },
         )
         .sortedByDescending { it.updatedTs }
       templateEntries.clear()
@@ -292,7 +292,8 @@ class DraftsViewModel @Inject constructor(
             ),
           )
         is TemplateData.RegistrationApplicationRejectionTemplateData,
-        null -> {}
+        null,
+        -> {}
       }
     }
 

@@ -7,8 +7,8 @@ import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.templates.db.TemplateTypes
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PostAndCommentTemplatesViewModel @Inject constructor(
@@ -27,16 +27,16 @@ class PostAndCommentTemplatesViewModel @Inject constructor(
       val entryId: Long,
       val postTemplateData: TemplateData.PostTemplateData,
       val description: String,
-    ): Item
+    ) : Item
     data class CommentTemplateItem(
       val entryId: Long,
       val commentTemplateData: TemplateData.CommentTemplateData,
       val description: String,
-    ): Item
+    ) : Item
   }
 
   data class Model(
-    val items: List<Item>
+    val items: List<Item>,
   )
 
   val model = StatefulLiveData<Model>()
@@ -94,8 +94,8 @@ class PostAndCommentTemplatesViewModel @Inject constructor(
 
       model.postValue(
         Model(
-          items = modelItems
-        )
+          items = modelItems,
+        ),
       )
     }
   }

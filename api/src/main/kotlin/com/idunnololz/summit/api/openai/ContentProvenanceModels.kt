@@ -25,11 +25,11 @@ data class ContentProvenanceResult(
     get() = outcome == "detected"
 }
 
-class MissingOpenAiApiKeyException :
-  IllegalStateException("An OpenAi Api key is required.")
+class MissingOpenAiApiKeyException : IllegalStateException("An OpenAi Api key is required.")
 
-class UnsupportedProvenanceImageException(val mimeType: String?) :
-  IllegalArgumentException("Unsupported image format: ${mimeType ?: "unknown"}")
+class UnsupportedProvenanceImageException(
+  val mimeType: String?,
+) : IllegalArgumentException("Unsupported image format: ${mimeType ?: "unknown"}")
 
 class ProvenanceImageTooLargeException :
   IllegalArgumentException("The image exceeds the 50 MiB limit.")
