@@ -1,7 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import java.util.EnumSet
-import org.jetbrains.kotlin.konan.properties.loadProperties
+import java.util.Properties
 
 plugins {
   id("com.android.application")
@@ -93,7 +93,9 @@ ksp {
 
 sentry {
   try {
-    val sentryProperties = loadProperties(File(rootDir, "sentry.properties").path)
+    val sentryProperties = Properties().apply {
+      File(rootDir, "sentry.properties").inputStream().use(::load)
+    }
     if (sentryProperties["auth.token"] == null) {
       autoUploadProguardMapping.set(false)
     }
@@ -135,6 +137,7 @@ dependencies {
   implementation(libs.fragment.ktx)
   implementation(libs.material)
   implementation(libs.cardview)
+  implementation(libs.media3.inspector)
   implementation(libs.recyclerview)
   implementation(libs.preference.ktx)
   implementation(libs.gson)

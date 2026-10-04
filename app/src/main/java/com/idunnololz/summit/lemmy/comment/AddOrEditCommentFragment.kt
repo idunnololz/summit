@@ -607,6 +607,8 @@ class AddOrEditCommentFragment :
           viewModel.currentDraftEntry.value = result.draft
           viewModel.currentDraftId.value = result.draft.id
         } else if (result.commentTemplate != null) {
+          saveDraft()
+
           viewModel.currentDraftId.value = null
           viewModel.currentDraftEntry.value = null
 
@@ -973,46 +975,48 @@ class AddOrEditCommentFragment :
 
     val currentDraftId = viewModel.currentDraftId.value
 
-    if (!content.isNullOrBlank()) {
-      val account = viewModel.currentAccount.value
+    if (content.isNullOrBlank()) {
+      return
+    }
 
-      if (currentDraftId != null && overwriteExistingDraft) {
-        viewModel.draftsManager.updateDraftAsync(
-          entryId = currentDraftId,
-          draftData = DraftData.CommentDraftData(
-            originalComment = args.editCommentView?.toOriginalCommentData(),
-            postRef = PostRef(
-              args.instance,
-              args.postView?.post?.id
-                ?: args.commentView?.post?.id
-                ?: args.editCommentView?.post?.id ?: 0,
-            ),
-            parentCommentId = args.commentView?.comment?.id,
-            content = content,
-            accountId = account?.id ?: 0L,
-            accountInstance = account?.instance ?: "",
+    val account = viewModel.currentAccount.value
+
+    if (currentDraftId != null && overwriteExistingDraft) {
+      viewModel.draftsManager.updateDraftAsync(
+        entryId = currentDraftId,
+        draftData = DraftData.CommentDraftData(
+          originalComment = args.editCommentView?.toOriginalCommentData(),
+          postRef = PostRef(
+            args.instance,
+            args.postView?.post?.id
+              ?: args.commentView?.post?.id
+              ?: args.editCommentView?.post?.id ?: 0,
           ),
-          showToast = true,
-        )
-      } else {
-        viewModel.draftsManager.saveDraftAsync(
-          DraftData.CommentDraftData(
-            originalComment = args.editCommentView?.toOriginalCommentData(),
-            postRef = PostRef(
-              args.instance,
-              args.postView?.post?.id
-                ?: args.commentView?.post?.id
-                ?: args.editCommentView?.post?.id ?: 0,
-            ),
-            parentCommentId = args.commentView?.comment?.id,
-            content = content,
-            accountId = account?.id ?: 0L,
-            accountInstance = account?.instance ?: "",
-            languageId = viewModel.languageId.value,
+          parentCommentId = args.commentView?.comment?.id,
+          content = content,
+          accountId = account?.id ?: 0L,
+          accountInstance = account?.instance ?: "",
+        ),
+        showToast = true,
+      )
+    } else {
+      viewModel.draftsManager.saveDraftAsync(
+        DraftData.CommentDraftData(
+          originalComment = args.editCommentView?.toOriginalCommentData(),
+          postRef = PostRef(
+            args.instance,
+            args.postView?.post?.id
+              ?: args.commentView?.post?.id
+              ?: args.editCommentView?.post?.id ?: 0,
           ),
-          showToast = true,
-        )
-      }
+          parentCommentId = args.commentView?.comment?.id,
+          content = content,
+          accountId = account?.id ?: 0L,
+          accountInstance = account?.instance ?: "",
+          languageId = viewModel.languageId.value,
+        ),
+        showToast = true,
+      )
     }
   }
 

@@ -859,6 +859,8 @@ class AddOrEditPostFragment :
           viewModel.currentDraftEntry.value = result.draft
           viewModel.currentDraftId.value = result.draft.id
         } else if (result.postTemplate != null) {
+          saveDraft()
+
           viewModel.currentDraftId.value = null
           viewModel.currentDraftEntry.value = null
 
@@ -1194,37 +1196,39 @@ class AddOrEditPostFragment :
 
     val currentDraftId = viewModel.currentDraftId.value
 
-    if (!title.isNullOrBlank() || !body.isNullOrBlank() || !url.isNullOrBlank()) {
-      if (currentDraftId != null && overwriteExistingDraft) {
-        viewModel.draftsManager.updateDraftAsync(
-          currentDraftId,
-          DraftData.PostDraftData(
-            originalPost = args.post?.toOriginalPostData(),
-            name = title,
-            body = body,
-            url = url,
-            isNsfw = isNsfw,
-            accountId = viewModel.currentAccount?.id ?: 0,
-            accountInstance = viewModel.currentAccount?.instance ?: "",
-            targetCommunityFullName = binding.communityEditText.text.toString(),
-          ),
-          showToast = true,
-        )
-      } else {
-        viewModel.draftsManager.saveDraftAsync(
-          DraftData.PostDraftData(
-            originalPost = args.post?.toOriginalPostData(),
-            name = title,
-            body = body,
-            url = url,
-            isNsfw = isNsfw,
-            accountId = viewModel.currentAccount?.id ?: 0,
-            accountInstance = viewModel.currentAccount?.instance ?: "",
-            targetCommunityFullName = binding.communityEditText.text.toString(),
-          ),
-          showToast = true,
-        )
-      }
+    if (title.isNullOrBlank() && body.isNullOrBlank() && url.isNullOrBlank()) {
+      return
+    }
+
+    if (currentDraftId != null && overwriteExistingDraft) {
+      viewModel.draftsManager.updateDraftAsync(
+        currentDraftId,
+        DraftData.PostDraftData(
+          originalPost = args.post?.toOriginalPostData(),
+          name = title,
+          body = body,
+          url = url,
+          isNsfw = isNsfw,
+          accountId = viewModel.currentAccount?.id ?: 0,
+          accountInstance = viewModel.currentAccount?.instance ?: "",
+          targetCommunityFullName = binding.communityEditText.text.toString(),
+        ),
+        showToast = true,
+      )
+    } else {
+      viewModel.draftsManager.saveDraftAsync(
+        DraftData.PostDraftData(
+          originalPost = args.post?.toOriginalPostData(),
+          name = title,
+          body = body,
+          url = url,
+          isNsfw = isNsfw,
+          accountId = viewModel.currentAccount?.id ?: 0,
+          accountInstance = viewModel.currentAccount?.instance ?: "",
+          targetCommunityFullName = binding.communityEditText.text.toString(),
+        ),
+        showToast = true,
+      )
     }
   }
 

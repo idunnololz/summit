@@ -6,8 +6,8 @@ import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.MetadataRetriever
 import androidx.media3.exoplayer.source.TrackGroupArray
+import androidx.media3.inspector.MetadataRetriever
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.idunnololz.summit.util.StatefulLiveData
@@ -95,7 +95,10 @@ class VideoInfoViewModel @Inject constructor(
 
     val uri = Uri.parse(url)
     val mediaItem = MediaItem.fromUri(uri)
-    val trackGroupsFuture = MetadataRetriever.retrieveMetadata(context, mediaItem)
+
+    val trackGroupsFuture = MetadataRetriever.Builder(context, mediaItem)
+      .build()
+      .retrieveTrackGroups()
     Futures.addCallback(
       trackGroupsFuture,
       object : FutureCallback<TrackGroupArray?> {

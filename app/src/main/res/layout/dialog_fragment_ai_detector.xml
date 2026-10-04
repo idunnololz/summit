@@ -85,13 +85,24 @@
         app:layout_constraintBottom_toTopOf="@+id/close"/>
 
     <Button
-        android:id="@+id/close"
-        style="@style/Widget.Material3.Button.TextButton"
+        android:id="@+id/learn_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginHorizontal="@dimen/padding_half"
+        android:layout_marginVertical="@dimen/padding"
+        android:text="@string/learn_more"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_half"
         android:layout_marginVertical="@dimen/padding"
         android:text="@string/close"
+        style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

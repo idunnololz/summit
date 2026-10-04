@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.openai.ContentProvenanceApiException
 import com.idunnololz.summit.api.openai.ContentProvenanceCheck
 import com.idunnololz.summit.api.openai.MissingOpenAiApiKeyException
@@ -149,6 +150,11 @@ class AiDetectorDialogFragment : BaseDialogFragment<DialogFragmentAiDetectorBind
         getString(R.string.ai_detector_detected_desc)
       } else {
         getString(R.string.ai_detector_not_detected_desc)
+      }
+      learnMore.setOnClickListener {
+        launchAlertDialog("learn_more") {
+          messageResId = R.string.how_ai_image_detector_works
+        }
       }
       if (check.hasDetectedSignal) {
         if (check.results.isEmpty()) {

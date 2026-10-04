@@ -18,6 +18,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment.Builder
 import com.idunnololz.summit.alert.AlertDialogFragment.Launcher
 import com.idunnololz.summit.alert.AlertDialogFragment.Result
 import com.idunnololz.summit.util.getParcelableCompat
+import io.noties.markwon.Markwon
 import kotlinx.parcelize.Parcelize
 
 class AlertDialogFragment : DialogFragment() {
@@ -29,6 +30,7 @@ class AlertDialogFragment : DialogFragment() {
     private const val EXTRA_ICON = "imgIcon"
     private const val EXTRA_MESSAGE = "message"
     private const val EXTRA_CANCELABLE = "cancelable"
+    private const val EXTRA_MARKDOWN = "markdown"
 
     private const val EXTRA_POSITIVE_TEXT = "positive_text"
     private const val EXTRA_NEGATIVE_TEXT = "negative_text"
@@ -176,8 +178,6 @@ class AlertDialogFragment : DialogFragment() {
     val title = args.get(EXTRA_TITLE)
     val icon = args.getInt(EXTRA_ICON)
     val message = args.get(EXTRA_MESSAGE)
-
-    Log.d("TEST1", "title: $title")
 
     var positiveTextId = args.getInt(EXTRA_POSITIVE_TEXT, 0)
     val negativeTextId = args.getInt(EXTRA_NEGATIVE_TEXT, 0)
