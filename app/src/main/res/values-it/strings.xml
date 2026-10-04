@@ -479,7 +479,7 @@
     <string name="use_gesture_actions_desc">Usa gesti per le azioni invece dei pulsanti</string>
     <string name="infinity">Scroll infinito</string>
     <string name="posts">Post</string>
-    <string name="cake_day_on_format">Lemmy-compleanno il %1$s</string>
+    <string name="cake_day_on_format">Lemmy-compleanno il %1$s (tra %2$s giorni)</string>
     <string name="comments">Commenti</string>
     <string name="user_blocked">Utente bloccato</string>
     <string name="bookmark">Segnalibro</string>
@@ -1398,12 +1398,14 @@
     <string name="report_on_private_message">Rapporto sul messaggio privato</string>
     <string name="report_message">segnala il messaggio</string>
     <plurals name="cross_posted_times">
-        <item quantity="one">ora %1$s con cross-post</item>
-        <item quantity="other">tempi %1$s incrociati</item>
+        <item quantity="one">Cross-postato %1$s volta</item>
+        <item quantity="many">Cross-postato %1$s volte</item>
+        <item quantity="other">Cross-postato %1$s volte</item>
     </plurals>
     <plurals name="users_format">
-        <item quantity="one">%1$s Utente</item>
-        <item quantity="other">Utenti %1$s</item>
+        <item quantity="one">%1$s utente</item>
+        <item quantity="many">%1$s utenti</item>
+        <item quantity="other">%1$s utenti</item>
     </plurals>
     <string name="title_choose_image_provider">Scegli</string>
     <string name="action_cancel">Annulla</string>
@@ -1660,7 +1662,8 @@
     <string name="warn_pii_sensitive_data">il valore ha l\'indicatore dei dati sensibili. Valore: "%1$s".</string>
     <string name="confirm_delete_template">Eliminare il modello?</string>
     <plurals name="warn_delete_drafts_format">
-        <item quantity="one">eliminare la bozza %1$s?</item>
-        <item quantity="other">eliminare le bozze %1$s?</item>
+        <item quantity="one">Eliminare %1$s bozza?</item>
+        <item quantity="many">Eliminare %1$s bozze?</item>
+        <item quantity="other">Eliminare %1$s bozze?</item>
     </plurals>
 </resources>

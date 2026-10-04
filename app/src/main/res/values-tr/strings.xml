@@ -513,7 +513,7 @@
     <string name="infinity">Sonsuzluk</string>
     <string name="no_your_limits">Hayır, senin sınırların yok.</string>
     <string name="view_all_comments">Tüm yorumları görüntüle</string>
-    <string name="cake_day_on_format">%1$s günü pasta günü</string>
+    <string name="cake_day_on_format">%1$s tarihinde pasta günü (%2$s gün sonra)</string>
     <string name="posts">Gönderiler</string>
     <string name="comments">Yorumlar</string>
     <string name="user_blocked">Kullanıcı engellendi</string>

@@ -19,11 +19,11 @@
     <string name="all">Tudo</string>
     <string name="prev">Voltar</string>
     <string name="home">Início</string>
-    <string name="image_saved_format">Imagem guardada em</string>
+    <string name="image_saved_format">Imagem guardada em %1$s.</string>
     <string name="local">Local</string>
-    <string name="page_format">Página</string>
+    <string name="page_format">Página %1$s</string>
     <string name="view">Ver</string>
-    <string name="save_success_format">Ficheiro guardado em</string>
+    <string name="save_success_format">Ficheiro guardado em %1$s</string>
     <string name="moderated_communities">Comunidades que moderas</string>
     <string name="next">Próximo</string>
     <string name="copy_link_address">Copiar</string>
@@ -31,7 +31,7 @@
     <string name="history">Histórico</string>
     <string name="enable">Ativar</string>
     <string name="theme">Tema</string>
-    <string name="locked_post_message">Publicação trancada pelos mlderado</string>
+    <string name="locked_post_message">Esta publicação foi bloqueada pelos moderadores de %1$s. Não é possível publicar novos comentários.</string>
     <string name="sort">Ordenar…</string>
     <string name="sort_order_hot">Populares</string>
     <string name="sort_order_new">Novas</string>
@@ -246,7 +246,7 @@
     <string name="about_summit_desc">Informação sobre a Summit for Lemmy</string>
     <string name="relay_style_navigation_desc">Adiciona um botão às publicações/comentários que permite saltar para o próximo item ou para o anterior.</string>
     <string name="open_links_in_external_browser">Abrir ligações num navegador externo</string>
-    <string name="removed_by_mod_message">Publicação removida pelos moderadores da</string>
+    <string name="removed_by_mod_message">Esta publicação foi removida pelos moderadores de %1$s.</string>
     <string name="save">Guardar</string>
     <string name="auth_required_title">Necessária autorização</string>
     <string name="error_account_instance_mismatch_title">Instância incompatível</string>
@@ -277,22 +277,22 @@
     <string name="filter_by_mod">Filtrar por moderador/administrador</string>
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s vez</item>
-        <item quantity="many"/>
+        <item quantity="many">Publicado %1$s vezes</item>
         <item quantity="other">Publicado %1$s vezes</item>
     </plurals>
     <plurals name="point_count_format">
         <item quantity="one">%1$s ponto</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s pontos</item>
         <item quantity="other">%1$s pontos</item>
     </plurals>
     <plurals name="more_replies_format">
         <item quantity="one">%1$d mais resposta</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$d mais respostas</item>
         <item quantity="other">%1$d mais respostas</item>
     </plurals>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d criança)</item>
-        <item quantity="many"/>
+        <item quantity="many">(%1$d crianças)</item>
         <item quantity="other">( %1$d crianças)</item>
     </plurals>
     <string name="view_users_moderation_history">Ver histórico de moderação do usuário</string>
@@ -486,7 +486,7 @@
     <string name="infinity">Infinidade</string>
     <string name="no_your_limits">Não há limites.</string>
     <string name="view_all_comments">Ver todos os comentários</string>
-    <string name="cake_day_on_format">Dia do bolo em %1$s</string>
+    <string name="cake_day_on_format">Dia do bolo em %1$s (daqui a %2$s dias)</string>
     <string name="posts">Postagens</string>
     <string name="comments">Comentários</string>
     <string name="user_blocked">Usuário bloqueado</string>
@@ -1366,27 +1366,27 @@
     <string name="ic_flip_24">Virar</string>
     <plurals name="posts_format">
         <item quantity="one">Postagem de %1$s</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s postagens</item>
         <item quantity="other">%1$s Postagens</item>
     </plurals>
     <plurals name="comments_format">
         <item quantity="one">Comentário de %1$s</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s comentários</item>
         <item quantity="other">Comentários de %1$s</item>
     </plurals>
     <plurals name="users_format">
         <item quantity="one">Usuário %1$s</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s usuários</item>
         <item quantity="other">Usuários %1$s</item>
     </plurals>
     <plurals name="day_format">
         <item quantity="one">dia %1$s</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s dias</item>
         <item quantity="other">%1$s dias</item>
     </plurals>
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s novo item na sua caixa de entrada</item>
-        <item quantity="many"/>
+        <item quantity="many">%1$s novos itens na sua caixa de entrada</item>
         <item quantity="other">%1$s novos itens na sua caixa de entrada</item>
     </plurals>
     <string name="reset_hidden_posts_confirm_title">Repor publicações escondidas</string>
@@ -1665,6 +1665,7 @@
     <string name="confirm_delete_template">Excluir modelo?</string>
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Excluir rascunho %1$s?</item>
+        <item quantity="many">Excluir rascunhos %1$s?</item>
         <item quantity="other">Excluir rascunhos %1$s?</item>
     </plurals>
 </resources>

@@ -778,7 +778,7 @@
     <string name="infinity">Oändlighet</string>
     <string name="no_your_limits">Inga dina gränser.</string>
     <string name="view_all_comments">Visa alla kommentarer</string>
-    <string name="cake_day_on_format">Tårtdag på %1$s</string>
+    <string name="cake_day_on_format">Tårtdag den %1$s (om %2$s dagar)</string>
     <string name="posts">Inlägg</string>
     <string name="banned">Förbjuden</string>
     <string name="deleted">Raderad</string>

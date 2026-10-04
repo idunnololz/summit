@@ -559,7 +559,7 @@
     <string name="use_gesture_actions_desc">कार्रवाइयों के लिए बटनों के बजाय जेस्चर का उपयोग करें</string>
     <string name="user_blocked">उपयोक्ता अवरुद्ध</string>
     <string name="view_all_comments">सभी टिप्पणियां देखें</string>
-    <string name="cake_day_on_format">%1$s पर केक दिवस</string>
+    <string name="cake_day_on_format">%1$s को केक दिवस (%2$s दिनों में)</string>
     <string name="user_unblocked">उपयोक्ता अनवरुद्ध</string>
     <string name="posts">पोस्ट</string>
     <string name="comments">टिप्पणियां</string>

@@ -287,7 +287,7 @@
     <string name="backup_and_restore_settings">Importovat a exportovat nastavení</string>
     <string name="no_your_limits">Žádné limitace.</string>
     <string name="view_all_comments">Zobrazit všechny komentáře</string>
-    <string name="cake_day_on_format">Dortový den na %1$s</string>
+    <string name="cake_day_on_format">Dortový den %1$s (za %2$s dní)</string>
     <string name="posts">Příspěvky</string>
     <string name="comments">Komentáře</string>
     <string name="user_blocked">Uživatel zablokován</string>
@@ -523,17 +523,20 @@
     <string name="offline_fetching_post_feed">Načítání zdroje příspěvků…</string>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d dítě)</item>
-        <item quantity="few"/>
+        <item quantity="few">(%1$d děti)</item>
+        <item quantity="many">(%1$d dětí)</item>
         <item quantity="other">( %1$d dětí)</item>
     </plurals>
     <plurals name="point_count_format">
         <item quantity="one">%1$s bod</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$s body</item>
+        <item quantity="many">%1$s bodů</item>
         <item quantity="other">%1$s bodů</item>
     </plurals>
     <plurals name="more_replies_format">
         <item quantity="one">%1$d další odpověď</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$d další odpovědi</item>
+        <item quantity="many">%1$d dalších odpovědí</item>
         <item quantity="other">Další odpovědi %1$d</item>
     </plurals>
     <string name="feed_info">Informace o zdroji</string>
@@ -567,7 +570,8 @@
     <string name="error_couldnt_find_object">Nepodařilo se najít příspěvek/komentář k této instanci.</string>
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s nová položka ve vaší doručené poště</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$s nové položky ve vaší doručené poště</item>
+        <item quantity="many">%1$s nových položek ve vaší doručené poště</item>
         <item quantity="other">Nové položky ve vaší doručené poště: %1$s</item>
     </plurals>
     <string name="comments_with_new_comments_format">%1$s ( %2$s nové)</string>
@@ -949,12 +953,14 @@
     <string name="solve_captcha_desc">Abyste se mohli zaregistrovat, musíte vyřešit captcha. Zadejte prosím kód z obrázku níže.</string>
     <plurals name="posts_format">
         <item quantity="one">%1$s příspěvek</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$s příspěvky</item>
+        <item quantity="many">%1$s příspěvků</item>
         <item quantity="other">%1$s příspěvků</item>
     </plurals>
     <plurals name="comments_format">
         <item quantity="one">%1$s komentář</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$s komentáře</item>
+        <item quantity="many">%1$s komentářů</item>
         <item quantity="other">Komentáře: %1$s</item>
     </plurals>
     <string name="text_emoji">Textové emotikony</string>
@@ -1008,7 +1014,8 @@
     <string name="lite">Lite</string>
     <plurals name="day_format">
         <item quantity="one">%1$s den</item>
-        <item quantity="few"/>
+        <item quantity="few">%1$s dny</item>
+        <item quantity="many">%1$s dní</item>
         <item quantity="other">%1$s dnů</item>
     </plurals>
     <string name="use_condensed_style_for_comment_header">Použijte zhuštěný styl pro záhlaví komentáře</string>
@@ -1398,12 +1405,16 @@
     <string name="report_on_private_message">Zpráva o soukromé zprávě</string>
     <string name="report_message">Hlášení zprávy</string>
     <plurals name="cross_posted_times">
-        <item quantity="one">Křížově zaúčtovaný čas %1$s</item>
-        <item quantity="other">Křížově zaúčtováno %1$s krát</item>
+        <item quantity="one">Sdíleno napříč komunitami %1$s krát</item>
+        <item quantity="few">Sdíleno napříč komunitami %1$s krát</item>
+        <item quantity="many">Sdíleno napříč komunitami %1$s krát</item>
+        <item quantity="other">Sdíleno napříč komunitami %1$s krát</item>
     </plurals>
     <plurals name="users_format">
-        <item quantity="one">Uživatel %1$s</item>
-        <item quantity="other">Uživatelé %1$s</item>
+        <item quantity="one">%1$s uživatel</item>
+        <item quantity="few">%1$s uživatelé</item>
+        <item quantity="many">%1$s uživatelů</item>
+        <item quantity="other">%1$s uživatelů</item>
     </plurals>
     <string name="title_choose_image_provider">Vyberte</string>
     <string name="action_cancel">Zrušit</string>
@@ -1660,8 +1671,10 @@
     <string name="warn_pii_sensitive_data">Hodnota má značku citlivých dat. Hodnota: `%1$s`</string>
     <string name="confirm_delete_template">Smazat šablonu?</string>
     <plurals name="warn_delete_drafts_format">
-        <item quantity="one">Smazat koncept %1$s?</item>
-        <item quantity="other">Smazat koncepty %1$s?</item>
+        <item quantity="one">Smazat %1$s koncept?</item>
+        <item quantity="few">Smazat %1$s koncepty?</item>
+        <item quantity="many">Smazat %1$s konceptů?</item>
+        <item quantity="other">Smazat %1$s konceptů?</item>
     </plurals>
 
 

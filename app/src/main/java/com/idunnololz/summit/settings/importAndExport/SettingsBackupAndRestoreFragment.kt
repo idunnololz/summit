@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
@@ -15,6 +16,7 @@ import com.idunnololz.summit.settings.ImportAndExportSettings
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.importAndExport.ExportSettingsViewModel.BackupOption.SaveInternal
 import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.util.PiiDetector
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -123,6 +125,10 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
                       }
                     }
                   }
+
+                  if (!it.data.issues.isNullOrEmpty()) {
+                    showSensitiveDataWarningIfNeeded(it.data.issues)
+                  }
                 }
               }
 
@@ -135,6 +141,37 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
         }
       }
     }
+  }
+
+  private fun showSensitiveDataWarningIfNeeded(issues: List<PiiDetector.PiiIssue>) {
+    val context = requireContext()
+    // too many false positives with keys so only look for suspicious values
+    val issues = issues.filter { it is PiiDetector.PiiIssue.SuspiciousValueIssue }
+
+    if (issues.isEmpty()) return
+
+    MaterialAlertDialogBuilder(context)
+      .apply {
+        setTitle(R.string.sensitive_information_detected)
+        setMessage(
+          buildString {
+            appendLine(context.getString(R.string.sensitive_information_detected_desc))
+            appendLine()
+            issues.forEach {
+              when (it) {
+                is PiiDetector.PiiIssue.SuspiciousKeyIssue ->
+                  appendLine(context.getString(
+                    R.string.sensitive_key_format, it.keyName, it.value))
+                is PiiDetector.PiiIssue.SuspiciousValueIssue ->
+                  appendLine(context.getString(
+                    R.string.sensitive_value_format, it.keyName, it.value))
+              }
+            }
+          }
+        )
+        setPositiveButton(android.R.string.ok) { _, _ -> }
+      }
+      .show()
   }
 
   override fun generateData(): List<SettingModelItem> = listOf(
@@ -170,6 +207,7 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
           backupOption = ExportSettingsViewModel.BackupOption.Copy,
           includeDatabase = false,
           dest = null,
+          runPiiDetector = true,
         ),
       )
     },

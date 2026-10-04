@@ -13,6 +13,7 @@ import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DATABASE_MAIN
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.importAndExport.export.defaultTablesToExport
+import com.idunnololz.summit.util.PiiDetector
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +49,8 @@ class ExportSettingsViewModel @Inject constructor(
 
     viewModelScope.launch(Dispatchers.Default) {
       try {
-        val encodedString = generateCode(backupConfig)
+        val generateCodeResult = generateCode(backupConfig)
+        val encodedString = generateCodeResult.code
         Log.d(TAG, encodedString)
 
         val uri = if (backupConfig.dest == null) {
@@ -68,6 +70,7 @@ class ExportSettingsViewModel @Inject constructor(
           BackupResult(
             uri = uri,
             config = backupConfig,
+            issues = generateCodeResult.issues,
           ),
         )
       } catch (e: Exception) {
@@ -87,14 +90,16 @@ class ExportSettingsViewModel @Inject constructor(
     backupName: String = "settings_backup_%datetime%",
   ) {
     viewModelScope.launch {
-      val file = settingsBackupManager.saveBackup(generateCode(backupConfig), backupName)
+      val generateCodeResult = generateCode(backupConfig)
+      val file = settingsBackupManager.saveBackup(generateCodeResult.code, backupName)
 
       backupFile.postValue(
         BackupResult(
-          file.toUri(),
-          BackupConfig(
+          uri = file.toUri(),
+          config = BackupConfig(
             BackupOption.SaveInternal,
           ),
+          issues = generateCodeResult.issues,
         ),
       )
     }
@@ -104,7 +109,12 @@ class ExportSettingsViewModel @Inject constructor(
     preferences.clear()
   }
 
-  private suspend fun generateCode(backupConfig: BackupConfig): String {
+  class GenerateCodeResult(
+    val code: String,
+    val issues: List<PiiDetector.PiiIssue>?,
+  )
+
+  private suspend fun generateCode(backupConfig: BackupConfig): GenerateCodeResult {
     val prefJson = preferences.asJson()
 
     if (backupConfig.includeDatabase) {
@@ -140,13 +150,21 @@ class ExportSettingsViewModel @Inject constructor(
       tempDb.delete()
     }
 
-    return Utils.compress(prefJson.toString(), Base64.NO_WRAP)
+    return GenerateCodeResult(
+      code = Utils.compress(prefJson.toString(), Base64.NO_WRAP),
+      issues = if (backupConfig.runPiiDetector) {
+        PiiDetector().isJsonSafe(prefJson)
+      } else {
+        null
+      },
+    )
   }
 
   data class BackupConfig(
     val backupOption: BackupOption,
     val includeDatabase: Boolean = true,
     val dest: Uri? = null,
+    val runPiiDetector: Boolean = false,
   )
 
   enum class BackupOption {
@@ -159,5 +177,6 @@ class ExportSettingsViewModel @Inject constructor(
   data class BackupResult(
     val uri: Uri,
     val config: BackupConfig,
+    val issues: List<PiiDetector.PiiIssue>?,
   )
 }

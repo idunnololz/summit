@@ -1,6 +1,10 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.preferences.SENSITIVE_DATA_PREFIX
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.regex.Pattern
 
 class PiiDetector {
@@ -108,12 +112,75 @@ class PiiDetector {
       """e[yw][A-Za-z0-9-_]+\.(?:e[yw][A-Za-z0-9-_]+)?\.[A-Za-z0-9-_]{2,}(?:(?:\.[A-Za-z0-9-_]{2,}){2})?""",
     )
     val sensitiveDataRegex: Pattern = Pattern.compile(
-      """^$SENSITIVE_DATA_PREFIX""",
+      SENSITIVE_DATA_PREFIX,
     )
+  }
+
+  sealed interface PiiIssue {
+    class SuspiciousKeyIssue(
+      val keyName: String,
+      val value: String,
+      val issue: ColumnNamePiiIssue,
+    ): PiiIssue
+    class SuspiciousValueIssue(
+      val keyName: String,
+      val value: String,
+      val issue: ValuePiiIssue,
+    ): PiiIssue
   }
 
   private val columnRegexes = ColumnRegexes()
   private val valueRegexes = ValueRegexes()
+
+  fun isJsonSafe(json: JSONObject): List<PiiIssue> {
+    val result = mutableListOf<PiiIssue>()
+    isJsonSafeInternal(json, result)
+    return result
+  }
+
+  private fun isJsonSafeInternal(json: JSONObject, result: MutableList<PiiIssue>) {
+    for (key in json.keys()) {
+      val value = json[key]
+
+      isColumnNameSafe(key)?.let {
+        result.add(PiiIssue.SuspiciousKeyIssue(key, value.toString(), it))
+      }
+
+      when {
+        value is String -> {
+          isValueSafe(value)?.let {
+            result.add(PiiIssue.SuspiciousValueIssue(key, value, it))
+          }
+        }
+        value is JSONObject -> {
+          isJsonSafeInternal(value, result)
+        }
+        value is JSONArray -> {
+          isJsonArrSafeInternal(key, value, result)
+        }
+      }
+    }
+  }
+
+  private fun isJsonArrSafeInternal(key: String, json: JSONArray, result: MutableList<PiiIssue>) {
+    (0 until json.length()).forEach {
+      val value = json.get(it)
+
+      when {
+        value is String -> {
+          isValueSafe(value)?.let {
+            result.add(PiiIssue.SuspiciousValueIssue(key, value, it))
+          }
+        }
+        value is JSONObject -> {
+          isJsonSafeInternal(value, result)
+        }
+        value is JSONArray -> {
+          isJsonArrSafeInternal(key, value, result)
+        }
+      }
+    }
+  }
 
   /**
    * Looks for suspicious column names.
@@ -166,42 +233,42 @@ class PiiDetector {
 
   fun isValueSafe(value: String): ValuePiiIssue? {
     with(valueRegexes) {
-      if (dateRegex.matcher(value).matches() ||
-        timeRegex.matcher(value).matches()
+      if (dateRegex.matcher(value).find() ||
+        timeRegex.matcher(value).find()
       ) {
         return ValuePiiIssue.DateTime
       }
-      if (phoneRegex.matcher(value).matches() ||
-        phonesWithExtsRegex.matcher(value).matches()
+      if (phoneRegex.matcher(value).find() ||
+        phonesWithExtsRegex.matcher(value).find()
       ) {
         return ValuePiiIssue.Phone
       }
-      if (emailRegex.matcher(value).matches()) {
+      if (emailRegex.matcher(value).find()) {
         return ValuePiiIssue.Email
       }
-      if (ipRegex.matcher(value).matches() ||
-        ipv6Regex.matcher(value).matches()
+      if (ipRegex.matcher(value).find() ||
+        ipv6Regex.matcher(value).find()
       ) {
         return ValuePiiIssue.Ip
       }
-      if (creditCardRegex.matcher(value).matches() ||
-        btcAddressRegex.matcher(value).matches()
+      if (creditCardRegex.matcher(value).find() ||
+        btcAddressRegex.matcher(value).find()
       ) {
         return ValuePiiIssue.CreditCard
       }
-      if (streetAddressRegex.matcher(value).matches() ||
-        zipCodeRegex.matcher(value).matches() ||
-        poBoxRegex.matcher(value).matches()
+      if (streetAddressRegex.matcher(value).find() ||
+        zipCodeRegex.matcher(value).find() ||
+        poBoxRegex.matcher(value).find()
       ) {
         return ValuePiiIssue.Address
       }
-      if (ssnRegex.matcher(value).matches()) {
+      if (ssnRegex.matcher(value).find()) {
         return ValuePiiIssue.Ssn
       }
-      if (jwtTokenRegex.matcher(value).matches()) {
+      if (jwtTokenRegex.matcher(value).find()) {
         return ValuePiiIssue.AuthToken
       }
-      if (sensitiveDataRegex.matcher(value).matches()) {
+      if (sensitiveDataRegex.matcher(value).find()) {
         return ValuePiiIssue.SensitiveData
       }
     }
