@@ -215,11 +215,11 @@ class SimpleDiskCache(
     }
   }
 
-  private fun toInternalKey(key: String): String = md5(key)
+  private fun toInternalKey(key: String): String = sha256(key)
 
-  private fun md5(s: String): String {
+  private fun sha256(s: String): String {
     try {
-      val m = MessageDigest.getInstance("MD5")
+      val m = MessageDigest.getInstance("SHA-256")
       m.update(s.toByteArray(charset("UTF-8")))
       val digest = m.digest()
       val bigInt = BigInteger(1, digest)
