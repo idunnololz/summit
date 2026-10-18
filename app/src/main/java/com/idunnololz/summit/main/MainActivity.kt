@@ -70,6 +70,7 @@ import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.linkEditor.LinkEditorDialogFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkFixer
@@ -78,6 +79,7 @@ import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityDialogFragment
 import com.idunnololz.summit.localTracking.screen.person.LocalStatsPersonDialogFragment
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
@@ -169,7 +171,13 @@ class MainActivity : SummitActivity() {
   lateinit var userCommunitiesManager: UserCommunitiesManager
 
   @Inject
-  override lateinit var preferences: Preferences
+  lateinit var preferenceManager: PreferenceManager
+
+  override val preferences: Preferences
+    get() = preferenceManager.currentPreferences
+
+  @Inject
+  override lateinit var globalStateStorage: GlobalStateStorage
 
   @Inject
   lateinit var accountManager: AccountManager

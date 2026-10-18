@@ -820,6 +820,7 @@ class CommunityAppBarController(
             videoType = VideoType.Unknown,
             videoState = null,
             downloadContext = null,
+            isVideoNsfw = false,
           )
         },
         onPageClick = { url, pageRef ->

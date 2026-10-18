@@ -528,6 +528,7 @@ class InboxFragment :
           videoType = videoType,
           videoState = state,
           downloadContext = null,
+          isVideoNsfw = false,
         )
       },
       onMarkAsRead = { view, inboxItem, read ->

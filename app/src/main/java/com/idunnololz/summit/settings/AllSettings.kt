@@ -28,6 +28,7 @@ import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.PostHeaderVersion
 import com.idunnololz.summit.preferences.PostsFeedHeaderVersions
 import com.idunnololz.summit.preferences.PreferenceKeys
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_MUTE_NSFW_VIDEOS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_FOCUS_SEARCH_BAR
@@ -2805,6 +2806,11 @@ class VideoPlayerSettings @Inject constructor(
     null,
     context.getString(R.string.loop_videos_by_default),
     relatedKeys = listOf(KEY_LOOP_VIDEO_BY_DEFAULT),
+  )
+  val alwaysMuteNsfwVideos = OnOffSettingItem(
+    title = context.getString(R.string.always_mute_nsfw_videos),
+    description = context.getString(R.string.always_mute_nsfw_videos_desc),
+    relatedKeys = listOf(KEY_ALWAYS_MUTE_NSFW_VIDEOS),
   )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(

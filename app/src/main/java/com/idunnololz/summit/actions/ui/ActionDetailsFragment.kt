@@ -122,6 +122,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             videoType = VideoType.Unknown,
             videoState = null,
             downloadContext = null,
+            isVideoNsfw = false,
           )
         },
         onPageClick = { url, pageRef ->

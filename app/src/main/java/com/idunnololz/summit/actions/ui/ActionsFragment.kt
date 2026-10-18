@@ -75,6 +75,7 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
             videoType = videoType,
             videoState = state,
             downloadContext = null,
+            isVideoNsfw = false,
           )
         },
         onPageClick = { url, pageRef ->

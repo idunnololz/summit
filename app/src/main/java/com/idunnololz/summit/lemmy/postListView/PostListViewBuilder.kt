@@ -194,7 +194,7 @@ class PostListViewBuilder @Inject constructor(
     preferences.indicatePostsAndCommentsCreatedByCurrentUser
   private var showEditedDate: Boolean = preferences.showEditedDate
   private var readPostStyle: Int? = postUiConfig.readPostStyle
-  private var autoPlayVideos: Boolean = preferences.autoPlayVideos
+  private var autoPlayVideos: Boolean = preferences.inlineVideoAutoPlayVideos
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
   private var hapticsOnActions: Boolean = preferences.hapticsOnActions
   private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
@@ -257,7 +257,7 @@ class PostListViewBuilder @Inject constructor(
     useMultilinePostHeaders = preferences.useMultilinePostHeaders
     indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
     showEditedDate = preferences.showEditedDate
-    autoPlayVideos = preferences.autoPlayVideos
+    autoPlayVideos = preferences.inlineVideoAutoPlayVideos
     parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
     hapticsOnActions = preferences.hapticsOnActions
     upvoteColor = preferences.upvoteColor

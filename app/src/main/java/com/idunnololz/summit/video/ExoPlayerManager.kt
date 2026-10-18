@@ -30,6 +30,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.net.toUri
 
 @SuppressLint("UnsafeOptInUsageError")
 @Singleton
@@ -75,9 +76,7 @@ class ExoPlayerManagerManager @Inject constructor(
   fun get(lifecycleOwner: LifecycleOwner): ExoPlayerManager =
     managersMap[lifecycleOwner] ?: ExoPlayerManager(
       context,
-      globalStateStorage,
       players,
-      preferences,
       { dataSourceFactory },
     ).also { manager ->
       Log.d(TAG, "No manager found for $lifecycleOwner. Creating one...")
@@ -124,9 +123,7 @@ class ExoPlayerManagerManager @Inject constructor(
 @SuppressLint("UnsafeOptInUsageError")
 class ExoPlayerManager(
   private val context: Context,
-  private val globalStateStorage: GlobalStateStorage,
   private val players: LinkedList<ExoPlayer>,
-  private val preferences: Preferences,
   private val getDataSourceFactory: () -> DataSource.Factory,
 ) {
 
@@ -149,25 +146,24 @@ class ExoPlayerManager(
     val url: String,
     val videoType: VideoType,
     val isInline: Boolean,
+    val videoState: VideoState,
     val playing: Boolean = true,
-    val videoState: VideoState? = null,
     val autoPlay: Boolean = true,
   )
 
   fun getPlayerForUrl(
     url: String,
     videoType: VideoType,
-    videoState: VideoState?,
+    videoState: VideoState,
     isInline: Boolean,
-    autoPlay: Boolean = true,
   ): ExoPlayer = getPlayer(isInline).also {
     val config = ExoPlayerConfig(
       url = url,
       videoType = videoType,
       videoState = videoState,
       isInline = isInline,
-      autoPlay = videoState?.playing ?: autoPlay,
-      playing = videoState?.playing ?: autoPlay,
+      autoPlay = videoState.playing,
+      playing = videoState.playing,
     )
     setupPlayer(it, config)
     savedState[it] = config
@@ -271,7 +267,7 @@ class ExoPlayerManager(
 
   private fun setupPlayer(player: ExoPlayer, config: ExoPlayerConfig) {
     // Create a data source factory.
-    val uri = Uri.parse(config.url)
+    val uri = config.url.toUri()
     val mediaItem = MediaItem.fromUri(uri)
     val mediaSource = when (config.videoType) {
       VideoType.Unknown -> throw RuntimeException("Unknown video type. Url: ${config.url}")
@@ -293,17 +289,10 @@ class ExoPlayerManager(
     player.prepare()
 
     val videoState = config.videoState
-    if (videoState != null) {
-      player.seekTo(videoState.currentTime)
-      if (config.isInline) {
-        player.volume = videoState.volume ?: preferences.inlineVideoDefaultVolume
-      }
-    } else {
-      if (config.isInline) {
-        player.volume = preferences.inlineVideoDefaultVolume
-      }
+    player.seekTo(videoState.currentTime)
+    if (videoState.volume != null) {
+      player.volume = videoState.volume
     }
-
     player.playWhenReady = config.playing
   }
 }

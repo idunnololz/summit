@@ -6,12 +6,14 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.media3.common.Player
 import androidx.navigation.NavController
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.NavBarController
@@ -19,6 +21,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.VideoState
+import javax.inject.Inject
 
 abstract class SummitActivity :
   BaseActivity(),
@@ -43,12 +46,26 @@ abstract class SummitActivity :
     videoType: VideoType,
     videoState: VideoState?,
     downloadContext: FileDownloadContext?,
+    isVideoNsfw: Boolean,
   ) {
     val direction = MainDirections.actionGlobalVideoViewerFragment(
       url = url,
       videoType = videoType,
       downloadContext = downloadContext,
-      videoState = videoState,
+      videoState = videoState ?: VideoState(
+        0,
+        volume = if (preferences.alwaysMuteNsfwVideos && isVideoNsfw) {
+          0f
+        } else {
+          globalStateStorage.videoStateVolume
+        },
+        playing = true,
+        repeatMode = if (preferences.loopVideoByDefault) {
+          Player.REPEAT_MODE_ALL
+        } else {
+          Player.REPEAT_MODE_OFF
+        },
+      ),
     )
     currentNavController?.navigateSafe(direction)
   }
@@ -124,7 +141,8 @@ abstract class SummitActivity :
   abstract var navBarController: NavBarController
   abstract var moreActionsHelper: MoreActionsHelper
   abstract var linkResolver: LinkResolver
-  abstract var preferences: Preferences
+  abstract val preferences: Preferences
+  abstract val globalStateStorage: GlobalStateStorage
   protected abstract var currentNavController: NavController?
 
   abstract fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit)

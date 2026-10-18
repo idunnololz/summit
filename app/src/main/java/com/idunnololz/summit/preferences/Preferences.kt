@@ -102,6 +102,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_ON_SCROLL
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_MUTE_NSFW_VIDEOS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY
@@ -608,7 +609,7 @@ class Preferences(
   var prefetchPosts: Boolean
     by booleanPreference(KEY_PREFETCH_POSTS, true)
 
-  var autoPlayVideos: Boolean
+  var inlineVideoAutoPlayVideos: Boolean
     by booleanPreference(KEY_AUTO_PLAY_VIDEOS, true)
   var autoHideUiOnPlay: Boolean
     by booleanPreference(KEY_AUTO_HIDE_UI_ON_PLAY, true)
@@ -782,6 +783,8 @@ class Preferences(
     by intPreference(KEY_DEFAULT_LANGUAGE_ID, -1)
   var openAiApiKey: String?
     by sensitiveStringPreference(KEY_OPEN_AI_API_KEY)
+  var alwaysMuteNsfwVideos: Boolean
+    by booleanPreference(KEY_ALWAYS_MUTE_NSFW_VIDEOS, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

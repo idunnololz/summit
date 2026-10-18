@@ -176,6 +176,7 @@ class ConversationFragment :
             videoType = videoType,
             videoState = state,
             downloadContext = null,
+            isVideoNsfw = false,
           )
         },
         onPageClick = { url, pageRef ->

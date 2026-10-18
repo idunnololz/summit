@@ -185,6 +185,7 @@ class MessageFragment :
               videoType = VideoType.Unknown,
               videoState = null,
               downloadContext = null,
+              isVideoNsfw = false,
             )
           },
           onPageClick = { url, pageRef ->
@@ -232,6 +233,7 @@ class MessageFragment :
           videoType = VideoType.Unknown,
           videoState = null,
           downloadContext = null,
+          isVideoNsfw = false,
         )
       },
       onPageClick = { url, pageRef ->
@@ -620,6 +622,7 @@ class MessageFragment :
               videoType = videoType,
               videoState = state,
               downloadContext = null,
+              isVideoNsfw = false,
             )
           },
           onVideoLongClickListener = { url ->

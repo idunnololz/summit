@@ -360,6 +360,7 @@ class ReportDetailsFragment :
                 videoType = VideoType.Unknown,
                 videoState = null,
                 downloadContext = null,
+                isVideoNsfw = false,
               )
             },
             onPageClick = { url, pageRef ->
@@ -769,6 +770,7 @@ class ReportDetailsFragment :
               videoType = videoType,
               videoState = state,
               downloadContext = null,
+              isVideoNsfw = false,
             )
           },
           onVideoLongClickListener = { url ->

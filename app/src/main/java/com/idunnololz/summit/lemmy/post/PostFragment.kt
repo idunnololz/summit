@@ -474,6 +474,7 @@ class PostFragment :
               videoType = videoType,
               videoState = state,
               downloadContext = postOrCommentView?.toFileDownloadContext(),
+              isVideoNsfw = postOrCommentView?.leftOrNull()?.post?.nsfw ?: false,
             )
           },
           onVideoLongClickListener = { url ->

@@ -344,17 +344,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             .getPlayerForUrl(
               url = url,
               videoType = videoType,
-              videoState = videoState ?: VideoState(
-                0,
-                volume = globalStateStorage.videoStateVolume,
-                playing = true,
-                repeatMode = if (currentPreferences.loopVideoByDefault) {
-                  Player.REPEAT_MODE_ALL
-                } else {
-                  Player.REPEAT_MODE_OFF
-                },
-              ),
-              autoPlay = currentPreferences.autoPlayVideos,
+              videoState = videoState ?: args.videoState, // videoState should never be null
               isInline = false,
             )
             .apply {

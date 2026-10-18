@@ -217,7 +217,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private var postQuickActions: PostQuickActionsSettings = preferences.postQuickActions
     ?: PostQuickActionsSettings()
   private var showEditedDate: Boolean = preferences.showEditedDate
-  private var autoPlayVideos: Boolean = preferences.autoPlayVideos
+  private var autoPlayVideos: Boolean = preferences.inlineVideoAutoPlayVideos
   private var useCondensedTypefaceForCommentHeaders: Boolean = preferences.useCondensedTypefaceForCommentHeaders
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
   private var showCrossPostsInPost: Boolean = preferences.showCrossPostsInPost
@@ -276,7 +276,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     showProfileIcons = preferences.showProfileIcons
     showDefaultProfileIcons = preferences.showDefaultProfileIcons
     showEditedDate = preferences.showEditedDate
-    autoPlayVideos = preferences.autoPlayVideos
+    autoPlayVideos = preferences.inlineVideoAutoPlayVideos
     useCondensedTypefaceForCommentHeaders = preferences.useCondensedTypefaceForCommentHeaders
     parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
     showCrossPostsInPost = preferences.showCrossPostsInPost

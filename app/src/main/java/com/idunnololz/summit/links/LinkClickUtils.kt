@@ -57,6 +57,7 @@ fun BaseActivity.onLinkClick(
           videoType = VideoType.Unknown,
           videoState = null,
           downloadContext = null,
+          isVideoNsfw = false,
         )
         return
       }

@@ -2493,6 +2493,8 @@
     <string name="sensitive_information_detected_desc">Sensitive information was detected encoded in the text copied. Please review the issues below. Be extra careful if you plan to share this code.</string>
     <string name="sensitive_key_format">Key found with name that implies the value might contain sensitive data. Key: \'%1$s\' Value: \'%2$s\'.</string>
     <string name="sensitive_value_format">Sensitive data was detected with the key \'%1$s\' and value \'%2$s\'.</string>
+    <string name="always_mute_nsfw_videos">Always mute NSFW videos</string>
+    <string name="always_mute_nsfw_videos_desc">When enabled, both the inline and full screen video player will be muted by default when playing a video associated with a NSFW post.</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>

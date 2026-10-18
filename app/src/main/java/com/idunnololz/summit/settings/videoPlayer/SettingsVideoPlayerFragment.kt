@@ -18,30 +18,26 @@ class SettingsVideoPlayerFragment : BaseSettingsFragment() {
   override fun generateData(): List<SettingModelItem> = listOf(
     settings.autoHideUiOnPlay.asOnOffSwitch(
       { preferences.autoHideUiOnPlay },
-      {
-        preferences.autoHideUiOnPlay = it
-      },
+      { preferences.autoHideUiOnPlay = it },
     ),
     settings.tapAnywhereToPlayPause.asOnOffSwitch(
       { preferences.tapAnywhereToPlayPause },
-      {
-        preferences.tapAnywhereToPlayPause = it
-      },
+      { preferences.tapAnywhereToPlayPause = it },
     ),
     settings.loopVideoByDefault.asOnOffSwitch(
       { preferences.loopVideoByDefault },
-      {
-        preferences.loopVideoByDefault = it
-      },
+      { preferences.loopVideoByDefault = it },
+    ),
+    settings.alwaysMuteNsfwVideos.asOnOffSwitch(
+      { preferences.alwaysMuteNsfwVideos },
+      { preferences.alwaysMuteNsfwVideos = it },
     ),
     SettingModelItem.SubgroupItem(
       getString(R.string.inline_video_player),
       listOf(
         settings.autoPlayVideos.asOnOffSwitch(
-          { preferences.autoPlayVideos },
-          {
-            preferences.autoPlayVideos = it
-          },
+          { preferences.inlineVideoAutoPlayVideos },
+          { preferences.inlineVideoAutoPlayVideos = it },
         ),
         settings.inlineVideoVolume.asSliderItem(
           { preferences.inlineVideoDefaultVolume },

@@ -32,7 +32,11 @@ class CustomPlayerView : PlayerView {
   private var isVolumeChanged = false
 
   @OptIn(UnstableApi::class)
-  fun setPlayerWithPreferences(player: Player?, videoState: VideoState?, preferences: Preferences) {
+  fun setPlayerWithPreferences(
+    player: Player?,
+    videoState: VideoState?,
+    preferences: Preferences,
+  ) {
     val negativeButton = findViewById<Button>(R.id.exo_negative_button)
     negativeButton.visibility = View.GONE
 

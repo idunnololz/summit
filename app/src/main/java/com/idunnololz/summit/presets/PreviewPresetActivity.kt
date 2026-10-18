@@ -41,6 +41,7 @@ import com.idunnololz.summit.databinding.PresetPreviewScreenContainerBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.MainFragment
@@ -125,6 +126,9 @@ class PreviewPresetActivity : SummitActivity() {
 
   @Inject
   override lateinit var linkResolver: LinkResolver
+
+  @Inject
+  override lateinit var globalStateStorage: GlobalStateStorage
 
   override fun onCreate(savedInstanceState: Bundle?) {
 //        sharedPreferencesManager.useTempPreferences = true

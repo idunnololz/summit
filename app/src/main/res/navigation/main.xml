@@ -102,8 +102,6 @@
             app:argType="com.idunnololz.summit.preview.VideoType" />
         <argument
             android:name="videoState"
-            android:defaultValue="@null"
-            app:nullable="true"
             app:argType="com.idunnololz.summit.video.VideoState"/>
         <argument
             android:name="downloadContext"

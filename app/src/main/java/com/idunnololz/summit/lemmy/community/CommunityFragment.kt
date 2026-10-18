@@ -410,6 +410,7 @@ class CommunityFragment :
             videoType = videoType,
             videoState = state,
             downloadContext = postView.toFileDownloadContext(),
+            isVideoNsfw = postView.post.nsfw,
           )
         },
         onVideoLongClickListener = { url ->

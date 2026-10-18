@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
+import androidx.media3.common.Player
 import coil3.asImage
 import coil3.dispose
 import coil3.load
@@ -468,15 +469,27 @@ class LemmyContentHelper(
 
       playerView.player = null
       playerView.setPlayerWithPreferences(
-        getExoPlayerManager().getPlayerForUrl(
+        player = getExoPlayerManager().getPlayerForUrl(
           url = videoInfo.videoUrl,
           videoType = videoType,
-          videoState = videoState,
+          videoState = videoState ?: VideoState(
+            currentTime = 0L,
+            volume = if (preferences.alwaysMuteNsfwVideos && postView.post.nsfw) {
+              0f
+            } else {
+              preferences.inlineVideoDefaultVolume
+            },
+            playing = autoPlayVideos,
+            repeatMode = if (preferences.loopVideoByDefault) {
+              Player.REPEAT_MODE_ALL
+            } else {
+              Player.REPEAT_MODE_OFF
+            },
+          ),
           isInline = true,
-          autoPlay = autoPlayVideos,
         ),
-        videoState,
-        preferences,
+        videoState = videoState,
+        preferences = preferences,
       )
     }
 

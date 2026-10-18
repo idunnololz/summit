@@ -179,6 +179,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             videoType = videoType,
             videoState = state,
             downloadContext = null,
+            isVideoNsfw = false,
           )
         },
         onVideoLongClickListener = { url ->
