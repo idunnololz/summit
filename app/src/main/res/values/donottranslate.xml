@@ -61,5 +61,11 @@ kersploosh
 WeeScottishMan
     </string>
 
+    <string name="open_debug_window">Open debug window</string>
+    <string name="debug_duplicate_posts">Duplicate posts</string>
+    <string name="debug_no_duplicate_posts">No duplicate post entries for the current account.</string>
+    <string name="debug_no_matching_duplicate_posts">No matching duplicate post entries.</string>
+    <string name="debug_post_id_format">Post ID: %1$d</string>
+
     <string name="search_authority" translatable="false">com.idunnololz.summit.search.SuggestionProvider</string>
 </resources>

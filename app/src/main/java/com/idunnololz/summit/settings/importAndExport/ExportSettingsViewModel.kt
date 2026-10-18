@@ -27,6 +27,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
@@ -80,9 +82,8 @@ class ExportSettingsViewModel @Inject constructor(
   }
 
   fun getBackupFileName(): String {
-    val dateFormatter = SimpleDateFormat("dd-MM-yyyy_HH-mm", Locale.US)
-
-    return "backup-${dateFormatter.format(Calendar.getInstance().time)}.summitbackup"
+    val now = Instant.fromEpochSeconds(Clock.System.now().epochSeconds)
+    return "summit-backup-${now}.summitbackup"
   }
 
   fun saveToInternalBackups(

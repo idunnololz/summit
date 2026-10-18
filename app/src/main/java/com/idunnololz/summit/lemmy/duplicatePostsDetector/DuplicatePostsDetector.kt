@@ -76,6 +76,9 @@ class DuplicatePostsDetector @Inject constructor(
     return currentDuplicatePostsDetector?.isPostDuplicateOfRead(postView) == true
   }
 
+  suspend fun getCurrentItems(): List<DuplicatePostItem> =
+    currentDuplicatePostsDetector?.getItems().orEmpty()
+
   private fun Account.getDuplicatePostsDetector(): PerAccountDuplicatePostsDetector {
     val key = StableAccountId(id, instance)
     val detector = detectors[key]
@@ -203,6 +206,12 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
     return readPost != null && readPost != postView.post.id.toLong()
   }
 
+  suspend fun getItems(): List<DuplicatePostItem> = mutex.withLock {
+    readPosts.map { (key, postId) ->
+      DuplicatePostItem(key, postId)
+    }
+  }
+
   private fun generateKeyForPostView(postView: PostView): String? {
     val key = buildString {
       append(postView.post.name)
@@ -252,3 +261,8 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor(
     }.trim()
   }
 }
+
+data class DuplicatePostItem(
+  val key: String,
+  val postId: Long,
+)

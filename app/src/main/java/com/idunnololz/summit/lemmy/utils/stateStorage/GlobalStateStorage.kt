@@ -15,6 +15,9 @@ class GlobalStateStorage(
   var videoStateVolume: Float
     by floatPreference("VIDEO_STATE_VOLUME")
 
+  var useVideoStateVolume: Boolean
+    by booleanPreference("USE_VIDEO_STATE_VOLUME")
+
   var colorPickerHistory: String?
     by stringPreference(
       "COLOR_PICKER_HISTORY",

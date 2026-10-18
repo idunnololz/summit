@@ -40,11 +40,13 @@ import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
+import com.idunnololz.summit.api.BuildConfig
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
+import com.idunnololz.summit.debug.DebugDialogFragment
 import com.idunnololz.summit.goTo.GoToDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
@@ -1832,6 +1834,15 @@ class CommunityFragment :
         )
       }
 
+      if (BuildConfig.DEBUG) {
+        addDivider()
+        addItemWithIcon(
+          id = R.id.debug_window,
+          title = getString(R.string.open_debug_window),
+          icon = R.drawable.outline_bug_report_24,
+        )
+      }
+
       if (getMainActivity()?.useBottomNavBar == false) {
         addDivider()
         val navBarDestinations = preferences.navBarConfig.navBarDestinations
@@ -2172,6 +2183,9 @@ class CommunityFragment :
       R.id.create_a_new_community -> {
         getMainActivity()?.showCreateCommunityScreen()
       }
+
+      R.id.debug_window ->
+        DebugDialogFragment.show(parentFragmentManager)
     }
   }
 
