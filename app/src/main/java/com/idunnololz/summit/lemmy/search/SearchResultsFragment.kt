@@ -173,13 +173,13 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             urlAlt = altUrl,
           )
         },
-        onVideoClick = { url, videoType, state ->
+        onVideoClick = { url, videoType, state, isNsfw ->
           getMainActivity()?.openVideo(
             url = url,
             videoType = videoType,
             videoState = state,
             downloadContext = null,
-            isVideoNsfw = false,
+            isVideoNsfw = isNsfw,
           )
         },
         onVideoLongClickListener = { url ->
@@ -397,6 +397,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
       url: String,
       videoType: VideoType,
       videoState: VideoState?,
+      isNsfw: Boolean,
     ) -> Unit,
     private val onVideoLongClickListener: (url: String) -> Unit,
     private val onPageClick: (url: String, PageRef) -> Unit,
@@ -566,7 +567,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           },
           onPageClick = onPageClick,
           onVideoClick = {
-            onVideoClick(it, VideoType.Unknown, null)
+            onVideoClick(it, VideoType.Unknown, null, post.nsfw)
           },
           onLinkClick = onLinkClick,
           onLinkLongClick = onLinkLongClick,
@@ -672,7 +673,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           onShowMoreOptions = { _, postView ->
             onPostActionClick(postView, R.id.pa_more)
           },
-          onVideoClick = onVideoClick,
+          onVideoClick = { url, videoType, videoState ->
+            onVideoClick(url, videoType, videoState, item.fetchedPost.postView.post.nsfw)
+          },
           onVideoLongClickListener = onVideoLongClickListener,
           onPageClick = { accountId, url, pageRef ->
             onPageClick(url, pageRef)

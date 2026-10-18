@@ -64,6 +64,7 @@ import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.coil.BlurTransformation
+import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.shimmer.ShimmerDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
@@ -782,7 +783,15 @@ class LemmyContentHelper(
 
         if (blur) {
           val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-          this.transformations(BlurTransformation(context, sampling = sampling))
+
+          if (isUrlVideo) {
+            transformations(
+              BlurTransformation(context, sampling = sampling),
+              VideoWatermarkTransformation(context)
+            )
+          } else {
+            this.transformations(BlurTransformation(context, sampling = sampling))
+          }
         }
 
         if (w > 0 && h > 0) {
@@ -882,7 +891,15 @@ class LemmyContentHelper(
       imageView.load(offlineManager.getCachedImageFile(thumbnailUrl)) {
         if (blur) {
           val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-          this.transformations(BlurTransformation(context, sampling = sampling))
+
+          if (isUrlVideo) {
+            transformations(
+              BlurTransformation(context, sampling = sampling),
+              VideoWatermarkTransformation(context)
+            )
+          } else {
+            this.transformations(BlurTransformation(context, sampling = sampling))
+          }
         }
 
         allowHardware(false)

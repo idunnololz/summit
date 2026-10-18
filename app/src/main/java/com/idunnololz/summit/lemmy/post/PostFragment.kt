@@ -469,12 +469,16 @@ class PostFragment :
             )
           },
           onVideoClick = { postOrCommentView, url, videoType, state ->
+
             getMainActivity()?.openVideo(
               url = url,
               videoType = videoType,
               videoState = state,
               downloadContext = postOrCommentView?.toFileDownloadContext(),
-              isVideoNsfw = postOrCommentView?.leftOrNull()?.post?.nsfw ?: false,
+              isVideoNsfw = postOrCommentView?.fold(
+                { it.post },
+                { it.post }
+              )?.nsfw ?: false,
             )
           },
           onVideoLongClickListener = { url ->
