@@ -15,6 +15,9 @@ class GlobalStateStorage(
   var videoStateVolume: Float
     by floatPreference("VIDEO_STATE_VOLUME")
 
+  var hasShownTextFieldToolbarScrollHint: Boolean
+    by booleanPreference("HAS_SHOWN_TEXT_FIELD_TOOLBAR_SCROLL_HINT")
+
   var colorPickerHistory: String?
     by stringPreference(
       "COLOR_PICKER_HISTORY",

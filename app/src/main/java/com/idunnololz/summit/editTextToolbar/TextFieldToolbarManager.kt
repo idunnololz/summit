@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
@@ -21,8 +23,10 @@ import com.idunnololz.summit.databinding.TextFieldToolbarItem2Binding
 import com.idunnololz.summit.databinding.TextFieldToolbarItemBinding
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
 import com.idunnololz.summit.emoji.EmojiPopupWindow
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
+import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.BottomMenu
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,6 +35,7 @@ import javax.inject.Singleton
 class TextFieldToolbarManager @Inject constructor(
   private val preferences: Preferences,
   private val emojiPopupWindowFactory: EmojiPopupWindow.Factory,
+  private val globalStateStorage: GlobalStateStorage,
 ) {
 
   val textFieldToolbarSettings = MutableLiveData(preferences.textFieldToolbarSettings)
@@ -168,6 +173,7 @@ class TextFieldToolbarManager @Inject constructor(
       val settings: View = b.root
 
       parentView.addView(container)
+      showScrollHintIfNeeded(parentView)
 
       return TextFormatToolbarViewHolder(
         preview = preview,
@@ -194,8 +200,29 @@ class TextFieldToolbarManager @Inject constructor(
       parentView,
       true,
     )
+    showScrollHintIfNeeded(parentView)
 
     return TextFormatToolbarViewHolder(b, emojiPopupWindowFactory)
+  }
+
+  private fun showScrollHintIfNeeded(parentView: ViewGroup) {
+    (parentView as? HorizontalScrollView)?.let { scrollView ->
+      if (globalStateStorage.hasShownTextFieldToolbarScrollHint) {
+        return
+      }
+
+      scrollView.doOnNextLayout {
+        if (globalStateStorage.hasShownTextFieldToolbarScrollHint ||
+          (!scrollView.canScrollHorizontally(-1) && !scrollView.canScrollHorizontally(1))
+        ) {
+          return@doOnNextLayout
+        }
+
+        globalStateStorage.hasShownTextFieldToolbarScrollHint = true
+
+        AnimationUtils.playScrollableHintAnimation(scrollView)
+      }
+    }
   }
 }
 

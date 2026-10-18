@@ -1,9 +1,16 @@
 package com.idunnololz.summit.util
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import android.widget.ScrollView
+
+private const val TAG = "AnimationUtils"
 
 object AnimationUtils {
 
@@ -219,6 +226,40 @@ object AnimationUtils {
       animatingOut = false
       view.animate().cancel()
       view.clearAnimation()
+    }
+  }
+
+  fun playScrollableHintAnimation(scrollView: ViewGroup) {
+    try {
+      val startScrollX = scrollView.scrollX
+      val direction = if (scrollView.canScrollHorizontally(1)) 1 else -1
+      val distance = Utils.convertDpToPixel(48f).toInt()
+      val maxScroll = (
+        (scrollView.getChildAt(0)?.width ?: scrollView.width) -
+          scrollView.width + scrollView.paddingStart + scrollView.paddingEnd
+        ).coerceAtLeast(0)
+      val target = (startScrollX + direction * distance).coerceIn(0, maxScroll)
+
+      if (target == startScrollX) {
+        return
+      }
+
+      AnimatorSet().apply {
+        playSequentially(
+          ObjectAnimator.ofInt(scrollView, "scrollX", startScrollX, target,).apply {
+            startDelay = 1400L
+            duration = 200L
+            interpolator = AccelerateDecelerateInterpolator()
+          },
+          ObjectAnimator.ofInt(scrollView, "scrollX", target, startScrollX).apply {
+            startDelay = 170L
+            duration = 200L
+            interpolator = AccelerateDecelerateInterpolator()
+          }
+        )
+      }.start()
+    } catch (e: Exception) {
+      Log.w(TAG, "Animation failed", e)
     }
   }
 }
