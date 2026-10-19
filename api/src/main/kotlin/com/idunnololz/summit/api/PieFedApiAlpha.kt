@@ -367,6 +367,16 @@ interface PieFedApiAlpha {
     @QueryMap form: Map<String, String>,
   ): Call<ListPrivateMessagesResponse>
 
+
+  /**
+   * Get / fetch private messages.
+   */
+  @GET("private_message/conversation")
+  fun getPrivateMessageConversation(
+    @HeaderMap headers: Map<String, String>,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListPrivateMessagesResponse>
+
   /**
    * These are instance wide reports that are only visible for instance admins.
    */

@@ -40,7 +40,6 @@ class ConversationViewModel @Inject constructor(
   private var lastPageIndex = -1
   private var highestLoadedPageIndex = -1
   var personId: Long? = null
-  private var draftMessage: String? = null
 
   val conversationInfoModel = MutableLiveData<ConversationInfoModel>()
   val conversationModel = MutableLiveData<ConversationModel>()

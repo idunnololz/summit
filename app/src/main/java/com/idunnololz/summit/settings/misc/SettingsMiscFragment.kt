@@ -325,6 +325,14 @@ class SettingsMiscFragment :
         onValueChanged = { preferences.openAiApiKey = it },
         showResetButton = true,
       ),
+      settings.colorCodeUpvotePercentage.asOnOffSwitch(
+        { preferences.colorCodeUpvotePercentage },
+        { preferences.colorCodeUpvotePercentage = it },
+      ),
+      settings.hideFabOnPostScreen.asOnOffSwitch(
+        { preferences.hideFabOnPostScreen },
+        { preferences.hideFabOnPostScreen = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

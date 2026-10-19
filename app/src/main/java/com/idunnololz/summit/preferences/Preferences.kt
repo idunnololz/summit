@@ -103,6 +103,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAUL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_MUTE_NSFW_VIDEOS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_CODE_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_FAB_ON_POST_SCREEN
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY
@@ -785,6 +787,10 @@ class Preferences(
     by sensitiveStringPreference(KEY_OPEN_AI_API_KEY)
   var alwaysMuteNsfwVideos: Boolean
     by booleanPreference(KEY_ALWAYS_MUTE_NSFW_VIDEOS, true)
+  var colorCodeUpvotePercentage: Boolean
+    by booleanPreference(KEY_COLOR_CODE_UPVOTE_PERCENTAGE)
+  var hideFabOnPostScreen: Boolean
+    by booleanPreference(KEY_HIDE_FAB_ON_POST_SCREEN, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

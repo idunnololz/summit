@@ -469,7 +469,6 @@ class PostFragment :
             )
           },
           onVideoClick = { postOrCommentView, url, videoType, state ->
-
             getMainActivity()?.openVideo(
               url = url,
               videoType = videoType,
@@ -624,7 +623,9 @@ class PostFragment :
       )
 
       fab.setup(preferences)
-      if (preferences.commentsNavigationFab) {
+      if (preferences.hideFabOnPostScreen) {
+        fab.hide()
+      } else if (preferences.commentsNavigationFab) {
         fab.setImageResource(R.drawable.outline_navigation_24)
         fab.show()
         fab.setOnClickListener {
@@ -956,7 +957,9 @@ class PostFragment :
       }
     } else {
       binding.root.removeView(binding.root.findViewById(R.id.screenshot_mode_container))
-      binding.fab.show()
+      if (!preferences.hideFabOnPostScreen) {
+        binding.fab.show()
+      }
       if (args.isSinglePage) {
         getSummitActivity()?.showNavBar()
       }

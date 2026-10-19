@@ -161,6 +161,7 @@ import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.lemmy.TransferCommunity
 import com.idunnololz.summit.api.dto.piefed.GetComment
+import com.idunnololz.summit.api.dto.piefed.GetPrivateMessageConversation
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
@@ -645,10 +646,21 @@ class PieFedApiAlphaAdapter(
     args: GetPrivateMessages,
     force: Boolean,
   ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
-    api.getPrivateMessages(
-      headers = generateHeaders(authorization, force),
-      form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
-    )
+    if (args.creator_id != null) {
+      api.getPrivateMessageConversation(
+        headers = generateHeaders(authorization, force),
+        form = GetPrivateMessageConversation(
+          personId = args.creator_id,
+          page = args.page?.toLemmyPageIndex(),
+          limit = args.limit,
+        ).serializeToMap(),
+      )
+    } else {
+      api.getPrivateMessages(
+        headers = generateHeaders(authorization, force),
+        form = args.copy(page = args.page?.toLemmyPageIndex()).serializeToMap(),
+      )
+    }
   }.map {
     PrivateMessagesResponse(
       private_messages = it.privateMessages.map { it.toPrivateMessageView() },

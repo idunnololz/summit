@@ -41,6 +41,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_BASE_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_CACHE_POLICY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_CODE_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_SCHEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENTS_NAVIGATION_FAB
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENT_GESTURE_ACTION_1
@@ -72,6 +73,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HAPTICS_ENABLED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_DUPLICATE_POSTS_ON_READ
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_FAB_ON_POST_SCREEN
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_READ_BY_DEFAULT
@@ -2281,6 +2283,15 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.enable_open_ai_tools),
     description = context.getString(R.string.enable_open_ai_tools_desc),
     relatedKeys = listOf(KEY_OPEN_AI_API_KEY),
+  )
+  val colorCodeUpvotePercentage = OnOffSettingItem(
+    title = context.getString(R.string.color_code_upvote_percentage),
+    description = context.getString(R.string.color_code_upvote_percentage_desc),
+    relatedKeys = listOf(KEY_COLOR_CODE_UPVOTE_PERCENTAGE),
+  )
+  val hideFabOnPostScreen = OnOffSettingItem(
+    title = context.getString(R.string.hide_fab_on_post_screen),
+    relatedKeys = listOf(KEY_HIDE_FAB_ON_POST_SCREEN),
   )
 }
 

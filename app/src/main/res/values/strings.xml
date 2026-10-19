@@ -2495,6 +2495,9 @@
     <string name="sensitive_value_format">Sensitive data was detected with the key \'%1$s\' and value \'%2$s\'.</string>
     <string name="always_mute_nsfw_videos">Always mute NSFW videos</string>
     <string name="always_mute_nsfw_videos_desc">When enabled, both the inline and full screen video player will be muted by default when playing a video associated with a NSFW post.</string>
+    <string name="color_code_upvote_percentage">Color code upvote percentage</string>
+    <string name="color_code_upvote_percentage_desc">When enabled content that has less than 50% upvote percentage will use the downvote color and content with over 50% upvote percentage will be upvote colored.</string>
+    <string name="hide_fab_on_post_screen">Hide FAB button on post screen</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>

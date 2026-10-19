@@ -291,7 +291,7 @@ class NavBarController(
       "animateNavBar() %shown: $percentShown diff: ${abs(
         currentPercentShown - percentShown,
       )} animate? $animate",
-      kotlin.RuntimeException(),
+//      kotlin.RuntimeException(),
     )
 
     val navigationBarOffset =

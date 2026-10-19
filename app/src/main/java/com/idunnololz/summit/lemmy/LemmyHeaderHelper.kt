@@ -493,11 +493,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
     if (showUpvotePercentage) {
       sb.appendSeparatorIfNeeded()
-      sb.append(
-        PrettyPrintUtils.defaultShortPercentFormat.format(
-          postView.upvotePercentage,
-        ),
-      )
+      sb.appendUpvotePercent(postView.upvotePercentage)
     }
 
     currentTextView.text = sb
@@ -819,11 +815,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
     if (showUpvotePercentage) {
       sb.appendSeparator()
-      sb.append(
-        PrettyPrintUtils.defaultShortPercentFormat.format(
-          commentView.upvotePercentage,
-        ),
-      )
+      sb.appendUpvotePercent(commentView.upvotePercentage)
     }
 
     if (wrapHeader) {
@@ -952,6 +944,31 @@ class LemmyHeaderHelper @AssistedInject constructor(
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
       )
     }
+  }
+
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun SpannableStringBuilder.appendUpvotePercent(
+    upvotePercent: Float
+  ) {
+    val start = length
+    append(PrettyPrintUtils.defaultShortPercentFormat.format(upvotePercent))
+
+    if (!preferences.colorCodeUpvotePercentage || upvotePercent == 0.5f) {
+      return
+    }
+
+    setSpan(
+      ForegroundColorSpan(
+        if (upvotePercent >= 0.5f) {
+          preferences.upvoteColor
+        } else {
+          preferences.downvoteColor
+        },
+      ),
+      start,
+      length,
+      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
   }
 }
 
