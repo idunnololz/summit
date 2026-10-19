@@ -1237,8 +1237,8 @@
     <string name="title_choose_image_provider">选择</string>
     <string name="title_gallery">画廊</string>
     <string name="title_camera">相机</string>
-    <string name="permission_gallery_denied">需要存储权限才能选择图库图片。请在“设置”&gt;“权限”中授予存储权限。</string>
-    <string name="permission_camera_extended_denied">拍照需要相机和存储权限。请在“设置”&gt;“权限”中允许这两项权限。</string>
+    <string name="permission_gallery_denied"><![CDATA[需要存储权限才能选择图库图片。请在“设置”&gt;“权限”中授予存储权限。]]></string>
+    <string name="permission_camera_extended_denied"><![CDATA[拍照需要相机和存储权限。请在“设置”&gt;“权限”中允许这两项权限。]]></string>
     <string name="mod_history">模组历史</string>
     <string name="view_user_profile">查看用户个人资料</string>
     <string name="reporter">记者</string>
@@ -1339,7 +1339,7 @@
     <string name="error_invalid_regex">无效的正则表达式</string>
     <string name="match_whole_word">整词匹配</string>
     <string name="background_color">背景颜色</string>
-    <string name="permission_camera_denied">拍照需要存储权限。请在“设置”&gt;“权限”中授予存储权限。</string>
+    <string name="permission_camera_denied"><![CDATA[拍照需要存储权限。请在“设置”&gt;“权限”中授予存储权限。]]></string>
     <string name="read_posts_hidden">阅读已隐藏的帖子。</string>
     <string name="ic_rotate_left_24">逆时针旋转</string>
     <string name="ic_rotate_right_24">旋转</string>
