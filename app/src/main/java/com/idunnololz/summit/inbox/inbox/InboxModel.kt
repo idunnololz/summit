@@ -6,6 +6,7 @@ import com.idunnololz.summit.inbox.conversation.Conversation
 
 class InboxModel(
   val items: List<InboxListItem> = listOf(),
+  val instance: String,
   val earliestMessageTs: Long? = null,
   val hasMore: Boolean = false,
 )

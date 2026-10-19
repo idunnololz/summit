@@ -110,7 +110,7 @@ class InboxViewModel @Inject constructor(
 
         inboxUpdate.setValue(
           InboxUpdate(
-            inboxModel = InboxModel(),
+            inboxModel = InboxModel(instance = instance),
             scrollToTop = false,
             isLoading = true,
           ),
@@ -142,7 +142,7 @@ class InboxViewModel @Inject constructor(
 
           inboxUpdate.setValue(
             InboxUpdate(
-              inboxModel = InboxModel(),
+              inboxModel = InboxModel(instance = instance),
               scrollToTop = false,
               isLoading = true,
             ),
@@ -411,6 +411,7 @@ class InboxViewModel @Inject constructor(
             },
             earliestMessageTs = conversations.conversationEarliestMessageTs,
             hasMore = false,
+            instance = instance,
           ),
           scrollToTop = scrollToTop,
           isLoading = false,
@@ -422,6 +423,7 @@ class InboxViewModel @Inject constructor(
           inboxModel = InboxModel(
             allInboxItems,
             hasMore = hasMore,
+            instance = instance,
           ),
           scrollToTop = scrollToTop,
           isLoading = false,

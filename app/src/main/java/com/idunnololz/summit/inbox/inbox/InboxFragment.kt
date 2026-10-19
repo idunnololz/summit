@@ -506,7 +506,6 @@ class InboxFragment :
       context = requireContext(),
       accountId = viewModel.currentAccount.value?.id,
       postAndCommentViewBuilder = postAndCommentViewBuilder,
-      instance = viewModel.instance,
       lifecycleOwner = viewLifecycleOwner,
       avatarHelper = avatarHelper,
       lemmyTextHelper = lemmyTextHelper,
@@ -716,7 +715,6 @@ class InboxFragment :
     private val context: Context,
     var accountId: Long?,
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
-    private val instance: String,
     private val lifecycleOwner: LifecycleOwner,
     private val avatarHelper: AvatarHelper,
     private val lemmyTextHelper: LemmyTextHelper,
@@ -754,18 +752,22 @@ class InboxFragment :
       }
       data class CompactInboxListItem(
         override val inboxItem: InboxItem,
+        val instance: String,
       ) : InboxListItem
       data class FullInboxListItem(
         override val inboxItem: InboxItem,
+        val instance: String,
       ) : InboxListItem
 
       data class RegistrationApplicationItem(
         val registrationApplication: RegistrationApplicationInboxItem,
+        val instance: String,
       ) : Item
 
       data class ConversationItem(
         val conversation: Conversation,
         val draftMessage: DraftData.MessageDraftData?,
+        val instance: String,
       ) : Item
 
       data class LoaderItem(
@@ -773,7 +775,7 @@ class InboxFragment :
       ) : Item
     }
 
-    private var inboxModel: InboxModel = InboxModel()
+    private var inboxModel: InboxModel? = null
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
@@ -808,7 +810,7 @@ class InboxFragment :
       addItemType(Item.CompactInboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
         postAndCommentViewBuilder.bindMessage(
           b = b,
-          instance = instance,
+          instance = item.instance,
           accountId = accountId,
           viewLifecycleOwner = lifecycleOwner,
           item = item.inboxItem,
@@ -831,7 +833,7 @@ class InboxFragment :
 
         postAndCommentViewBuilder.bindMessage(
           b = b,
-          instance = instance,
+          instance = item.instance,
           accountId = accountId,
           viewLifecycleOwner = lifecycleOwner,
           item = item.inboxItem,
@@ -854,7 +856,7 @@ class InboxFragment :
       ) { item, b, _ ->
         postAndCommentViewBuilder.bindRegistrationApplication(
           b = b,
-          instance = instance,
+          instance = item.instance,
           item = item.registrationApplication,
           onImageClick = onImageClick,
           onVideoClick = onVideoClick,
@@ -906,7 +908,7 @@ class InboxFragment :
           text = draftContent
             ?: conversation.content
             ?: "",
-          instance = instance,
+          instance = item.instance,
           onImageClick = { url, peek ->
             onImageClick(url, peek)
           },
@@ -959,9 +961,9 @@ class InboxFragment :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    fun hasMore(): Boolean = inboxModel.hasMore
+    fun hasMore(): Boolean = inboxModel?.hasMore == true
 
-    fun isEmpty(): Boolean = inboxModel.items.isEmpty()
+    fun isEmpty(): Boolean = inboxModel?.items?.isEmpty() ?: true
 
     fun getItemAt(position: Int): InboxItem? =
       when (val item = adapterHelper.items.getOrNull(position)) {
@@ -981,48 +983,63 @@ class InboxFragment :
     }
 
     private fun refreshItems(cb: (() -> Unit)? = null) {
+      val inboxModel = inboxModel
       val newItems = mutableListOf<Item>()
 
       newItems.add(Item.HeaderItem)
 
-      val earliestMessageTs = inboxModel.earliestMessageTs
-      if (earliestMessageTs != null) {
-        newItems.add(Item.TooManyMessagesWarningItem(earliestMessageTs))
-      }
+      if (inboxModel != null) {
+        val earliestMessageTs = inboxModel.earliestMessageTs
+        if (earliestMessageTs != null) {
+          newItems.add(Item.TooManyMessagesWarningItem(earliestMessageTs))
+        }
 
-      inboxModel.items.map { item ->
-        when (item) {
-          is InboxListItem.ConversationItem -> {
-            newItems.add(
-              Item.ConversationItem(
-                item.conversation,
-                item.draftMessage,
-              ),
-            )
-          }
-          is InboxListItem.RegistrationApplicationInboxItem -> {
-            newItems.add(
-              Item.RegistrationApplicationItem(
-                item.item,
-              ),
-            )
-          }
-          is InboxListItem.RegularInboxItem -> {
-            when (preferences.inboxLayout) {
-              InboxLayoutId.COMPACT ->
-                newItems.add(Item.CompactInboxListItem(item.item))
-              InboxLayoutId.FULL ->
-                newItems.add(Item.FullInboxListItem(item.item))
+        inboxModel.items.map { item ->
+          when (item) {
+            is InboxListItem.ConversationItem -> {
+              newItems.add(
+                Item.ConversationItem(
+                  conversation = item.conversation,
+                  draftMessage = item.draftMessage,
+                  instance = inboxModel.instance,
+                ),
+              )
+            }
+            is InboxListItem.RegistrationApplicationInboxItem -> {
+              newItems.add(
+                Item.RegistrationApplicationItem(
+                  registrationApplication = item.item,
+                  instance = inboxModel.instance,
+                ),
+              )
+            }
+            is InboxListItem.RegularInboxItem -> {
+              when (preferences.inboxLayout) {
+                InboxLayoutId.COMPACT ->
+                  newItems.add(
+                    Item.CompactInboxListItem(
+                      inboxItem = item.item,
+                      instance = inboxModel.instance,
+                    )
+                  )
+                InboxLayoutId.FULL ->
+                  newItems.add(
+                    Item.FullInboxListItem(
+                      inboxItem = item.item,
+                      instance = inboxModel.instance,
+                    )
+                  )
+              }
             }
           }
         }
-      }
 
-      if (inboxModel.items.isNotEmpty()) {
-        if (inboxModel.hasMore) {
-          newItems.add(Item.LoaderItem(StatefulData.NotStarted()))
-        } else {
-          newItems.add(Item.LoaderItem(StatefulData.Success(Unit)))
+        if (inboxModel.items.isNotEmpty()) {
+          if (inboxModel.hasMore) {
+            newItems.add(Item.LoaderItem(StatefulData.NotStarted()))
+          } else {
+            newItems.add(Item.LoaderItem(StatefulData.Success(Unit)))
+          }
         }
       }
 
