@@ -1036,12 +1036,7 @@ class CommunityFragment :
 
     with(binding) {
       swipeRefreshLayout.setOnRefreshListener {
-        viewModel.fetchCurrentPage(
-          force = true,
-          resetHideRead = true,
-          clearPages = true,
-          scrollToTop = true,
-        )
+        viewModel.refresh()
         communityAppBarController?.refreshCommunityInfoIfNeeded()
       }
       loadingView.setOnRefreshClickListener {

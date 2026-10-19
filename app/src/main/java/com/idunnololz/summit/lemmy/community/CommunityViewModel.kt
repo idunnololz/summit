@@ -62,6 +62,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -112,6 +113,11 @@ class CommunityViewModel @Inject constructor(
 
     // Only used for non-infinity
     val scrollToSavedPosition: Boolean = false,
+  )
+
+  private class FetchingPageJob(
+    val page: Int,
+    val job: Job,
   )
 
   private val postsRepository = postsRepositoryFactory.create(state)
@@ -165,7 +171,7 @@ class CommunityViewModel @Inject constructor(
     },
   )
 
-  private var fetchingPages = mutableSetOf<Int>()
+  private var fetchingPageJobs = listOf<FetchingPageJob>()
   val postListEngine = postListEngineFactory.create(
     infinity = preferences.infinity,
     autoLoadMoreItems = preferences.autoLoadMorePosts,
@@ -181,12 +187,11 @@ class CommunityViewModel @Inject constructor(
   var lockBottomBar: Boolean = false
 
   private var hiddenPostObserverJob: Job? = null
-  private var fetchPageJob: Job? = null
 
   private val onAccountChangeListener = object : AccountManager.OnAccountChangedListener {
     override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
-      fetchPageJob?.cancel()
-      fetchingPages.clear()
+      fetchingPageJobs.forEach { it.job.cancel() }
+      fetchingPageJobs = listOf()
 
       postsRepository.onAccountChanged()
 
@@ -401,11 +406,13 @@ class CommunityViewModel @Inject constructor(
 
     if (force || !postListEngine.isCurrentPageLoaded()) {
       postListEngine.purgeCurrentPageAndBeyond()
-      fetchPageInternal(
-        pageToFetch = postListEngine.currentPageIndex.value,
-        force = force,
-        scrollToTop = clearPagePosition,
-      )
+      viewModelScope.launch {
+        fetchPageInternal(
+          pageToFetch = postListEngine.currentPageIndex.value,
+          force = force,
+          scrollToTop = clearPagePosition,
+        )
+      }
     } else {
       postListEngine.createItems()
       loadedPostsData.postValue(
@@ -430,13 +437,15 @@ class CommunityViewModel @Inject constructor(
     if (!infinity) {
       loadPageIndexNoInfinity(pageIndex = pageIndex, force = force, clearPagePosition = true)
     } else {
-      fetchPageInternal(
-        pageToFetch = pageIndex,
-        force = force,
-        clearPagesOnSuccess = clearPagesOnSuccess,
-        scrollToTop = scrollToTop,
-        includeHideReadCount = includeHideReadCount,
-      )
+      viewModelScope.launch {
+        fetchPageInternal(
+          pageToFetch = pageIndex,
+          force = force,
+          clearPagesOnSuccess = clearPagesOnSuccess,
+          scrollToTop = scrollToTop,
+          includeHideReadCount = includeHideReadCount,
+        )
+      }
     }
   }
 
@@ -469,6 +478,17 @@ class CommunityViewModel @Inject constructor(
     }
   }
 
+  fun refresh() {
+    viewModelScope.launch {
+      fetchCurrentPageInternal(
+        force = true,
+        resetHideRead = true,
+        clearPages = true,
+        scrollToTop = true,
+      )
+    }
+  }
+
   fun fetchCurrentPage(
     force: Boolean = false,
     resetHideRead: Boolean = false,
@@ -476,61 +496,75 @@ class CommunityViewModel @Inject constructor(
     scrollToTop: Boolean = false,
   ) {
     viewModelScope.launch {
-      if (resetHideRead) {
-        if (hideReadMode.value == HideReadMode.OnUntilRefresh) {
-          hideReadMode.value = HideReadMode.Off
-        }
-        postsRepository.updateHideRead(hideRead = hideReadMode.value != HideReadMode.Off)
-      }
-
-      val pages = if (postListEngine.infinity) {
-        if (clearPages) {
-          listOf()
-        } else {
-          postListEngine.getCurrentPages()
-        }
-      } else {
-        listOf(requireNotNull(currentPageIndex.value))
-      }
-
-      if (clearPages) {
-        postsRepository.reset()
-      }
-
-      if (pages.isEmpty()) {
-        if (postListEngine.infinity) {
-          fetchPage(
-            pageIndex = 0,
-            force = true,
-            clearPagesOnSuccess = clearPages,
-            scrollToTop = scrollToTop,
-            includeHideReadCount = hideReadMode.value != HideReadMode.Off,
-          )
-        } else {
-          fetchCurrentPage()
-        }
-        return@launch
-      }
-
-      if (postListEngine.infinity) {
-        pages.forEach {
-          fetchPageInternal(
-            pageToFetch = it,
-            force = force,
-            scrollToTop = scrollToTop,
-          )
-        }
-      } else {
-        loadPageIndexNoInfinity(
-          pageIndex = postListEngine.currentPageIndex.value,
-          force = force,
-          clearPagePosition = false,
-        )
-      }
+      fetchCurrentPageInternal(
+        force = force,
+        resetHideRead = resetHideRead,
+        clearPages = clearPages,
+        scrollToTop = scrollToTop,
+      )
     }
   }
 
-  private fun fetchPageInternal(
+  private suspend fun fetchCurrentPageInternal(
+    force: Boolean = false,
+    resetHideRead: Boolean = false,
+    clearPages: Boolean = false,
+    scrollToTop: Boolean = false,
+  ) {
+    if (resetHideRead) {
+      if (hideReadMode.value == HideReadMode.OnUntilRefresh) {
+        hideReadMode.value = HideReadMode.Off
+      }
+      postsRepository.updateHideRead(hideRead = hideReadMode.value != HideReadMode.Off)
+    }
+
+    val pages = if (postListEngine.infinity) {
+      if (clearPages) {
+        listOf()
+      } else {
+        postListEngine.getCurrentPages()
+      }
+    } else {
+      listOf(requireNotNull(currentPageIndex.value))
+    }
+
+    if (clearPages) {
+      postsRepository.reset()
+    }
+
+    if (pages.isEmpty()) {
+      if (postListEngine.infinity) {
+        fetchPage(
+          pageIndex = 0,
+          force = true,
+          clearPagesOnSuccess = clearPages,
+          scrollToTop = scrollToTop,
+          includeHideReadCount = hideReadMode.value != HideReadMode.Off,
+        )
+      } else {
+        fetchCurrentPageInternal()
+      }
+      return
+    }
+
+    if (postListEngine.infinity) {
+      pages.forEach {
+        fetchPageInternal(
+          pageToFetch = it,
+          force = force,
+          scrollToTop = scrollToTop,
+        )
+      }
+    } else {
+      loadPageIndexNoInfinity(
+        pageIndex = postListEngine.currentPageIndex.value,
+        force = force,
+        clearPagePosition = false,
+      )
+    }
+  }
+
+  private suspend fun fetchPageInternal(
     pageToFetch: Int,
     force: Boolean,
     clearPagesOnSuccess: Boolean = false,
@@ -538,7 +572,9 @@ class CommunityViewModel @Inject constructor(
     includeHideReadCount: Boolean = false,
     isRestoreOperation: Boolean = false,
   ) {
-    if (fetchingPages.contains(pageToFetch)) {
+    val job = fetchingPageJobs.firstOrNull { it.page == pageToFetch }
+    if (job != null) {
+      job.job.join()
       return
     }
 
@@ -557,11 +593,9 @@ class CommunityViewModel @Inject constructor(
 
     Log.d(TAG, "Fetching page $pageToFetch")
 
-    fetchingPages.add(pageToFetch)
-
     loadedPostsData.setIsLoading()
 
-    fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
+    val fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
       if (pageToFetch < postListEngine.pages.size) {
         if (force) {
           val posts = postListEngine.pages.getOrNull(pageToFetch)?.posts
@@ -613,7 +647,7 @@ class CommunityViewModel @Inject constructor(
           }
 
           withContext(Dispatchers.Main) {
-            fetchingPages.remove(pageToFetch)
+            fetchingPageJobs = fetchingPageJobs.filter { it.page != pageToFetch }
           }
         }
         .onFailure {
@@ -642,7 +676,7 @@ class CommunityViewModel @Inject constructor(
           }
 
           withContext(Dispatchers.Main) {
-            fetchingPages.remove(pageToFetch)
+            fetchingPageJobs = fetchingPageJobs.filter { it.page != pageToFetch }
           }
         }
 
@@ -656,6 +690,11 @@ class CommunityViewModel @Inject constructor(
         }
       }
     }
+
+    fetchingPageJobs += FetchingPageJob(
+      pageToFetch,
+      fetchPageJob,
+    )
   }
 
   fun changeCommunity(communityRef: CommunityRef?, restore: Boolean) {
@@ -740,7 +779,7 @@ class CommunityViewModel @Inject constructor(
 
     for (i in 0..restorePages) {
       fetchPageInternal(pageToFetch = i, force = false, isRestoreOperation = true)
-      fetchPageJob?.join()
+      fetchingPageJobs.forEach { it.job.join() }
     }
 
     // Turn caching back on once we are done restoring
