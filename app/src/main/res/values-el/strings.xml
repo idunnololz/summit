@@ -1391,9 +1391,9 @@
     <string name="reported_content_highlighted">Αναφερόμενο περιεχόμενο (επισημασμένο)</string>
     <string name="banned_person_from_community_permanently_format">Αποκλεισμός %1$s από την κοινότητα %2$s οριστικά.</string>
     <string name="restore_browsing_sessions_desc">Όταν είναι ενεργό, οι ροές αναρτήσεων αποθηκεύονται και επαναφέρονται όταν η εφαρμογή τερματίζεται από το ΛΣ και δημιουργείται ξανά.</string>
-    <string name="permission_gallery_denied">Απαιτείται άδεια αποθήκευσης για την επιλογή εικόνας από τη συλλογή. Παρακαλούμε επέτρεψε την άδεια αποθήκευσης από τις Ρυθμίσεις &gt; Δικαιώματα.</string>
-    <string name="permission_camera_extended_denied">Απαιτούνται δικαιώματα κάμερας και αποθηκευτικού χώρου για τη λήψη φωτογραφίας. Παρακαλούμε επέτρεψε και τα δύο δικαιώματα που ζητούνται από τις Ρυθμίσεις &gt; Δικαιώματα.</string>
-    <string name="permission_camera_denied">Απαιτείται άδεια αποθήκευσης για τη λήψη μιας φωτογραφίας. Παρακαλούμε επέτρεψε την άδεια αποθήκευσης από τις Ρυθμίσεις &gt; Δικαιώματα.</string>
+    <string name="permission_gallery_denied"><![CDATA[Απαιτείται άδεια αποθήκευσης για την επιλογή εικόνας από τη συλλογή. Παρακαλούμε επέτρεψε την άδεια αποθήκευσης από τις Ρυθμίσεις &gt; Δικαιώματα.]]></string>
+    <string name="permission_camera_extended_denied"><![CDATA[Απαιτούνται δικαιώματα κάμερας και αποθηκευτικού χώρου για τη λήψη φωτογραφίας. Παρακαλούμε επέτρεψε και τα δύο δικαιώματα που ζητούνται από τις Ρυθμίσεις &gt; Δικαιώματα.]]></string>
+    <string name="permission_camera_denied"><![CDATA[Απαιτείται άδεια αποθήκευσης για τη λήψη μιας φωτογραφίας. Παρακαλούμε επέτρεψε την άδεια αποθήκευσης από τις Ρυθμίσεις &gt; Δικαιώματα.]]></string>
     <string name="error_failed_to_create_camera_image_file">Αποτυχία δημιουργίας αρχείου εικόνας Κάμερας</string>
     <string name="error_failed_to_crop_image">Αποτυχία περικοπής εικόνας</string>
     <string name="error_failed_to_compress_image">Αποτυχία συμπίεσης εικόνας</string>
