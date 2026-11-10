@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.preview.VideoType
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 object ContentUtils {
   fun isUrlImage(url: String): Boolean {
@@ -16,7 +17,8 @@ object ContentUtils {
   }
 
   fun isUrlVideo(url: String): Boolean {
-    val urlWithoutParams = url.split("?").getOrElse(0) { "" }
+    val unwrappedUrl = unwrapImageProxyUrl(url)
+    val urlWithoutParams = unwrappedUrl.split("?").getOrElse(0) { "" }
     return isUrlMp4(urlWithoutParams) ||
       isUrlWebm(urlWithoutParams) ||
       isUrlHls(urlWithoutParams) ||
@@ -46,5 +48,17 @@ object ContentUtils {
     VideoType.Dash
   } else {
     VideoType.Unknown
+  }
+
+  fun unwrapImageProxyUrl(urlString: String): String {
+    val url = urlString.toHttpUrlOrNull() ?: return urlString
+
+    if (url.pathSegments.lastOrNull()?.equals("image_proxy", ignoreCase = true) != true) {
+      return urlString
+    }
+
+    val urlParam = url.queryParameter("url") ?: return urlString
+
+    return unwrapImageProxyUrl(urlParam)
   }
 }

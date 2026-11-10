@@ -75,6 +75,7 @@ import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -698,6 +699,7 @@ class AddOrEditPostFragment :
         if (communityEditText.hasFocus()) {
           viewModel.showSearch.value = query.isNotBlank()
         }
+        viewModel.communityFullName.value = query
       }
       viewModel.currentDraftEntry.observe(viewLifecycleOwner) {
         if (it == null) return@observe
@@ -1116,7 +1118,12 @@ class AddOrEditPostFragment :
   }
 
   private fun Post.getCrossPostContent(): String = buildString {
-    appendLine(getString(R.string.cross_posted_from_format, ap_id))
+    appendLine(
+      getString(
+        R.string.cross_posted_from_format,
+        ap_id.toHttpUrlOrNull()?.toString() ?: ap_id
+      )
+    )
     appendLine()
 
     val body = body ?: return@buildString

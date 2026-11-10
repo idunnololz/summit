@@ -694,7 +694,7 @@ class LemmyApiV3Adapter(
     args: SaveUserSettings,
   ): Result<Unit> =
     retrofitErrorHandler { api.saveUserSettings(generateHeaders(authorization, false), args) }
-      .map { Unit }
+      .map { }
 
   override suspend fun uploadImage(
     authorization: String?,
@@ -789,9 +789,7 @@ class LemmyApiV3Adapter(
     args: ApproveRegistrationApplication,
   ): Result<Unit> = retrofitErrorHandler {
     api.approveRegistrationApplication(generateHeaders(authorization, false), args)
-  }.map {
-    Unit
-  }
+  }.map { }
 
   override suspend fun getModLogs(
     authorization: String?,

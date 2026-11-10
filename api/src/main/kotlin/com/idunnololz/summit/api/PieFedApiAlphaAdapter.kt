@@ -993,7 +993,7 @@ class PieFedApiAlphaAdapter(
     args: SaveUserSettings,
   ): Result<Unit> =
     retrofitErrorHandler { api.saveUserSettings(generateHeaders(authorization, false), args) }
-      .map { Unit }
+      .map { }
 
   override suspend fun uploadImage(
     authorization: String?,

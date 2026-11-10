@@ -92,7 +92,8 @@ class AsyncDrawableSpan(
 
     canvasSize = canvasWidth
 
-    if (canvasWidth - x.toInt() < minWidth) {
+    if (canvasWidth - x.toInt() < minWidth ||
+      canvasWidth - x.toInt() < drawable.intrinsicWidth) {
       // Just take the entire column...
       drawable.initWithKnownDimensions(
         max(canvasWidth, minWidth),
@@ -100,7 +101,7 @@ class AsyncDrawableSpan(
       )
     } else {
       drawable.initWithKnownDimensions(
-        max(canvasWidth - x.toInt(), minWidth),
+        max(canvasWidth - x.toInt() - 1, minWidth),
         paint.textSize,
       )
     }

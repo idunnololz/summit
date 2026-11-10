@@ -17,7 +17,7 @@ import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.Language
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.SortType
@@ -30,6 +30,7 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.utils.LanguageHelper
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
@@ -38,6 +39,7 @@ import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -70,6 +72,14 @@ class AddOrEditCommentViewModel @Inject constructor(
 
   private val commentsFetcher = CommentsFetcher(lemmyApiClient)
 
+  private val languageHelper = LanguageHelper(
+    coroutineScope = viewModelScope,
+    apiClient = lemmyApiClient,
+    state = state,
+  )
+
+  val communityId = MutableStateFlow<CommunityId?>(null)
+
   val apiInstance: String
     get() = lemmyApiClient.instance
 
@@ -79,7 +89,8 @@ class AddOrEditCommentViewModel @Inject constructor(
 
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
-  val languageOptions = state.getLiveData<List<Language>>("languages")
+  val languageOptions
+    get() = languageHelper.languageOptions
   val languageId = state.getLiveData<LanguageId?>(
     "language",
     accountManager.currentAccount.asAccount?.let {
@@ -95,15 +106,13 @@ class AddOrEditCommentViewModel @Inject constructor(
 
   init {
     viewModelScope.launch {
-      lemmyApiClient.fetchSiteWithRetry(force = false)
-        .onSuccess { site ->
-          val discussionLanguages = site.all_languages
-            .filter { site.discussion_languages.contains(it.id) }
+      launch {
+        communityId.collect { communityId ->
+          communityId ?: return@collect
 
-          languageOptions.value = discussionLanguages.ifEmpty {
-            site.all_languages
-          }
+          languageHelper.setCommunityIdOrName(Either.Left(communityId))
         }
+      }
     }
   }
 
@@ -135,7 +144,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         postRef = postRef,
         parentId = parentId,
         content = content,
-        languageId = languageId.value,
+        languageId = languageHelper.getValidLanguage(languageId.value),
         accountId = account.id,
       )
 
@@ -165,7 +174,7 @@ class AddOrEditCommentViewModel @Inject constructor(
           postRef = PostRef(instance, inboxItem.postId),
           parentId = inboxItem.commentId,
           content = content,
-          languageId = languageId.value,
+          languageId = languageHelper.getValidLanguage(languageId.value),
           accountId = account.id,
         )
 
@@ -204,7 +213,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         postRef = postRef,
         commentId = commentId,
         content = content,
-        languageId = languageId.value,
+        languageId = languageHelper.getValidLanguage(languageId.value),
         accountId = account.id,
       )
 

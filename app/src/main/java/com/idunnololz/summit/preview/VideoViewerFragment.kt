@@ -31,6 +31,7 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.getVideoTypeStrippingParams
+import com.idunnololz.summit.util.ContentUtils.unwrapImageProxyUrl
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
 import com.idunnololz.summit.util.getParcelableCompat
@@ -282,7 +283,10 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     when (videoType) {
       VideoType.Unknown -> {
         val uri = url.toUri()
-        if (ContentUtils.isUrlMp4(uri.path ?: "")) {
+        val unwrappedUrl = unwrapImageProxyUrl(url)
+        if (unwrappedUrl != url) {
+          loadVideo(context, unwrappedUrl, VideoType.Unknown, videoState)
+        } else if (ContentUtils.isUrlMp4(uri.path ?: "")) {
           loadVideo(context, url, VideoType.Mp4, videoState)
         } else if (ContentUtils.isUrlWebm(uri.path ?: "")) {
           loadVideo(context, url, VideoType.Webm, videoState)

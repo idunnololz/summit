@@ -10,7 +10,6 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
-import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -20,6 +19,7 @@ import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.LanguageHelper
 import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
@@ -30,7 +30,6 @@ import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.arrow.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.collections.ifEmpty
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,6 +54,13 @@ class AddOrEditPostViewModel @Inject constructor(
     private const val TAG = "CreateOrEditPostViewModel"
   }
 
+  private val languageHelper = LanguageHelper(
+    coroutineScope = viewModelScope,
+    apiClient = apiClient,
+    state = state,
+  )
+
+  val communityFullName = MutableStateFlow<String?>(null)
   var postPrefilled: Boolean = false
   val createOrEditPostResult = StatefulLiveData<PostView>()
   val searchResults = StatefulLiveData<List<CommunityView>>()
@@ -66,7 +72,8 @@ class AddOrEditPostViewModel @Inject constructor(
 
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
-  val languageOptions = state.getLiveData<List<Language>>("languages")
+  val languageOptions
+    get() = languageHelper.languageOptions
   val languageId = state.getLiveData<LanguageId?>(
     "language",
     accountManager.currentAccount.asAccount?.let {
@@ -100,15 +107,14 @@ class AddOrEditPostViewModel @Inject constructor(
           }
         }
     }
-    viewModelScope.launch {
-      apiClient.fetchSiteWithRetry(force = false)
-        .onSuccess { site ->
-          val discussionLanguages = site.all_languages
-            .filter { site.discussion_languages.contains(it.id) }
 
-          languageOptions.value = discussionLanguages.ifEmpty {
-            site.all_languages
-          }
+    viewModelScope.launch {
+      communityFullName
+        .debounce(500)
+        .collect { communityFullName ->
+          communityFullName ?: return@collect
+
+          languageHelper.setCommunityIdOrName(Either.Right(communityFullName))
         }
     }
   }
@@ -164,7 +170,7 @@ class AddOrEditPostViewModel @Inject constructor(
         communityId = community.id,
         thumbnailUrl = thumbnailUrl?.ifBlank { null },
         altText = altText?.ifBlank { null },
-        languageId = languageId.value,
+        languageId = languageHelper.getValidLanguage(languageId.value),
       )
 
       recentCommunityManager.addRecentCommunityPostedTo(
@@ -225,7 +231,7 @@ class AddOrEditPostViewModel @Inject constructor(
         account = account,
         thumbnailUrl = thumbnailUrl,
         altText = altText,
-        languageId = languageId.value,
+        languageId = languageHelper.getValidLanguage(languageId.value),
       )
 
       result

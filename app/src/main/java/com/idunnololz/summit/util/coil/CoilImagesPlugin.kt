@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.text.Spanned
+import android.util.Log
 import android.widget.TextView
 import coil3.ImageLoader
 import coil3.asDrawable
