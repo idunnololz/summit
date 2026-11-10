@@ -21,6 +21,7 @@ import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +55,7 @@ class LocalStatsListFragment : BaseFragment<FragmentLocalStatsListBinding>() {
     super.onViewCreated(view, savedInstanceState)
 
     requireSummitActivity().apply {
-      setupForFragment<LocalStatsFragment>()
+      setupForThisFragment()
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
       insetViewAutomaticallyByPaddingAndNavUi(
         viewLifecycleOwner,

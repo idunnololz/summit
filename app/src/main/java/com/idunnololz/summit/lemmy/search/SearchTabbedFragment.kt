@@ -53,6 +53,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -188,7 +189,7 @@ class SearchTabbedFragment :
     }
 
     requireSummitActivity().apply {
-      setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
+      setupForThisFragment()
 
       insetViewAutomaticallyByPaddingAndNavUi(
         viewLifecycleOwner,

@@ -47,6 +47,17 @@
                 app:layout_constraintBottom_toTopOf="@+id/view_raw"/>
 
             <ImageView
+                android:id="@+id/copy_raw"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:src="@drawable/baseline_content_copy_24"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="@+id/view_raw"
+                app:layout_constraintEnd_toStartOf="@+id/view_raw"
+                app:tint="?colorControlNormal" />
+
+            <ImageView
                 android:id="@+id/view_raw"
                 android:layout_width="48dp"
                 android:layout_height="48dp"

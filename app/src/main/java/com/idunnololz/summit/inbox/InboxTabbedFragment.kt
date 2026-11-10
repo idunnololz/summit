@@ -41,6 +41,7 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -131,7 +132,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
           inboxViewModel.isUserOnInboxScreen.value = false
         } else {
           requireSummitActivity().apply {
-            setupForFragment<CommunityFragment>()
+            setupForThisFragment()
             if (isSlideable) {
               setNavUiOpenPercent(1f, force = isSlideable)
             }

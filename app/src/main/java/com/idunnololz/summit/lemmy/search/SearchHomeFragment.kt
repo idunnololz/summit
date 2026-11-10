@@ -77,6 +77,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
@@ -503,7 +504,7 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
     requireSummitActivity().registerOnNavigationItemReselectedListener(
       onNavigationItemReselectedListener,
     )
-    setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
+    setupForThisFragment()
   }
 
   override fun onPause() {

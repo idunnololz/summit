@@ -35,12 +35,17 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils.copyToClipboard
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getColorWithAlpha
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.tsToFullDateTime
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,16 +91,10 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
 
     with(binding) {
       requireSummitActivity().apply {
-        insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-      }
-      toolbar.apply {
-        setNavigationIcon(R.drawable.baseline_close_24)
-        setNavigationOnClickListener {
-          findNavController().navigateUp()
-        }
-        setNavigationIconTint(
-          context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-        )
+        setupForThisFragment()
+        setupToolbar(toolbar, "")
+        insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, toolbar)
+        insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, recyclerView)
       }
 
       val context = requireContext()
@@ -436,6 +435,9 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
           }
         }
 
+        b.copyRaw.setOnClickListener {
+          copyToClipboard(context, item.value)
+        }
         b.viewRaw.setOnClickListener {
           onViewRawClick(item.value)
         }

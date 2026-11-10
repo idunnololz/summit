@@ -84,6 +84,7 @@ import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.tsToConcise
@@ -146,7 +147,7 @@ class InboxFragment :
 
     if (savedInstanceState == null) {
       requireSummitActivity().apply {
-        setupForFragment<InboxTabbedFragment>()
+        setupForThisFragment()
       }
     }
 
