@@ -236,7 +236,8 @@ class AddOrEditCommentFragment :
     registerListeners()
 
     viewModel.communityId.value = args.postView?.community?.id
-      ?: requireNotNull(args.commentView).community.id
+      ?: args.commentView?.community?.id
+      ?: requireNotNull(args.editCommentView).community.id
 
     textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
       binding.bottomBar.removeAllViews()

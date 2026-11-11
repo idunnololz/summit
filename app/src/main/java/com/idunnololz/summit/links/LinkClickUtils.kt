@@ -1,6 +1,7 @@
 package com.idunnololz.summit.links
 
 import android.content.Context
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.MainApplication

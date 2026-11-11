@@ -162,9 +162,6 @@ class MainActivity : SummitActivity() {
   override lateinit var moreActionsHelper: MoreActionsHelper
 
   @Inject
-  override lateinit var linkResolver: LinkResolver
-
-  @Inject
   lateinit var themeManager: ThemeManager
 
   @Inject

@@ -125,9 +125,6 @@ class PreviewPresetActivity : SummitActivity() {
   lateinit var directoryHelper: DirectoryHelper
 
   @Inject
-  override lateinit var linkResolver: LinkResolver
-
-  @Inject
   override lateinit var globalStateStorage: GlobalStateStorage
 
   override fun onCreate(savedInstanceState: Bundle?) {

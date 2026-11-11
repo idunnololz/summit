@@ -9,9 +9,14 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
+import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
+import javax.inject.Inject
 
+@AndroidEntryPoint
 abstract class BaseActivity : AppCompatActivity() {
 
   companion object {
@@ -24,6 +29,15 @@ abstract class BaseActivity : AppCompatActivity() {
   private val logTag: String = javaClass.canonicalName ?: "UNKNOWN_CLASS"
 
   var isMaterialYou = false
+
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
+  @Inject
+  lateinit var apiClient: LemmyApiClient
+
+  val currentInstance: String
+    get() = apiClient.instance
 
   override fun attachBaseContext(base: Context) {
     val viewPump = MainApplication.getInstance().themeManager.viewPump

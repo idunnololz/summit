@@ -140,7 +140,6 @@ abstract class SummitActivity :
 
   abstract var navBarController: NavBarController
   abstract var moreActionsHelper: MoreActionsHelper
-  abstract var linkResolver: LinkResolver
   abstract val preferences: Preferences
   abstract val globalStateStorage: GlobalStateStorage
   protected abstract var currentNavController: NavController?

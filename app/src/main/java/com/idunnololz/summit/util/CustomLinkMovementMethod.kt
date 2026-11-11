@@ -199,6 +199,22 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
             fragmentManager = null,
           )
         }
+      } else if (clickableSpan is URLSpan) {
+        val handled = onLinkClickListener?.onClick(
+          textView,
+          clickableSpan.url,
+          "",
+          bounds,
+        ) ?: false
+
+        if (!handled) {
+          // this shouldn't really be called
+          Utils.openExternalLink(
+            context = textView.context,
+            url = clickableSpan.url,
+            fragmentManager = null,
+          )
+        }
       } else {
         clickableSpan.onClick(textView)
       }
@@ -434,24 +450,42 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
   ) {
 
     companion object {
-      fun ofSpan(textView: TextView, span: ClickableSpan): ClickableSpanWithText? {
-        val s = textView.text as Spanned
-        val start = s.getSpanStart(span)
-        val end = s.getSpanEnd(span)
+      fun ofSpan(
+        textView: TextView,
+        span: ClickableSpan,
+      ): ClickableSpanWithText? {
+        val root = textView.text as? Spanned ?: return null
+
+        fromSpanned(root, span)?.let {
+          return it
+        }
+
+        return root
+          .getSpans(0, root.length, TableRowSpan::class.java)
+          .asSequence()
+          .flatMap { it.cells.asSequence() }
+          .mapNotNull { it.text as? Spanned }
+          .mapNotNull { fromSpanned(it, span) }
+          .firstOrNull()
+      }
+
+      private fun fromSpanned(
+        text: Spanned,
+        span: ClickableSpan,
+      ): ClickableSpanWithText? {
+        val start = text.getSpanStart(span)
+        val end = text.getSpanEnd(span)
 
         if (start < 0 || end < 0) {
           return null
         }
 
-        val text = s.subSequence(start, end).toString()
+        val spanText = text.subSequence(start, end).toString()
+
         return ClickableSpanWithText(
           span = span,
-          text = text,
-          url = if (span is URLSpan) {
-            span.url
-          } else {
-            text
-          },
+          text = spanText,
+          url = if (span is URLSpan) span.url else spanText,
         )
       }
     }

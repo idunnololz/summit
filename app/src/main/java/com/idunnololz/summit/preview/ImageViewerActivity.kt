@@ -122,9 +122,6 @@ class ImageViewerActivity :
   lateinit var linkFetcher: LinkFetcher
 
   @Inject
-  lateinit var linkResolver: LinkResolver
-
-  @Inject
   lateinit var peekImageManager: PeekImageManager
 
   private var isImageLoaded = false
