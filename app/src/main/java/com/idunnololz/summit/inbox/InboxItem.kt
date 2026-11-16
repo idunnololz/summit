@@ -29,6 +29,7 @@ interface CommentBackedItem {
   val commentId: Int
   val commentPath: String
   val postId: Int
+  val communityId: Int
 }
 
 enum class RegistrationDecision {
@@ -87,6 +88,7 @@ sealed interface InboxItem :
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
+    override val communityId: Int,
   ) : InboxItem,
     CommentBackedItem {
 
@@ -110,6 +112,7 @@ sealed interface InboxItem :
       isDeleted = reply.comment.deleted,
       isRemoved = reply.comment.removed,
       isRead = reply.comment_reply.read,
+      communityId = reply.community.id,
     )
 
     override fun toString(): String = "ReplyInboxItem { content = $content }"
@@ -143,6 +146,7 @@ sealed interface InboxItem :
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
+    override val communityId: Int,
   ) : InboxItem,
     CommentBackedItem {
 
@@ -166,6 +170,7 @@ sealed interface InboxItem :
       isDeleted = mention.comment.deleted,
       isRemoved = mention.comment.removed,
       isRead = mention.person_mention.read,
+      communityId = mention.community.id,
     )
 
     override fun toString(): String = "MentionInboxItem { content = $content }"

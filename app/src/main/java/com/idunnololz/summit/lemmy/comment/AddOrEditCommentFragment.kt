@@ -46,6 +46,7 @@ import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragme
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
@@ -237,7 +238,8 @@ class AddOrEditCommentFragment :
 
     viewModel.communityId.value = args.postView?.community?.id
       ?: args.commentView?.community?.id
-      ?: requireNotNull(args.editCommentView).community.id
+      ?: args.editCommentView?.community?.id
+      ?: (args.inboxItem as? CommentBackedItem)?.communityId
 
     textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
       binding.bottomBar.removeAllViews()
