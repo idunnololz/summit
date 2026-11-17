@@ -164,6 +164,7 @@ import com.idunnololz.summit.api.dto.piefed.GetComment
 import com.idunnololz.summit.api.dto.piefed.GetPrivateMessageConversation
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.models.PutCommentReportResolveRequest
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
 import com.idunnololz.summit.api.local.GetModlogResponse
@@ -746,13 +747,20 @@ class PieFedApiAlphaAdapter(
   override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Result<CommentReportResponse> = Result.failure(NotYetImplemented())
-//    retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
-//      .map {
-//        CommentReportResponse(
-//          comment_report_view = it.commentReportView.toCommentReportView(),
-//        )
-//      }
+  ): Result<CommentReportResponse> =
+    retrofitErrorHandler {
+      api.resolveCommentReport(
+        generateHeaders(authorization, false),
+        PutCommentReportResolveRequest(
+          reportId = args.report_id,
+          resolved = args.resolved,
+        )
+      )
+    }.map {
+      CommentReportResponse(
+        comment_report_view = it.commentReportView.toCommentReportView(),
+      )
+    }
 
   override suspend fun createPrivateMessage(
     authorization: String?,

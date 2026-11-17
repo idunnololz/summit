@@ -79,6 +79,7 @@ import com.idunnololz.summit.api.dto.piefed.models.ListPrivateMessagesResponse
 import com.idunnololz.summit.api.dto.piefed.models.ModCommunityResponse
 import com.idunnololz.summit.api.dto.piefed.models.PostReportResponse
 import com.idunnololz.summit.api.dto.piefed.models.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.piefed.models.PutCommentReportResolveRequest
 import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
@@ -416,11 +417,11 @@ interface PieFedApiAlpha {
     @QueryMap form: Map<String, String>,
   ): Call<GetCommentReportListResponse>
 
-//  @PUT("comment/report/resolve")
-//  fun resolveCommentReport(
-//    @HeaderMap headers: Map<String, String>,
-//    @Body resolveCommentReport: ResolveCommentReport,
-//  ): Call<CommentReportResponse>
+  @PUT("comment/report/resolve")
+  fun resolveCommentReport(
+    @HeaderMap headers: Map<String, String>,
+    @Body resolveCommentReport: PutCommentReportResolveRequest,
+  ): Call<GetCommentReportResponse>
 
   /**
    * Create a private message.
