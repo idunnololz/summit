@@ -191,14 +191,13 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
   fun openPaneNoAnimation() {
     openPane()
     (dragHelperField?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
+    requestLayout()
   }
 
   fun closePaneNoAnimation() {
     closePane()
-
-    post {
-      (dragHelperField?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
-    }
+    (dragHelperField?.get(this@FixedSlidingPaneLayout) as? ViewDragHelper)?.abort()
+    requestLayout()
   }
 
   private fun getSystemGestureInsets(): Insets? {
