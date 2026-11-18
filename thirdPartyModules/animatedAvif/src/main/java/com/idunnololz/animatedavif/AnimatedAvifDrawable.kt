@@ -51,7 +51,7 @@ class AnimatedAvifDrawable internal constructor(
     playback?.cancel()
   }
 
-  fun poster(resources: Resources): Drawable = BitmapDrawable(resources, frame)
+  fun getFirstFrameAsDrawable(resources: Resources): Drawable = BitmapDrawable(resources, frame)
 
   override fun draw(canvas: Canvas) {
     canvas.drawBitmap(frame, null, bounds, paint)

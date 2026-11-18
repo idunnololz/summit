@@ -39,6 +39,8 @@ import okio.ForwardingSource
 import okio.Source
 import okio.buffer
 
+internal val MAX_AVIF_SIZE = Size(1920, 1920)
+
 class AvifDecoder(
   private val source: SourceFetchResult,
   private val options: Options,
@@ -51,7 +53,6 @@ class AvifDecoder(
     private const val BUFFER_SIZE = 16384
     private val BUFFER_REF = AtomicReference<ByteArray>()
     private const val MIME_TYPE_JPEG = "image/jpeg"
-    private val MAX_SIZE = Size(1920, 1920)
   }
 
   override suspend fun decode(): DecodeResult? = runInterruptible {
@@ -213,7 +214,7 @@ class AvifDecoder(
       dstWidth = dstWidth.toDouble(),
       dstHeight = dstHeight.toDouble(),
       scale = options.scale,
-      maxSize = MAX_SIZE,
+      maxSize = MAX_AVIF_SIZE,
     )
     if (options.precision == Precision.INEXACT) {
       scale = scale.coerceAtMost(1.0)

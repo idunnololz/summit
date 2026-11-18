@@ -13,6 +13,7 @@ import coil3.asDrawable
 import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.size.Dimension
+import com.idunnololz.animatedavif.AnimatedAvifDrawable
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -143,6 +144,9 @@ class CoilImagesPlugin(
           loaded.set(true)
           if (drawable.isAttached) {
             val loadedDrawable = image.asDrawable(context.resources)
+            if (loadedDrawable is AnimatedAvifDrawable) {
+              AsyncDrawableSchedulerFixed.hostView(drawable)?.let(loadedDrawable::setHostView)
+            }
 
 //                        val maxScaleFactor = drawable.lastKnownCanvasWidth / image.width.toFloat()
 //                        if (loadedDrawable.bounds.isEmpty) {

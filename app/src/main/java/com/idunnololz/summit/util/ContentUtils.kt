@@ -13,6 +13,7 @@ object ContentUtils {
       urlWithoutParams.endsWith(".gif", ignoreCase = true) ||
       urlWithoutParams.endsWith(".svg", ignoreCase = true) ||
       urlWithoutParams.endsWith(".avif", ignoreCase = true) ||
+      urlWithoutParams.endsWith(".avifs", ignoreCase = true) ||
       urlWithoutParams.endsWith("/image_proxy", ignoreCase = true)
   }
 

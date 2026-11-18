@@ -14,6 +14,9 @@ import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableSpan
 
 object AsyncDrawableSchedulerFixed {
+  internal fun hostView(drawable: AsyncDrawable): TextView? =
+    (drawable.getCallback() as? DrawableCallbackImpl)?.view
+
   fun schedule(textView: TextView) {
     // we need a simple check if current text has already scheduled drawables
     // we need this in order to allow multiple calls to schedule (different plugins

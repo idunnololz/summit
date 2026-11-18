@@ -19,6 +19,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
+import com.idunnololz.animatedavif.AnimatedAvifDecoder
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -27,6 +28,7 @@ import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.AvifDecoder
 import com.idunnololz.summit.util.coil.BetterDebugLogger
+import com.idunnololz.summit.util.coil.MAX_AVIF_SIZE
 import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
 import com.idunnololz.summit.util.crashLogger.isCrashLoggerInitialized
 import dagger.hilt.android.EntryPointAccessors
@@ -110,6 +112,12 @@ class MainApplication :
           ),
         )
         .components {
+          add(
+            AnimatedAvifDecoder.Factory(
+              maxFrameSize = MAX_AVIF_SIZE,
+              isEnabled = { preferences.useBundledAvifDecoder }
+            )
+          )
           if (SDK_INT >= 28) {
             add(AnimatedImageDecoder.Factory())
           } else {

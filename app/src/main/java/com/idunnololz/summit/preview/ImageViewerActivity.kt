@@ -33,6 +33,7 @@ import coil3.request.allowHardware
 import coil3.size.Dimension
 import coil3.target.Target
 import com.google.android.material.snackbar.Snackbar
+import com.idunnololz.animatedavif.AnimatedAvifDrawable
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
@@ -42,7 +43,6 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseActivity
@@ -875,7 +875,14 @@ class ImageViewerActivity :
                 startPostponedEnterTransition()
                 binding.loadingView.hideAll()
 
-                binding.dummyImageView.setImageDrawable(drawable)
+                (binding.imageView.drawable as? Animatable)?.stop()
+                binding.dummyImageView.setImageDrawable(
+                  if (drawable is AnimatedAvifDrawable) {
+                    drawable.getFirstFrameAsDrawable(resources)
+                  } else {
+                    drawable
+                  }
+                )
                 binding.imageView.setImageDrawable(drawable)
 
                 if (drawable is Animatable) {
