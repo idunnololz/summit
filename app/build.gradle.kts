@@ -120,6 +120,7 @@ configurations.configureEach {
 
 dependencies {
   implementation(project(":api"))
+  implementation(project(":thirdPartyModules:animatedAvif"))
   implementation(project(":thirdPartyModules:calligraphy"))
   implementation(project(":thirdPartyModules:overlappingPane"))
   implementation(project(":thirdPartyModules:markwon:markwon-core"))

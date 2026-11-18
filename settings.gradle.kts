@@ -1,5 +1,6 @@
 include(":api")
 include(":app")
+include(":thirdPartyModules:animatedAvif")
 include(":thirdPartyModules:calligraphy")
 include(":thirdPartyModules:overlappingPane")
 include(":thirdPartyModules:markwon:markwon-core")
