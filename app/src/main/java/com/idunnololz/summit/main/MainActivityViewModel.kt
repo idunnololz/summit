@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.emoji.InstanceEmojisManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef

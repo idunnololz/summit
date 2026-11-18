@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.emoji.InstanceEmojisManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.models.SearchResponse
@@ -55,6 +56,7 @@ class MentionsController @AssistedInject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val mentionsAdapterFactory: MentionsResultAdapter.Factory,
   private val animationsHelper: AnimationsHelper,
+  private val instanceEmojisManager: InstanceEmojisManager,
 ) {
   @AssistedFactory
   interface Factory {
@@ -67,6 +69,7 @@ class MentionsController @AssistedInject constructor(
   private val mentionsAutoCompleteRepository = MentionsAutoCompleteRepository(
     lifecycleOwner.lifecycleScope,
     apiClient,
+    instanceEmojisManager,
   )
 
   private var currentQueryPopupWindow: MentionsAutoCompletePopupWindow? = null
@@ -118,7 +121,7 @@ class MentionsController @AssistedInject constructor(
     return false
   }
 
-  private fun extractQueryIfExists(text: Editable?, cursorPosition: Int): String? {
+  private fun extractQueryIfExists(text: Editable?, cursorPosition: Int): QueryTrigger? {
     text ?: return null
 
     var position = cursorPosition - 1
@@ -140,7 +143,23 @@ class MentionsController @AssistedInject constructor(
         val lookAhead = text.getOrNull(position - 1)
 
         if (lookAhead == null || lookAhead.isWhitespace()) {
-          return text.substring(position, cursorPosition)
+          return QueryTrigger(
+            type = QueryType.CommunityOrPerson,
+            rawQuery = text.substring(position, cursorPosition),
+            position = position,
+          )
+        }
+      } else if (char == ':') {
+        // emoji
+
+        val lookAhead = text.getOrNull(position - 1)
+
+        if (lookAhead == null || lookAhead.isWhitespace()) {
+          return QueryTrigger(
+            type = QueryType.Emoji,
+            rawQuery = text.substring(position, cursorPosition),
+            position = position,
+          )
         }
       }
 
@@ -170,22 +189,24 @@ class MentionsController @AssistedInject constructor(
     val popupMargin = 0 // margin is built into the background
     val backgroundPadding = anchor.context.resources.getDimensionPixelSize(R.dimen.padding) * 2
 
-    fun onItemSelected(text: String) {
-      val query = extractQueryIfExists(editText.text, editText.selectionStart)
-        ?: return
-      val position = editText.selectionStart
-      editText.text?.replace(
-        position - query.length,
-        position,
-        "$text ",
-      )
+    fun onItemSelected(queryTrigger: QueryTrigger, text: String) {
+      val position = queryTrigger.position
+      try {
+        editText.text?.replace(
+          position,
+          position + queryTrigger.rawQuery.length,
+          "$text ",
+        )
+      } catch (_: Exception) {
+
+      }
     }
 
     currentQueryPopupWindow = MentionsAutoCompletePopupWindow(
       context = anchor.context,
       adapterFactory = mentionsAdapterFactory,
       animationsHelper = animationsHelper,
-      onItemSelected = { onItemSelected(it) },
+      onItemSelected = { resultItem, text -> onItemSelected(resultItem.queryTrigger, text) },
       onItemLongClick = { resultItem, view ->
         PopupMenu(
           anchor.context,
@@ -200,24 +221,27 @@ class MentionsController @AssistedInject constructor(
             setOnMenuItemClickListener {
               when (it.itemId) {
                 R.id.insert_link -> {
-                  when (resultItem) {
+                  val t = when (resultItem) {
                     is CommunityResultItem -> {
                       val link = LinkUtils.getLinkForCommunity(
                         resultItem.communityView.community.toCommunityRef(),
                       )
                       val text = "${resultItem.mentionPrefix}${resultItem.communityView.community.fullName}"
-
-                      onItemSelected("[$text]($link)")
+                      "[$text]($link)"
                     }
                     is PersonResultItem -> {
                       val link = LinkUtils.getLinkForPerson(
                         resultItem.personView.person.toPersonRef(),
                       )
                       val text = "${resultItem.mentionPrefix}${resultItem.personView.person.fullName}"
-
-                      onItemSelected("[$text]($link)")
+                      "[$text]($link)"
+                    }
+                    is EmojiResultItem -> {
+                      "[${resultItem.emoji.shortcode}](${resultItem.emoji.imageUrl})"
                     }
                   }
+
+                  onItemSelected(resultItem.queryTrigger, t)
                 }
               }
               true
@@ -290,9 +314,10 @@ class MentionsController @AssistedInject constructor(
 class MentionsAutoCompleteRepository(
   private val coroutineScope: CoroutineScope,
   private val apiClient: AccountAwareLemmyClient,
+  private val instanceEmojisManager: InstanceEmojisManager,
 ) {
 
-  private val queryFlow = MutableSharedFlow<String>()
+  private val queryTriggerFlow = MutableSharedFlow<QueryTrigger?>()
   private var queryJob: Job? = null
   private val trigram = NGram(3)
 
@@ -300,11 +325,11 @@ class MentionsAutoCompleteRepository(
 
   private val queryContext = Dispatchers.Default.limitedParallelism(1)
 
-  val queryResult = MutableLiveData<QueryResult?>()
+  internal val queryResult = MutableLiveData<QueryResult?>()
 
   init {
     coroutineScope.launch(queryContext) {
-      queryFlow
+      queryTriggerFlow
         .debounce(100)
         .collect {
           doQuery(it)
@@ -319,11 +344,13 @@ class MentionsAutoCompleteRepository(
     }
   }
 
-  private suspend fun doQuery(queryString: String) = withContext(queryContext) a@{
-    if (queryString.isBlank()) {
+  private suspend fun doQuery(queryTrigger: QueryTrigger?) = withContext(queryContext) a@{
+    if (queryTrigger == null) {
       internalResult.emit(null)
       return@a
     }
+
+    val queryString = queryTrigger.rawQuery
 
     if (queryString.length == 1) {
       internalResult.emit(
@@ -332,7 +359,7 @@ class MentionsAutoCompleteRepository(
           fullQuery = "",
           nameQuery = "",
           instanceQuery = "",
-          rawQuery = queryString,
+          originalQueryTrigger = queryTrigger,
           isLoading = false,
           isQueryBlank = true,
         ),
@@ -340,8 +367,49 @@ class MentionsAutoCompleteRepository(
       return@a
     }
 
-    val queryPrefix = queryString.take(1)
-    val actualQuery = queryString.substring(1)
+    when (queryTrigger.type) {
+      QueryType.Emoji -> runEmojiQuery(queryTrigger)
+      QueryType.CommunityOrPerson -> runCommunityOrPersonQuery(queryTrigger)
+    }
+  }
+
+  private suspend fun runEmojiQuery(queryTrigger: QueryTrigger) {
+    val queryPrefix = queryTrigger.queryPrefix
+    val actualQuery = queryTrigger.actualQuery
+
+    val results = instanceEmojisManager.queryEmojis(queryTrigger.actualQuery)
+      .sortedBy {
+        trigram.distance(
+          it.shortcode,
+          actualQuery,
+        )
+      }
+      .map {
+        EmojiResultItem(
+          it.shortcode,
+          0.0,
+          queryTrigger,
+          it,
+        )
+      }
+
+
+    internalResult.emit(
+      QueryResult(
+        results = results,
+        fullQuery = actualQuery,
+        nameQuery = "",
+        instanceQuery = "",
+        originalQueryTrigger = queryTrigger,
+        isLoading = false,
+        isQueryBlank = false,
+      ),
+    )
+  }
+
+  private suspend fun runCommunityOrPersonQuery(queryTrigger: QueryTrigger) {
+    val queryPrefix = queryTrigger.queryPrefix
+    val actualQuery = queryTrigger.actualQuery
     val tokens = actualQuery.split("@")
     val nameQuery = tokens[0]
     val instanceQuery = tokens.getOrElse(1) { "" }
@@ -352,7 +420,7 @@ class MentionsAutoCompleteRepository(
 
     if (currentResult != null) {
       if (actualQuery == currentResult.fullQuery) {
-        return@a
+        return
       }
       internalResult.emit(currentResult.copy(isLoading = true))
     }
@@ -396,8 +464,8 @@ class MentionsAutoCompleteRepository(
                     communityView = it,
                     mentionPrefix = queryPrefix,
                     sortKey = it.community.fullName,
-                    popularityValue =
-                    min(it.counts.users_active_month / 10_000.0, 1.0),
+                    popularityValue = min(it.counts.users_active_month / 10_000.0, 1.0),
+                    queryTrigger = queryTrigger,
                   )
                 }
                 it.users.mapTo(results) {
@@ -407,6 +475,7 @@ class MentionsAutoCompleteRepository(
                     sortKey = it.person.fullName,
                     bio = it.person.bio?.take(100),
                     popularityValue = 0.0,
+                    queryTrigger = queryTrigger,
                   )
                 }
               }
@@ -429,7 +498,7 @@ class MentionsAutoCompleteRepository(
             fullQuery = actualQuery,
             nameQuery = nameQuery,
             instanceQuery = instanceQuery,
-            rawQuery = queryString,
+            originalQueryTrigger = queryTrigger,
             isLoading = false,
             isQueryBlank = false,
           ),
@@ -438,20 +507,20 @@ class MentionsAutoCompleteRepository(
     }
   }
 
-  fun submitQuery(queryString: String) {
+  internal fun submitQuery(queryTrigger: QueryTrigger) {
     coroutineScope.launch(Dispatchers.Default) {
-      queryFlow.emit(queryString)
+      queryTriggerFlow.emit(queryTrigger)
     }
   }
 
   fun resetQuery() {
     coroutineScope.launch(Dispatchers.Default) {
-      queryFlow.emit("")
+      queryTriggerFlow.emit(null)
     }
   }
 }
 
-data class QueryResult(
+internal data class QueryResult(
   val results: List<MentionsAutoCompleteItem>,
   /**
    * Eg. "a@b.com"
@@ -465,10 +534,7 @@ data class QueryResult(
    * Eg. "b.com"
    */
   val instanceQuery: String,
-  /**
-   * Eg. "!a@b.com"
-   */
-  val rawQuery: String,
+  val originalQueryTrigger: QueryTrigger,
   val isLoading: Boolean,
   val isQueryBlank: Boolean,
 )
@@ -490,18 +556,30 @@ data object EmptyItem : MentionsAutoCompleteItem {
     get() = 0.0
 }
 
-sealed interface ResultItem : MentionsAutoCompleteItem
-data class CommunityResultItem(
+sealed interface ResultItem : MentionsAutoCompleteItem {
+  val queryTrigger: QueryTrigger
+}
+
+internal data class CommunityResultItem(
   override val sortKey: String,
   override val popularityValue: Double,
   val mentionPrefix: String,
   val communityView: CommunityView,
+  override val queryTrigger: QueryTrigger,
 ) : ResultItem
 
-data class PersonResultItem(
+internal data class PersonResultItem(
   override val sortKey: String,
   override val popularityValue: Double,
   val mentionPrefix: String,
   val personView: PersonView,
   val bio: String?,
+  override val queryTrigger: QueryTrigger,
+) : ResultItem
+
+internal data class EmojiResultItem(
+  override val sortKey: String,
+  override val popularityValue: Double,
+  override val queryTrigger: QueryTrigger,
+  val emoji: InstanceEmojisManager.InstanceEmoji,
 ) : ResultItem

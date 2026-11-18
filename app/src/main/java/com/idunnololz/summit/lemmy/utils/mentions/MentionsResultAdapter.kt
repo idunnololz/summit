@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -41,6 +42,8 @@ class MentionsResultAdapter @AssistedInject constructor(
           is PersonResultItem ->
             old.personView.person.id ==
               (new as PersonResultItem).personView.person.id
+          is EmojiResultItem ->
+            old.emoji.id == (new as EmojiResultItem).emoji.id
         }
     },
   ).apply {
@@ -80,6 +83,27 @@ class MentionsResultAdapter @AssistedInject constructor(
         append(b.root.context.getString(R.string.person))
         appendSeparator()
         append(item.bio ?: b.root.context.getString(R.string.no_bio))
+      }
+
+      b.root.setOnClickListener {
+        onResultSelected?.invoke(item)
+      }
+      b.root.setOnLongClickListener {
+        onResultLongClick?.invoke(item, b.root)
+        true
+      }
+    }
+    addItemType(
+      clazz = EmojiResultItem::class,
+      inflateFn = MentionQueryResultItemBinding::inflate,
+    ) { item, b, h ->
+      b.icon.load(item.emoji.imageUrl)
+      b.text.text = item.emoji.shortcode
+      @Suppress("SetTextI18n")
+      b.subtitle.text = buildSpannedString {
+        append(b.root.context.getString(R.string.emoji))
+        appendSeparator()
+        append(item.emoji.altText)
       }
 
       b.root.setOnClickListener {

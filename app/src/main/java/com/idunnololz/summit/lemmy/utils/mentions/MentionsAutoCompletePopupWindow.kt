@@ -15,7 +15,7 @@ class MentionsAutoCompletePopupWindow(
   context: Context,
   adapterFactory: MentionsResultAdapter.Factory,
   animationsHelper: AnimationsHelper,
-  val onItemSelected: (String) -> Unit,
+  val onItemSelected: (ResultItem, String) -> Unit,
   val onItemLongClick: (ResultItem, View) -> Unit,
 ) : PopupWindow(context) {
 
@@ -40,12 +40,18 @@ class MentionsAutoCompletePopupWindow(
         is CommunityResultItem -> {
           val text = "!${it.communityView.community.fullName}"
 
-          onItemSelected(text)
+          onItemSelected(it, text)
         }
         is PersonResultItem -> {
           val text = "@${it.personView.person.fullName}"
 
-          onItemSelected(text)
+          onItemSelected(it, text)
+        }
+        is EmojiResultItem -> {
+          val altText = it.emoji.altText.takeIf { it.isNotBlank() } ?: it.emoji.shortcode
+          val text = "![${altText}](${it.emoji.imageUrl} \"emoji ${it.emoji.shortcode}\")"
+
+          onItemSelected(it, text)
         }
       }
     }
