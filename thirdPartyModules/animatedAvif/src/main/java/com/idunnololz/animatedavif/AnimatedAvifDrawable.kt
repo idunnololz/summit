@@ -15,6 +15,7 @@ import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
@@ -34,7 +35,7 @@ class AnimatedAvifDrawable internal constructor(
   firstFrame: Bitmap,
   private val durations: DoubleArray,
   repetitionCount: Int,
-) : Drawable(), Animatable {
+) : Drawable(), Animatable2Compat {
 
   private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
   private var frame = firstFrame
@@ -44,6 +45,7 @@ class AnimatedAvifDrawable internal constructor(
   private var finished = false
   private var playback: Job? = null
   private var hostView: WeakReference<View>? = null
+  private val callbacks = mutableListOf<Animatable2Compat.AnimationCallback>()
 
   fun setHostView(view: View) {
     if (hostView?.get() === view) return
@@ -66,12 +68,21 @@ class AnimatedAvifDrawable internal constructor(
   override fun start() {
     if (finished) return
     started = true
+
+    for (index in callbacks.indices.reversed()) {
+      callbacks[index].onAnimationStart(this)
+    }
+
     invalidateSelf()
   }
 
   override fun stop() {
     started = false
     playback?.cancel()
+
+    for (index in callbacks.indices.reversed()) {
+      callbacks[index].onAnimationEnd(this)
+    }
   }
 
   override fun isRunning(): Boolean = started && isVisible && !finished
@@ -182,6 +193,18 @@ class AnimatedAvifDrawable internal constructor(
       finished = true
       Log.w("AnimatedAvifDrawable", "AVIF playback stopped after a decode error", e)
     }
+  }
+
+  override fun registerAnimationCallback(callback: Animatable2Compat.AnimationCallback) {
+    callbacks.add(callback)
+  }
+
+  override fun unregisterAnimationCallback(
+    callback: Animatable2Compat.AnimationCallback,
+  ): Boolean = callbacks.remove(callback)
+
+  override fun clearAnimationCallbacks() {
+    callbacks.clear()
   }
 }
 

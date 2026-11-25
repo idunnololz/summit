@@ -24,6 +24,7 @@ dependencies {
   implementation(libs.coil.gif)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.lifecycle.runtime)
+  implementation(libs.vectordrawable.animated)
 
   testImplementation("junit:junit:4.13.2")
 }

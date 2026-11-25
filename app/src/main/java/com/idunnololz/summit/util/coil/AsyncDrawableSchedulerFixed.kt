@@ -5,9 +5,13 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.os.SystemClock
+import android.text.DynamicLayout
+import android.text.NoCopySpan
 import android.text.Spannable
+import android.text.style.UpdateAppearance
 import android.view.View
 import android.widget.TextView
+import com.idunnololz.animatedavif.AnimatedAvifDrawable
 import com.idunnololz.summit.R
 import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.image.AsyncDrawable
@@ -59,23 +63,19 @@ object AsyncDrawableSchedulerFixed {
       var drawable: AsyncDrawable
       for (span in spans) {
         drawable = span.drawableSpan.drawable
-        if (span.parentSpan is TableRowSpan) {
-          drawable.setCallback2(
-            DrawableCallbackImpl(
-              textView,
-              TableRowTextViewInvalidator(span.parentSpan, textView),
-              drawable.bounds,
-            ),
-          )
-        } else {
-          drawable.setCallback2(
-            DrawableCallbackImpl(
-              textView,
-              invalidator,
-              drawable.bounds,
-            ),
-          )
-        }
+
+        (drawable.result as? AnimatedAvifDrawable)?.setHostView(textView)
+
+        drawable.setCallback2(
+          DrawableCallbackImpl(
+            view = textView,
+            drawable = drawable,
+            textViewSpan = span.textViewSpan,
+            invalidator = span.tableRow?.let {
+              TableRowTextViewInvalidator(it, textView)
+            } ?: invalidator,
+          ),
+        )
       }
     }
   }
@@ -101,62 +101,74 @@ object AsyncDrawableSchedulerFixed {
 
   private class ExtractedDrawableSpan(
     val drawableSpan: AsyncDrawableSpan,
-    val parentSpan: Any,
-  )
+    val tableRow: TableRowSpan?,
+    outermostTableRow: TableRowSpan?,
+  ) {
+    val textViewSpan: Any = outermostTableRow ?: drawableSpan
+  }
 
   private fun extractRecursive(textView: TextView): MutableList<ExtractedDrawableSpan>? {
-    val cs = textView.text as? Spannable
-    val length = cs?.length ?: 0
+    val spannable = textView.text as? Spannable
+    val length = spannable?.length ?: 0
 
     if (length == 0) {
       return null
     }
 
-    if (cs == null) {
+    if (spannable == null) {
       return null
     }
 
-    fun extractFromSpannable(
-      accumulator: MutableList<ExtractedDrawableSpan>,
-      spannable: Spannable,
-      parent: Any,
-    ) {
-      val tableRows = spannable.getSpans(0, length, TableRowSpan::class.java)
-
-      for (row in tableRows) {
-        val cells = row.cells
-
-        for (cell in cells) {
-          val cellText = cell.text()
-          val spannable = cellText as? Spannable
-            ?: continue
-
-          extractFromSpannable(accumulator, spannable, row)
-        }
-      }
-
-      accumulator.addAll(
-        spannable.getSpans(0, length, AsyncDrawableSpan::class.java)
-          .map {
-            ExtractedDrawableSpan(
-              drawableSpan = it,
-              parentSpan = parent,
-            )
-          },
-      )
-    }
-
     val spans = mutableListOf<ExtractedDrawableSpan>()
-    extractFromSpannable(spans, cs, cs)
+    extractFromSpannable(accumulator = spans, spannable = spannable)
 
     return spans
   }
 
+  private fun extractFromSpannable(
+    accumulator: MutableList<ExtractedDrawableSpan>,
+    spannable: Spannable,
+    tableRow: TableRowSpan? = null,
+    outermostTableRow: TableRowSpan? = tableRow,
+  ) {
+    val length = spannable.length
+    val tableRows = spannable.getSpans(0, length, TableRowSpan::class.java)
+
+    for (row in tableRows) {
+      val cells = row.cells
+
+      for (cell in cells) {
+        val cellText = cell.text()
+        val spannable = cellText as? Spannable
+          ?: continue
+
+        extractFromSpannable(
+          accumulator = accumulator,
+          spannable = spannable,
+          tableRow = row,
+          outermostTableRow = outermostTableRow ?: row
+        )
+      }
+    }
+
+    accumulator.addAll(
+      spannable.getSpans(0, length, AsyncDrawableSpan::class.java)
+        .map {
+          ExtractedDrawableSpan(
+            drawableSpan = it,
+            tableRow = tableRow,
+            outermostTableRow = outermostTableRow,
+          )
+        },
+    )
+  }
+
   private class DrawableCallbackImpl(
-    private val view: TextView,
+    val view: TextView,
+    private val drawable: AsyncDrawable,
+    private val textViewSpan: Any,
     // @since 4.1.0
     private val invalidator: Invalidator,
-    initialBounds: Rect?,
   ) : Drawable.Callback {
     // @since 4.1.0
     // interface to be used when bounds change and view must be invalidated
@@ -164,10 +176,18 @@ object AsyncDrawableSchedulerFixed {
       fun invalidate()
     }
 
-    private var previousBounds: Rect
+    private val previousBounds = Rect(drawable.bounds)
+    private val appearanceChange = object : UpdateAppearance, NoCopySpan {}
+    private val redraw = Runnable {
+      if (drawable.callback !== this) return@Runnable
+      val text = view.text as? Spannable ?: return@Runnable
+      val start = text.getSpanStart(textViewSpan)
+      val end = text.getSpanEnd(textViewSpan)
+      if (start !in 0..<end) return@Runnable
 
-    init {
-      previousBounds = Rect(initialBounds)
+      // Hacky way to force the text view to invalidate its draw cache and force a re-render.
+      text.setSpan(appearanceChange, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+      text.removeSpan(appearanceChange)
     }
 
     override fun invalidateDrawable(who: Drawable) {
@@ -175,6 +195,7 @@ object AsyncDrawableSchedulerFixed {
         view.post { invalidateDrawable(who) }
         return
       }
+      if (drawable.callback !== this) return
       val rect = who.bounds
 
       // okay... the thing is IF we do not change bounds size, normal invalidate would do
@@ -184,9 +205,14 @@ object AsyncDrawableSchedulerFixed {
         // invalidation moved to upper level (so invalidation can be deferred,
         // and multiple calls combined)
         invalidator.invalidate()
-        previousBounds = Rect(rect)
+        previousBounds.set(rect)
       } else {
-        view.postInvalidate()
+        if (view.isHardwareAccelerated && view.layout is DynamicLayout) {
+          view.removeCallbacks(redraw)
+          view.postOnAnimation(redraw)
+        } else {
+          view.postInvalidateOnAnimation()
+        }
       }
     }
 
