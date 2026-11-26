@@ -73,7 +73,11 @@ fun setupBottomSheetAndShow(
 }
 
 fun BaseBottomSheetDialogFragment<*>.fixBottomSheetFling(recyclerView: RecyclerView) {
-  (dialog as? BottomSheetDialog)?.behavior?.let { behavior ->
+  (dialog as? BottomSheetDialog)?.fixBottomSheetFling(recyclerView)
+}
+
+fun BottomSheetDialog.fixBottomSheetFling(recyclerView: RecyclerView) {
+  behavior.let { behavior ->
     fixBottomSheetFling(behavior, recyclerView)
   }
 }

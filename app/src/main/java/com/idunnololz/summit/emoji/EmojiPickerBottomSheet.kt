@@ -1,17 +1,16 @@
 package com.idunnololz.summit.emoji
 
 import android.content.Context
-import android.graphics.Rect
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupWindow
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.findViewTreeOnBackPressedDispatcherOwner
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import coil3.load
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogEmojiBinding
 import com.idunnololz.summit.databinding.EmojiListInstanceEmojiItemBinding
@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.GridAutofitLayoutManager
 import com.idunnololz.summit.util.GridSpaceItemDecoration
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
+import com.idunnololz.summit.util.fixBottomSheetFling
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -39,14 +40,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class EmojiPopupWindow @AssistedInject constructor(
+class EmojiPickerBottomSheet @AssistedInject constructor(
   private val textEmojisManager: TextEmojisManager,
   private val instanceEmojisManager: InstanceEmojisManager,
   @Assisted private val context: Context,
   @Assisted private val lifecycleOwner: LifecycleOwner,
   @Assisted private val fragmentManager: FragmentManager,
   @Assisted private val onEmojiSelected: (SelectedEmoji) -> Unit = {},
-) : PopupWindow(context) {
+) : BottomSheetDialog(context) {
 
   sealed interface SelectedEmoji {
     class SelectedTextEmoji(val text: String) : SelectedEmoji
@@ -60,7 +61,7 @@ class EmojiPopupWindow @AssistedInject constructor(
       lifecycleOwner: LifecycleOwner,
       fragmentManager: FragmentManager,
       onEmojiSelected: (SelectedEmoji) -> Unit = {},
-    ): EmojiPopupWindow
+    ): EmojiPickerBottomSheet
   }
 
   val binding: DialogEmojiBinding
@@ -71,13 +72,11 @@ class EmojiPopupWindow @AssistedInject constructor(
   private var onEmojiChangedJob: Job? = null
 
   init {
-    width = ViewGroup.LayoutParams.MATCH_PARENT
-
     val binding = DialogEmojiBinding.inflate(LayoutInflater.from(context)).also {
       binding = it
     }
-    setContentView(binding.root)
 
+    setContentView(binding.root)
 
     binding.toolbar.apply {
       val iconTint = this.context.getColorStateListFromAttribute(
@@ -134,12 +133,12 @@ class EmojiPopupWindow @AssistedInject constructor(
     setupTextEmojiList()
     setupInstanceEmojiList()
 
-    setBackgroundDrawable(null)
-
     binding.root.setOnClickListener {
       dismiss()
     }
-    isOutsideTouchable = true
+
+    fixBottomSheetFling(binding.textEmojisRecyclerView)
+    fixBottomSheetFling(binding.instanceEmojisRecyclerView)
 
     setOnDismissListener {
       onBackPressedCallback?.remove()
@@ -200,7 +199,7 @@ class EmojiPopupWindow @AssistedInject constructor(
       val allOptions = textEmojisManager.getAllEmojis()
 
       adapter.setItems(allOptions.map { TextEmojisAdapter.Item.EmojiItem(it.text) }) {
-        update()
+//        update()
       }
     }
 
@@ -210,7 +209,7 @@ class EmojiPopupWindow @AssistedInject constructor(
           val allOptions = textEmojisManager.getAllEmojis()
 
           adapter.setItems(allOptions.map { TextEmojisAdapter.Item.EmojiItem(it.text) }) {
-            update()
+//            update()
           }
         }
       }
@@ -292,35 +291,16 @@ class EmojiPopupWindow @AssistedInject constructor(
       ?.addCallback(lifecycleOwner, onBackPressedCallback)
     this.onBackPressedCallback = onBackPressedCallback
 
-    val anchorPos = IntArray(2).apply {
-      anchor.getLocationOnScreen(this)
-    }
-    val visibleDisplayFrame = Rect()
-    var bottomInset = 0
-    val rootView = anchor.rootView
-    requireNotNull(rootView).apply {
-      getWindowVisibleDisplayFrame(visibleDisplayFrame)
-      bottomInset = rootView.height - visibleDisplayFrame.bottom
-    }
-    val yOffset = anchorPos[1] + anchor.paddingTop
-
-    val distanceToBottom = visibleDisplayFrame.bottom - yOffset
-    val distanceToTop: Int = yOffset - visibleDisplayFrame.top
-
-//        showAsDropDown(anchor)
-
-    if (distanceToBottom > distanceToTop) {
-      showAsDropDown(anchor, 0, 0)
+    val ime = WindowInsetsCompat.Type.ime()
+    val insets = ViewCompat.getRootWindowInsets(anchor)
+    val imeHeightPx = if (insets != null && insets.isVisible(ime)) {
+      insets.getInsets(ime).bottom
     } else {
-//            showAtLocation(anchor, Gravity.TOP, 0, 0)
-      showAsDropDown(anchor, 0, -distanceToTop, Gravity.TOP or Gravity.START)
+      0
     }
+    behavior.peekHeight = imeHeightPx
 
-    binding.root.post {
-      apply {
-        update()
-      }
-    }
+    show()
   }
 
   private class InstanceEmojisAdapter(

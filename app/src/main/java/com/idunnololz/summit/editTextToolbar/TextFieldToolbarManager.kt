@@ -22,7 +22,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TextFieldToolbarItem2Binding
 import com.idunnololz.summit.databinding.TextFieldToolbarItemBinding
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
-import com.idunnololz.summit.emoji.EmojiPopupWindow
+import com.idunnololz.summit.emoji.EmojiPickerBottomSheet
 import com.idunnololz.summit.emoji.markdownCode
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.Preferences
@@ -35,7 +35,7 @@ import javax.inject.Singleton
 @Singleton
 class TextFieldToolbarManager @Inject constructor(
   private val preferences: Preferences,
-  private val emojiPopupWindowFactory: EmojiPopupWindow.Factory,
+  private val emojiPickerBottomSheetFactory: EmojiPickerBottomSheet.Factory,
   private val globalStateStorage: GlobalStateStorage,
 ) {
 
@@ -192,7 +192,7 @@ class TextFieldToolbarManager @Inject constructor(
         image = image,
         linkApp = linkApp,
         settings = settings,
-        emojiPopupWindowFactory = emojiPopupWindowFactory,
+        emojiPickerBottomSheetFactory = emojiPickerBottomSheetFactory,
       )
     }
 
@@ -203,7 +203,7 @@ class TextFieldToolbarManager @Inject constructor(
     )
     showScrollHintIfNeeded(parentView)
 
-    return TextFormatToolbarViewHolder(b, emojiPopupWindowFactory)
+    return TextFormatToolbarViewHolder(b, emojiPickerBottomSheetFactory)
   }
 
   private fun showScrollHintIfNeeded(parentView: ViewGroup) {
@@ -243,14 +243,14 @@ class TextFormatToolbarViewHolder(
   val image: View?,
   val linkApp: View?,
   val settings: View,
-  private val emojiPopupWindowFactory: EmojiPopupWindow.Factory,
+  private val emojiPickerBottomSheetFactory: EmojiPickerBottomSheet.Factory,
 ) {
 
   private var editText: EditText? = null
 
   constructor(
     b: TextFormatToolbarBinding,
-    emojiPopupWindowFactory: EmojiPopupWindow.Factory,
+    emojiPickerBottomSheetFactory: EmojiPickerBottomSheet.Factory,
   ) : this(
     b.preview,
     b.drafts,
@@ -267,7 +267,7 @@ class TextFormatToolbarViewHolder(
     b.image,
     b.linkApp,
     b.settings,
-    emojiPopupWindowFactory,
+    emojiPickerBottomSheetFactory,
   )
 
   var isEnabled: Boolean = true
@@ -350,15 +350,15 @@ class TextFormatToolbarViewHolder(
       }
     }
     textEmojis?.setOnClickListener {
-      emojiPopupWindowFactory.create(
+      emojiPickerBottomSheetFactory.create(
         context = it.context,
         lifecycleOwner = lifecycleOwner,
         fragmentManager = fragmentManager,
         onEmojiSelected = {
           editText.replaceTextAtCursor(
             when (it) {
-              is EmojiPopupWindow.SelectedEmoji.SelectedInstanceEmoji -> it.emoji.markdownCode
-              is EmojiPopupWindow.SelectedEmoji.SelectedTextEmoji -> it.text
+              is EmojiPickerBottomSheet.SelectedEmoji.SelectedInstanceEmoji -> it.emoji.markdownCode
+              is EmojiPickerBottomSheet.SelectedEmoji.SelectedTextEmoji -> it.text
             }
           )
         },
