@@ -183,7 +183,7 @@
     <string name="mau_format">%1$s ΜΕΧ</string>
     <string name="comment">Σχόλιο</string>
     <string name="preview">Προεπισκόπηση</string>
-    <string name="text_emojis">Εμότζι κειμένου</string>
+    <string name="emojis">Εμότζι κειμένου</string>
     <string name="bold">Έντονο</string>
     <string name="italic">Πλάγιο</string>
     <string name="strikethrough">Γραμμή διαγραφής</string>

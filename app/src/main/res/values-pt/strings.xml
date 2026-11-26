@@ -109,7 +109,7 @@
     <string name="quote">Citação</string>
     <string name="bulleted_list">Lista</string>
     <string name="numbered_list">Lista numerada</string>
-    <string name="text_emojis">Emojis de texto</string>
+    <string name="emojis">Emojis de texto</string>
     <string name="bold">Negrito</string>
     <string name="italic">Itálico</string>
     <string name="strikethrough">Riscado</string>

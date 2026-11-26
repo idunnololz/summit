@@ -37,8 +37,8 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:padding="12dp"
-        android:contentDescription="@string/text_emojis"
-        android:tooltipText="@string/text_emojis"
+        android:contentDescription="@string/emojis"
+        android:tooltipText="@string/emojis"
         android:background="?selectableItemBackgroundBorderless"
         android:layout_gravity="center_vertical"
         app:tint="?colorControlNormal"/>

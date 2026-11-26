@@ -128,7 +128,7 @@
     <string name="mau_format">%1$s MAU</string>
     <string name="error_page_not_found">पेज नहीं मिला।</string>
     <string name="comment">टिप्पणी</string>
-    <string name="text_emojis">पाठ इमोजी</string>
+    <string name="emojis">पाठ इमोजी</string>
     <string name="bold">बोल्ड</string>
     <string name="italic">इटैलिक</string>
     <string name="strikethrough">स्ट्राइकथ्रू</string>

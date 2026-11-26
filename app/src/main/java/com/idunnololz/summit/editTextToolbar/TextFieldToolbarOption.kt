@@ -18,7 +18,7 @@ enum class TextFieldToolbarOption(
   ),
   TextEmojisField(
     R.drawable.baseline_emoji_emotions_24,
-    R.string.text_emojis,
+    R.string.emojis,
   ),
   Spoiler(
     R.drawable.baseline_spoiler_24,

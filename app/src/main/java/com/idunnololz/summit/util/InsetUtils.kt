@@ -2,6 +2,8 @@ package com.idunnololz.summit.util
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
@@ -153,5 +155,15 @@ fun InsetsProvider.autoScrollToEditTextCursorOnIme(
         lastImeHeight = it.imeHeight
       }
     }
+  }
+}
+
+fun View.getImeHeight(): Int {
+  val ime = WindowInsetsCompat.Type.ime()
+  val insets = ViewCompat.getRootWindowInsets(this)
+  return if (insets != null && insets.isVisible(ime)) {
+    insets.getInsets(ime).bottom
+  } else {
+    0
   }
 }

@@ -250,7 +250,7 @@
     <!-- Keep short. Button text. Shows a preview of the content when clicked. -->
     <string name="preview">Preview</string>
     <!-- Keep short. Button text. Opens a menu where the user can pick from a list of emojis when clicked. -->
-    <string name="text_emojis">Text emojis</string>
+    <string name="emojis">Emojis</string>
     <!-- Keep short. Button text. Bolds text in the text editor. -->
     <string name="bold">Bold</string>
     <!-- Keep short. Button text. Italicises text in the text editor. -->

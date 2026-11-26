@@ -76,7 +76,7 @@
     <string name="error_page_not_found">Sayfa bulunamadı.</string>
     <string name="comment">Yorum</string>
     <string name="preview">Önizleme</string>
-    <string name="text_emojis">Metin emojileri</string>
+    <string name="emojis">Metin emojileri</string>
     <string name="bold">Gözü pek</string>
     <string name="italic">İtalik</string>
     <string name="strikethrough">Üstü çizili</string>

@@ -286,7 +286,7 @@ class DbDetailsDialogFragment : BaseDialogFragment<DialogFragmentDbDetailsBindin
           }
           "text_emojis" -> {
             icon = R.drawable.outline_emoji_emotions_24
-            name = context.getString(R.string.text_emojis)
+            name = context.getString(R.string.emojis)
             desc = context.getString(R.string.text_emojis_table_desc)
           }
           "user_tags" -> {

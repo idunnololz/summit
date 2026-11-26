@@ -121,7 +121,7 @@
     <string name="error_page_not_found">Pagina non trovata.</string>
     <string name="comment">Commento</string>
     <string name="preview">Anteprima</string>
-    <string name="text_emojis">Inserisci emoji</string>
+    <string name="emojis">Inserisci emoji</string>
     <string name="bold">Grassetto</string>
     <string name="italic">Corsivo</string>
     <string name="strikethrough">Barrato</string>

@@ -9,8 +9,6 @@ import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.findViewTreeOnBackPressedDispatcherOwner
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +28,7 @@ import com.idunnololz.summit.util.GridSpaceItemDecoration
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import com.idunnololz.summit.util.fixBottomSheetFling
+import com.idunnololz.summit.util.getImeHeight
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -282,7 +281,10 @@ class EmojiPickerBottomSheet @AssistedInject constructor(
     }
   }
 
-  fun showOnView(anchor: View) {
+  /**
+   * @param anchor sort of used but not for its original intended purpose. This used to be a popup.
+   */
+  fun show(anchor: View) {
     if (isShowing) return
 
     val onBackPressedCallback = getPredictiveBackBackPressCallback()
@@ -291,14 +293,12 @@ class EmojiPickerBottomSheet @AssistedInject constructor(
       ?.addCallback(lifecycleOwner, onBackPressedCallback)
     this.onBackPressedCallback = onBackPressedCallback
 
-    val ime = WindowInsetsCompat.Type.ime()
-    val insets = ViewCompat.getRootWindowInsets(anchor)
-    val imeHeightPx = if (insets != null && insets.isVisible(ime)) {
-      insets.getInsets(ime).bottom
+    val imeHeightPx = anchor.getImeHeight()
+    behavior.peekHeight = if (imeHeightPx == 0) {
+      Utils.convertDpToPixel(240f).toInt()
     } else {
-      0
+      imeHeightPx
     }
-    behavior.peekHeight = imeHeightPx
 
     show()
   }

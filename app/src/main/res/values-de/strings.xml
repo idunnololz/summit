@@ -105,7 +105,7 @@
     <string name="error_page_not_found">Seite nicht gefunden.</string>
     <string name="comment">Kommentar</string>
     <string name="preview">Vorschau</string>
-    <string name="text_emojis">Text-Emojis</string>
+    <string name="emojis">Text-Emojis</string>
     <string name="bold">Fettdruck</string>
     <string name="italic">Kursiv</string>
     <string name="mau_format">%1$s Benutzer / Monat</string>

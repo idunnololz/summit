@@ -95,7 +95,7 @@
     <string name="mau_format">%1$s MAU</string>
     <string name="error_page_not_found">Stránka nenalezena.</string>
     <string name="comment">Komentář</string>
-    <string name="text_emojis">Textové emoji</string>
+    <string name="emojis">Textové emoji</string>
     <string name="bold">Tučně</string>
     <string name="italic">Kurzíva</string>
     <string name="strikethrough">Proškrtnutí</string>

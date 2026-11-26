@@ -106,7 +106,7 @@ class TextFieldToolbarManager @Inject constructor(
           }
           TextFieldToolbarOption.TextEmojisField -> {
             textEmojis = b.root
-            textView?.text = context.getString(R.string.text_emojis)
+            textView?.text = context.getString(R.string.emojis)
           }
           TextFieldToolbarOption.Spoiler -> {
             spoiler = b.root
@@ -362,7 +362,7 @@ class TextFormatToolbarViewHolder(
             }
           )
         },
-      ).showOnView(it)
+      ).show(it)
     }
     spoiler?.setOnClickListener {
       editText.wrapTextAtCursor(

@@ -71,7 +71,7 @@
     <string name="name">姓名</string>
     <string name="delete_community">删除社区</string>
     <string name="undo_delete_community">撤消删除社区</string>
-    <string name="text_emojis">文字表情符号</string>
+    <string name="emojis">文字表情符号</string>
     <string name="bold">大胆的</string>
     <string name="italic">斜体</string>
     <string name="strikethrough">删除线</string>
