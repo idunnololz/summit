@@ -23,6 +23,7 @@ import com.idunnololz.summit.databinding.TextFieldToolbarItem2Binding
 import com.idunnololz.summit.databinding.TextFieldToolbarItemBinding
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
 import com.idunnololz.summit.emoji.EmojiPopupWindow
+import com.idunnololz.summit.emoji.markdownCode
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
@@ -349,26 +350,19 @@ class TextFormatToolbarViewHolder(
       }
     }
     textEmojis?.setOnClickListener {
-//            PopupMenu(it.context, it).apply {
-//                menu.apply {
-//                    TEXT_EMOJIS.withIndex().forEach { (index, str) ->
-//                        add(0, index, 0, str)
-//                    }
-//                }
-//                setOnMenuItemClickListener {
-//                    editText.replaceTextAtCursor(TEXT_EMOJIS[it.itemId])
-//                    true
-//                }
-//            }.show()
       emojiPopupWindowFactory.create(
         context = it.context,
         lifecycleOwner = lifecycleOwner,
         fragmentManager = fragmentManager,
         onEmojiSelected = {
-          editText.replaceTextAtCursor(it)
+          editText.replaceTextAtCursor(
+            when (it) {
+              is EmojiPopupWindow.SelectedEmoji.SelectedInstanceEmoji -> it.emoji.markdownCode
+              is EmojiPopupWindow.SelectedEmoji.SelectedTextEmoji -> it.text
+            }
+          )
         },
       ).showOnView(it)
-//                .show(fragmentManager, "EmojiDialog")
     }
     spoiler?.setOnClickListener {
       editText.wrapTextAtCursor(

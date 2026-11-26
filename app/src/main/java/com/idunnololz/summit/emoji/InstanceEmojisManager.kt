@@ -13,6 +13,8 @@ import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
+const val DEFAULT_EMOJI_SIZE_DP = 24
+
 @Singleton
 class InstanceEmojisManager @Inject constructor(
   private val accountManager: AccountManager,
@@ -20,14 +22,9 @@ class InstanceEmojisManager @Inject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
-  data class InstanceEmoji(
-    val id: Long,
-    val shortcode: String,
-    val imageUrl: String,
-    val altText: String,
-    val category: String,
-    val publishedMs: Long,
-    val updatedMs: Long? = null,
+  class InstanceEmojiCollection(
+    val instance: String,
+    val emojis: List<InstanceEmoji>,
   )
 
   private val coroutineScope: CoroutineScope = coroutineScopeFactory.create()
@@ -35,6 +32,8 @@ class InstanceEmojisManager @Inject constructor(
   private var allEmojis: List<InstanceEmoji>? = null
 
   private var keyToEmojiMapping: Map<String, InstanceEmoji> = mapOf()
+
+  private var instance: String? = null
 
   init {
     coroutineScope.launch {
@@ -47,6 +46,13 @@ class InstanceEmojisManager @Inject constructor(
     }
   }
 
+  fun getAllEmojis(): InstanceEmojiCollection? {
+    return InstanceEmojiCollection(
+      instance = instance ?: return null,
+      emojis = allEmojis ?: return null,
+    )
+  }
+
   fun queryEmojis(startsWith: String): List<InstanceEmoji> {
     return keyToEmojiMapping.entries
       .filter {
@@ -57,6 +63,7 @@ class InstanceEmojisManager @Inject constructor(
   }
 
   fun loadEmojisFromSite(instance: String, emojis: List<CustomEmojiView>) {
+    this.instance = instance
     val newEmojis = mutableListOf<InstanceEmoji>()
     val newKeyToEmojiMapping = mutableMapOf<String, InstanceEmoji>()
     emojis.forEach { emojiView ->

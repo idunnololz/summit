@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.emoji.InstanceEmoji
 import com.idunnololz.summit.emoji.InstanceEmojisManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
@@ -581,5 +582,5 @@ internal data class EmojiResultItem(
   override val sortKey: String,
   override val popularityValue: Double,
   override val queryTrigger: QueryTrigger,
-  val emoji: InstanceEmojisManager.InstanceEmoji,
+  val emoji: InstanceEmoji,
 ) : ResultItem

@@ -44,7 +44,8 @@
     <dimen name="theme_color_bar_width">4dp</dimen>
     <dimen name="conversation_bubble_padding">60dp</dimen>
     <dimen name="icon_size">24dp</dimen>
-    <dimen name="emoji_item_width">140dp</dimen>
+    <dimen name="text_emoji_item_width">140dp</dimen>
+    <dimen name="instance_emoji_item_width">80dp</dimen> <!-- 48 + 16 + 16 -->
     <dimen name="predictive_back_margin">16dp</dimen>
     <dimen name="search_home_items_width">140dp</dimen>
 

@@ -8,6 +8,7 @@ import android.widget.PopupWindow
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.MentionsPopupBinding
+import com.idunnololz.summit.emoji.markdownCode
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.ext.setup
 
@@ -48,10 +49,7 @@ class MentionsAutoCompletePopupWindow(
           onItemSelected(it, text)
         }
         is EmojiResultItem -> {
-          val altText = it.emoji.altText.takeIf { it.isNotBlank() } ?: it.emoji.shortcode
-          val text = "![${altText}](${it.emoji.imageUrl} \"emoji ${it.emoji.shortcode}\")"
-
-          onItemSelected(it, text)
+          onItemSelected(it, it.emoji.markdownCode)
         }
       }
     }

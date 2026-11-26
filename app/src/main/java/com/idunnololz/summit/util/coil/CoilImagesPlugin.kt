@@ -14,6 +14,7 @@ import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.size.Dimension
 import com.idunnololz.animatedavif.AnimatedAvifDrawable
+import com.idunnololz.summit.emoji.DEFAULT_EMOJI_SIZE_DP
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
@@ -95,7 +96,8 @@ class CoilImagesPlugin(
         .target(target)
         .apply {
           if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
-            size(Utils.convertDpToPixel(24f).toInt(), Utils.convertDpToPixel(24f).toInt())
+            val s = Utils.convertDpToPixel(DEFAULT_EMOJI_SIZE_DP.toFloat()).toInt()
+            size(s, s)
           } else {
             size(
               Dimension.Pixels(drawable.lastKnownCanvasWidth),

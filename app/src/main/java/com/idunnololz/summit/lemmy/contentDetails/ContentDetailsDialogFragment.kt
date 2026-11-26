@@ -34,6 +34,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToFullDateTime
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.serialization.json.Json
@@ -198,13 +199,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
     val context = requireContext()
 
     with(binding) {
-      toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-      toolbar.setNavigationIconTint(
-        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-      )
-      toolbar.setNavigationOnClickListener {
-        dismiss()
-      }
+      setupToolbar(toolbar, "")
 
       if (BuildConfig.DEBUG) {
         toolbar.addMenuProvider(
