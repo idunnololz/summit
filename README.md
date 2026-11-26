@@ -39,8 +39,11 @@ This is the repository that contains the source code of Summit for Lemmy.
 
 1. Go to https://translate.idunnololz.com/projects/summit/summit/#reports
 2. Choose report structure `json`.
-3. Change starting date to 1/1/1999.
-4. Change ending date to the current date.
+3. Change date range. Use this script:
+```javascript
+document.querySelector('form[action*="/credits/"] [name="period"]').value =
+  "01/01/1999 - 01/01/2100";
+```
 5. Click generate.
 6. Copy the result and paste the json into [app/src/main/res/raw/translate.json].
 

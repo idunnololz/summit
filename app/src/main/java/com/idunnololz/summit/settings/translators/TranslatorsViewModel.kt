@@ -42,10 +42,10 @@ class TranslatorsViewModel @Inject constructor(
           val translators = languageToTranslators.getOrPut(locale) { mutableListOf() }
 
           for (index2 in 0 until valueJson.length()) {
-            val translatorStats = valueJson.getJSONArray(index2)
-            val email = translatorStats.getString(0)
-            val name = translatorStats.getString(1)
-            val stringsTranslated = translatorStats.getDouble(2)
+            val translatorStats = valueJson.getJSONObject(index2)
+            val email = translatorStats.getString("email")
+            val name = translatorStats.getString("full_name")
+            val stringsTranslated = translatorStats.getDouble("change_count")
 
             if (email == "garyguo9@gmail.com" ||
               email == "noreply-mt-google-translate-api-v3@weblate.org" ||

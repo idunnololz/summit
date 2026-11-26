@@ -1,188 +1,280 @@
 [
   {
-    "Chinese (Simplified)":[
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        1514
-      ],
-      [
-        "garyguo9@gmail.com",
-        "Weblate Admin",
-        9
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        5
-      ]
+    "Chinese (Simplified Han script)": [
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 1513
+      },
+      {
+        "email": "garyguo9@gmail.com",
+        "username": "admin",
+        "full_name": "Weblate Admin",
+        "date_joined": "2024-03-13T04:36:39.762298+00:00",
+        "change_count": 12
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 5
+      }
     ]
   },
   {
-    "Czech":[
-      [
-        "itrytohelp.panorama511@passinbox.com",
-        "Ziixe",
-        684
-      ],
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        637
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        6
-      ]
+    "Czech": [
+      {
+        "email": "itrytohelp.panorama511@passinbox.com",
+        "username": "ziixe",
+        "full_name": "Ziixe",
+        "date_joined": "2024-03-29T17:11:09.158965+00:00",
+        "change_count": 683
+      },
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 637
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 6
+      }
     ]
   },
   {
-    "German":[
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        912
-      ],
-      [
-        "asudox+83bw0x2@posteo.com",
-        "asudox",
-        618
-      ],
-      [
-        "idunnololz.cahoots016@passmail.net",
-        "babanabread yummi",
-        184
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        3
-      ]
+    "French": [
+      {
+        "email": "idunnololz.fructose803@passmail.net",
+        "username": "SpaceCadetDeshin",
+        "full_name": "Patrice Sureaud",
+        "date_joined": "2026-11-11T16:37:34.376169+00:00",
+        "change_count": 84
+      }
     ]
   },
   {
-    "Greek":[
-      [
-        "lefteris592@gmail.com",
-        "Lefteris T.",
-        1690
-      ],
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        17
-      ]
+    "German": [
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 912
+      },
+      {
+        "email": "asudox+83bw0x2@posteo.com",
+        "username": "asudox",
+        "full_name": "asudox",
+        "date_joined": "2025-03-22T16:58:22.406961+00:00",
+        "change_count": 618
+      },
+      {
+        "email": "idunnololz.cahoots016@passmail.net",
+        "username": "babanabread",
+        "full_name": "babanabread yummi",
+        "date_joined": "2024-05-16T08:05:13.265101+00:00",
+        "change_count": 183
+      },
+      {
+        "email": "adiabol@proton.me",
+        "username": "CovertOperative",
+        "full_name": "Georg Ebert",
+        "date_joined": "2026-09-26T19:04:33.953772+00:00",
+        "change_count": 47
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 3
+      },
+      {
+        "email": "14ckcz4et@mozmail.com",
+        "username": "andomedanova",
+        "full_name": "Raffaela Vo\u00df",
+        "date_joined": "2026-08-07T12:06:36.711203+00:00",
+        "change_count": 3
+      }
     ]
   },
   {
-    "Hindi":[
-      [
-        "weblate.scrambled777@simplelogin.com",
-        "Scrambled777",
-        1467
-      ],
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        157
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        2
-      ]
+    "Greek": [
+      {
+        "email": "lefteris592@gmail.com",
+        "username": "Leftr",
+        "full_name": "Lefteris T.",
+        "date_joined": "2024-12-14T17:56:00.939017+00:00",
+        "change_count": 1689
+      },
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 17
+      },
+      {
+        "email": "garyguo9@gmail.com",
+        "username": "admin",
+        "full_name": "Weblate Admin",
+        "date_joined": "2024-03-13T04:36:39.762298+00:00",
+        "change_count": 3
+      }
     ]
   },
   {
-    "Italian":[
-      [
-        "diego.beraldin@gmail.com",
-        "Diego Beraldin",
-        995
-      ],
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        163
-      ],
-      [
-        "garyguo9@gmail.com",
-        "Weblate Admin",
-        7
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        2
-      ]
+    "Hindi": [
+      {
+        "email": "weblate.scrambled777@simplelogin.com",
+        "username": "Scrambled777",
+        "full_name": "Scrambled777",
+        "date_joined": "2024-03-20T09:22:42.568283+00:00",
+        "change_count": 1465
+      },
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 157
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 2
+      }
     ]
   },
   {
-    "Portuguese":[
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        1076
-      ],
-      [
-        "lemmysummit@tmpod.dev",
-        "tmpod",
-        317
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        3
-      ],
-      [
-        "garyguo9@gmail.com",
-        "Weblate Admin",
-        1
-      ]
+    "Italian": [
+      {
+        "email": "diego.beraldin@gmail.com",
+        "username": "Diego",
+        "full_name": "Diego Beraldin",
+        "date_joined": "2024-03-20T07:15:15.421560+00:00",
+        "change_count": 994
+      },
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 163
+      },
+      {
+        "email": "garyguo9@gmail.com",
+        "username": "admin",
+        "full_name": "Weblate Admin",
+        "date_joined": "2024-03-13T04:36:39.762298+00:00",
+        "change_count": 7
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 2
+      }
     ]
   },
   {
-    "Swedish":[
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        996
-      ],
-      [
-        "weblate@steken.xyz",
-        "Erik",
-        98
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        2
-      ],
-      [
-        "garyguo9@gmail.com",
-        "Weblate Admin",
-        1
-      ]
+    "Portuguese": [
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 1076
+      },
+      {
+        "email": "lemmysummit@tmpod.dev",
+        "username": "tmpod",
+        "full_name": "tmpod",
+        "date_joined": "2025-06-06T10:04:57.854804+00:00",
+        "change_count": 316
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 3
+      },
+      {
+        "email": "garyguo9@gmail.com",
+        "username": "admin",
+        "full_name": "Weblate Admin",
+        "date_joined": "2024-03-13T04:36:39.762298+00:00",
+        "change_count": 1
+      }
     ]
   },
   {
-    "Turkish":[
-      [
-        "noreply-mt-google-translate-api-v3@weblate.org",
-        "Google Cloud Translation Advanced",
-        1061
-      ],
-      [
-        "mehmettalhaeren@gmail.com",
-        "Talha",
-        25
-      ],
-      [
-        "noreply-mt-weblate@weblate.org",
-        "Weblate",
-        1
-      ]
+    "Swedish": [
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 995
+      },
+      {
+        "email": "weblate@steken.xyz",
+        "username": "ZebraGoose",
+        "full_name": "Erik",
+        "date_joined": "2024-03-20T19:44:38.791766+00:00",
+        "change_count": 97
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 2
+      },
+      {
+        "email": "garyguo9@gmail.com",
+        "username": "admin",
+        "full_name": "Weblate Admin",
+        "date_joined": "2024-03-13T04:36:39.762298+00:00",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "Turkish": [
+      {
+        "email": "noreply-mt-google-translate-api-v3@weblate.org",
+        "username": "mt:google-translate-api-v3",
+        "full_name": "Google Cloud Translation Advanced",
+        "date_joined": "2024-10-31T07:06:50.430778+00:00",
+        "change_count": 1060
+      },
+      {
+        "email": "mehmettalhaeren@gmail.com",
+        "username": "Alpagu",
+        "full_name": "Talha",
+        "date_joined": "2024-07-12T04:16:17.821523+00:00",
+        "change_count": 25
+      },
+      {
+        "email": "noreply-mt-weblate@weblate.org",
+        "username": "mt:weblate",
+        "full_name": "Weblate",
+        "date_joined": "2024-10-31T07:06:51.703636+00:00",
+        "change_count": 1
+      }
     ]
   }
 ]
