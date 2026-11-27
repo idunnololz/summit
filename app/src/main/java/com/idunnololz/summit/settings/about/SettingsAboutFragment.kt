@@ -5,6 +5,7 @@ import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
+import com.idunnololz.summit.misc.TermsOfServiceFragment
 import com.idunnololz.summit.settings.AboutSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.SettingModelItem
@@ -39,6 +40,7 @@ class SettingsAboutFragment : BaseSettingsFragment() {
       }),
     settings.googlePlayLink.asCustomItem { openAppOnPlayStore() },
     settings.giveFeedback.asCustomItem { showHelpAndFeedbackOptions() },
+    settings.terms.asCustomItem { TermsOfServiceFragment.show(childFragmentManager) },
     SettingModelItem.SubgroupItem(
       title = getString(R.string.supporters),
       settings = listOf(

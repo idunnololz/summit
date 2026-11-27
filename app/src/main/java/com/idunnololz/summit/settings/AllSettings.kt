@@ -1778,6 +1778,10 @@ class AboutSettings @Inject constructor(
     context.getString(R.string.translators),
     context.getString(R.string.translators_desc),
   )
+  val terms = BasicSettingItem(
+    null,
+    context.getString(R.string.terms_of_service),
+  )
 }
 
 class CacheSettings @Inject constructor(

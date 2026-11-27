@@ -2498,6 +2498,7 @@
     <string name="color_code_upvote_percentage">Color code upvote percentage</string>
     <string name="color_code_upvote_percentage_desc">When enabled content that has less than 50% upvote percentage will use the downvote color and content with over 50% upvote percentage will be upvote colored.</string>
     <string name="hide_fab_on_post_screen">Hide FAB button on post screen</string>
+    <string name="terms_of_service">Terms of service</string>
 
     <plurals name="warn_delete_drafts_format">
         <item quantity="one">Delete %1$s draft?</item>
