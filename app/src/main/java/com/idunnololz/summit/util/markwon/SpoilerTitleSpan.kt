@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper
+import com.idunnololz.summit.util.coil.AsyncDrawableSchedulerFixed
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
@@ -190,10 +191,11 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         val wrapper =
           object : DetailsClickableSpan() {
             override fun onClick(p0: View) {
+              AsyncDrawableSchedulerFixed.unschedule(textView)
               detailsStartSpan.isExpanded = !detailsStartSpan.isExpanded
               detailsStartSpan.isProcessed = false
               processSpoilers(textView, resetProcessed = false)
-              AsyncDrawableScheduler.schedule(textView)
+              AsyncDrawableSchedulerFixed.schedule(textView)
             }
 
             override fun updateDrawState(ds: TextPaint) {
