@@ -787,7 +787,7 @@ class LemmyContentHelper(
           if (isUrlVideo) {
             transformations(
               BlurTransformation(context, sampling = sampling),
-              VideoWatermarkTransformation(context)
+              VideoWatermarkTransformation(context),
             )
           } else {
             this.transformations(BlurTransformation(context, sampling = sampling))
@@ -895,7 +895,7 @@ class LemmyContentHelper(
           if (isUrlVideo) {
             transformations(
               BlurTransformation(context, sampling = sampling),
-              VideoWatermarkTransformation(context)
+              VideoWatermarkTransformation(context),
             )
           } else {
             this.transformations(BlurTransformation(context, sampling = sampling))

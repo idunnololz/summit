@@ -5,10 +5,10 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.util.arrow.Either
+import kotlin.collections.ifEmpty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.collections.ifEmpty
 
 class LanguageHelper(
   private val coroutineScope: CoroutineScope,

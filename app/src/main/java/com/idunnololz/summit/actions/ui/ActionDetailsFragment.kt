@@ -43,7 +43,6 @@ import com.idunnololz.summit.util.getColorWithAlpha
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions

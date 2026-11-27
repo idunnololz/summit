@@ -23,6 +23,7 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_MUTE_NSFW_VIDEOS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
@@ -36,6 +37,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_BASE_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_CACHE_POLICY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_CODE_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_SCHEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENTS_NAVIGATION_FAB
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENTS_NAVIGATION_FAB_OFF_X
@@ -78,6 +80,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_DUPLICATE_POSTS_ON_READ
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_FAB_ON_POST_SCREEN
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_READ_BY_DEFAULT
@@ -102,9 +105,6 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_ON_SCROLL
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_MUTE_NSFW_VIDEOS
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COLOR_CODE_UPVOTE_PERCENTAGE
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_FAB_ON_POST_SCREEN
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY

@@ -75,8 +75,8 @@ import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @AndroidEntryPoint
 class AddOrEditPostFragment :
@@ -1121,8 +1121,8 @@ class AddOrEditPostFragment :
     appendLine(
       getString(
         R.string.cross_posted_from_format,
-        ap_id.toHttpUrlOrNull()?.toString() ?: ap_id
-      )
+        ap_id.toHttpUrlOrNull()?.toString() ?: ap_id,
+      ),
     )
     appendLine()
 

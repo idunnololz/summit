@@ -2,8 +2,8 @@ package com.idunnololz.summit.video
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
@@ -30,7 +30,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.net.toUri
 
 @SuppressLint("UnsafeOptInUsageError")
 @Singleton

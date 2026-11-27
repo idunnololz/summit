@@ -747,20 +747,19 @@ class PieFedApiAlphaAdapter(
   override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Result<CommentReportResponse> =
-    retrofitErrorHandler {
-      api.resolveCommentReport(
-        generateHeaders(authorization, false),
-        PutCommentReportResolveRequest(
-          reportId = args.report_id,
-          resolved = args.resolved,
-        )
-      )
-    }.map {
-      CommentReportResponse(
-        comment_report_view = it.commentReportView.toCommentReportView(),
-      )
-    }
+  ): Result<CommentReportResponse> = retrofitErrorHandler {
+    api.resolveCommentReport(
+      generateHeaders(authorization, false),
+      PutCommentReportResolveRequest(
+        reportId = args.report_id,
+        resolved = args.resolved,
+      ),
+    )
+  }.map {
+    CommentReportResponse(
+      comment_report_view = it.commentReportView.toCommentReportView(),
+    )
+  }
 
   override suspend fun createPrivateMessage(
     authorization: String?,

@@ -160,14 +160,24 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
             issues.forEach {
               when (it) {
                 is PiiDetector.PiiIssue.SuspiciousKeyIssue ->
-                  appendLine(context.getString(
-                    R.string.sensitive_key_format, it.keyName, it.value))
+                  appendLine(
+                    context.getString(
+                      R.string.sensitive_key_format,
+                      it.keyName,
+                      it.value,
+                    ),
+                  )
                 is PiiDetector.PiiIssue.SuspiciousValueIssue ->
-                  appendLine(context.getString(
-                    R.string.sensitive_value_format, it.keyName, it.value))
+                  appendLine(
+                    context.getString(
+                      R.string.sensitive_value_format,
+                      it.keyName,
+                      it.value,
+                    ),
+                  )
               }
             }
-          }
+          },
         )
         setPositiveButton(android.R.string.ok) { _, _ -> }
       }

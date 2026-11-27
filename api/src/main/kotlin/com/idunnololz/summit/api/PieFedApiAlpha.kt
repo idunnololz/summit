@@ -368,7 +368,6 @@ interface PieFedApiAlpha {
     @QueryMap form: Map<String, String>,
   ): Call<ListPrivateMessagesResponse>
 
-
   /**
    * Get / fetch private messages.
    */

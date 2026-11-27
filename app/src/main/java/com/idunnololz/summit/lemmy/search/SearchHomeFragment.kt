@@ -58,7 +58,6 @@ import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.SearchHomeConfig
 import com.idunnololz.summit.preferences.anySectionsEnabled
-import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.util.AnimationsHelper
@@ -76,7 +75,6 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.showMoreLinkOptions

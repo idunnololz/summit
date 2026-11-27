@@ -450,10 +450,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
   ) {
 
     companion object {
-      fun ofSpan(
-        textView: TextView,
-        span: ClickableSpan,
-      ): ClickableSpanWithText? {
+      fun ofSpan(textView: TextView, span: ClickableSpan): ClickableSpanWithText? {
         val root = textView.text as? Spanned ?: return null
 
         fromSpanned(root, span)?.let {
@@ -469,10 +466,7 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
           .firstOrNull()
       }
 
-      private fun fromSpanned(
-        text: Spanned,
-        span: ClickableSpan,
-      ): ClickableSpanWithText? {
+      private fun fromSpanned(text: Spanned, span: ClickableSpan): ClickableSpanWithText? {
         val start = text.getSpanStart(span)
         val end = text.getSpanEnd(span)
 

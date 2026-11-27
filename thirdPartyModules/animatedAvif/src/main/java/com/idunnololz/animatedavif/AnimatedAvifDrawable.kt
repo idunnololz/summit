@@ -6,7 +6,6 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.SystemClock
@@ -35,7 +34,8 @@ class AnimatedAvifDrawable internal constructor(
   firstFrame: Bitmap,
   private val durations: DoubleArray,
   repetitionCount: Int,
-) : Drawable(), Animatable2Compat {
+) : Drawable(),
+  Animatable2Compat {
 
   private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
   private var frame = firstFrame

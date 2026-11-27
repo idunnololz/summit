@@ -83,7 +83,6 @@ import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -1021,14 +1020,14 @@ class InboxFragment :
                     Item.CompactInboxListItem(
                       inboxItem = item.item,
                       instance = inboxModel.instance,
-                    )
+                    ),
                   )
                 InboxLayoutId.FULL ->
                   newItems.add(
                     Item.FullInboxListItem(
                       inboxItem = item.item,
                       instance = inboxModel.instance,
-                    )
+                    ),
                   )
               }
             }

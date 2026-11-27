@@ -115,8 +115,8 @@ class MainApplication :
           add(
             AnimatedAvifDecoder.Factory(
               maxFrameSize = MAX_AVIF_SIZE,
-              isEnabled = { preferences.useBundledAvifDecoder }
-            )
+              isEnabled = { preferences.useBundledAvifDecoder },
+            ),
           )
           if (SDK_INT >= 28) {
             add(AnimatedImageDecoder.Factory())

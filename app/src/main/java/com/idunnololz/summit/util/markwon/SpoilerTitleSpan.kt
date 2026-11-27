@@ -15,7 +15,6 @@ import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
-import io.noties.markwon.image.AsyncDrawableScheduler
 import kotlin.math.max
 import org.commonmark.parser.Parser
 
@@ -190,7 +189,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
 
         val wrapper =
           object : DetailsClickableSpan() {
-            override fun onClick(p0: View) {
+            override fun onClick(view: View) {
               AsyncDrawableSchedulerFixed.unschedule(textView)
               detailsStartSpan.isExpanded = !detailsStartSpan.isExpanded
               detailsStartSpan.isProcessed = false

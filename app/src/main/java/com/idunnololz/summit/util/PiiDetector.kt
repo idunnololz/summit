@@ -1,11 +1,9 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.preferences.SENSITIVE_DATA_PREFIX
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
+import java.util.regex.Pattern
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.regex.Pattern
 
 class PiiDetector {
   private class ColumnRegexes {
@@ -121,12 +119,12 @@ class PiiDetector {
       val keyName: String,
       val value: String,
       val issue: ColumnNamePiiIssue,
-    ): PiiIssue
+    ) : PiiIssue
     class SuspiciousValueIssue(
       val keyName: String,
       val value: String,
       val issue: ValuePiiIssue,
-    ): PiiIssue
+    ) : PiiIssue
   }
 
   private val columnRegexes = ColumnRegexes()

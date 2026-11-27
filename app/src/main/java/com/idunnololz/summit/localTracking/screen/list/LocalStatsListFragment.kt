@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentLocalStatsListBinding
 import com.idunnololz.summit.databinding.LocalStatsListItemBinding
-import com.idunnololz.summit.localTracking.screen.LocalStatsFragment
 import com.idunnololz.summit.localTracking.screen.list.LocalStatsListModel.Item
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -20,7 +19,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.toErrorMessage

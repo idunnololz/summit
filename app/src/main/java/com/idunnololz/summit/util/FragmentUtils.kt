@@ -22,9 +22,7 @@ import com.idunnololz.summit.preview.VideoViewerFragment
 import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.accounts.SettingsAccountsFragment
 import com.idunnololz.summit.settings.cache.SettingsCacheFragment
-import com.idunnololz.summit.settings.commentQuickActions.CustomQuickActionsFragment
 import com.idunnololz.summit.you.YouFragment
 import kotlin.reflect.KClass
 
@@ -32,7 +30,7 @@ inline fun <reified T> BaseFragment<*>.setupForFragment(animate: Boolean = true)
   setupForFragment(T::class, animate)
 }
 
-inline fun <reified T: BaseFragment<*>> T.setupForThisFragment(animate: Boolean = true) {
+inline fun <reified T : BaseFragment<*>> T.setupForThisFragment(animate: Boolean = true) {
   setupForFragment(T::class, animate)
 }
 
@@ -69,7 +67,8 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
           hideNotificationBarBg()
         }
         BaseSettingsFragment::class,
-        SettingsFragment::class -> {
+        SettingsFragment::class,
+        -> {
           navBarController.hideNavBar()
           hideNotificationBarBg()
         }
@@ -82,12 +81,14 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
         }
         SearchHomeFragment::class,
         SearchTabbedFragment::class,
-        FilteredPostsAndCommentsTabbedFragment::class -> {
+        FilteredPostsAndCommentsTabbedFragment::class,
+        -> {
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         InboxFragment::class,
-        InboxTabbedFragment::class -> {
+        InboxTabbedFragment::class,
+        -> {
           showNotificationBarBg()
         }
         ActionDetailsFragment::class -> {

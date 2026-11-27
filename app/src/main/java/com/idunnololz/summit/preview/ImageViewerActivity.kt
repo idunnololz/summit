@@ -881,7 +881,7 @@ class ImageViewerActivity :
                     drawable.getFirstFrameAsDrawable(resources)
                   } else {
                     drawable
-                  }
+                  },
                 )
                 binding.imageView.setImageDrawable(drawable)
 

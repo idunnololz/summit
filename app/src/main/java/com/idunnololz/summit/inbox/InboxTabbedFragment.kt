@@ -31,7 +31,6 @@ import com.idunnololz.summit.inbox.message.MessageFragment
 import com.idunnololz.summit.inbox.message.MessageFragmentArgs
 import com.idunnololz.summit.inbox.report.ReportDetailsFragment
 import com.idunnololz.summit.inbox.report.ReportDetailsFragmentArgs
-import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
@@ -40,7 +39,6 @@ import com.idunnololz.summit.util.arrow.Either
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import dagger.hilt.android.AndroidEntryPoint

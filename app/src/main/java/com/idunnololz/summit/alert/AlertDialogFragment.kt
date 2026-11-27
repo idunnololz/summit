@@ -3,7 +3,6 @@ package com.idunnololz.summit.alert
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -18,7 +17,6 @@ import com.idunnololz.summit.alert.AlertDialogFragment.Builder
 import com.idunnololz.summit.alert.AlertDialogFragment.Launcher
 import com.idunnololz.summit.alert.AlertDialogFragment.Result
 import com.idunnololz.summit.util.getParcelableCompat
-import io.noties.markwon.Markwon
 import kotlinx.parcelize.Parcelize
 
 class AlertDialogFragment : DialogFragment() {

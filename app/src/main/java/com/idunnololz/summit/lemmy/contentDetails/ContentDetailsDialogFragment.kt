@@ -32,7 +32,6 @@ import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToFullDateTime
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint

@@ -18,7 +18,6 @@ import com.idunnololz.summit.databinding.DialogFragmentDebugBinding
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostItem
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupToolbar

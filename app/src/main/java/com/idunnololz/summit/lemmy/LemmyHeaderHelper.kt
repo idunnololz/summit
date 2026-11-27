@@ -947,9 +947,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
   }
 
   @Suppress("NOTHING_TO_INLINE")
-  private inline fun SpannableStringBuilder.appendUpvotePercent(
-    upvotePercent: Float
-  ) {
+  private inline fun SpannableStringBuilder.appendUpvotePercent(upvotePercent: Float) {
     val start = length
     append(PrettyPrintUtils.defaultShortPercentFormat.format(upvotePercent))
 

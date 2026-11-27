@@ -476,7 +476,7 @@ class PostFragment :
               downloadContext = postOrCommentView?.toFileDownloadContext(),
               isVideoNsfw = postOrCommentView?.fold(
                 { it.post },
-                { it.post }
+                { it.post },
               )?.nsfw ?: false,
             )
           },

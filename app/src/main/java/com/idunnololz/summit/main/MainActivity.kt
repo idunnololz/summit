@@ -74,7 +74,6 @@ import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.linkEditor.LinkEditorDialogFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkFixer
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.localTracking.screen.community.LocalStatsCommunityDialogFragment

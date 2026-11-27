@@ -13,5 +13,5 @@ data class InstanceEmoji(
 val InstanceEmoji.markdownCode: String
   get() {
     val altText = altText.takeIf { it.isNotBlank() } ?: shortcode
-    return "![${altText}](${imageUrl} \"emoji ${shortcode}\")"
+    return "![$altText]($imageUrl \"emoji ${shortcode}\")"
   }

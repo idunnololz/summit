@@ -359,7 +359,7 @@ class TextFormatToolbarViewHolder(
             when (it) {
               is EmojiPickerBottomSheet.SelectedEmoji.SelectedInstanceEmoji -> it.emoji.markdownCode
               is EmojiPickerBottomSheet.SelectedEmoji.SelectedTextEmoji -> it.text
-            }
+            },
           )
         },
       ).show(it)

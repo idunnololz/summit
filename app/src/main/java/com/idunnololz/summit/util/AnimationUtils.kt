@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.Transformation
-import android.widget.ScrollView
 
 private const val TAG = "AnimationUtils"
 
@@ -246,7 +245,7 @@ object AnimationUtils {
 
       AnimatorSet().apply {
         playSequentially(
-          ObjectAnimator.ofInt(scrollView, "scrollX", startScrollX, target,).apply {
+          ObjectAnimator.ofInt(scrollView, "scrollX", startScrollX, target).apply {
             startDelay = 1400L
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
@@ -255,7 +254,7 @@ object AnimationUtils {
             startDelay = 170L
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
-          }
+          },
         )
       }.start()
     } catch (e: Exception) {

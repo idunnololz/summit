@@ -39,7 +39,6 @@ import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
 import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.AnimationsHelper
@@ -52,7 +51,6 @@ import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupForThisFragment
 import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider

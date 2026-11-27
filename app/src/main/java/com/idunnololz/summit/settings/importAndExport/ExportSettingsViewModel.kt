@@ -19,16 +19,13 @@ import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
@@ -83,7 +80,7 @@ class ExportSettingsViewModel @Inject constructor(
 
   fun getBackupFileName(): String {
     val now = Instant.fromEpochSeconds(Clock.System.now().epochSeconds)
-    return "summit-backup-${now}.summitbackup"
+    return "summit-backup-$now.summitbackup"
   }
 
   fun saveToInternalBackups(

@@ -14,14 +14,12 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.NavBarController
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.video.VideoState
-import javax.inject.Inject
 
 abstract class SummitActivity :
   BaseActivity(),

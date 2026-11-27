@@ -49,8 +49,12 @@ class EmojiPickerBottomSheet @AssistedInject constructor(
 ) : BottomSheetDialog(context) {
 
   sealed interface SelectedEmoji {
-    class SelectedTextEmoji(val text: String) : SelectedEmoji
-    class SelectedInstanceEmoji(val emoji: InstanceEmoji) : SelectedEmoji
+    class SelectedTextEmoji(
+      val text: String,
+    ) : SelectedEmoji
+    class SelectedInstanceEmoji(
+      val emoji: InstanceEmoji,
+    ) : SelectedEmoji
   }
 
   @AssistedFactory
@@ -216,7 +220,9 @@ class EmojiPickerBottomSheet @AssistedInject constructor(
   }
 
   private fun getPredictiveBackBackPressCallback(): OnBackPressedCallback {
-    val predictiveBackMargin = context.resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
+    val predictiveBackMargin = context.resources.getDimensionPixelSize(
+      R.dimen.predictive_back_margin,
+    )
     var initialTouchY = -1f
 
     return object : OnBackPressedCallback(true) {
@@ -339,11 +345,14 @@ class EmojiPickerBottomSheet @AssistedInject constructor(
       adapterHelper.onBindViewHolder(holder, position)
 
     fun setItems(items: List<InstanceEmoji>, cb: () -> Unit) {
-      adapterHelper.setItems(items.map {
-        Item.EmojiItem(
-          it
-        )
-      }, this) { cb() }
+      adapterHelper.setItems(
+        items.map {
+          Item.EmojiItem(
+            it,
+          )
+        },
+        this,
+      ) { cb() }
     }
   }
 

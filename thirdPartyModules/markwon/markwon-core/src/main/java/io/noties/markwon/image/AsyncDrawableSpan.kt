@@ -93,7 +93,8 @@ class AsyncDrawableSpan(
     canvasSize = canvasWidth
 
     if (canvasWidth - x.toInt() < minWidth ||
-      canvasWidth - x.toInt() < drawable.intrinsicWidth) {
+      canvasWidth - x.toInt() < drawable.intrinsicWidth
+    ) {
       // Just take the entire column...
       drawable.initWithKnownDimensions(
         max(canvasWidth, minWidth),

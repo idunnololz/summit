@@ -146,7 +146,7 @@ object AsyncDrawableSchedulerFixed {
           accumulator = accumulator,
           spannable = spannable,
           tableRow = row,
-          outermostTableRow = outermostTableRow ?: row
+          outermostTableRow = outermostTableRow ?: row,
         )
       }
     }

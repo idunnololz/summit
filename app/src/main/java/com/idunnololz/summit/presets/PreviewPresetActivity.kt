@@ -42,7 +42,6 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
-import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.main.MainFragmentArgs

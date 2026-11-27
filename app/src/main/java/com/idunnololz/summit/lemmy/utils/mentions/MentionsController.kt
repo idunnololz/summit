@@ -199,7 +199,6 @@ class MentionsController @AssistedInject constructor(
           "$text ",
         )
       } catch (_: Exception) {
-
       }
     }
 
@@ -393,7 +392,6 @@ class MentionsAutoCompleteRepository(
           it,
         )
       }
-
 
     internalResult.emit(
       QueryResult(
